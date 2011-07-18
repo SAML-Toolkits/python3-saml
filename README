@@ -4,7 +4,7 @@ Python SAML
 
 This Python SAML toolkit provides functionality for creating SAML AuthnRequests
 which can be sent to an identity provider and for verifying SAML Responses from
-an identity provider. Onelogin is an example of an identity provider.
+an identity provider. OneLogin is an example of an identity provider.
 
 Non-Python Requirements
 =======================
@@ -116,7 +116,7 @@ the SAML Consumer URL field.
 Receiving and verifying the response
 ------------------------------------
 The user will then be redirected to the OneLogin login page where they will
-enter their credentials in order to verify their identity. After Onelogin has
+enter their credentials in order to verify their identity. After OneLogin has
 verified their identity, it will redirect the user to the
 assertion_consumer_service_url--http://localhost:7070/example/saml/consume.
 

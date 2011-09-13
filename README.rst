@@ -75,7 +75,7 @@ not be used for anything other than exploring and testing.
 Creating and sending the AuthnRequest to the identity provider
 --------------------------------------------------------------
 The identification flow starts when a user requests a resource from the service
-provider which, in this case, is implemented in our example app. In our example,
+provider which, in this case, is implemented in our example app. In our example
 the user requests a resource by going to the root path of our app, i.e,::
 
     http://localhost:7070/
@@ -117,7 +117,7 @@ Receiving and verifying the response
 ------------------------------------
 The user will then be redirected to the OneLogin login page where they will
 enter their credentials in order to verify their identity. After OneLogin has
-verified their identity, it will redirect the user to the
+verified their identity it will redirect the user to the
 assertion_consumer_service_url--http://localhost:7070/example/saml/consume.
 
 Our example app then verifies the SAML Response from OneLogin using the fingerprint

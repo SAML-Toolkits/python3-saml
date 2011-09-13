@@ -81,7 +81,7 @@ class Response(object):
 
     name_id = property(
         fget=_get_name_id,
-        doc="The identity provider to which the user belongs",
+        doc="The value requested in the name_identifier_format, e.g., the user's email address",
         )
 
     def is_valid(

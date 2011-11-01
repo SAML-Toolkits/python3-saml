@@ -61,7 +61,7 @@ def create(
         nsmap=dict(saml='urn:oasis:names:tc:SAML:2.0:assertion'),
         )
 
-    authn_request = samlp_maker.AuthRequest(
+    authn_request = samlp_maker.AuthnRequest(
         ProtocolBinding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         Version='2.0',
         IssueInstant=now_iso,

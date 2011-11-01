@@ -9,7 +9,7 @@ from StringIO import StringIO
 from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 
-from onelogin.saml import AuthRequest, Response
+from onelogin.saml import AuthnRequest, Response
 
 __version__ = '0.1'
 
@@ -57,7 +57,7 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
             self._bad_request()
             return
 
-        url = AuthRequest.create(**self.settings)
+        url = AuthnRequest.create(**self.settings)
         self.send_response(301)
         self.send_header("Location", url)
         self.end_headers()
@@ -78,7 +78,7 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
         valid = res.is_valid()
         name_id = res.name_id
         if valid:
-            msg = 'The identify of {name_id} has been verified'.format(
+            msg = 'The identity of {name_id} has been verified'.format(
                 name_id=name_id,
                 )
             self._serve_msg(200, msg)

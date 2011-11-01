@@ -85,13 +85,13 @@ in the form of URL string which we use to redirect the user to our identity
 provider--OneLogin::
 
         from BaseHTTPServer import BaseHTTPRequestHandler
-        from onelogin.saml import AuthRequest
+        from onelogin.saml import AuthnRequest
         ...
         class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
           ...
           def do_GET(self):
             ...
-            url = AuthRequest.create(**self.settings)
+            url = AuthnRequest.create(**self.settings)
             self.send_response(301)
             self.send_header("Location", url)
             self.end_headers()
@@ -135,7 +135,7 @@ of the public certificate originally obtained from OneLogin::
             valid = res.is_valid()
             name_id = res.name_id
             if valid:
-                msg = 'The identify of {name_id} has been verified'.format(
+                msg = 'The identity of {name_id} has been verified'.format(
                     name_id=name_id,
                     )
                 self._serve_msg(200, msg)

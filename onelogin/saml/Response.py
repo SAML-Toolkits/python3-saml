@@ -1,7 +1,7 @@
 import base64
 
 from lxml import etree
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from onelogin.saml import SignatureVerifier
 
@@ -103,6 +103,8 @@ class Response(object):
             namespaces=namespaces,
             )
 
+        now = _clock()
+
         not_before = None
         not_on_or_after = None
         for condition in conditions:
@@ -110,14 +112,13 @@ class Response(object):
             not_before = condition.attrib.get('NotBefore', None)
 
         if not_before is None:
-            raise ResponseConditionError('Did not find NotBefore condition')
+            #notbefore condition is not mandatory. If it is not specified, use yesterday as not_before condition
+            not_before = (now-timedelta(1,0,0)).strftime('%Y-%m-%dT%H:%M:%SZ')
         if not_on_or_after is None:
             raise ResponseConditionError('Did not find NotOnOrAfter condition')
 
         not_before = self._parse_datetime(not_before)
         not_on_or_after = self._parse_datetime(not_on_or_after)
-
-        now = _clock()
 
         if now < not_before:
             raise ResponseValidationError(

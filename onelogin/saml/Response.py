@@ -84,6 +84,13 @@ class Response(object):
         doc="The value requested in the name_identifier_format, e.g., the user's email address",
         )
 
+    def get_assertion_attribute_value(self,attribute_name):
+        """
+        Get the value of an AssertionAttribute, located in an Assertion/AttributeStatement/Attribute[@Name=attribute_name/AttributeValue tag
+        """
+        result = self._document.xpath('/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="%s"]/saml:AttributeValue'%attribute_name,namespaces=namespaces)
+        return [n.text.strip() for n in result]
+
     def is_valid(
         self,
         _clock=None,

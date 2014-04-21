@@ -58,7 +58,10 @@ class Response(object):
         self._signature = signature
 
     def _parse_datetime(self, dt):
-        return datetime.strptime(dt, '%Y-%m-%dT%H:%M:%SZ')
+        try:
+            return datetime.strptime(dt, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            return datetime.strptime(dt, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def _get_name_id(self):
         result = self._document.xpath(

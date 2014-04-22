@@ -15,6 +15,7 @@ __version__ = '0.1'
 
 log = logging.getLogger(__name__)
 
+
 class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
     server_version = 'SampleAppHTTPRequestHandler/%s' % __version__
 
@@ -57,7 +58,7 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
             self._bad_request()
             return
 
-        url = AuthnRequest.create(**self.settings)
+        url = AuthRequest.create(**self.settings)
         self.send_response(301)
         self.send_header("Location", url)
         self.end_headers()
@@ -74,26 +75,27 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
         res = Response(
             query['SAMLResponse'].pop(),
             self.settings['idp_cert_fingerprint'],
-            )
+        )
         valid = res.is_valid()
         name_id = res.name_id
         if valid:
             msg = 'The identity of {name_id} has been verified'.format(
                 name_id=name_id,
-                )
+            )
             self._serve_msg(200, msg)
         else:
             msg = '{name_id} is not authorized to use this resource'.format(
                 name_id=name_id,
-                )
+            )
             self._serve_msg(401, msg)
+
 
 def main(config_file):
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s.%(msecs)03d example: %(levelname)s: %(message)s',
         datefmt='%Y-%m-%dT%H:%M:%S',
-        )
+    )
 
     config = ConfigParser.RawConfigParser()
     config_path = os.path.expanduser(config_file)
@@ -109,27 +111,27 @@ def main(config_file):
     settings['assertion_consumer_service_url'] = config.get(
         'saml',
         'assertion_consumer_service_url'
-        )
+    )
     settings['issuer'] = config.get(
         'saml',
         'issuer'
-        )
+    )
     settings['name_identifier_format'] = config.get(
         'saml',
         'name_identifier_format'
-        )
+    )
     settings['idp_sso_target_url'] = config.get(
         'saml',
         'idp_sso_target_url'
-        )
+    )
     settings['idp_cert_file'] = config.get(
         'saml',
         'idp_cert_file'
-        )
+    )
     settings['idp_cert_fingerprint'] = config.get(
         'saml',
         'idp_cert_fingerprint'
-        )
+    )
 
     cert_file = settings.pop('idp_cert_file', None)
 
@@ -148,7 +150,7 @@ def main(config_file):
     httpd = HTTPServer(
         (host, port),
         SampleAppHTTPRequestHandler,
-        )
+    )
 
     socket_name = httpd.socket.getsockname()
 
@@ -156,24 +158,24 @@ def main(config_file):
         'Serving HTTP on {host} port {port} ...'.format(
             host=socket_name[0],
             port=socket_name[1],
-            )
         )
+    )
 
     httpd.serve_forever()
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(
         usage='%prog [OPTS]',
-        )
+    )
     parser.add_option(
         '--config-file',
         metavar='PATH',
         help='The configuration file containing the app and SAML settings',
-        )
+    )
 
     parser.set_defaults(
         config_file='example.cfg'
-        )
+    )
 
     options, args = parser.parse_args()
     if args:

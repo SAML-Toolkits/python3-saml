@@ -85,13 +85,13 @@ in the form of URL string which we use to redirect the user to our identity
 provider--OneLogin::
 
         from BaseHTTPServer import BaseHTTPRequestHandler
-        from onelogin.saml import AuthnRequest
+        from onelogin.saml import AuthRequest
         ...
         class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
           ...
           def do_GET(self):
             ...
-            url = AuthnRequest.create(**self.settings)
+            url = AuthRequest.create(**self.settings)
             self.send_response(301)
             self.send_header("Location", url)
             self.end_headers()

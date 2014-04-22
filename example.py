@@ -59,7 +59,9 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
             return
 
         url = AuthRequest.create(**self.settings)
-        self.send_response(301)
+        self.send_response(302)
+        self.send_header("Cache-Control", "no-cache, no-store")
+        self.send_header("Pragma", "no-cache")
         self.send_header("Location", url)
         self.end_headers()
 

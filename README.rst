@@ -57,8 +57,8 @@ To run the unit-tests::
 
 Running the example app
 =======================
-To run with the default configuration file, example.cfg, which needs to be
-filled out completely::
+To run with the default configuration, copy example.cfg.dist to example.cfg,
+and fill it out completely. Then run the example with::
 
     python setup.py example
 

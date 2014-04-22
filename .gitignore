@@ -15,3 +15,7 @@
 /eggs
 /build
 /dist
+
+example.cfg
+*.crt
+*.pem

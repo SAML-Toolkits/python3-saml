@@ -283,11 +283,11 @@ class TestResponse(object):
          <saml:SubjectConfirmationData
            InResponseTo="identifier_1"
            Recipient="https://sp.example.com/SAML2/SSO/POST"
-           NotOnOrAfter="2004-12-05T09:27:05Z"/>
+           NotOnOrAfter="2024-12-05T09:27:05Z"/>
        </saml:SubjectConfirmation>
      </saml:Subject>
      <saml:Conditions
-       NotOnOrAfter="2004-12-05T09:27:05Z">
+       NotOnOrAfter="2024-12-05T09:27:05Z">
        <saml:AudienceRestriction>
          <saml:Audience>https://sp.example.com/SAML2</saml:Audience>
        </saml:AudienceRestriction>
@@ -307,18 +307,23 @@ class TestResponse(object):
         encoded_response = base64.b64encode(response)
         res = Response(
             response=encoded_response,
-            signature=None,
-            )
-        msg = assert_raises(
-            ResponseConditionError,
-            res.is_valid,
+            signature='foo signature',
             )
 
-        eq(str(msg),
-           ('There was a problem validating a condition: Did not find NotBefore '
-            + 'condition'
-            ),
-           )
+        fake_verifier = fudge.Fake(
+            'verifier',
+            callable=True,
+            )
+        fake_verifier.times_called(1)
+        fake_verifier.with_args(res._document, 'foo signature')
+
+        fake_verifier.returns(True)
+
+        msg = res.is_valid(
+            _verifier=fake_verifier,
+            )
+
+        eq(msg, True)
 
     @fudge.with_fakes
     def test_is_valid_not_on_or_after_missing(self):

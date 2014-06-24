@@ -105,7 +105,13 @@ def create(_clock=None, _uuid=None, _zlib=None, _base64=None,
         [('SAMLRequest', encoded_request)],
     )
 
-    return '{url}?{query}'.format(
+    if '?' in idp_sso_target_url:
+        separator = '&'
+    else:
+        separator = '?'
+
+    return '{url}{sep}{query}'.format(
         url=idp_sso_target_url,
+        sep=separator,
         query=urlencoded_request,
     )

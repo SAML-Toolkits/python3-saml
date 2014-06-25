@@ -23,9 +23,7 @@ class TestAuthRequest(object):
         fake_zlib = fudge.Fake('zlib')
         fake_zlib.remember_order()
         fake_compress = fake_zlib.expects('compress')
-        fake_compress.with_args(
-"""<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Version="2.0" IssueInstant="2011-07-09T19:24:52" ID="hex_uuid" AssertionConsumerServiceURL="http://foo.bar/consume"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">foo_issuer</saml:Issuer><samlp:NameIDPolicy AllowCreate="true" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/><samlp:RequestedAuthnContext Comparison="exact"><saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp:AuthnRequest>"""
-)
+        uncompressed_req = """<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Version="2.0" IssueInstant="2011-07-09T19:24:52" ID="hex_uuid" AssertionConsumerServiceURL="http://foo.bar/consume"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">foo_issuer</saml:Issuer><samlp:NameIDPolicy AllowCreate="true" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/><samlp:RequestedAuthnContext Comparison="exact"><saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp:AuthnRequest>"""
         fake_compress.returns('HDfoo_compressedCHCK')
 
         fake_base64 = fudge.Fake('base64')

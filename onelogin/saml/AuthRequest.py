@@ -54,7 +54,7 @@ def create(_clock=None, _uuid=None, _zlib=None, _base64=None,
     # http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf Section
     # 1.3.3
     now = now.replace(microsecond=0)
-    now_iso = now.isoformat()
+    now_iso = now.isoformat() + 'Z'
 
     unique_id = _uuid()
     unique_id = unique_id.hex

@@ -75,6 +75,12 @@ def verify(document, signature, _etree=None, _tempfile=None, _subprocess=None,
     if _os is None:
         _os = os
 
+    signatureNodes = document.xpath("//ds:Signature", namespaces={'ds': 'http://www.w3.org/2000/09/xmldsig#'})
+
+    parent_id_container = 'urn:oasis:names:tc:SAML:2.0:assertion:Assertion'
+    if signatureNodes and signatureNodes[0].getparent().tag == '{urn:oasis:names:tc:SAML:2.0:protocol}Response':
+        parent_id_container = 'urn:oasis:names:tc:SAML:2.0:protocol:Response'
+
     xmlsec_bin = _get_xmlsec_bin()
 
     verified = False
@@ -117,7 +123,7 @@ def verify(document, signature, _etree=None, _tempfile=None, _subprocess=None,
                     '--pubkey-cert-pem',
                     cert_filename,
                     '--id-attr:ID',
-                    'urn:oasis:names:tc:SAML:2.0:assertion:Assertion',
+                    parent_id_container,
                     xml_filename,
                 ]
 

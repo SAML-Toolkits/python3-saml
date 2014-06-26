@@ -83,7 +83,7 @@ class Response(object):
 
         self._request_data = request_data
         decoded_response = _base64.b64decode(response)
-        self._document = _etree.fromstring(decoded_response)
+        self._document = _etree.fromstring(decoded_response, parser=_etree.XMLParser())
         self._signature = signature
         self._issuer = issuer
 

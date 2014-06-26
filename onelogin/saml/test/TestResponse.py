@@ -81,8 +81,12 @@ class TestResponse(object):
 
         fake_etree = fudge.Fake('etree')
         fake_etree.remember_order()
+        xmlparser = fake_etree.expects('XMLParser')
+        xmlparser.with_arg_count(0)
+        fake_xmlparser = fudge.Fake('etree.XMLParser')
+        xmlparser.returns(fake_xmlparser)
         from_string = fake_etree.expects('fromstring')
-        from_string.with_args('foo decoded response')
+        from_string.with_args('foo decoded response', parser=fake_xmlparser)
         from_string.returns('foo document')
 
         res = Response(

@@ -4,11 +4,13 @@ from lxml import etree
 from datetime import datetime, timedelta
 
 from onelogin.saml import SignatureVerifier
+from onelogin.saml.Utils import get_self_url_no_query
 
 
 namespaces = dict(
     samlp='urn:oasis:names:tc:SAML:2.0:protocol',
     saml='urn:oasis:names:tc:SAML:2.0:assertion',
+    ds='http://www.w3.org/2000/09/xmldsig#',
 )
 
 
@@ -38,8 +40,36 @@ class ResponseConditionError(Exception):
     def __str__(self):
         return '%s: %s' % (self.__doc__, self._msg)
 
+
+class ResponseFormatError(Exception):
+    """There was a problem validating the format"""
+    def __init__(self, msg):
+        self._msg = msg
+
+    def __str__(self):
+        return '%s: %s' % (self.__doc__, self._msg)
+
+
+class ResponseDestinationError(Exception):
+    """There was a problem validating a destination"""
+    def __init__(self, msg):
+        self._msg = msg
+
+    def __str__(self):
+        return '%s: %s' % (self.__doc__, self._msg)
+
+
+class ResponseSubjectConfirmationError(Exception):
+    """There was a problem validating the response, no valid SubjectConfirmation found"""
+    def __init__(self, msg):
+        self._msg = msg
+
+    def __str__(self):
+        return '%s: %s' % (self.__doc__, self._msg)
+
+
 class Response(object):
-    def __init__(self, response, signature, _base64=None, _etree=None, issuer=None):
+    def __init__(self, request_data, response, signature, _base64=None, _etree=None, issuer=None):
         """
         Extract information from an samlp:Response
         Arguments:
@@ -51,6 +81,7 @@ class Response(object):
         if _etree is None:
             _etree = etree
 
+        self._request_data = request_data
         decoded_response = _base64.b64decode(response)
         self._document = _etree.fromstring(decoded_response)
         self._signature = signature
@@ -93,11 +124,58 @@ class Response(object):
         result = self._document.xpath('/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="%s"]/saml:AttributeValue' % attribute_name, namespaces=namespaces)
         return [n.text.strip() for n in result]
 
+    def get_audiences(self):
+        """
+        Gets the audiences
+
+        :returns: The valid audiences for the SAML Response
+        :rtype: list
+        """
+        audiences = []
+
+        audience_nodes = self._document.xpath(
+            '/samlp:Response/saml:Assertion/saml:Conditions/saml:AudienceRestriction/saml:Audience',
+            namespaces=namespaces,
+        )
+        for audience_node in audience_nodes:
+            audiences.append(audience_node.text)
+        return audiences
+
+    def validate_num_assertions(self):
+        """
+        Verifies that the document only contains a single Assertion (encrypted or not)
+
+        :returns: True if only 1 assertion encrypted or not
+        :rtype: bool
+        """
+        #Not encrypted assertion supported yet
+        #encrypted_assertion_nodes = self._document.xpath('//saml:EncryptedAssertion')
+        assertion_nodes = self._document.xpath(
+            '//saml:Assertion',
+            namespaces=namespaces,
+        )
+        return len(assertion_nodes) == 1
+
     def is_valid(self, _clock=None, _verifier=None):
         """
         Verify that the samlp:Response is valid.
         Return True if valid, otherwise False.
         """
+
+        # Checks SAML version
+        if self._document.get('Version', None) != '2.0':
+            raise ResponseFormatError('Unsupported SAML version')
+
+        # Checks that ID exists
+        if self._document.get('ID', None) is None:
+            raise ResponseFormatError('Missing ID attribute on SAML Response')
+
+        # Checks that the response only has one assertion
+        if not self.validate_num_assertions():
+            raise ResponseFormatError('Only 1 Assertion in the SAMLResponse is supported')
+
+
+
         if _clock is None:
             _clock = datetime.utcnow
         if _verifier is None:
@@ -110,44 +188,74 @@ class Response(object):
 
         now = _clock()
 
-        foundCondition = False
-        fountConditionAndAudience = False
-
         for condition in conditions:
             
             not_before = condition.attrib.get('NotBefore', None)
             not_on_or_after = condition.attrib.get('NotOnOrAfter', None)
             
             if not_before is None:
-                #notbefore condition is not mandatory. If it is not specified, use yesterday as not_before condition
                 not_before = (now - timedelta(0, 5, 0)).strftime('%Y-%m-%dT%H:%M:%SZ')
             if not_on_or_after is None:
-                continue
+                not_on_or_after = (now + timedelta(0, 5, 0)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
             not_before = self._parse_datetime(not_before)
             not_on_or_after = self._parse_datetime(not_on_or_after)
 
             if now < not_before:
-                continue
+                raise ResponseConditionError('Timmig issue')
             if now >= not_on_or_after:
+                raise ResponseConditionError('Timmig issue')
+
+        current_url = get_self_url_no_query(self._request_data)
+
+        # Checks destination
+        destination = self._document.get('Destination', None)
+        if destination and destination not in current_url:
+            raise ResponseDestinationError('The response was received at %s instead of %s' % (current_url, destination))
+
+        # Checks audience
+        valid_audiences = self.get_audiences()
+        if valid_audiences and self._issuer not in valid_audiences:
+            raise ResponseConditionError('%s is not a valid audience for this Response' % self._issuer)
+
+        # Checks the SubjectConfirmation, at least one SubjectConfirmation must be valid
+        any_subject_confirmation = False
+        subject_confirmation_nodes = self._document.xpath(
+            '//saml:Subject/saml:SubjectConfirmation',
+            namespaces=namespaces
+        )
+
+        in_response_to = self._document.get('InResponseTo', None)
+        for scn in subject_confirmation_nodes:
+            method = scn.get('Method', None)
+            if method and method != 'urn:oasis:names:tc:SAML:2.0:cm:bearer':
                 continue
-            foundCondition = True
+            scData = scn.find('saml:SubjectConfirmationData', namespaces=namespaces)
+            if scData is None:
+                continue
+            else:
+                irt = scData.get('InResponseTo', None)
+                if irt != in_response_to:
+                    continue
+                recipient = scData.get('Recipient', None)
+                if recipient not in current_url:
+                    continue
+                nooa = scData.get('NotOnOrAfter', None)
+                if nooa:
+                    parsed_nooa = self._parse_datetime(nooa)
+                    if parsed_nooa <= now:
+                        continue
+                nb = scData.get('NotBefore', None)
+                if nb:
+                    parsed_nb = self._parse_datetime(nb)
+                    if parsed_nb > now:
+                        continue
+                any_subject_confirmation = True
+                break
 
-            if self._issuer:
-                audiences = condition.xpath(
-                    '/samlp:Response/saml:Assertion/saml:Conditions/saml:AudienceRestriction/saml:Audience',
-                    namespaces=namespaces,
-                )
-                audienceValues = []
-                for audience in audiences:
-                    audienceValues.append(audience.text)
-                if self._issuer in audienceValues:
-                    fountConditionAndAudience = True
+        if not any_subject_confirmation:
+            raise ResponseSubjectConfirmationError('A valid SubjectConfirmation was not found on this Response')
 
-        if not foundCondition:
-            raise ResponseConditionError('Timmig issue')
-        if foundCondition and not fountConditionAndAudience:
-            raise ResponseConditionError('Not valid Audience')
 
         return _verifier(
             self._document,

@@ -77,3 +77,98 @@ def format_cert(cert, heads=True):
             x509_cert = '-----BEGIN CERTIFICATE-----\n' + '\n'.join(wrap(x509_cert, 64)) + '\n-----END CERTIFICATE-----\n'
 
     return x509_cert
+
+
+def get_self_url_no_query(request_data):
+    """
+    Returns the URL of the current host + current view.
+
+    :param request_data: The request as a dict
+    :type: dict
+
+    :return: The url of current host + current view
+    :rtype: string
+    """
+    self_url_host = get_self_url_host(request_data)
+    script_name = request_data['script_name']
+    if script_name and script_name[0] != '/':
+        script_name = '/' + script_name
+    self_url_host += script_name
+    if 'path_info' in request_data:
+        self_url_host += request_data['path_info']
+
+    return self_url_host
+
+
+def get_self_url_host(request_data):
+    """
+    Returns the protocol + the current host + the port (if different than
+    common ports).
+
+    :param request_data: The request as a dict
+    :type: dict
+
+    :return: Url
+    :rtype: string
+    """
+    current_host = get_self_host(request_data)
+    port = ''
+    if is_https(request_data):
+        protocol = 'https'
+    else:
+        protocol = 'http'
+
+    if 'server_port' in request_data:
+        port_number = request_data['server_port']
+        port = ':' + port_number
+
+        if protocol == 'http' and port_number == '80':
+            port = ''
+        elif protocol == 'https' and port_number == '443':
+            port = ''
+
+    return '%s://%s%s' % (protocol, current_host, port)
+
+
+def get_self_host(request_data):
+    """
+    Returns the current host.
+
+    :param request_data: The request as a dict
+    :type: dict
+
+    :return: The current host
+    :rtype: string
+    """
+    if 'http_host' in request_data:
+        current_host = request_data['http_host']
+    elif 'server_name' in request_data:
+        current_host = request_data['server_name']
+    else:
+        raise Exception('No hostname defined')
+
+    if ':' in current_host:
+        current_host_data = current_host.split(':')
+        possible_port = current_host_data[-1]
+        try:
+            possible_port = float(possible_port)
+            current_host = current_host_data[0]
+        except ValueError:
+            current_host = ':'.join(current_host_data)
+
+    return current_host
+
+
+def is_https(request_data):
+    """
+    Checks if https or http.
+
+    :param request_data: The request as a dict
+    :type: dict
+
+    :return: False if https is not active
+    :rtype: boolean
+    """
+    is_https = 'https' in request_data and request_data['https'] != 'off'
+    is_https = is_https or ('server_port' in request_data and request_data['server_port'] == '443')
+    return is_https

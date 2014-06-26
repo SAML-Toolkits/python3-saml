@@ -43,6 +43,19 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
         """Serve Bad Request (400)."""
         self._serve_msg(400, 'Bad Request')
 
+    def prepare_request(self):
+        request_data = {}
+        request_data['server_name'] = self.server.server_name
+        request_data['server_port'] = str(self.server.server_port)
+        request_data['path_info'] = self.path
+        request_data['request_uri'] = self.path
+        request_data['script_name'] = ''
+        if self.protocol_version == 'HTTP/1.0':
+            request_data['https'] = 'off'
+        else:
+            request_data['https'] = 'on'
+        return request_data
+
     def log_message(self, format, *args):
         log.info(format % args)
 
@@ -72,11 +85,12 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
         if not self.path == self.saml_post_path:
             self._bad_request()
             return
-
+        request_data = self.prepare_request()
         length = int(self.headers['Content-Length'])
         data = self.rfile.read(length)
         query = urlparse.parse_qs(data)
         res = Response(
+            request_data,
             query['SAMLResponse'].pop(),
             self.settings['idp_cert_fingerprint'],
             issuer=self.settings['issuer']

@@ -38,9 +38,8 @@ class ResponseConditionError(Exception):
     def __str__(self):
         return '%s: %s' % (self.__doc__, self._msg)
 
-
 class Response(object):
-    def __init__(self, response, signature, _base64=None, _etree=None):
+    def __init__(self, response, signature, _base64=None, _etree=None, issuer=None):
         """
         Extract information from an samlp:Response
         Arguments:
@@ -55,6 +54,7 @@ class Response(object):
         decoded_response = _base64.b64decode(response)
         self._document = _etree.fromstring(decoded_response)
         self._signature = signature
+        self._issuer = issuer
 
     def _parse_datetime(self, dt):
         try:
@@ -110,29 +110,44 @@ class Response(object):
 
         now = _clock()
 
-        not_before = None
-        not_on_or_after = None
+        foundCondition = False
+        fountConditionAndAudience = False
+
         for condition in conditions:
-            not_on_or_after = condition.attrib.get('NotOnOrAfter', None)
+            
             not_before = condition.attrib.get('NotBefore', None)
+            not_on_or_after = condition.attrib.get('NotOnOrAfter', None)
+            
+            if not_before is None:
+                #notbefore condition is not mandatory. If it is not specified, use yesterday as not_before condition
+                not_before = (now - timedelta(0, 5, 0)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            if not_on_or_after is None:
+                continue
 
-        if not_before is None:
-            #notbefore condition is not mandatory. If it is not specified, use yesterday as not_before condition
-            not_before = (now - timedelta(1, 0, 0)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        if not_on_or_after is None:
-            raise ResponseConditionError('Did not find NotOnOrAfter condition')
+            not_before = self._parse_datetime(not_before)
+            not_on_or_after = self._parse_datetime(not_on_or_after)
 
-        not_before = self._parse_datetime(not_before)
-        not_on_or_after = self._parse_datetime(not_on_or_after)
+            if now < not_before:
+                continue
+            if now >= not_on_or_after:
+                continue
+            foundCondition = True
 
-        if now < not_before:
-            raise ResponseValidationError(
-                'Current time is earlier than NotBefore condition'
-            )
-        if now >= not_on_or_after:
-            raise ResponseValidationError(
-                'Current time is on or after NotOnOrAfter condition'
-            )
+            if self._issuer:
+                audiences = condition.xpath(
+                    '/samlp:Response/saml:Assertion/saml:Conditions/saml:AudienceRestriction/saml:Audience',
+                    namespaces=namespaces,
+                )
+                audienceValues = []
+                for audience in audiences:
+                    audienceValues.append(audience.text)
+                if self._issuer in audienceValues:
+                    fountConditionAndAudience = True
+
+        if not foundCondition:
+            raise ResponseConditionError('Timmig issue')
+        if foundCondition and not fountConditionAndAudience:
+            raise ResponseConditionError('Not valid Audience')
 
         return _verifier(
             self._document,

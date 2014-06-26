@@ -79,6 +79,7 @@ class SampleAppHTTPRequestHandler(BaseHTTPRequestHandler):
         res = Response(
             query['SAMLResponse'].pop(),
             self.settings['idp_cert_fingerprint'],
+            issuer=self.settings['issuer']
         )
         valid = res.is_valid()
         name_id = res.name_id

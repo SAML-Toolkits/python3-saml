@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from onelogin.saml import SignatureVerifier
 
+
 namespaces = dict(
     samlp='urn:oasis:names:tc:SAML:2.0:protocol',
     saml='urn:oasis:names:tc:SAML:2.0:assertion',

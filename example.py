@@ -10,6 +10,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 
 from onelogin.saml import AuthRequest, Response
+from onelogin.saml.Utils import format_finger_print, calculate_x509_fingerprint
+
 
 __version__ = '0.1'
 
@@ -143,7 +145,13 @@ def main(config_file):
         cert_path = os.path.abspath(cert_path)
 
         with open(cert_path) as f:
-            settings['idp_cert_fingerprint'] = f.read()
+            cert = f.read()
+            fingerprint = calculate_x509_fingerprint(cert)
+            if fingerprint:
+                settings['idp_cert_fingerprint'] = fingerprint
+    else:
+        formated = format_finger_print(settings['idp_cert_fingerprint'])
+        settings['idp_cert_fingerprint'] = formated
 
     parts = urlparse.urlparse(settings['assertion_consumer_service_url'])
     SampleAppHTTPRequestHandler.protocol_version = 'HTTP/1.0'

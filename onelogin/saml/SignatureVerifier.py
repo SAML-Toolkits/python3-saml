@@ -6,6 +6,8 @@ import logging
 
 from lxml import etree
 
+from onelogin.saml.Utils import calculate_x509_fingerprint, format_cert
+
 log = logging.getLogger(__name__)
 
 
@@ -81,6 +83,14 @@ def verify(document, signature, _etree=None, _tempfile=None, _subprocess=None,
     if signatureNodes and signatureNodes[0].getparent().tag == '{urn:oasis:names:tc:SAML:2.0:protocol}Response':
         parent_id_container = 'urn:oasis:names:tc:SAML:2.0:protocol:Response'
 
+    certificateNodes = document.xpath("//ds:X509Certificate", namespaces={'ds': 'http://www.w3.org/2000/09/xmldsig#'})
+
+    if not certificateNodes or calculate_x509_fingerprint(certificateNodes[0].text) != signature:
+        return False
+    else:
+        # use the x509 cert instead of fingerprint required by xmlsec
+        signature = format_cert(certificateNodes[0].text)
+
     xmlsec_bin = _get_xmlsec_bin()
 
     verified = False
@@ -94,20 +104,7 @@ def verify(document, signature, _etree=None, _tempfile=None, _subprocess=None,
             xml_fp.write(doc_str)
             xml_fp.seek(0)
             with _tempfile.NamedTemporaryFile(delete=False) as cert_fp:
-                if signature.startswith(
-                    '-----BEGIN CERTIFICATE-----'
-                ):
-                    # If there's no matching 'END CERTIFICATE'
-                    # cryptpAppKeyLoad will fail
-                    cert_fp.write(signature)
-                else:
-                    cert_fp.write(
-                        '{begin}\n{signature}\n{end}'.format(
-                            begin='-----BEGIN CERTIFICATE-----',
-                            signature=signature,
-                            end='-----END CERTIFICATE-----',
-                        )
-                    )
+                cert_fp.write(signature)
                 cert_fp.seek(0)
 
                 cert_filename = cert_fp.name

@@ -202,9 +202,9 @@ class Response(object):
             not_on_or_after = self._parse_datetime(not_on_or_after)
 
             if now < not_before:
-                raise ResponseConditionError('Timmig issue')
+                raise ResponseConditionError('Timing issue')
             if now >= not_on_or_after:
-                raise ResponseConditionError('Timmig issue')
+                raise ResponseConditionError('Timing issue')
 
         current_url = get_self_url_no_query(self._request_data)
 

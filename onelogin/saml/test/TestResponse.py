@@ -11,7 +11,7 @@ from onelogin.saml import (
     ResponseValidationError,
     ResponseNameIDError,
     ResponseConditionError,
-    )
+)
 
 test_response = """<samlp:Response
    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -67,7 +67,9 @@ test_response = """<samlp:Response
  </samlp:Response>
 """
 
+
 class TestResponse(object):
+
     def setUp(self):
         fudge.clear_expectations()
 
@@ -89,12 +91,18 @@ class TestResponse(object):
         from_string.with_args('foo decoded response', parser=fake_xmlparser)
         from_string.returns('foo document')
 
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html'
+        }
+
         res = Response(
+            request_data=request_data,
             response='foo response',
             signature='foo signature',
             _base64=fake_base64,
             _etree=fake_etree,
-            )
+        )
 
         eq(res._document, 'foo document')
         eq(res._signature, 'foo signature')
@@ -105,7 +113,7 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
         name_id = res.name_id
 
         eq('3f7b3dcf-1674-4ecd-92c8-1544f346baf8', name_id)
@@ -173,18 +181,16 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
         msg = assert_raises(
             ResponseNameIDError,
             res._get_name_id,
-            )
+        )
 
         eq(
-            str(msg),
-            ('There was a problem getting the name ID: Found more than one '
-             + 'name ID'
-             ),
-            )
+            str(msg), ('There was a problem getting the name ID:' +
+                       ' Found more than one name ID'),
+        )
 
     @fudge.with_fakes
     def test_get_name_id_none(self):
@@ -241,18 +247,18 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
         msg = assert_raises(
             ResponseNameIDError,
             res._get_name_id,
-            )
+        )
 
         eq(
             str(msg),
             ('There was a problem getting the name ID: Did not find a name '
              + 'ID'
              ),
-            )
+        )
 
     @fudge.with_fakes
     def test_is_valid_not_before_missing(self):
@@ -312,12 +318,12 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature='foo signature',
-            )
+        )
 
         fake_verifier = fudge.Fake(
             'verifier',
             callable=True,
-            )
+        )
         fake_verifier.times_called(1)
         fake_verifier.with_args(res._document, 'foo signature')
 
@@ -325,7 +331,7 @@ class TestResponse(object):
 
         msg = res.is_valid(
             _verifier=fake_verifier,
-            )
+        )
 
         eq(msg, True)
 
@@ -387,17 +393,17 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
         msg = assert_raises(
             ResponseConditionError,
             res.is_valid,
-            )
+        )
 
-        eq(str(msg),
-           ('There was a problem validating a condition: Did not find '
-            + 'NotOnOrAfter condition'
-            ),
-           )
+        eq(
+            str(msg),
+            ('There was a problem validating a condition:' +
+             ' Did not find NotOnOrAfter condition'),
+        )
 
     @fudge.with_fakes
     def test_is_valid_current_time_earlier(self):
@@ -405,7 +411,7 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
 
         def fake_clock():
             return datetime(2004, 12, 05, 9, 16, 45, 462796)
@@ -413,13 +419,13 @@ class TestResponse(object):
             ResponseValidationError,
             res.is_valid,
             _clock=fake_clock,
-            )
+        )
 
-        eq(str(msg),
-           ('There was a problem validating the response: Current time is '
-            + 'earlier than NotBefore condition'
-            ),
-           )
+        eq(
+            str(msg),
+            ('There was a problem validating the response: Current time is ' +
+             'earlier than NotBefore condition'),
+        )
 
     @fudge.with_fakes
     def test_is_valid_current_time_on_or_after(self):
@@ -427,7 +433,7 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature=None,
-            )
+        )
 
         def fake_clock():
             return datetime(2004, 12, 05, 9, 30, 45, 462796)
@@ -435,13 +441,13 @@ class TestResponse(object):
             ResponseValidationError,
             res.is_valid,
             _clock=fake_clock,
-            )
+        )
 
-        eq(str(msg),
-           ('There was a problem validating the response: Current time is '
-            + 'on or after NotOnOrAfter condition'
-            ),
-           )
+        eq(
+            str(msg),
+            ('There was a problem validating the response: Current time is ' +
+             'on or after NotOnOrAfter condition'),
+        )
 
     @fudge.with_fakes
     def test_is_valid_simple(self):
@@ -449,7 +455,7 @@ class TestResponse(object):
         res = Response(
             response=encoded_response,
             signature='foo signature',
-            )
+        )
 
         def fake_clock():
             return datetime(2004, 12, 05, 9, 18, 45, 462796)
@@ -457,7 +463,7 @@ class TestResponse(object):
         fake_verifier = fudge.Fake(
             'verifier',
             callable=True,
-            )
+        )
         fake_verifier.times_called(1)
         fake_verifier.with_args(res._document, 'foo signature')
 
@@ -466,6 +472,6 @@ class TestResponse(object):
         msg = res.is_valid(
             _clock=fake_clock,
             _verifier=fake_verifier,
-            )
+        )
 
         eq(msg, True)

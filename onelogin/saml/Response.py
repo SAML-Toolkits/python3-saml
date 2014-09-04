@@ -174,8 +174,6 @@ class Response(object):
         if not self.validate_num_assertions():
             raise ResponseFormatError('Only 1 Assertion in the SAMLResponse is supported')
 
-
-
         if _clock is None:
             _clock = datetime.utcnow
         if _verifier is None:
@@ -189,10 +187,10 @@ class Response(object):
         now = _clock()
 
         for condition in conditions:
-            
+
             not_before = condition.attrib.get('NotBefore', None)
             not_on_or_after = condition.attrib.get('NotOnOrAfter', None)
-            
+
             if not_before is None:
                 not_before = (now - timedelta(0, 5, 0)).strftime('%Y-%m-%dT%H:%M:%SZ')
             if not_on_or_after is None:
@@ -255,7 +253,6 @@ class Response(object):
 
         if not any_subject_confirmation:
             raise ResponseSubjectConfirmationError('A valid SubjectConfirmation was not found on this Response')
-
 
         return _verifier(
             self._document,

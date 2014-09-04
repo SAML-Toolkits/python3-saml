@@ -125,12 +125,15 @@ of the public certificate originally obtained from OneLogin::
 
           def do_POST(self):
             ...
+            request_data = self.prepare_request()
             length = int(self.headers['Content-Length'])
             data = self.rfile.read(length)
             query = urlparse.parse_qs(data)
             res = Response(
+                request_data,
                 query['SAMLResponse'].pop(),
                 self.settings['idp_cert_fingerprint'],
+                issuer=self.settings['issuer']
                 )
             valid = res.is_valid()
             name_id = res.name_id
@@ -144,6 +147,10 @@ of the public certificate originally obtained from OneLogin::
                     name_id=name_id,
                     )
                 self._serve_msg(401, msg)
+
+The request_data must be used to build the Response due is_valid method checks Destination, Recipient, etc
+and need to know info like SERVER_NAME, SERVER_PORT, PATH_INFO, SCRIPT_NAME, REQUEST_URI. If you using a
+python framework be sure to build a dict with those indexs and provide it to the Response constructor
 
 Once again, the self.settings variable is populated from an entry in
 the configuration file. You can find the public certificate under Security->SAML

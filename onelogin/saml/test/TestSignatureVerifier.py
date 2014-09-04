@@ -8,6 +8,7 @@ from onelogin.saml import SignatureVerifier
 
 from onelogin.saml.test.util import assert_raises
 
+
 class TestSignatureVerifier(object):
     def setUp(self):
         fudge.clear_expectations()
@@ -26,7 +27,7 @@ class TestSignatureVerifier(object):
         fake_tempfile.remember_order()
         named_xmlfile = fake_tempfile.expects(
             'NamedTemporaryFile'
-            )
+        )
         named_xmlfile.with_args(delete=False)
         xmlfile = named_xmlfile.returns_fake()
         xmlfile.remember_order()
@@ -41,13 +42,13 @@ class TestSignatureVerifier(object):
         seek.with_args(0)
 
         exit = xmlfile.expects('__exit__')
-        exit.with_args(None, None,None)
+        exit.with_args(None, None, None)
 
         xmlfile.has_attr(name='xmlfile')
 
         named_certfile = fake_tempfile.next_call(
             'NamedTemporaryFile'
-            )
+        )
         named_certfile.with_args(delete=False)
         certfile = named_certfile.returns_fake()
         certfile.remember_order()
@@ -61,15 +62,14 @@ class TestSignatureVerifier(object):
             ('-----BEGIN CERTIFICATE-----\nfoo signature\n'
              + '-----END CERTIFICATE-----'
              )
-            )
+        )
         seek = certfile.expects('seek')
         seek.with_args(0)
 
         exit = certfile.expects('__exit__')
-        exit.with_args(None, None,None)
+        exit.with_args(None, None, None)
 
         certfile.has_attr(name='certfile')
-
 
         fake_subprocess = fudge.Fake('subprocess')
         fake_subprocess.remember_order()
@@ -84,10 +84,10 @@ class TestSignatureVerifier(object):
                 '--id-attr:ID',
                 'urn:oasis:names:tc:SAML:2.0:assertion:Assertion',
                 'xmlfile',
-                ],
+            ],
             stderr=1,
             stdout=1,
-            )
+        )
         proc = popen.returns_fake()
         proc.remember_order()
         wait = proc.expects('wait')
@@ -109,7 +109,7 @@ class TestSignatureVerifier(object):
             _tempfile=fake_tempfile,
             _subprocess=fake_subprocess,
             _os=fake_os,
-            )
+        )
 
     @fudge.with_fakes
     def test_get_xmlsec_bin_default(self):
@@ -183,13 +183,13 @@ Error: failed to verify file "/tmp/tmpYjEjq5"
             SignatureVerifier.SignatureVerifierError,
             SignatureVerifier._parse_stderr,
             fake_proc
-            )
+        )
 
-        eq(str(msg),
-           ('There was a problem validating the response: XMLSec returned error '
-            + 'code 1. Please check your certficate.'
-            ),
-           )
+        eq(
+            str(msg),
+            ('There was a problem validating the response: XMLSec returned error ' +
+             'code 1. Please check your certficate.'),
+        )
 
     @fudge.with_fakes
     def test_get_parse_stderr_error_should_not_happen(self):
@@ -203,13 +203,13 @@ Error: failed to verify file "/tmp/tmpYjEjq5"
             SignatureVerifier.SignatureVerifierError,
             SignatureVerifier._parse_stderr,
             fake_proc
-            )
+        )
 
-        eq(str(msg),
-           ('There was a problem validating the response: XMLSec exited with '
-            + 'code 0 but did not return OK when verifying the  SAML response.'
-            )
-           )
+        eq(
+            str(msg),
+            ('There was a problem validating the response: XMLSec exited with ' +
+             'code 0 but did not return OK when verifying the  SAML response.')
+        )
 
     @fudge.with_fakes
     def test_get_parse_stderr_ok_windows(self):

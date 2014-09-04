@@ -3,6 +3,7 @@ from Response import (
     ResponseValidationError,
     ResponseNameIDError,
     ResponseConditionError,
+    ResponseSubjectConfirmationError,
     )
 import AuthRequest
 import SignatureVerifier

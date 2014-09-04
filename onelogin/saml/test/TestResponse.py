@@ -11,6 +11,7 @@ from onelogin.saml import (
     ResponseValidationError,
     ResponseNameIDError,
     ResponseConditionError,
+    ResponseSubjectConfirmationError,
 )
 
 test_response = """<samlp:Response
@@ -92,14 +93,17 @@ class TestResponse(object):
         from_string.returns('foo document')
 
         request_data = {
-            'http_host': 'example.com',
-            'script_name': 'index.html'
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
         }
 
         res = Response(
             request_data=request_data,
             response='foo response',
             signature='foo signature',
+            issuer='https://sp.example.com/SAML2',
             _base64=fake_base64,
             _etree=fake_etree,
         )
@@ -110,9 +114,18 @@ class TestResponse(object):
     @fudge.with_fakes
     def test_get_name_id_simple(self):
         encoded_response = base64.b64encode(test_response)
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
+            issuer='https://sp.example.com/SAML2',
         )
         name_id = res.name_id
 
@@ -178,9 +191,19 @@ class TestResponse(object):
  </samlp:Response>
 """
         encoded_response = base64.b64encode(response)
+
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
+            issuer='https://sp.example.com/SAML2',
         )
         msg = assert_raises(
             ResponseNameIDError,
@@ -244,9 +267,19 @@ class TestResponse(object):
  </samlp:Response>
 """
         encoded_response = base64.b64encode(response)
+
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
+            issuer='https://sp.example.com/SAML2',
         )
         msg = assert_raises(
             ResponseNameIDError,
@@ -315,9 +348,18 @@ class TestResponse(object):
  </samlp:Response>
 """
         encoded_response = base64.b64encode(response)
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature='foo signature',
+            issuer='https://sp.example.com/SAML2',
         )
 
         fake_verifier = fudge.Fake(
@@ -390,25 +432,42 @@ class TestResponse(object):
  </samlp:Response>
 """
         encoded_response = base64.b64encode(response)
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
+            issuer='https://sp.example.com/SAML2',
         )
         msg = assert_raises(
-            ResponseConditionError,
+            ResponseSubjectConfirmationError,
             res.is_valid,
         )
 
         eq(
             str(msg),
-            ('There was a problem validating a condition:' +
-             ' Did not find NotOnOrAfter condition'),
+            ('There was a problem validating the response, no valid SubjectConfirmation' +
+             ' found: A valid SubjectConfirmation was not found on this Response'),
         )
 
     @fudge.with_fakes
     def test_is_valid_current_time_earlier(self):
         encoded_response = base64.b64encode(test_response)
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
         )
@@ -416,45 +475,62 @@ class TestResponse(object):
         def fake_clock():
             return datetime(2004, 12, 05, 9, 16, 45, 462796)
         msg = assert_raises(
-            ResponseValidationError,
+            ResponseConditionError,
             res.is_valid,
             _clock=fake_clock,
         )
 
         eq(
             str(msg),
-            ('There was a problem validating the response: Current time is ' +
-             'earlier than NotBefore condition'),
+            ('There was a problem validating a condition: Timing issue'),
         )
 
     @fudge.with_fakes
     def test_is_valid_current_time_on_or_after(self):
         encoded_response = base64.b64encode(test_response)
+
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature=None,
+            issuer='https://sp.example.com/SAML2',
         )
 
         def fake_clock():
             return datetime(2004, 12, 05, 9, 30, 45, 462796)
         msg = assert_raises(
-            ResponseValidationError,
+            ResponseConditionError,
             res.is_valid,
             _clock=fake_clock,
         )
 
         eq(
             str(msg),
-            ('There was a problem validating the response: Current time is ' +
-             'on or after NotOnOrAfter condition'),
+            ('There was a problem validating a condition: Timing issue'),
         )
 
     @fudge.with_fakes
     def test_is_valid_simple(self):
         encoded_response = base64.b64encode(test_response)
+        request_data = {
+            'server_port': '443',
+            'http_host': 'sp.example.com',
+            'path_info': '/SAML2/SSO/POST',
+            'script_name': ''
+        }
+
         res = Response(
+            request_data=request_data,
             response=encoded_response,
             signature='foo signature',
+            issuer='https://sp.example.com/SAML2',
         )
 
         def fake_clock():
@@ -466,7 +542,6 @@ class TestResponse(object):
         )
         fake_verifier.times_called(1)
         fake_verifier.with_args(res._document, 'foo signature')
-
         fake_verifier.returns(True)
 
         msg = res.is_valid(

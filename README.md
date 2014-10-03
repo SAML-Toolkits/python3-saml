@@ -1,5 +1,7 @@
 # OneLogin's SAML Python Toolkit
 
+[![Coverage Status](https://coveralls.io/repos/onelogin/python-saml/badge.png)](https://coveralls.io/r/onelogin/python-saml)
+
 Add SAML support to your Python softwares using this library.
 Forget those complicated libraries and use that open source library provided
 and supported by OneLogin Inc.

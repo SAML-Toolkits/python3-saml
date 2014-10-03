@@ -17,3 +17,7 @@ __pycache_
 /build
 /dist
 /venv
+
+*.key
+*.crt
+*.pem

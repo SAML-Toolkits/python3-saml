@@ -32,4 +32,16 @@ setup(
         'isodate==0.5.0',
         'defusedxml==0.4.1',
     ]
+    extras_require={
+        'test': (
+            # Test runner.
+            'pytest',
+
+            # Ensure PEP8 conformance.
+            'pytest-pep8',
+
+            # Ensure test coverage.
+            'pytest-cov',
+        )
+    }
 )

@@ -1,5 +1,6 @@
 # OneLogin's SAML Python Toolkit
 
+[![Build Status](https://api.travis-ci.org/onelogin/python-saml.png?branch=master)](http://travis-ci.org/onelogin/python-saml)
 [![Coverage Status](https://coveralls.io/repos/onelogin/python-saml/badge.png)](https://coveralls.io/r/onelogin/python-saml)
 
 Add SAML support to your Python softwares using this library.

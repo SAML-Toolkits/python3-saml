@@ -1,0 +1,24 @@
+{
+    "strict": true,
+    "debug": true,
+    "sp": {
+        "entityId": "http://<sp_domain>/metadata/",
+        "assertionConsumerService": {
+            "url": "http://<sp_domain>/?acs"
+        },
+        "singleLogoutService": {
+            "url": "http://<sp_domain>/?sls"
+        },
+        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified"
+    },
+    "idp": {
+        "entityId": "https://app.onelogin.com/saml/metadata/<onelogin_connector_id>",
+        "singleSignOnService": {
+            "url": "https://app.onelogin.com/trust/saml2/http-post/sso/<onelogin_connector_id>"
+        },
+        "singleLogoutService": {
+            "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/<onelogin_connector_id>"
+        },
+        "x509cert": "<onelogin_connector_cert>"
+    },
+}

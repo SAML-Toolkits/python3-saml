@@ -7,15 +7,13 @@
 *.pyo
 .*.swp
 
+__pycache_
 /parts
 /.installed.cfg
 /develop-eggs
-/*.egg
+/*.eg
 /*.egg-info
 /eggs
 /build
 /dist
-
-example.cfg
-*.crt
-*.pem
+/venv

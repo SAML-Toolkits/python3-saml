@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if paint_logout %}
+  {% if attributes %}
+    <p>You have the following attributes:</p>
+    <table class="table table-striped">
+      <thead>
+        <th>Name</th><th>Values</th>
+      </thead>
+      <tbody>
+        {% for attr in attributes %}
+          <tr><td>{{ attr.0 }}</td>
+          <td><ul class="list-unstyled">
+            {% for val in attr.1 %}
+              <li>{{ val }}</li>
+            {% endfor %}
+          </ul></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-danger" role="alert">You don't have any attributes</div>
+  {% endif %}
+  <a href="/?slo" class="btn btn-danger">Logout</a>
+{% else %}
+  <a href="/?sso2" class="btn btn-primary">Login and access again to this page</a>
+{% endif %}
+
+{% endblock %}

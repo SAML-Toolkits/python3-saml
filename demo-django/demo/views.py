@@ -1,0 +1,101 @@
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import (HttpResponse, HttpResponseRedirect,
+                         HttpResponseServerError)
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
+
+
+def init_saml_auth(req):
+    auth = OneLogin_Saml2_Auth(req, custom_base_path=settings.SAML_FOLDER)
+    return auth
+
+
+def prepare_django_request(request):
+    result = {
+        'http_host': request.META['HTTP_HOST'],
+        'script_name': request.META['PATH_INFO'],
+        'server_port': request.META['SERVER_PORT'],
+        'get_data': request.GET.copy(),
+        'post_data': request.POST.copy()
+    }
+    return result
+
+
+def index(request):
+    req = prepare_django_request(request)
+    auth = init_saml_auth(req)
+    errors = []
+    not_auth_warn = False
+    success_slo = False
+    attributes = False
+    paint_logout = False
+
+    if 'sso' in req['get_data']:
+        return HttpResponseRedirect(auth.login())
+    elif 'sso2' in req['get_data']:
+        return_to = OneLogin_Saml2_Utils.get_self_url(req) + reverse('attrs')
+        return HttpResponseRedirect(auth.login(return_to))
+    elif 'slo' in req['get_data']:
+        return HttpResponseRedirect(auth.logout())
+    elif 'acs' in req['get_data']:
+        auth.process_response()
+        errors = auth.get_errors()
+        not_auth_warn = not auth.is_authenticated()
+        if not errors:
+            request.session['samlUserdata'] = auth.get_attributes()
+            if 'RelayState' in req['post_data'] and OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:
+                return HttpResponseRedirect(auth.redirect_to(req['post_data']['RelayState']))
+    elif 'sls' in req['get_data']:
+        dscb = lambda: request.session.flush()
+        url = auth.process_slo(delete_session_cb=dscb)
+        if url is not None:
+            return HttpResponseRedirect(url)
+        errors = auth.get_errors()
+        if len(errors) == 0:
+            success_slo = True
+
+    if 'samlUserdata' in request.session:
+        paint_logout = True
+        if len(request.session['samlUserdata']) > 0:
+            attributes = request.session['samlUserdata'].items()
+
+    return render_to_response('index.html',
+                              {'errors': errors,
+                               'not_auth_warn': not_auth_warn,
+                               'success_slo': success_slo,
+                               'attributes': attributes,
+                               'paint_logout': paint_logout},
+                              context_instance=RequestContext(request))
+
+
+def attrs(request):
+    paint_logout = False
+    attributes = False
+
+    if 'samlUserdata' in request.session:
+        paint_logout = True
+        if len(request.session['samlUserdata']) > 0:
+            attributes = request.session['samlUserdata'].items()
+
+    return render_to_response('attrs.html',
+                              {'paint_logout': paint_logout,
+                               'attributes': attributes},
+                              context_instance=RequestContext(request))
+
+
+def metadata(request):
+    req = prepare_django_request(request)
+    auth = init_saml_auth(req)
+    saml_settings = auth.get_settings()
+    metadata = saml_settings.get_sp_metadata()
+    errors = saml_settings.validate_metadata(metadata)
+
+    if len(errors) == 0:
+        resp = HttpResponse(content=metadata, content_type='text/xml')
+    else:
+        resp = HttpResponseServerError(content=', '.join(errors))
+    return resp

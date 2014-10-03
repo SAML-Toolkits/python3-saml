@@ -4,7 +4,7 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='python-saml',
@@ -21,27 +21,24 @@ setup(
     author_email='support@onelogin.com',
     license='BSD',
     url='https://github.com/onelogin/python-saml',
-    packages = ['onelogin/saml2'],
+    packages=['onelogin/saml2'],
     package_dir={
         '': 'src',
-    },    
+    },
     test_suite='tests',
     install_requires=[
         'M2Crypto==0.22.3',
         'dm.xmlsec.binding==1.3.1',
         'isodate==0.5.0',
         'defusedxml==0.4.1',
-    ]
+    ],
     extras_require={
         'test': (
-            # Test runner.
-            'pytest',
-
-            # Ensure PEP8 conformance.
-            'pytest-pep8',
-
-            # Ensure test coverage.
-            'pytest-cov',
-        )
-    }
+            'coverage==3.7.1',
+            'pylint==1.3.1',
+            'pep8==1.5.7',
+            'pyflakes==0.8.1',
+            'coveralls==0.4.4',
+        ),
+    },
 )

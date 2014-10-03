@@ -593,7 +593,7 @@ class OneLogin_Saml2_Utils:
             enc_data = EncData(xmlsec.TransformAes128Cbc, type=xmlsec.TypeEncElement)
             enc_data.ensureCipherValue()
             key_info = enc_data.ensureKeyInfo()
-            #enc_key = key_info.addEncryptedKey(xmlsec.TransformRsaPkcs1)
+            # enc_key = key_info.addEncryptedKey(xmlsec.TransformRsaPkcs1)
             enc_key = key_info.addEncryptedKey(xmlsec.TransformRsaOaep)
             enc_key.ensureCipherValue()
 

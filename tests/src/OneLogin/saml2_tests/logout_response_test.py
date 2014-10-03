@@ -255,11 +255,11 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         response = OneLogin_Saml2_Logout_Response(settings, request_data['get_data']['SAMLResponse'])
         self.assertTrue(response.is_valid(request_data))
 
-        relayState = request_data['get_data']['RelayState'];
-        del request_data['get_data']['RelayState'];
+        relayState = request_data['get_data']['RelayState']
+        del request_data['get_data']['RelayState']
         inv_response = OneLogin_Saml2_Logout_Response(settings, request_data['get_data']['SAMLResponse'])
         self.assertFalse(inv_response.is_valid(request_data))
-        request_data['get_data']['RelayState'] = relayState;
+        request_data['get_data']['RelayState'] = relayState
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, request_data['get_data']['SAMLResponse'])

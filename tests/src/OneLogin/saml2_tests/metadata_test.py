@@ -88,7 +88,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
             contacts,
             organization
         )
-        self.assertIsNotNone(metadata3) 
+        self.assertIsNotNone(metadata3)
         self.assertIn('<md:SPSSODescriptor', metadata3)
         self.assertIn('cacheDuration="PT1412593469S"', metadata3)
         self.assertIn('validUntil="2014-10-01T11:04:29Z"', metadata3)

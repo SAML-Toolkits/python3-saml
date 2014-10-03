@@ -1,0 +1,18 @@
+language: python
+python:
+  - '2.6'
+  - '2.7'
+
+before_install:
+  - 'travis_retry sudo apt-get install python-dev libxml2-dev libxmlsec1-dev'
+
+install:
+  - 'travis_retry pip install -e ".[test]" --use-mirrors'
+
+script: 
+  - 'coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
+  - 'coverage report -m --rcfile=tests/coverage.rc'
+  - 'pep8 tests/src/OneLogin/saml2_tests/*.py demo-flask/*.py demo-django/*.py src/onelogin/saml2/*.py --config=tests/pep8.rc'
+  - 'pyflakes src/onelogin/saml2 demo-django demo-flask tests/src/OneLogin/saml2_tests'
+
+after_success: 'coveralls --rcfile=.coveralls.yml'

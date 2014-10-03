@@ -238,7 +238,6 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(settings_data)
         self.assertEqual(cert_2, settings.get_sp_cert())
 
-
     def testFormatSPKey(self):
         """
         Tests the format_sp_key method of the OneLogin_Saml2_Settings

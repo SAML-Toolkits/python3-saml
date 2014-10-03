@@ -580,7 +580,7 @@ class OneLogin_Saml2_Settings:
         else:
             dom = res
             element = dom.documentElement
-            if not element.tagName in 'md:EntityDescriptor':
+            if element.tagName not in 'md:EntityDescriptor':
                 errors.append('noEntityDescriptor_xml')
             else:
                 if len(element.getElementsByTagName('md:SPSSODescriptor')) != 1:

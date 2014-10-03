@@ -12,11 +12,12 @@ __pycache_
 /.installed.cfg
 /develop-eggs
 /*.eg
-/*.egg-info
+*.egg-info
 /eggs
 /build
 /dist
 /venv
+.coverage
 
 *.key
 *.crt

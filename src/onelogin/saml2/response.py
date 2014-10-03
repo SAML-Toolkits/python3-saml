@@ -118,8 +118,8 @@ class OneLogin_Saml2_Response(object):
                     if not destination.startswith(current_url):
                         # TODO: Review if following lines are required, since we can control the
                         # request_data
-                        #current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
-                        #if not destination.startswith(current_url_routed):
+                        #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
+                        #  if not destination.startswith(current_url_routed):
                         raise Exception('The response was received at %s instead of %s' % (current_url, destination))
 
                 # Checks audience
@@ -352,7 +352,7 @@ class OneLogin_Saml2_Response(object):
         :rtype: bool
         """
         conditions_nodes = self.__query_assertion('/saml:Conditions')
-        
+
         for conditions_node in conditions_nodes:
             nb_attr = conditions_node.get('NotBefore')
             nooa_attr = conditions_node.get('NotOnOrAfter')

@@ -4,7 +4,7 @@ python:
   - '2.7'
 
 before_install:
-  - 'travis_retry sudo apt-get install python-dev libxml2-dev libxmlsec1-dev'
+  - 'python setup develop'
 
 install:
   - 'travis_retry pip install -e ".[test]" --use-mirrors'

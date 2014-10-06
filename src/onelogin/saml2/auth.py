@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Auth class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Main class of OneLogin's Python Toolkit.
+
+Initializes the SP SAML instance
+
+"""
 
 from base64 import b64encode
 from urllib import quote_plus
@@ -19,6 +27,14 @@ from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 
 
 class OneLogin_Saml2_Auth(object):
+    """
+
+    This class implements the SP SAML instance.
+
+    Defines the methods that you can invoke in your application in
+    order to add SAML support (initiates sso, initiates slo, processes a
+    SAML Response, a Logout Request or a Logout Response).
+    """
 
     def __init__(self, request_data, old_settings=None, custom_base_path=None):
         """

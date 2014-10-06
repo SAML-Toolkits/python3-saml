@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Metadata class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Metadata class of OneLogin's Python Toolkit.
+
+"""
 
 from time import gmtime, strftime
 from datetime import datetime
@@ -11,7 +17,12 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
-class OneLogin_Saml2_Metadata:
+class OneLogin_Saml2_Metadata(object):
+    """
+
+    A class that contains methods related to the metadata of the SP
+
+    """
 
     TIME_VALID = 172800   # 2 days
     TIME_CACHED = 604800  # 1 week
@@ -65,10 +76,11 @@ class OneLogin_Saml2_Metadata:
         sls = ''
         if 'singleLogoutService' in sp:
             sls = """<md:SingleLogoutService Binding="%(binding)s"
-                                Location="%(location)s" />""" % {
-                'binding': sp['singleLogoutService']['binding'],
-                'location': sp['singleLogoutService']['url'],
-            }
+                                Location="%(location)s" />""" % \
+                {
+                    'binding': sp['singleLogoutService']['binding'],
+                    'location': sp['singleLogoutService']['url'],
+                }
 
         str_authnsign = 'true' if authnsign else 'false'
         str_wsign = 'true' if wsign else 'false'
@@ -81,12 +93,13 @@ class OneLogin_Saml2_Metadata:
         <md:OrganizationName xml:lang="%(lang)s">%(name)s</md:OrganizationName>
         <md:OrganizationDisplayName xml:lang="%(lang)s">%(display_name)s</md:OrganizationDisplayName>
         <md:OrganizationURL xml:lang="%(lang)s">%(url)s</md:OrganizationURL>
-    </md:Organization>""" % {
-                    'lang': lang,
-                    'name': info['name'],
-                    'display_name': info['displayname'],
-                    'url': info['url'],
-                })
+    </md:Organization>""" % \
+                    {
+                        'lang': lang,
+                        'name': info['name'],
+                        'display_name': info['displayname'],
+                        'url': info['url'],
+                    })
             str_organization = '\n'.join(organization_info)
 
         str_contacts = ''
@@ -96,11 +109,12 @@ class OneLogin_Saml2_Metadata:
                 contacts_info.append("""    <md:ContactPerson contactType="%(type)s">
         <md:GivenName>%(name)s</md:GivenName>
         <md:EmailAddress>%(email)s</md:EmailAddress>
-    </md:ContactPerson>""" % {
-                    'type': ctype,
-                    'name': info['givenName'],
-                    'email': info['emailAddress'],
-                })
+    </md:ContactPerson>""" % \
+                    {
+                        'type': ctype,
+                        'name': info['givenName'],
+                        'email': info['emailAddress'],
+                    })
             str_contacts = '\n'.join(contacts_info)
 
         metadata = """<?xml version="1.0"?>
@@ -117,19 +131,20 @@ class OneLogin_Saml2_Metadata:
     </md:SPSSODescriptor>
 %(organization)s
 %(contacts)s
-</md:EntityDescriptor>""" % {
-            'valid': valid_until_time,
-            'cache': cache_duration_str,
-            'entity_id': sp['entityId'],
-            'authnsign': str_authnsign,
-            'wsign': str_wsign,
-            'name_id_format': sp['NameIDFormat'],
-            'binding': sp['assertionConsumerService']['binding'],
-            'location': sp['assertionConsumerService']['url'],
-            'sls': sls,
-            'organization': str_organization,
-            'contacts': str_contacts,
-        }
+</md:EntityDescriptor>""" % \
+            {
+                'valid': valid_until_time,
+                'cache': cache_duration_str,
+                'entity_id': sp['entityId'],
+                'authnsign': str_authnsign,
+                'wsign': str_wsign,
+                'name_id_format': sp['NameIDFormat'],
+                'binding': sp['assertionConsumerService']['binding'],
+                'location': sp['assertionConsumerService']['url'],
+                'sls': sls,
+                'organization': str_organization,
+                'contacts': str_contacts,
+            }
 
         return metadata
 

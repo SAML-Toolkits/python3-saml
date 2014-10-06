@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Logout_Request class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Logout Request class of OneLogin's Python Toolkit.
+
+"""
 
 from base64 import b64decode
 from defusedxml.lxml import fromstring
@@ -13,7 +19,14 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
-class OneLogin_Saml2_Logout_Request:
+class OneLogin_Saml2_Logout_Request(object):
+    """
+
+    This class handles a Logout Request.
+
+    Builds a Logout Response object and validates it.
+
+    """
 
     def __init__(self, settings):
         """
@@ -52,13 +65,14 @@ class OneLogin_Saml2_Logout_Request:
     Destination="%(single_logout_url)s">
     <saml:Issuer>%(entity_id)s</saml:Issuer>
     %(name_id)s
-</samlp:LogoutRequest>""" % {
-            'id': uid,
-            'issue_instant': issue_instant,
-            'single_logout_url': idp_data['singleLogoutService']['url'],
-            'entity_id': sp_data['entityId'],
-            'name_id': name_id,
-        }
+</samlp:LogoutRequest>""" % \
+            {
+                'id': uid,
+                'issue_instant': issue_instant,
+                'single_logout_url': idp_data['singleLogoutService']['url'],
+                'entity_id': sp_data['entityId'],
+                'name_id': name_id,
+            }
 
         self.__logout_request = logout_request
 

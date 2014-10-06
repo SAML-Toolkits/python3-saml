@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Utils class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Auxiliary class of OneLogin's Python Toolkit.
+
+"""
 
 import base64
 from datetime import datetime
@@ -29,12 +35,16 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 
 
-def print_xmlsec_errors(filename, line, func, errorObject, errorSubject, reason, msg):
+def print_xmlsec_errors(filename, line, func, error_object, error_subject, reason, msg):
+    """
+    Auxiliary method. It override the default xmlsec debug message.
+    """
+
     info = []
-    if errorObject != "unknown":
-        info.append("obj=" + errorObject)
-    if errorSubject != "unknown":
-        info.append("subject=" + errorSubject)
+    if error_object != "unknown":
+        info.append("obj=" + error_object)
+    if error_subject != "unknown":
+        info.append("subject=" + error_subject)
     if msg.strip():
         info.append("msg=" + msg)
     if reason != 1:
@@ -43,13 +53,22 @@ def print_xmlsec_errors(filename, line, func, errorObject, errorSubject, reason,
         print "%s:%d(%s)" % (filename, line, func), " ".join(info)
 
 
-class OneLogin_Saml2_Utils:
+class OneLogin_Saml2_Utils(object):
+    """
+
+    Auxiliary class that contains several utility methods to parse time,
+    urls, add sign, encrypt, decrypt, sign validation, handle xml ...
+
+    """
 
     @staticmethod
     def decode_base64_and_inflate(value):
-        """ base64 decodes and then inflates according to RFC1951
+        """
+        base64 decodes and then inflates according to RFC1951
         :param value: a deflated and encoded string
-        :return: the string after decoding and inflating
+        :type value: string
+        :returns: the string after decoding and inflating
+        :rtype: string
         """
 
         return zlib.decompress(base64.b64decode(value), -15)
@@ -59,15 +78,26 @@ class OneLogin_Saml2_Utils:
         """
         Deflates and the base64 encodes a string
         :param value: The string to deflate and encode
-        :return: The deflated and encoded string
+        :type value: string
+        :returns: The deflated and encoded string
+        :rtype: string
         """
         return base64.b64encode(zlib.compress(value)[2:-4])
 
     @staticmethod
     def validate_xml(xml, schema, debug=False):
         """
+        Validates a xml against a schema
+        :param xml: The xml that will be validated
+        :type: string|DomDocument
+        :param schema: The schema
+        :type: string
+        :param debug: If debug is active, the parse-errors will be showed
+        :type: bool
+        :returns: Error code or the DomDocument of the xml
+        :rtype: string
         """
-        assert (isinstance(xml, basestring) or isinstance(xml, Document))
+        assert isinstance(xml, basestring) or isinstance(xml, Document)
         assert isinstance(schema, basestring)
 
         if isinstance(xml, Document):
@@ -80,17 +110,16 @@ class OneLogin_Saml2_Utils:
             return 'unloaded_xml'
 
         schema_file = join(dirname(__file__), 'schemas', schema)
-        f = open(schema_file, 'r')
-        schema_doc = etree.parse(f)
-        f.close()
+        f_schema = open(schema_file, 'r')
+        schema_doc = etree.parse(f_schema)
+        f_schema.close()
         xmlschema = etree.XMLSchema(schema_doc)
 
         if not xmlschema.validate(dom):
-            xml_errors = [xmlschema.error_log]
             if debug:
                 stderr.write('Errors validating the metadata')
                 stderr.write(':\n\n')
-                for error in xml_errors:
+                for error in xmlschema.error_log:
                     stderr.write('%s\n' % error.message)
 
             return 'invalid_xml'
@@ -142,7 +171,7 @@ class OneLogin_Saml2_Utils:
         private_key = private_key.replace('\r', '')
         private_key = private_key.replace('\n', '')
         if len(private_key) > 0:
-            if (private_key.find('-----BEGIN PRIVATE KEY-----') != -1):
+            if private_key.find('-----BEGIN PRIVATE KEY-----') != -1:
                 private_key = private_key.replace('-----BEGIN PRIVATE KEY-----', '')
                 private_key = private_key.replace('-----END PRIVATE KEY-----', '')
                 private_key = private_key.replace(' ', '')
@@ -419,7 +448,7 @@ class OneLogin_Saml2_Utils:
         :rtype: int
         """
         assert isinstance(duration, basestring)
-        assert (timestamp is None or isinstance(timestamp, int))
+        assert timestamp is None or isinstance(timestamp, int)
 
         timedelta = duration_parser(duration)
         if timestamp is None:
@@ -601,23 +630,25 @@ class OneLogin_Saml2_Utils:
             enc_ctx = xmlsec.EncCtx(mngr)
             enc_ctx.encKey = xmlsec.Key.generate(xmlsec.KeyDataAes, 128, xmlsec.KeyDataTypeSession)
 
-            ed = enc_ctx.encryptXml(enc_data, elem[0])
+            edata = enc_ctx.encryptXml(enc_data, elem[0])
 
-            newdoc = parseString(etree.tostring(ed))
+            newdoc = parseString(etree.tostring(edata))
 
-            newdoc.firstChild.removeAttribute('xmlns')
-            newdoc.firstChild.removeAttribute('xmlns:saml')
-            newdoc.firstChild.setAttribute('xmlns:xenc', OneLogin_Saml2_Constants.NS_XENC)
-            newdoc.firstChild.setAttribute('xmlns:dsig', OneLogin_Saml2_Constants.NS_DS)
+            if newdoc.hasChildNodes():
+                child = newdoc.firstChild
+                child.removeAttribute('xmlns')
+                child.removeAttribute('xmlns:saml')
+                child.setAttribute('xmlns:xenc', OneLogin_Saml2_Constants.NS_XENC)
+                child.setAttribute('xmlns:dsig', OneLogin_Saml2_Constants.NS_DS)
 
             nodes = newdoc.getElementsByTagName("*")
-            for n in nodes:
-                if n.tagName == 'ns0:KeyInfo':
-                    n.tagName = 'dsig:KeyInfo'
-                    n.removeAttribute('xmlns:ns0')
-                    n.setAttribute('xmlns:dsig', OneLogin_Saml2_Constants.NS_DS)
+            for node in nodes:
+                if node.tagName == 'ns0:KeyInfo':
+                    node.tagName = 'dsig:KeyInfo'
+                    node.removeAttribute('xmlns:ns0')
+                    node.setAttribute('xmlns:dsig', OneLogin_Saml2_Constants.NS_DS)
                 else:
-                    n.tagName = 'xenc:' + n.tagName
+                    node.tagName = 'xenc:' + node.tagName
 
             encrypted_id = newdoc.createElement('saml:EncryptedID')
             encrypted_data = newdoc.replaceChild(encrypted_id, newdoc.firstChild)
@@ -703,10 +734,10 @@ class OneLogin_Saml2_Utils:
         :returns: The temporary file
         :rtype: file-like object
         """
-        f = NamedTemporaryFile(delete=True)
-        f.file.write(content)
-        f.file.flush()
-        return f
+        f_temp = NamedTemporaryFile(delete=True)
+        f_temp.file.write(content)
+        f_temp.file.flush()
+        return f_temp
 
     @staticmethod
     def add_sign(xml, key, cert, debug=False):
@@ -774,13 +805,13 @@ class OneLogin_Saml2_Utils:
         key_info.addX509Data()
 
         dsig_ctx = xmlsec.DSigCtx()
-        signKey = xmlsec.Key.loadMemory(key, xmlsec.KeyDataFormatPem, None)
+        sign_key = xmlsec.Key.loadMemory(key, xmlsec.KeyDataFormatPem, None)
 
         file_cert = OneLogin_Saml2_Utils.write_temp_file(cert)
-        signKey.loadCert(file_cert.name, xmlsec.KeyDataFormatCertPem)
+        sign_key.loadCert(file_cert.name, xmlsec.KeyDataFormatCertPem)
         file_cert.close()
 
-        dsig_ctx.signKey = signKey
+        dsig_ctx.signKey = sign_key
         dsig_ctx.sign(signature)
 
         newdoc = parseString(etree.tostring(elem))
@@ -793,9 +824,9 @@ class OneLogin_Saml2_Utils:
             if not signature.tagName.startswith('ds:'):
                 signature.tagName = 'ds:' + signature.tagName
             nodes = signature.getElementsByTagName("*")
-            for n in nodes:
-                if not n.tagName.startswith('ds:'):
-                    n.tagName = 'ds:' + n.tagName
+            for node in nodes:
+                if not node.tagName.startswith('ds:'):
+                    node.tagName = 'ds:' + node.tagName
 
         return newdoc.saveXML(newdoc.firstChild)
 

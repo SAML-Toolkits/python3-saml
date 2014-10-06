@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Response class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+SAML Response class of OneLogin's Python Toolkit.
+
+"""
 
 from base64 import b64decode
 from copy import deepcopy
@@ -14,6 +20,12 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_Response(object):
+    """
+
+    This class handles a SAML Response. It parses or validates
+    a Logout Response object.
+
+    """
 
     def __init__(self, settings, response):
         """
@@ -146,25 +158,25 @@ class OneLogin_Saml2_Response(object):
                     method = scn.get('Method', None)
                     if method and method != OneLogin_Saml2_Constants.CM_BEARER:
                         continue
-                    scData = scn.find('saml:SubjectConfirmationData', namespaces=OneLogin_Saml2_Constants.NSMAP)
-                    if scData is None:
+                    sc_data = scn.find('saml:SubjectConfirmationData', namespaces=OneLogin_Saml2_Constants.NSMAP)
+                    if sc_data is None:
                         continue
                     else:
-                        irt = scData.get('InResponseTo', None)
+                        irt = sc_data.get('InResponseTo', None)
                         if irt != in_response_to:
                             continue
-                        recipient = scData.get('Recipient', None)
+                        recipient = sc_data.get('Recipient', None)
                         if recipient and current_url not in recipient:
                             continue
-                        nooa = scData.get('NotOnOrAfter', None)
+                        nooa = sc_data.get('NotOnOrAfter', None)
                         if nooa:
                             parsed_nooa = OneLogin_Saml2_Utils.parse_SAML_to_time(nooa)
                             if parsed_nooa <= OneLogin_Saml2_Utils.now():
                                 continue
-                        nb = scData.get('NotBefore', None)
+                        nb = sc_data.get('NotBefore', None)
                         if nb:
                             parsed_nb = OneLogin_Saml2_Utils.parse_SAML_to_time(nb)
-                            if (parsed_nb > OneLogin_Saml2_Utils.now()):
+                            if parsed_nb > OneLogin_Saml2_Utils.now():
                                 continue
                         any_subject_confirmation = True
                         break
@@ -183,7 +195,7 @@ class OneLogin_Saml2_Response(object):
                 fingerprint = idp_data.get('certFingerprint', None)
 
                 # Only validates the first sign found
-                if ('{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP) in signed_elements:
+                if '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements:
                     document_to_validate = self.document
                 else:
                     if self.encrypted:
@@ -385,14 +397,14 @@ class OneLogin_Saml2_Response(object):
             signed_message_query = '/samlp:Response' + signature_expr
             message_reference_nodes = self.__query(signed_message_query)
             if message_reference_nodes:
-                id = message_reference_nodes[0].get('URI')
-                final_query = "/samlp:Response[@ID='%s']/" % id[1:]
+                message_id = message_reference_nodes[0].get('URI')
+                final_query = "/samlp:Response[@ID='%s']/" % message_id[1:]
             else:
                 final_query = "/samlp:Response"
             final_query += assertion_expr
         else:
-            id = assertion_reference_nodes[0].get('URI')
-            final_query = '/samlp:Response' + assertion_expr + "[@ID='%s']" % id[1:]
+            assertion_id = assertion_reference_nodes[0].get('URI')
+            final_query = '/samlp:Response' + assertion_expr + "[@ID='%s']" % assertion_id[1:]
         final_query += xpath_expr
         return self.__query(final_query)
 
@@ -428,7 +440,7 @@ class OneLogin_Saml2_Response(object):
             raise Exception('No private key available, check settings')
 
         encrypted_assertion_nodes = OneLogin_Saml2_Utils.query(dom, '//saml:EncryptedAssertion')
-        if (encrypted_assertion_nodes):
+        if encrypted_assertion_nodes:
             encrypted_data_nodes = OneLogin_Saml2_Utils.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
                 encrypted_data = encrypted_data_nodes[0]

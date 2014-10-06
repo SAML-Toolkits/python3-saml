@@ -1,10 +1,24 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Error class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Error class of OneLogin's Python Toolkit.
+
+Defines common Error codes and has a custom initializator.
+
+"""
 
 
 class OneLogin_Saml2_Error(Exception):
+    """
+
+    This class implements a custom Exception handler.
+    Defines custom error codes.
+
+    """
 
     # Errors
     SETTINGS_FILE_NOT_FOUND = 0

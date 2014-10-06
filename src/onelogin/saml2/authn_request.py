@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Authn_Request class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+AuthNRequest class of OneLogin's Python Toolkit.
+
+"""
 
 from base64 import b64encode
 from zlib import compress
@@ -10,7 +16,13 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
 
-class OneLogin_Saml2_Authn_Request:
+class OneLogin_Saml2_Authn_Request(object):
+    """
+
+    This class handles an AuthNRequest. It builds an
+    AuthNRequest object.
+
+    """
 
     def __init__(self, settings):
         """
@@ -62,15 +74,16 @@ class OneLogin_Saml2_Authn_Request:
     <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
-</samlp:AuthnRequest>""" % {
-            'id': uid,
-            'provider_name': provider_name_str,
-            'issue_instant': issue_instant,
-            'destination': destination,
-            'assertion_url': sp_data['assertionConsumerService']['url'],
-            'entity_id': sp_data['entityId'],
-            'name_id_policy': name_id_policy_format,
-        }
+</samlp:AuthnRequest>""" % \
+            {
+                'id': uid,
+                'provider_name': provider_name_str,
+                'issue_instant': issue_instant,
+                'destination': destination,
+                'assertion_url': sp_data['assertionConsumerService']['url'],
+                'entity_id': sp_data['entityId'],
+                'name_id_policy': name_id_policy_format,
+            }
 
         self.__authn_request = request
 

@@ -1,10 +1,23 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Constants class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Constants class of OneLogin's Python Toolkit.
+
+"""
 
 
-class OneLogin_Saml2_Constants:
+class OneLogin_Saml2_Constants(object):
+    """
+
+    This class defines all the constants that will be used
+    in the OneLogin's Python Toolkit.
+
+    """
+
     # Value added to the current time in time condition validations
     ALOWED_CLOCK_DRIFT = 300
 

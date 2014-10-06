@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+""" OneLogin_Saml2_Logout_Response class
+
+Copyright (c) 2014, OneLogin, Inc.
+All rights reserved.
+
+Logout Response class of OneLogin's Python Toolkit.
+
+"""
 
 from base64 import b64decode
 from defusedxml.lxml import fromstring
@@ -14,7 +20,13 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
-class OneLogin_Saml2_Logout_Response():
+class OneLogin_Saml2_Logout_Response(object):
+    """
+
+    This class  handles a Logout Response. It Builds or parses a Logout Response object
+    and validates it.
+
+    """
 
     def __init__(self, settings, response=None):
         """
@@ -163,13 +175,14 @@ class OneLogin_Saml2_Logout_Response():
     <samlp:Status>
         <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
     </samlp:Status>
-</samlp:LogoutResponse>""" % {
-            'id': uid,
-            'issue_instant': issue_instant,
-            'destination': idp_data['singleLogoutService']['url'],
-            'in_response_to': in_response_to,
-            'entity_id': sp_data['entityId'],
-        }
+</samlp:LogoutResponse>""" % \
+            {
+                'id': uid,
+                'issue_instant': issue_instant,
+                'destination': idp_data['singleLogoutService']['url'],
+                'in_response_to': in_response_to,
+                'entity_id': sp_data['entityId'],
+            }
 
         self.__logout_response = logout_response
 

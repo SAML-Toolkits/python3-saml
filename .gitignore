@@ -18,6 +18,7 @@ __pycache_
 /dist
 /venv
 .coverage
+.pypirc
 
 *.key
 *.crt

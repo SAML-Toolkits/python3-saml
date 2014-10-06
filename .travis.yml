@@ -3,10 +3,8 @@ python:
   - '2.6'
   - '2.7'
 
-before_install:
-  - 'python setup develop'
-
 install:
+  - 'travis_retry pip install .'
   - 'travis_retry pip install -e ".[test]" --use-mirrors'
 
 script: 

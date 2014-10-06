@@ -364,13 +364,16 @@ class OneLogin_Saml2_Settings(object):
                         'certFileName' not in security['signMetadata']:
                     errors.append('sp_signMetadata_invalid')
 
-            if (('authnRequestsSigned' in security and security['authnRequestsSigned']) or \
-                 ('logoutRequestSigned' in security and security['logoutRequestSigned']) or \
-                 ('logoutResponseSigned' in security and security['logoutResponseSigned']) or \
-                 ('wantAssertionsEncrypted' in security and security['wantAssertionsEncrypted']) or \
-                 ('wantNameIdEncrypted' in security and security['wantNameIdEncrypted'])) and \
-                    not self.check_sp_certs():
-                errors.append('sp_cert_not_found_and_required')
+            authn_sign = 'authnRequestsSigned' in security.keys() and security['authnRequestsSigned']
+            logout_req_sign = 'logoutRequestSigned' in security.keys() and security['logoutRequestSigned']
+            logout_res_sign = 'logoutResponseSigned' in security.keys() and security['logoutResponseSigned']
+            want_assert_enc = 'wantAssertionsEncrypted' in security.keys() and security['wantAssertionsEncrypted']
+            want_nameid_enc = 'wantNameIdEncrypted' in security.keys() and security['wantNameIdEncrypted']
+
+            if not self.check_sp_certs():
+                if authn_sign or logout_req_sign or logout_res_sign or \
+                   want_assert_enc or want_nameid_enc:
+                    errors.append('sp_cert_not_found_and_required')
 
             exists_x509 = ('idp' in settings and
                            'x509cert' in settings['idp'] and
@@ -378,11 +381,15 @@ class OneLogin_Saml2_Settings(object):
             exists_fingerprint = ('idp' in settings and
                                   'certFingerprint' in settings['idp'] and
                                   len(settings['idp']['certFingerprint']) > 0)
-            if (('wantAssertionsSigned' in security and security['wantAssertionsSigned']) or \
-                 ('wantMessagesSigned' in security and security['wantMessagesSigned'])) and \
+
+            want_assert_sign = 'wantAssertionsSigned' in security.keys() and security['wantAssertionsSigned']
+            want_mes_signed = 'wantMessagesSigned' in security.keys() and security['wantMessagesSigned']
+            nameid_enc = 'nameIdEncrypted' in security.keys() and security['nameIdEncrypted']
+
+            if (want_assert_sign or want_mes_signed) and \
                     not(exists_x509 or exists_fingerprint):
                 errors.append('idp_cert_or_fingerprint_not_found_and_required')
-            if ('nameIdEncrypted' in security and security['nameIdEncrypted']) and not exists_x509:
+            if nameid_enc and not exists_x509:
                 errors.append('idp_cert_not_found_and_required')
 
         if 'contactPerson' in settings:

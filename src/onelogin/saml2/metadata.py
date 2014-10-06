@@ -89,7 +89,7 @@ class OneLogin_Saml2_Metadata(object):
         if len(organization) > 0:
             organization_info = []
             for (lang, info) in organization.items():
-                organization_info.append("""    <md:Organization>
+                org = """    <md:Organization>
         <md:OrganizationName xml:lang="%(lang)s">%(name)s</md:OrganizationName>
         <md:OrganizationDisplayName xml:lang="%(lang)s">%(display_name)s</md:OrganizationDisplayName>
         <md:OrganizationURL xml:lang="%(lang)s">%(url)s</md:OrganizationURL>
@@ -99,14 +99,15 @@ class OneLogin_Saml2_Metadata(object):
                         'name': info['name'],
                         'display_name': info['displayname'],
                         'url': info['url'],
-                    })
+                    }
+                organization_info.append(org)
             str_organization = '\n'.join(organization_info)
 
         str_contacts = ''
         if len(contacts) > 0:
             contacts_info = []
             for (ctype, info) in contacts.items():
-                contacts_info.append("""    <md:ContactPerson contactType="%(type)s">
+                contact = """    <md:ContactPerson contactType="%(type)s">
         <md:GivenName>%(name)s</md:GivenName>
         <md:EmailAddress>%(email)s</md:EmailAddress>
     </md:ContactPerson>""" % \
@@ -114,7 +115,8 @@ class OneLogin_Saml2_Metadata(object):
                         'type': ctype,
                         'name': info['givenName'],
                         'email': info['emailAddress'],
-                    })
+                    }
+                contacts_info.append(contact)
             str_contacts = '\n'.join(contacts_info)
 
         metadata = """<?xml version="1.0"?>

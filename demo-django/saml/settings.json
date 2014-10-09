@@ -20,5 +20,5 @@
             "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/<onelogin_connector_id>"
         },
         "x509cert": "<onelogin_connector_cert>"
-    },
+    }
 }

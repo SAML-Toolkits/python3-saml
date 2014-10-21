@@ -92,7 +92,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetNameIdData(self):
         """
-        Tests the get_name_id_data method of the OneLogin_Saml2_LogoutRequest
+        Tests the get_nameid_data method of the OneLogin_Saml2_LogoutRequest
         """
         expected_name_id_data = {
             'Value': 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c',
@@ -101,23 +101,23 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         }
 
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
-        name_id_data = OneLogin_Saml2_Logout_Request.get_name_id_data(request)
+        name_id_data = OneLogin_Saml2_Logout_Request.get_nameid_data(request)
         self.assertEqual(expected_name_id_data, name_id_data)
 
         dom = parseString(request)
-        name_id_data_2 = OneLogin_Saml2_Logout_Request.get_name_id_data(dom)
+        name_id_data_2 = OneLogin_Saml2_Logout_Request.get_nameid_data(dom)
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
         try:
-            OneLogin_Saml2_Logout_Request.get_name_id_data(request_2)
+            OneLogin_Saml2_Logout_Request.get_nameid_data(request_2)
             self.assertTrue(False)
         except Exception as e:
             self.assertIn('Key is required in order to decrypt the NameID', e.message)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
-        name_id_data_4 = OneLogin_Saml2_Logout_Request.get_name_id_data(request_2, key)
+        name_id_data_4 = OneLogin_Saml2_Logout_Request.get_nameid_data(request_2, key)
         expected_name_id_data = {
             'Value': 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69',
             'Format': 'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress',
@@ -130,36 +130,36 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         encrypted_data = encrypted_id_nodes[0].firstChild.nextSibling
         encrypted_id_nodes[0].removeChild(encrypted_data)
         try:
-            OneLogin_Saml2_Logout_Request.get_name_id_data(dom_2.toxml(), key)
+            OneLogin_Saml2_Logout_Request.get_nameid_data(dom_2.toxml(), key)
             self.assertTre(False)
         except Exception as e:
             self.assertIn('Not NameID found in the Logout Request', e.message)
 
         inv_request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'no_nameId.xml'))
         try:
-            OneLogin_Saml2_Logout_Request.get_name_id_data(inv_request)
+            OneLogin_Saml2_Logout_Request.get_nameid_data(inv_request)
             self.assertTre(False)
         except Exception as e:
             self.assertIn('Not NameID found in the Logout Request', e.message)
 
     def testGetNameId(self):
         """
-        Tests the get_name_id of the OneLogin_Saml2_LogoutRequest
+        Tests the get_nameid of the OneLogin_Saml2_LogoutRequest
         """
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
-        name_id = OneLogin_Saml2_Logout_Request.get_name_id(request)
+        name_id = OneLogin_Saml2_Logout_Request.get_nameid(request)
         self.assertEqual(name_id, 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c')
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
         try:
-            OneLogin_Saml2_Logout_Request.get_name_id(request_2)
+            OneLogin_Saml2_Logout_Request.get_nameid(request_2)
             self.assertTrue(False)
         except Exception as e:
             self.assertIn('Key is required in order to decrypt the NameID', e.message)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
-        name_id_3 = OneLogin_Saml2_Logout_Request.get_name_id(request_2, key)
+        name_id_3 = OneLogin_Saml2_Logout_Request.get_nameid(request_2, key)
         self.assertEqual('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', name_id_3)
 
     def testGetIssuer(self):

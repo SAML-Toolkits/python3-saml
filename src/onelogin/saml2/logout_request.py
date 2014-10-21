@@ -100,7 +100,7 @@ class OneLogin_Saml2_Logout_Request(object):
         return dom.documentElement.getAttribute('ID')
 
     @staticmethod
-    def get_name_id_data(request, key=None):
+    def get_nameid_data(request, key=None):
         """
         Gets the NameID Data of the the Logout Request
         :param request: Logout Request Message
@@ -143,7 +143,7 @@ class OneLogin_Saml2_Logout_Request(object):
         return name_id_data
 
     @staticmethod
-    def get_name_id(request, key=None):
+    def get_nameid(request, key=None):
         """
         Gets the NameID of the Logout Request Message
         :param request: Logout Request Message
@@ -153,7 +153,7 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: Name ID Value
         :rtype: string
         """
-        name_id = OneLogin_Saml2_Logout_Request.get_name_id_data(request, key)
+        name_id = OneLogin_Saml2_Logout_Request.get_nameid_data(request, key)
         return name_id['Value']
 
     @staticmethod

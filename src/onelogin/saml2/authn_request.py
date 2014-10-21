@@ -38,6 +38,7 @@ class OneLogin_Saml2_Authn_Request(object):
         security = self.__settings.get_security_data()
 
         uid = OneLogin_Saml2_Utils.generate_unique_id()
+        self.__id = uid
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
         destination = idp_data['singleSignOnService']['url']
@@ -95,3 +96,11 @@ class OneLogin_Saml2_Authn_Request(object):
         """
         deflated_request = compress(self.__authn_request)[2:-4]
         return b64encode(deflated_request)
+
+    def get_id(self):
+        """
+        Returns the AuthNRequest ID.
+        :return: AuthNRequest ID
+        :rtype: string
+        """
+        return self.__id

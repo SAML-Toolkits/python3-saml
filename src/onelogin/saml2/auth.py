@@ -47,6 +47,7 @@ class OneLogin_Saml2_Auth(object):
         self.__settings = OneLogin_Saml2_Settings(old_settings, custom_base_path)
         self.__attributes = []
         self.__nameid = None
+        self.__session_index = None
         self.__authenticated = False
         self.__errors = []
 
@@ -86,7 +87,9 @@ class OneLogin_Saml2_Auth(object):
             if response.is_valid(self.__request_data, request_id):
                 self.__attributes = response.get_attributes()
                 self.__nameid = response.get_nameid()
+                self.__session_index = response.get_session_index()
                 self.__authenticated = True
+
             else:
                 self.__errors.append('invalid_response')
 
@@ -191,6 +194,14 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         return self.__nameid
+
+    def get_session_index(self):
+        """
+        Returns the SessionIndex from the AuthnStatement.
+        :returns: The SessionIndex of the assertion
+        :rtype: string
+        """
+        return self.__session_index
 
     def get_errors(self):
         """

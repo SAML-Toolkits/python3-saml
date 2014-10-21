@@ -43,7 +43,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testGetSettings(self):
         """
-        Tests the getSettings method of the OneLogin_Saml2_Auth class
+        Tests the get_settings method of the OneLogin_Saml2_Auth class
         Build a OneLogin_Saml2_Settings object with a setting array
         and compare the value returned from the method of the
         auth object
@@ -57,7 +57,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testGetSSOurl(self):
         """
-        Tests the getSSOurl method of the OneLogin_Saml2_Auth class
+        Tests the get_sso_url method of the OneLogin_Saml2_Auth class
         """
         settings_info = self.loadSettingsJSON()
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
@@ -67,13 +67,33 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testGetSLOurl(self):
         """
-        Tests the getSLOurl method of the OneLogin_Saml2_Auth class
+        Tests the get_slo_url method of the OneLogin_Saml2_Auth class
         """
         settings_info = self.loadSettingsJSON()
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
 
         slo_url = settings_info['idp']['singleLogoutService']['url']
         self.assertEqual(auth.get_slo_url(), slo_url)
+
+    def testGetSessionIndex(self):
+        """
+        Tests the get_session_index method of the OneLogin_Saml2_Auth class
+        """
+        settings_info = self.loadSettingsJSON()
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        self.assertIsNone(auth.get_session_index())
+
+        request_data = self.get_request()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth2 = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        self.assertIsNone(auth2.get_session_index())
+
+        auth2.process_response()
+        self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', auth2.get_session_index())
 
     def testProcessNoResponse(self):
         """
@@ -92,7 +112,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessResponseInvalid(self):
         """
-        Tests the processResponse method of the OneLogin_Saml2_Auth class
+        Tests the process_response method of the OneLogin_Saml2_Auth class
         Case Invalid Response, After processing the response the user
         is not authenticated, attributes are notreturned, no nameID and
         the error array is not empty, contains 'invalid_response
@@ -114,7 +134,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessResponseInvalidRequestId(self):
         """
-        Tests the processResponse method of the OneLogin_Saml2_Auth class
+        Tests the process_response method of the OneLogin_Saml2_Auth class
         Case Invalid Response, Invalid requestID
         """
         request_data = self.get_request()
@@ -141,7 +161,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessResponseValid(self):
         """
-        Tests the processResponse method of the OneLogin_Saml2_Auth class
+        Tests the process_response method of the OneLogin_Saml2_Auth class
         Case Valid Response, After processing the response the user
         is authenticated, attributes are returned, also has a nameID and
         the error array is empty
@@ -172,7 +192,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testRedirectTo(self):
         """
-        Tests the redirectTo method of the OneLogin_Saml2_Auth class
+        Tests the redirect_to method of the OneLogin_Saml2_Auth class
         (phpunit raises an exception when a redirect is executed, the
         exception is catched and we check that the targetURL is correct)
         Case redirect without url parameter
@@ -186,7 +206,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testRedirectTowithUrl(self):
         """
-        Tests the redirectTo method of the OneLogin_Saml2_Auth class
+        Tests the redirect_to method of the OneLogin_Saml2_Auth class
         (phpunit raises an exception when a redirect is executed, the
         exception is catched and we check that the targetURL is correct)
         Case redirect with url parameter
@@ -201,7 +221,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessNoSLO(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case No Message, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
@@ -213,7 +233,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLOResponseInvalid(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Invalid Logout Response
         """
         request_data = self.get_request()
@@ -235,7 +255,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLOResponseNoSucess(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Logout Response not sucess
         """
         request_data = self.get_request()
@@ -254,7 +274,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLOResponseRequestId(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Logout Response with valid and invalid Request ID
         """
         request_data = self.get_request()
@@ -278,7 +298,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLOResponseValid(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Valid Logout Response
         """
         request_data = self.get_request()
@@ -308,7 +328,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLOResponseValidDeletingSession(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Valid Logout Response, validating deleting the local session
         """
         request_data = self.get_request()
@@ -338,7 +358,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLORequestInvalidValid(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Invalid Logout Request
         """
         settings_info = self.loadSettingsJSON()
@@ -370,7 +390,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLORequestNotOnOrAfterFailed(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Logout Request NotOnOrAfter failed
         """
         request_data = self.get_request()
@@ -389,7 +409,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLORequestDeletingSession(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Valid Logout Request, validating that the local session is deleted,
         a LogoutResponse is created and a redirection executed
         """
@@ -437,7 +457,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLORequestRelayState(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Valid Logout Request, validating the relayState,
         a LogoutResponse is created and a redirection executed
         """
@@ -464,7 +484,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testProcessSLORequestSignedResponse(self):
         """
-        Tests the processSLO method of the OneLogin_Saml2_Auth class
+        Tests the process_slo method of the OneLogin_Saml2_Auth class
         Case Valid Logout Request, validating the relayState,
         a signed LogoutResponse is created and a redirection executed
         """
@@ -627,7 +647,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testSetStrict(self):
         """
-        Tests the setStrict method of the OneLogin_Saml2_Auth
+        Tests the set_strict method of the OneLogin_Saml2_Auth
         """
         settings_info = self.loadSettingsJSON()
         settings_info['strict'] = False
@@ -652,7 +672,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testBuildRequestSignature(self):
         """
-        Tests the buildRequestSignature method of the OneLogin_Saml2_Auth
+        Tests the build_request_signature method of the OneLogin_Saml2_Auth
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
@@ -673,7 +693,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testBuildResponseSignature(self):
         """
-        Tests the buildResponseSignature method of the OneLogin_Saml2_Auth
+        Tests the build_response_signature method of the OneLogin_Saml2_Auth
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))

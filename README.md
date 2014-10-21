@@ -118,8 +118,8 @@ SAML requires a x.509 cert to sign and encrypt elements like NameID, Message, As
 
 If our environment requires sign or encrypt support, the certs folder may contain the x509 cert and the private key that the SP will use:
 
-    sp.crt The public cert of the SP
-    sp.key The privake key of the SP
+* sp.crt The public cert of the SP
+* sp.key The privake key of the SP
 
 Or also we can provide those data in the setting file at the 'x509cert' and the privateKey' json parameters of the 'sp' element.
 
@@ -247,6 +247,7 @@ This is the settings.json file:
 
 In addition to the required settings data (idp, sp), there is extra information that could be defined at advanced_settings.json
 
+```javascript
 {
     // Security settings
     "security": {
@@ -315,6 +316,7 @@ In addition to the required settings data (idp, sp), there is extra information 
         }
     }
 }
+```
 
 In the security section, you can set the way that the SP will handle the messages and assertions. Contact the admin of the IdP and ask him what the IdP expects, and decide what validations will handle the SP and what requirements the SP will have and communicate them to the IdP's admin too.
 
@@ -365,6 +367,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 #### The Request ####
 
 Building an OneLogin_Saml2_Auth object requires a 'request' parameter.
+
 ```python
 auth = OneLogin_Saml2_Auth(req)
 ```
@@ -379,9 +382,10 @@ req = {
     "get_data": "",
     "post_data": ""
 }
+```
 
 Each python framework built its own request object, you may map its data to match what the saml toolkit expects.
-Let's see some examples:
+Let`s see some examples:
 
 ```python
 def prepare_from_django_request(request):
@@ -448,7 +452,7 @@ errors = saml_settings.validate_metadata(metadata)
 if len(errors) == 0:
     print metadata
 else:
-    "Error found on Metadata: %s" % (', '.join(errors))
+    print "Error found on Metadata: %s" % (', '.join(errors))
 ```
 
 The get_sp_metadata will return the metadata signed or not based on the security info of the advanced_settings.json ('signMetadata').
@@ -476,7 +480,7 @@ if not errors:
     else:
       print 'Not authenticated'
 else:
-    "Error when processing SAML Response: %s" % (', '.join(errors))
+    print "Error when processing SAML Response: %s" % (', '.join(errors))
 ```
 
 The SAML response is processed and then checked that there are no errors. It also verifies that the user is authenticated and stored the userdata in session.
@@ -489,6 +493,7 @@ At that point there are 2 possible alternatives:
 Notice that we saved the user data in the session before the redirection to have the user data available at the RelayState view.
 
 In order to retrieve attributes we use:
+
 ```python
 attributes = auth.get_attributes();
 ```
@@ -509,10 +514,10 @@ If we execute print attributes we could get:
 Each attribute name can be used as a key to obtain the value. Every attribute is a list of values. A single-valued attribute is a listy of a single element.
 
 The following code is equivalent:
+
 ```python
 attributes = auth.get_attributes();
 print attributes['cn']
-
 
 print auth.get_attribute('cn')
 ```

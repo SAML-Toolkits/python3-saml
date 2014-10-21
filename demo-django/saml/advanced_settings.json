@@ -1,7 +1,7 @@
 {
     "security": {        
         "nameIdEncrypted": false,
-        "authnRequestsSigned": true,
+        "authnRequestsSigned": false,
         "logoutRequestSigned": false,
         "logoutResponseSigned": false,
         "signMetadata": false,

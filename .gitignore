@@ -23,3 +23,6 @@ __pycache_
 *.key
 *.crt
 *.pem
+
+settings.py
+advanced_settings.py

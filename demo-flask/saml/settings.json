@@ -2,23 +2,29 @@
     "strict": true,
     "debug": true,
     "sp": {
-        "entityId": "http://pytoolkit.com:8000/metadata/",
+        "entityId": "https://<sp_domain>/metadata/",
         "assertionConsumerService": {
-            "url": "http://pytoolkit.com:8000/?acs"
+            "url": "https://<sp_domain>/?acs",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
         },
         "singleLogoutService": {
-            "url": "http://pytoolkit.com:8000/?sls"
+            "url": "https://<sp_domain>/?sls",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
-        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified"
+        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
+        "x509cert": "",
+        "privateKey": ""
     },
     "idp": {
-        "entityId": "https://app.onelogin.com/saml/metadata/383123",
+        "entityId": "https://app.onelogin.com/saml/metadata/<onelogin_connector_id>",
         "singleSignOnService": {
-            "url": "https://app.onelogin.com/trust/saml2/http-post/sso/383123"
+            "url": "https://app.onelogin.com/trust/saml2/http-post/sso/<onelogin_connector_id>",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
         "singleLogoutService": {
-            "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/383123"
+            "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/<onelogin_connector_id>",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
-        "x509cert": "MIIDGTCCAoKgAwIBAgIBATANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbTAeFw0xMzA2MDUxNzE2MjBaFw0xODA2MDUxNzE2MjBaMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9uZUxvZ2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCsalDL15zSKeEGy9c0Hao7+G02x6k/MlZuCwEvkPKUcl9QF/q0584lta735hmiZSuWOFQDNQ4VT53VevjAhOtzLJOsa8wcZ+SA1s3j4bNcpUIAHltb4Az6NC7U2/LatfnwscOazEJnVsfL4aaBdpIHBFQ6Ed0StD0AfB6Ci0hURwIDAQABo4HUMIHRMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFHm3fLi+Q1zMc3guMyHy5AHdQvdgMIGRBgNVHSMEgYkwgYaAFHm3fLi+Q1zMc3guMyHy5AHdQvdgoWukaTBnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbYIBATAOBgNVHQ8BAf8EBAMCBPAwDQYJKoZIhvcNAQEFBQADgYEANZvzlB1Aq84AdOvsn2XKxBB/PmNZLqnM1VWRPaNcvjafx7eHd5qayXFNQz+bOLujENmgAm5padbydG89SeefpOGcY2TMsVt0RUzxTnN3Zq5G6Ja2fAKOEX01ejdoPPMmStqqSw8k1wPUU8uLYJG5wmjf0rCb8RVaeAwMc+wcEIA="
+        "x509cert": "<onelogin_connector_cert>"
     }
-}
+}}

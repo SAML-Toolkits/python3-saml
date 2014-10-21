@@ -64,8 +64,8 @@ Installation
 ### Dependences ###
 
  * python 2.7
- * M2Crypto  A Python crypto and SSL toolkit
- * dm.xmlsec.binding  Cython/lxml based binding for the XML security library
+ * M2Crypto  A Python crypto and SSL toolkit (depends on swig)
+ * dm.xmlsec.binding  Cython/lxml based binding for the XML security library (depends on libxmlsec1-dev)
  * isodate  An ISO 8601 date/time/duration parser and formater
  * defusedxml  XML bomb protection for Python stdlib modules
 
@@ -177,7 +177,7 @@ Demos and test
 We said that this toolkit includes a django application demo and a flask applicacion demo,
 lets see how fast is deploy them.
 
-** Virtualenv **
+***Virtualenv***
 
 The use of a [virtualenv](http://virtualenv.readthedocs.org/en/latest/) is
 highly recommended.

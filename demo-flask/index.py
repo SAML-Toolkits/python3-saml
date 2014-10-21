@@ -20,7 +20,6 @@ def init_saml_auth(req):
 
 
 def prepare_flask_request(request):
-    # TODO Include 'server_port'
     url_data = urlparse(request.url)
     return {
         'http_host': request.host,
@@ -52,7 +51,7 @@ def index():
         auth.process_response()
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
-        if not errors:
+        if len(errors) == 0:
             session['samlUserdata'] = auth.get_attributes()
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
@@ -60,11 +59,12 @@ def index():
     elif 'sls' in request.args:
         dscb = lambda: session.clear()
         url = auth.process_slo(delete_session_cb=dscb)
-        if url is not None:
-            return redirect(url)
         errors = auth.get_errors()
         if len(errors) == 0:
-            success_slo = True
+            if url is not None:
+                return redirect(url)
+            else:
+                success_slo = True
 
     if 'samlUserdata' in session:
         paint_logout = True

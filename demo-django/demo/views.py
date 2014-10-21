@@ -52,11 +52,12 @@ def index(request):
     elif 'sls' in req['get_data']:
         dscb = lambda: request.session.flush()
         url = auth.process_slo(delete_session_cb=dscb)
-        if url is not None:
-            return HttpResponseRedirect(url)
         errors = auth.get_errors()
         if len(errors) == 0:
-            success_slo = True
+            if url is not None:
+                return HttpResponseRedirect(url)
+            else:
+                success_slo = True
 
     if 'samlUserdata' in request.session:
         paint_logout = True

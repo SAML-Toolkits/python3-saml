@@ -18,7 +18,7 @@ const-rgx=(([A-Z_][A-Z0-9_]*)|([a-z_][a-z0-9_]*)|(__.*__)|register|urlpatterns)$
 good-names=_,i,j,k,e,qs,pk,setUp,tearDown,el,ns,fd,js,nb,na,sp,SAML_SINGLE_LOGOUT_NOT_SUPPORTED,SAML_SINGLE_LOGOUT_NOT_SUPPORTED,NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
 docstring-min-length=1
 
-disable=E0611,W0703,W0511,W1401,F0401,W0102,E1103,W0212
+disable=E0611,W0703,W0511,W1401,F0401,W0102,E1103,W0212,I0011
 
 [TYPECHECK]
 

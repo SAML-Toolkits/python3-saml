@@ -136,6 +136,7 @@ class OneLogin_Saml2_Logout_Response(object):
                     raise Exception('Signature validation failed. Logout Response rejected')
 
             return True
+        # pylint: disable=R0801
         except Exception as err:
             self.__error = err.__str__()
             debug = self.__settings.is_debug_active()

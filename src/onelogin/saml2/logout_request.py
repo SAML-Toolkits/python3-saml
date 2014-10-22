@@ -291,6 +291,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
             return True
         except Exception as err:
+            # pylint: disable=R0801
             self.__error = err.__str__()
             debug = self.__settings.is_debug_active()
             if debug:

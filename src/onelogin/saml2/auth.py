@@ -40,8 +40,14 @@ class OneLogin_Saml2_Auth(object):
         """
         Initializes the SP SAML instance.
 
-        Arguments are:
-            * (dict)   old_settings. Setting data
+        :param request_data: Request Data
+        :type request_data: dict
+
+        :param settings: Optional. SAML Toolkit Settings
+        :type settings: dict|object
+
+        :param custom_base_path: Optional. Path where are stored the settings file and the cert folder
+        :type custom_base_path: string
         """
         self.__request_data = request_data
         self.__settings = OneLogin_Saml2_Settings(old_settings, custom_base_path)
@@ -124,14 +130,14 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
         elif 'get_data' in self.__request_data and 'SAMLRequest' in self.__request_data['get_data']:
-            request = OneLogin_Saml2_Utils.decode_base64_and_inflate(self.__request_data['get_data']['SAMLRequest'])
-            if not OneLogin_Saml2_Logout_Request.is_valid(self.__settings, request, self.__request_data):
+            logout_request = OneLogin_Saml2_Logout_Request(self.__settings, self.__request_data['get_data']['SAMLRequest'])
+            if not logout_request.is_valid(self.__request_data):
                 self.__errors.append('invalid_logout_request')
             else:
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
-                in_response_to = OneLogin_Saml2_Logout_Request.get_id(request)
+                in_response_to = OneLogin_Saml2_Logout_Request.get_id(OneLogin_Saml2_Utils.decode_base64_and_inflate(self.__request_data['get_data']['SAMLRequest']))
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
                 response_builder.build(in_response_to)
                 logout_response = response_builder.get_response()

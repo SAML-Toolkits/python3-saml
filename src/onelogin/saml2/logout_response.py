@@ -39,6 +39,8 @@ class OneLogin_Saml2_Logout_Response(object):
                                                     response from the IdP.
         """
         self.__settings = settings
+        self.__error = None
+
         if response is not None:
             self.__logout_response = OneLogin_Saml2_Utils.decode_base64_and_inflate(response)
             self.document = parseString(self.__logout_response)
@@ -75,6 +77,7 @@ class OneLogin_Saml2_Logout_Response(object):
         :return: Returns if the SAML LogoutResponse is or not valid
         :rtype: boolean
         """
+        self.__error = None
         try:
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
@@ -134,9 +137,10 @@ class OneLogin_Saml2_Logout_Response(object):
 
             return True
         except Exception as err:
+            self.__error = err.__str__()
             debug = self.__settings.is_debug_active()
             if debug:
-                print err
+                print err.__str__()
             return False
 
     def __query(self, query):
@@ -193,3 +197,9 @@ class OneLogin_Saml2_Logout_Response(object):
         :rtype: string
         """
         return OneLogin_Saml2_Utils.deflate_and_base64_encode(self.__logout_response)
+
+    def get_error(self):
+        """
+        After execute a validation process, if fails this method returns the cause
+        """
+        return self.__error

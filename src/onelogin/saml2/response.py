@@ -53,7 +53,10 @@ class OneLogin_Saml2_Response(object):
 
     def is_valid(self, request_data, request_id=None):
         """
-        Constructs the response object.
+        Validates the response object.
+
+        :param request_data: Request Data
+        :type request_data: dict
 
         :param request_id: Optional argument. The ID of the AuthNRequest sent by this SP to the IdP
         :type request_id: string

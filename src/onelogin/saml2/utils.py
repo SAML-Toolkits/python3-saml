@@ -15,7 +15,7 @@ import calendar
 from hashlib import sha1
 from isodate import parse_duration as duration_parser
 from lxml import etree
-from defusedxml.lxml import fromstring
+from defusedxml.lxml import tostring, fromstring
 from os.path import basename, dirname, join
 import re
 from sys import stderr
@@ -97,11 +97,13 @@ class OneLogin_Saml2_Utils(object):
         :returns: Error code or the DomDocument of the xml
         :rtype: string
         """
-        assert isinstance(xml, basestring) or isinstance(xml, Document)
+        assert isinstance(xml, basestring) or isinstance(xml, Document) or isinstance(xml, etree._Element)
         assert isinstance(schema, basestring)
 
         if isinstance(xml, Document):
             xml = xml.toxml()
+        elif isinstance(xml, etree._Element):
+            xml = tostring(xml)
 
         # Switch to lxml for schema validation
         try:

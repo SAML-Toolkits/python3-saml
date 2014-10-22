@@ -3,6 +3,7 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
+from base64 import b64encode
 import json
 from os.path import dirname, join, exists
 import unittest
@@ -202,16 +203,20 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
         Case Invalid XML
         """
-        request = '<xml>invalid</xml>'
+        request = b64encode('<xml>invalid</xml>')
         request_data = {
             'http_host': 'example.com',
-            'script_name': 'index.html'
+            'script_name': 'index.html',
         }
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
 
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, request)
+
+        self.assertTrue(logout_request.is_valid(request_data))
+
         settings.set_strict(True)
-        self.assertFalse(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, request)
+        self.assertFalse(logout_request2.is_valid(request_data))
 
     def testIsInvalidIssuer(self):
         """
@@ -226,11 +231,13 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Invalid issuer in the Logout Request', e.message)
@@ -246,21 +253,25 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         }
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('The LogoutRequest was received at', e.message)
 
         dom = parseString(request)
         dom.documentElement.setAttribute('Destination', None)
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, dom.toxml(), request_data))
+        logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        self.assertTrue(logout_request3.is_valid(request_data))
 
         dom.documentElement.removeAttribute('Destination')
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, dom.toxml(), request_data))
+        logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        self.assertTrue(logout_request4.is_valid(request_data))
 
     def testIsInvalidNotOnOrAfter(self):
         """
@@ -275,11 +286,14 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+
+        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Timing issues (please check your clock settings)', e.message)
@@ -295,21 +309,26 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
 
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
-        self.assertFalse(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertFalse(logout_request2.is_valid(request_data))
 
         settings.set_strict(False)
         dom = parseString(request)
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, dom, request_data))
+        logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        self.assertTrue(logout_request3.is_valid(request_data))
 
         settings.set_strict(True)
-        self.assertFalse(OneLogin_Saml2_Logout_Request.is_valid(settings, dom, request_data))
+        logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        self.assertFalse(logout_request4.is_valid(request_data))
 
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
-        request_2 = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request_2, request_data))
+        request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
+        logout_request5 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request5.is_valid(request_data))
 
     def testIsValidSign(self):
         """
@@ -318,48 +337,53 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request_data = {
             'http_host': 'example.com',
             'script_name': 'index.html',
-            'SAMLRequest': 'lVLBitswEP0Vo7tjeWzJtki8LIRCYLvbNksPewmyPc6K2pJqyXQ/v1LSQlroQi/DMJr33rwZbZ2cJysezNms/gt+X9H55G2etBOXlx1ZFy2MdMoJLWd0wvfieP/xQcCGCrsYb3ozkRvI+wjpHC5eGU2Sw35HTg3lA8hqZFwWFcMKsStpxbEsxoLXeQN9OdY1VAgk+YqLC8gdCUQB7tyKB+281D6UaF6mtEiBPudcABcMXkiyD26Ulv6CevXeOpFlVvlunb5ttEmV3ZjlnGn8YTRO5qx0NuBs8kzpAd829tXeucmR5NH4J/203I8el6gFRUqbFPJnyEV51Wq30by4TLW0/9ZyarYTxt4sBsjUYLMZvRykl1Fxm90SXVkfwx4P++T4KSafVzmpUcVJ/sfSrQZJPphllv79W8WKGtLx0ir8IrVTqD1pT2MH3QAMSs4KTvui71jeFFiwirOmprwPkYW063+5uRq4urHiiC4e8hCX3J5wqAEGaPpw9XB5JmkBdeDqSlkz6CmUXdl0Qae5kv2F/1384wu3PwE=',
-            'RelayState': '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
-            'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
-            'Signature': 'XCwCyI5cs7WhiJlB5ktSlWxSBxv+6q2xT3c8L7dLV6NQG9LHWhN7gf8qNsahSXfCzA0Ey9dp5BQ0EdRvAk2DIzKmJY6e3hvAIEp1zglHNjzkgcQmZCcrkK9Czi2Y1WkjOwR/WgUTUWsGJAVqVvlRZuS3zk3nxMrLH6f7toyvuJc='
+            'get_data': {
+                'SAMLRequest': 'lVLBitswEP0Vo7tjeWzJtki8LIRCYLvbNksPewmyPc6K2pJqyXQ/v1LSQlroQi/DMJr33rwZbZ2cJysezNms/gt+X9H55G2etBOXlx1ZFy2MdMoJLWd0wvfieP/xQcCGCrsYb3ozkRvI+wjpHC5eGU2Sw35HTg3lA8hqZFwWFcMKsStpxbEsxoLXeQN9OdY1VAgk+YqLC8gdCUQB7tyKB+281D6UaF6mtEiBPudcABcMXkiyD26Ulv6CevXeOpFlVvlunb5ttEmV3ZjlnGn8YTRO5qx0NuBs8kzpAd829tXeucmR5NH4J/203I8el6gFRUqbFPJnyEV51Wq30by4TLW0/9ZyarYTxt4sBsjUYLMZvRykl1Fxm90SXVkfwx4P++T4KSafVzmpUcVJ/sfSrQZJPphllv79W8WKGtLx0ir8IrVTqD1pT2MH3QAMSs4KTvui71jeFFiwirOmprwPkYW063+5uRq4urHiiC4e8hCX3J5wqAEGaPpw9XB5JmkBdeDqSlkz6CmUXdl0Qae5kv2F/1384wu3PwE=',
+                'RelayState': '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
+                'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+                'Signature': 'XCwCyI5cs7WhiJlB5ktSlWxSBxv+6q2xT3c8L7dLV6NQG9LHWhN7gf8qNsahSXfCzA0Ey9dp5BQ0EdRvAk2DIzKmJY6e3hvAIEp1zglHNjzkgcQmZCcrkK9Czi2Y1WkjOwR/WgUTUWsGJAVqVvlRZuS3zk3nxMrLH6f7toyvuJc='
+            }
         }
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
-        request = OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['SAMLRequest'])
+        request = OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest'])
 
         settings.set_strict(False)
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        self.assertTrue(logout_request.is_valid(request_data))
 
-        relayState = request_data['RelayState']
-        del request_data['RelayState']
-        self.assertFalse(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
-        request_data['RelayState'] = relayState
+        relayState = request_data['get_data']['RelayState']
+        del request_data['get_data']['RelayState']
+        self.assertFalse(logout_request.is_valid(request_data))
+        request_data['get_data']['RelayState'] = relayState
 
         settings.set_strict(True)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('The LogoutRequest was received at', e.message)
 
         settings.set_strict(False)
-        old_signature = request_data['Signature']
-        request_data['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333='
+        old_signature = request_data['get_data']['Signature']
+        request_data['get_data']['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333='
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            valid = logout_request3.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Signature validation failed. Logout Request rejected', e.message)
 
-        request_data['Signature'] = old_signature
-        old_signature_algorithm = request_data['SigAlg']
-        del request_data['SigAlg']
-        self.assertTrue(OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data))
+        request_data['get_data']['Signature'] = old_signature
+        old_signature_algorithm = request_data['get_data']['SigAlg']
+        del request_data['get_data']['SigAlg']
+        self.assertTrue(logout_request3.is_valid(request_data))
 
-        request_data['RelayState'] = 'http://example.com/relaystate'
+        request_data['get_data']['RelayState'] = 'http://example.com/relaystate'
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request, request_data)
+            valid = logout_request3.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Signature validation failed. Logout Request rejected', e.message)
@@ -367,23 +391,25 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings.set_strict(True)
         request_2 = request.replace('https://pitbulk.no-ip.org/newonelogin/demo1/index.php?sls', current_url)
         request_2 = request_2.replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/')
-        request_data['SAMLRequest'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(request_2)
+        request_data['get_data']['SAMLRequest'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(request_2)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request_2, request_data)
+            logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
+            valid = logout_request4.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Signature validation failed. Logout Request rejected', e.message)
 
         settings.set_strict(False)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request_2, request_data)
+            logout_request5 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
+            valid = logout_request5.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Signature validation failed. Logout Request rejected', e.message)
 
-        request_data['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        request_data['get_data']['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request_2, request_data)
+            valid = logout_request5.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('Invalid signAlg in the recieved Logout Request', e.message)
@@ -392,21 +418,23 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings_info['strict'] = True
         settings_info['security']['wantMessagesSigned'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
-        request_data['SigAlg'] = old_signature_algorithm
-        old_signature = request_data['Signature']
-        del request_data['Signature']
+        request_data['get_data']['SigAlg'] = old_signature_algorithm
+        old_signature = request_data['get_data']['Signature']
+        del request_data['get_data']['Signature']
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings, request_2, request_data)
+            logout_request6 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
+            valid = logout_request6.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('The Message of the Logout Request is not signed and the SP require it', e.message)
 
-        request_data['Signature'] = old_signature
+        request_data['get_data']['Signature'] = old_signature
         settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'
         del settings_info['idp']['x509cert']
         settings_2 = OneLogin_Saml2_Settings(settings_info)
         try:
-            valid = OneLogin_Saml2_Logout_Request.is_valid(settings_2, request_2, request_data)
+            logout_request7 = OneLogin_Saml2_Logout_Request(settings_2, b64encode(request_2))
+            valid = logout_request7.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
             self.assertIn('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', e.message)

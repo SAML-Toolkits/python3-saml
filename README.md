@@ -626,8 +626,7 @@ auth = OneLogin_Saml2_Auth(req)             # Initialize the SP SAML instance
 if 'sso' in request.args:                   # SSO action (SP-SSO initited).  Will send an AuthNRequest to the IdP
     return redirect(auth.login())
 elif 'sso2' in request.args:                       # Another SSO init action 
-    $returnTo = $spBaseUrl.'/demo1/attrs.php';     # but set a custom RelayState URL
-    return_to = '%sattrs/' % request.host_url
+    return_to = '%sattrs/' % request.host_url      # but set a custom RelayState URL
     return redirect(auth.login(return_to))
 elif 'slo' in request.args:                     # SLO action. Will sent a Logout Request to IdP
     return redirect(auth.logout())

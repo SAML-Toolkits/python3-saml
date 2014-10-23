@@ -65,7 +65,7 @@ Installation
 
  * python 2.7
  * M2Crypto  A Python crypto and SSL toolkit (depends on swig)
- * dm.xmlsec.binding  Cython/lxml based binding for the XML security library (depends on libxmlsec1-dev)
+ * dm.xmlsec.binding  Cython/lxml based binding for the XML security library (depends on python-dev libxml2-dev libxmlsec1-dev)
  * isodate  An ISO 8601 date/time/duration parser and formater
  * defusedxml  XML bomb protection for Python stdlib modules
 
@@ -110,7 +110,7 @@ the classes and methods that are described in a later section.
 
 #### demo-django ####
 
-This folder contains a Django project that will be used as demo to show how to add SAML support to the Django Framework. 'demo' is the main folder of the django project (with its settings.py, views.py, urls.py), 'templates' is the django templates of the project and 'saml' is a folder that contains the 'certs' folder with the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
+This folder contains a Django project that will be used as demo to show how to add SAML support to the Django Framework. 'demo' is the main folder of the django project (with its settings.py, views.py, urls.py), 'templates' is the django templates of the project and 'saml' is a folder that contains the 'certs' folder that could be used to store the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
 
 ***Notice about certs***
 
@@ -124,6 +124,12 @@ If our environment requires sign or encrypt support, the certs folder may contai
 Or also we can provide those data in the setting file at the 'x509cert' and the privateKey' json parameters of the 'sp' element.
 
 Sometimes we could need a signature on the metadata published by the SP, in this case we could use the x.509 cert previously mentioned or use a new x.509 cert: metadata.crt and metadata.key.
+
+If you want to create self-signed certs, you can do it at the https://www.samltool.com/self_signed_certs.php service, or using the command:
+
+```bash
+openssl req -new -x509 -days 3652 -nodes -out sp.crt -keyout saml.key
+```
 
 #### demo-flask ####
 
@@ -167,7 +173,7 @@ This is the settings.json file:
 
 ```javascript
 {
-    // If strict is True, then the PHP Toolkit will reject unsigned 
+    // If strict is True, then the Python Toolkit will reject unsigned 
     // or unencrypted messages if it expects them to be signed or encrypted.
     // Also it will reject the messages if the SAML standard is not strictly
     // followed. Destination, NameId, Conditions ... are validated too.
@@ -202,7 +208,7 @@ This is the settings.json file:
         },
         // Specifies the constraints on the name identifier to be used to
         // represent the requested subject.
-        // Take a look on lib/Saml2/Constants.php to see the NameIdFormat supported.
+        // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
         "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
@@ -612,35 +618,38 @@ We can code a unique file that initiates the SSO process, handle the response, g
 Note: Review the demos, in a later section we explain the demo use case further in detail.
 
 ```python
-req = prepare_request_for_toolkit(request)
-auth = OneLogin_Saml2_Auth(req)
+req = prepare_request_for_toolkit(request)  # Process the request and build the request dict that
+                                            # the toolkit expects
 
-if 'sso' in request.args:
+auth = OneLogin_Saml2_Auth(req)             # Initialize the SP SAML instance
+
+if 'sso' in request.args:                   # SSO action (SP-SSO initited).  Will send an AuthNRequest to the IdP
     return redirect(auth.login())
-elif 'sso2' in request.args:
+elif 'sso2' in request.args:                       # Another SSO init action 
+    $returnTo = $spBaseUrl.'/demo1/attrs.php';     # but set a custom RelayState URL
     return_to = '%sattrs/' % request.host_url
     return redirect(auth.login(return_to))
-elif 'slo' in request.args:
+elif 'slo' in request.args:                     # SLO action. Will sent a Logout Request to IdP
     return redirect(auth.logout())
-elif 'acs' in request.args:
-    auth.process_response()
-    errors = auth.get_errors()
-    if len(errors) == 0:
-        if not auth.is_authenticated():
-            msg = "Not authenticated"
+elif 'acs' in request.args:                 # Assertion Consumer Service
+    auth.process_response()                     # Process the Response of the IdP
+    errors = auth.get_errors()              # This method receives an array with the errors
+    if len(errors) == 0:                    # that could took place during the process 
+        if not auth.is_authenticated():         # This check if the response was ok and the user
+            msg = "Not authenticated"           # data retrieved or not (user authenticated)
         else:
-            session['samlUserdata'] = auth.get_attributes()
+            request.session['samlUserdata'] = auth.get_attributes()     # Retrieves user data
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
-            if 'RelayState' in request.form and self_url != request.form['RelayState']:
-                return redirect(auth.redirect_to(request.form['RelayState']))
-            else:
+            if 'RelayState' in request.form and self_url != request.form['RelayState']:   
+                return redirect(auth.redirect_to(request.form['RelayState']))   # Redirect if there is a relayState
+            else:                           # If there is user data we save that to print it later.
                 msg = ''
                 for attr_name in request.session['samlUserdata'].keys():
                     msg += '%s ==> %s' % (attr_name, '|| '.join(request.session['samlUserdata'][attr_name]))
-elif 'sls' in request.args:
-    delete_session_callback = lambda: session.clear()
-    url = auth.process_slo(delete_session_cb=delete_session_callback)
-    errors = auth.get_errors()
+elif 'sls' in request.args:                                             # Single Logout Service
+    delete_session_callback = lambda: session.clear()           # Obtain session clear callback
+    url = auth.process_slo(delete_session_cb=delete_session_callback)   # Process the Logout Request & Logout Response
+    errors = auth.get_errors()              #  Retrieves possible validation errors
     if len(errors) == 0:
         if url is not None:
             return redirect(url)
@@ -662,7 +671,7 @@ Described below are the main classes and methods that can be invoked from the SA
 
 Main class of OneLogin Python Toolkit
 
-* ***__init__*** Initializes the SP SAML instance.
+* `__init__` Initializes the SP SAML instance.
 * ***login*** Initiates the SSO process.
 * ***logout*** Initiates the SLO process.
 * ***process_response*** Process the SAML Response sent by the IdP.
@@ -685,7 +694,7 @@ Main class of OneLogin Python Toolkit
 
 SAML 2 Authentication Request class
 
-* ***__init__** This class handles an AuthNRequest. It builds an AuthNRequest object.
+* `__init__` This class handles an AuthNRequest. It builds an AuthNRequest object.
 * ***get_request*** Returns unsigned AuthnRequest.
 * ***get_id*** Returns the AuthNRequest ID.
 
@@ -694,7 +703,7 @@ SAML 2 Authentication Request class
 
 SAML 2 Authentication Response class
 
-* ***__init__*** Constructs the SAML Response object.
+* `__init__` Constructs the SAML Response object.
 * ***is_valid*** Determines if the SAML Response is valid. Includes checking of the signature by a certificate.
 * ***check_status*** Check if the status of the response is success or not
 * ***get_audiences*** Gets the audiences
@@ -712,7 +721,7 @@ SAML 2 Authentication Response class
 
 SAML 2 Logout Request class
 
-* ***__init__*** Constructs the Logout Request object.
+* `__init__` Constructs the Logout Request object.
 * ***get_request*** Returns the Logout Request defated, base64encoded.
 * ***get_id*** Returns the ID of the Logout Request.
 * ***get_nameid_data*** Gets the NameID Data of the the Logout Request (returns a dict).
@@ -726,7 +735,7 @@ SAML 2 Logout Request class
 
 SAML 2 Logout Response class
 
-* ***__init__*** Constructs a Logout Response object.
+* `__init__` Constructs a Logout Response object.
 * ***get_issuer*** Gets the Issuer of the Logout Response Message
 * ***get_status*** Gets the Status of the Logout Response.
 * ***is_valid*** Determines if the SAML LogoutResponse is valid
@@ -737,9 +746,9 @@ SAML 2 Logout Response class
 
 ####OneLogin_Saml2_Settings - settings.py####
 
-Configuration of the OneLogin PHP Toolkit
+Configuration of the OneLogin Python Toolkit
 
-* ***__init__***  Initializes the settings: Sets the paths of the different folders and Loads settings info from settings file or array/object provided.
+* `__init__`  Initializes the settings: Sets the paths of the different folders and Loads settings info from settings file or array/object provided.
 * ***check_settings*** Checks the settings info.
 * ***get_errors*** Returns an array with the errors, the array is empty when the settings is ok.
 * ***get_sp_metadata*** Gets the SP metadata. The XML representation.
@@ -870,10 +879,49 @@ You'll have the demo running at http://localhost:8000
 
 ####Content####
 
+The flask project contains:
+
+
+* ***index.py*** Is the main flask file, where or the SAML handle take place.
+
+* ***templates***. Is the folder where flask stores the templates of the project. It was implemented a base.html template that is extended by index.html and attrs.html, the templates of our simple demo that shows messages, user attributes when available and login and logout links.
+
+* ***saml*** Is a folder that contains the 'certs' folder that could be used to store the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
+
+
+####SP setup####
+
+The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways: settings files or define a setting dict. In the demo-flask it used the first method. 
+
+In the index.py file we define the app.config['SAML_PATH'], that will target to the 'saml' folder. We require it in order to load the settings files.
+
+First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+
+####IdP setup####
+
+Once the SP is configured, the metadata of the SP is published at the /metadata url. Based on that info, configure the IdP.
 
 ####How it works####
 
+1. First time you access to the main view 'http://localhost:8000', you can select to login and return to the same view or login and be redirected to /?attrs (attrs view).
 
+ 2. When you click:
+
+    2.1 in the first link, we access to /?sso (index view). An AuthNRequest is sent to the IdP, we authenticate at the IdP and then a Response is sent to the SP, specifically the Assertion Consumer Service view: /?acs, notice that a RelayState parameter is set to the url that initiated the process, the index view.
+
+    2.2 in the second link we access to /?attrs (attrs view), we will expetience have the same process described at 2.1 with the diference that as RelayState is set the attrs url.
+
+ 3. The SAML Response is processed in the ACS /?acs, if the Response is not valid, the process stops here and a message is shown. Otherwise we are redirected to the RelayState view. a) / or b) /?attrs
+
+ 4. We are logged in the app and the user attributes are showed. At this point, we can test the single log out functionality.
+
+ The single log out funcionality could be tested by 2 ways.
+
+    5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies to the SP a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
+
+    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the idP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
+
+Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET paramters are used to know the action that must be done.
 
 ### Demo Django ###
 
@@ -884,10 +932,9 @@ virtualenv  and execute:
 ```
  pip install -r demo-django/requirements.txt
 ``` 
-This will install django and its dependences. Once it has finished, you have to complete
-the configuration of the toolkit. You'll find it at `demo-django/settings.json`
+This will install django and its dependences. Once it has finished, you have to complete the configuration of the toolkit.
 
-Now, with the virtualenv loaded, you can run the demo like this:
+Later, with the virtualenv loaded, you can run the demo like this:
 ```
  cd demo-django
  python manage.py runserver 0.0.0.0:8000
@@ -897,6 +944,32 @@ You'll have the demo running at http://localhost:8000
 
 ####Content####
 
+The django project contains:
+
+* ***manage.py***. A file that is automatically created in each Django project. Is a thin wrapper around django-admin.py that takes care of putting the project’s package on sys.path and sets the DJANGO_SETTINGS_MODULE environment variable.
+
+* ***saml*** Is a folder that contains the 'certs' folder that could be used to store the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
+
+* ***demo*** Is the main folder of the django project, that contains the typical files:
+  * ***settings.py*** Contains the default parameters of a django project except the SAML_FOLDER parameter, that may contain the path where is located the 'saml' folder.
+  * ***urls.py*** A file that define url routes. In the demo we defined '/' that is related to the index view, '/attrs' that is related with the attrs view and '/metadata', related to th metadata view.
+  * ***views.py*** This file contains the views of the django project and some aux methods.
+  * ***wsgi.py*** A file that let as deploy django using WSGI, the Python standard for web servers and applications.
+
+* ***templates***. Is the folder where django stores the templates of the project. It was implemented a base.html template that is extended by index.html and attrs.html, the templates of our simple demo that shows messages, user attributes when available and login and logout links.
+
+####SP setup####
+
+The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways: settings files or define a setting dict. In the demo-django it used the first method. 
+
+After set the SAML_FOLDER in the demo/settings.py, the settings of the python toolkit will be loaded on the django web. 
+
+First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+
+####IdP setup####
+
+Once the SP is configured, the metadata of the SP is published at the /metadata url. Based on that info, configure the IdP.
+
 ####How it works####
 
-
+This demo works very similar to the flask-demo (We did it intentionally).

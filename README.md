@@ -658,11 +658,165 @@ else:
 
 Described below are the main classes and methods that can be invoked from the SAML2 library.
 
-TODO
+####OneLogin_Saml2_Auth - auth.py####
+
+Main class of OneLogin Python Toolkit
+
+* ***__init__*** Initializes the SP SAML instance.
+* ***login*** Initiates the SSO process.
+* ***logout*** Initiates the SLO process.
+* ***process_response*** Process the SAML Response sent by the IdP.
+* ***process_slo*** Process the SAML Logout Response / Logout Request sent by the IdP.
+* ***redirect_to*** Redirects the user to the url past by parameter or to the url that we defined in our SSO Request.
+* ***is_authenticated*** Checks if the user is authenticated or not.
+* ***get_attributes*** Returns the set of SAML attributes.
+* ***get_attribute*** Returns the requested SAML attribute.
+* ***get_nameid*** Returns the nameID.
+* ***get_session_index*** Gets the SessionIndex from the AuthnStatement.
+* ***get_errors*** Returns a list with code errors if something went wrong.
+* ***get_sso_url*** Gets the SSO url.
+* ***get_slo_url*** Gets the SLO url.
+* ***build_request_signature*** Builds the Signature of the SAML Request.
+* ***build_response_signature*** Builds the Signature of the SAML Response.
+* ***get_settings*** Returns the settings info.
+* ***set_strict*** Set the strict mode active/disable.
+
+####OneLogin_Saml2_Auth - authn_request.py####
+
+SAML 2 Authentication Request class
+
+* ***__init__** This class handles an AuthNRequest. It builds an AuthNRequest object.
+* ***get_request*** Returns unsigned AuthnRequest.
+* ***get_id*** Returns the AuthNRequest ID.
 
 
-Demos and test
---------------
+####OneLogin_Saml2_Response - response.py####
+
+SAML 2 Authentication Response class
+
+* ***__init__*** Constructs the SAML Response object.
+* ***is_valid*** Determines if the SAML Response is valid. Includes checking of the signature by a certificate.
+* ***check_status*** Check if the status of the response is success or not
+* ***get_audiences*** Gets the audiences
+* ***get_issuers*** Gets the issuers (from message and from assertion)
+* ***get_nameid_data*** Gets the NameID Data provided by the SAML Response from the IdP (returns a dict)
+* ***get_nameid*** Gets the NameID provided by the SAML Response from the IdP (returns a string)
+* ***get_session_not_on_or_after*** Gets the SessionNotOnOrAfter from the AuthnStatement
+* ***get_session_index*** Gets the SessionIndex from the AuthnStatement
+* ***get_attributes*** Gets the Attributes from the AttributeStatement element.
+* ***validate_num_assertions*** Verifies that the document only contains a single Assertion (encrypted or not)
+* ***validate_timestamps*** Verifies that the document is valid according to Conditions Element
+* ***get_error*** After execute a validation process, if fails this method returns the cause
+
+####OneLogin_Saml2_LogoutRequest - logout_request.py####
+
+SAML 2 Logout Request class
+
+* ***__init__*** Constructs the Logout Request object.
+* ***get_request*** Returns the Logout Request defated, base64encoded.
+* ***get_id*** Returns the ID of the Logout Request.
+* ***get_nameid_data*** Gets the NameID Data of the the Logout Request (returns a dict).
+* ***get_nameid*** Gets the NameID of the Logout Request Message (returns a string).
+* ***get_issuer*** Gets the Issuer of the Logout Request Message.
+* ***get_session_indexes*** Gets the SessionIndexes from the Logout Request.
+* ***is_valid*** Checks if the Logout Request recieved is valid.
+* ***get_error*** After execute a validation process, if fails this method returns the cause.
+
+####OneLogin_Saml2_LogoutResponse - logout_response.py####
+
+SAML 2 Logout Response class
+
+* ***__init__*** Constructs a Logout Response object.
+* ***get_issuer*** Gets the Issuer of the Logout Response Message
+* ***get_status*** Gets the Status of the Logout Response.
+* ***is_valid*** Determines if the SAML LogoutResponse is valid
+* ***build*** Creates a Logout Response object.
+* ***get_response*** Returns a Logout Response object. 
+* ***get_error*** After execute a validation process, if fails this method returns the cause.
+
+
+####OneLogin_Saml2_Settings - settings.py####
+
+Configuration of the OneLogin PHP Toolkit
+
+* ***__init__***  Initializes the settings: Sets the paths of the different folders and Loads settings info from settings file or array/object provided.
+* ***check_settings*** Checks the settings info.
+* ***get_errors*** Returns an array with the errors, the array is empty when the settings is ok.
+* ***get_sp_metadata*** Gets the SP metadata. The XML representation.
+* ***validate_metadata*** Validates an XML SP Metadata.
+* ***get_base_path*** Returns base path.
+* ***get_cert_path*** Returns cert path.
+* ***get_lib_path*** Returns lib path.
+* ***get_ext_lib_path*** Returns external lib path.
+* ***get_schemas_path*** Returns schema path.
+* ***check_sp_certs*** Checks if the x509 certs of the SP exists and are valid.
+* ***get_sp_key*** Returns the x509 private key of the SP.
+* ***get_sp_cert*** Returns the x509 public cert of the SP.
+* ***get_idp_cert*** Returns the x509 public cert of the IdP.
+* ***get_sp_data*** Gets the SP data.
+* ***get_idp_data*** Gets the IdP data.
+* ***get_security_data***  Gets security data.
+* ***get_contacts*** Gets contacts data.
+* ***get_organization*** Gets organization data.
+* ***format_idp_cert*** Formats the IdP cert.
+* ***format_sp_cert*** Formats the SP cert.
+* ***format_sp_key*** Formats the private key.
+* ***set_strict*** Activates or deactivates the strict mode.
+* ***is_strict*** Returns if the 'strict' mode is active.
+* ***is_debug_active*** Returns if the debug is active.
+
+####OneLogin_Saml2_Metadata - metadata.py####
+
+A class that contains functionality related to the metadata of the SP
+
+* ***builder*** Generates the metadata of the SP based on the settings. 
+* ***sign_metadata*** Signs the metadata with the key/cert provided.
+* ***add_x509_key_descriptors*** Adds the x509 descriptors (sign/encriptation) to the metadata
+
+####OneLogin_Saml2_Utils - utils.py####
+
+Auxiliary class that contains several methods
+
+* ***decode_base64_and_inflate*** Base64 decodes and then inflates according to RFC1951.
+* ***deflate_and_base64_encode*** Deflates and the base64 encodes a string.
+* ***validate_xml*** Validates a xml against a schema.
+* ***format_cert*** Returns a x509 cert (adding header & footer if required).
+* ***format_private_key*** Returns a private key (adding header & footer if required).
+* ***redirect*** Executes a redirection to the provided url (or return the target url).
+* ***get_self_url_host*** Returns the protocol + the current host + the port (if different than common ports).
+* ***get_self_host*** Returns the current host.
+* ***is_https*** Checks if https or http.
+* ***get_self_url_no_query*** Returns the URL of the current host + current view.
+* ***get_self_routed_url_no_query*** Returns the routed URL of the current host + current view.
+* ***get_self_url*** Returns the URL of the current host + current view + query.
+* ***generate_unique_id*** Generates an unique string (used for example as ID for assertions).
+* ***parse_time_to_SAML*** Converts a UNIX timestamp to SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z.
+* ***parse_SAML_to_time*** Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z to a UNIX timestamp.
+* ***now*** Returns unix timestamp of actual time.
+* ***parse_duration*** Interprets a ISO8601 duration value relative to a given timestamp.
+* ***get_expire_time*** Compares 2 dates and returns the earliest.
+* ***query*** Extracts nodes that match the query from the Element.
+* ***delete_local_session*** Deletes the local session.
+* ***calculate_x509_fingerprint*** Calculates the fingerprint of a x509cert.
+* ***format_finger_print*** Formates a fingerprint.
+* ***generate_name_id*** Generates a nameID.
+* ***get_status*** Gets Status from a Response.
+* ***decrypt_element*** Decrypts an encrypted element.
+* ***write_temp_file*** Writes some content into a temporary file and returns it.
+* ***add_sign*** Adds signature key and senders certificate to an element (Message or Assertion).
+* ***validate_sign*** Validates a signature (Message or Assertion).
+* ***validate_binary_sign*** Validates signed bynary data (Used to validate GET Signature).
+
+For more info, look at the source code; each method is documented and details about what does and how to use it are provided. Make sure to also check the doc folder where HTML documentation about the classes and methods is provided.
+
+Demos included in the toolkit
+-----------------------------
+
+The toolkit includes 2 demos to teach how use the toolkit (A django and a flask project), take a look on it.
+Demos require that SP and IdP are well configured before test it, so edit the settings files.
+
+Notice that each python framework has it own way to handle routes/urls and process request, so focus on
+how it deployed. New demos using other python frameworks are welcome as a contribution.
 
 ### Getting Started ###
 
@@ -692,7 +846,7 @@ If you want install it in a nomal mode, execute:
  python setup.py install
 ```
 
-#### Demo Flask ####
+### Demo Flask ###
 
 You'll need a virtualenv with the toolkit installed on it.
 
@@ -714,7 +868,14 @@ Now, with the virtualenv loaded, you can run the demo like this:
 
 You'll have the demo running at http://localhost:8000
 
-#### Demo Django ####
+####Content####
+
+
+####How it works####
+
+
+
+### Demo Django ###
 
 You'll need a virtualenv with the toolkit installed on it.
 
@@ -734,32 +895,8 @@ Now, with the virtualenv loaded, you can run the demo like this:
 
 You'll have the demo running at http://localhost:8000
 
-#### Tests Suite ####
+####Content####
 
-To run the test you only need to load the virtualenv with the toolkit installed
-on it and execute:
-```
- python setup.py test
-```
-
-The previous line will run the tests for the whole toolkit. You can also run
-the tests for a specific module. To do so for the `auth` module you would
-have to execute this:
-```
- python setup.py test --test-suite tests.src.OneLogin.saml2_tests.auth_test.OneLogin_Saml2_Auth_Test
-```
-
-With the `--test-suite` parameter you can specify the module to test. You'll
-find all the module available and their class names at
-`tests/src/OneLogin/saml2_tests/`
+####How it works####
 
 
-### How it works ###
-
-#### Demo Django ####
-
-TODO
-
-#### Demo Django ####
-
-TODO

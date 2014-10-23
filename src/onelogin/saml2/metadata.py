@@ -30,7 +30,7 @@ class OneLogin_Saml2_Metadata(object):
     @staticmethod
     def builder(sp, authnsign=False, wsign=False, valid_until=None, cache_duration=None, contacts=None, organization=None):
         """
-        Build the metadata of the SP
+        Builds the metadata of the SP
 
         :param sp: The SP data
         :type sp: string
@@ -153,7 +153,7 @@ class OneLogin_Saml2_Metadata(object):
     @staticmethod
     def sign_metadata(metadata, key, cert):
         """
-        Sign the metadata with the key/cert provided
+        Signs the metadata with the key/cert provided
 
         :param metadata: SAML Metadata XML
         :type metadata: string
@@ -172,7 +172,7 @@ class OneLogin_Saml2_Metadata(object):
     @staticmethod
     def add_x509_key_descriptors(metadata, cert=None):
         """
-        Add the x509 descriptors (sign/encriptation to the metadata
+        Adds the x509 descriptors (sign/encriptation) to the metadata
         The same cert will be used for sign/encrypt
 
         :param metadata: SAML Metadata XML

@@ -927,7 +927,7 @@ class OneLogin_Saml2_Utils(object):
     @staticmethod
     def validate_binary_sign(signed_query, signature, cert=None, algorithm=xmlsec.TransformRsaSha1, debug=False):
         """
-        Validates a GET Signature
+        Validates signed bynary data (Used to validate GET Signature).
 
         :param signed_query: The element we should validate
         :type: string

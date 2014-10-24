@@ -6,6 +6,7 @@
 
 from setuptools import setup
 
+
 setup(
     name='python-saml',
     version='2.0.0',
@@ -21,7 +22,11 @@ setup(
     author_email='support@onelogin.com',
     license='MIT',
     url='https://github.com/onelogin/python-saml',
-    packages=['onelogin/saml2'],
+    packages=['onelogin','onelogin/saml2'],
+    include_package_data=True,
+    package_data = {
+            'onelogin/saml2/schemas': ['*.xsd'],
+    },
     package_dir={
         '': 'src',
     },

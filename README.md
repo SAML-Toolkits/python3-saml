@@ -66,10 +66,10 @@ Installation
 ### Dependences ###
 
  * python 2.7
- * M2Crypto  A Python crypto and SSL toolkit (depends on swig)
- * dm.xmlsec.binding  Cython/lxml based binding for the XML security library (depends on python-dev libxml2-dev libxmlsec1-dev)
- * isodate  An ISO 8601 date/time/duration parser and formater
- * defusedxml  XML bomb protection for Python stdlib modules
+ * [M2Crypto](https://pypi.python.org/pypi/M2Crypto)  A Python crypto and SSL toolkit (depends on openssl, swig)
+ * [dm.xmlsec.binding](https://pypi.python.org/pypi/dm.xmlsec.binding)  Cython/lxml based binding for the XML security library (depends on python-dev libxml2-dev libxmlsec1-dev)
+ * [isodate](https://pypi.python.org/pypi/isodate)  An ISO 8601 date/time/duration parser and formater
+ * [defusedxml](https://pypi.python.org/pypi/defusedxml)  XML bomb protection for Python stdlib modules
 
 Review the setup.py file to know the version of the library that python-saml is using
 

@@ -56,6 +56,7 @@ class OneLogin_Saml2_Auth(object):
         self.__session_index = None
         self.__authenticated = False
         self.__errors = []
+        self.__error_reason = None
 
     def get_settings(self):
         """
@@ -98,6 +99,7 @@ class OneLogin_Saml2_Auth(object):
 
             else:
                 self.__errors.append('invalid_response')
+                self.__error_reason = response.get_error()
 
         else:
             self.__errors.append('invalid_binding')
@@ -124,6 +126,7 @@ class OneLogin_Saml2_Auth(object):
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, self.__request_data['get_data']['SAMLResponse'])
             if not logout_response.is_valid(self.__request_data, request_id):
                 self.__errors.append('invalid_logout_response')
+                self.__error_reason = logout_response.get_error()
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
                 self.__errors.append('logout_not_success')
             elif not keep_local_session:
@@ -133,6 +136,7 @@ class OneLogin_Saml2_Auth(object):
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, self.__request_data['get_data']['SAMLRequest'])
             if not logout_request.is_valid(self.__request_data):
                 self.__errors.append('invalid_logout_request')
+                self.__error_reason = logout_request.get_error()
             else:
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
@@ -217,6 +221,15 @@ class OneLogin_Saml2_Auth(object):
         :rtype: list
         """
         return self.__errors
+
+    def get_last_error_reason(self):
+        """
+        Return the reason for the last error
+
+        :returns: Reason of the last error
+        :rtype: None | string
+        """
+        return self.__error_reason
 
     def get_attribute(self, name):
         """

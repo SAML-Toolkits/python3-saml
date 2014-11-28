@@ -338,6 +338,10 @@ class OneLogin_Saml2_Settings(object):
         if 'sp' not in settings or len(settings['sp']) == 0:
             errors.append('sp_not_found')
         else:
+            # check_sp_certs uses self.__sp so I add it
+            old_sp = self.__sp
+            self.__sp = settings['sp']
+
             sp = settings['sp']
             security = {}
             if 'security' in settings:
@@ -415,6 +419,9 @@ class OneLogin_Saml2_Settings(object):
                         ('url' not in organization or len(organization['url']) == 0):
                     errors.append('organization_not_enought_data')
                     break
+        # Restores the value that had the self.__sp
+        if 'old_sp' in locals():
+            self.__sp = old_sp
 
         return errors
 

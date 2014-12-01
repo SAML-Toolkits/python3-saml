@@ -77,14 +77,44 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
-        saml_settings['sp']['AuthnContextClassRef'] = OneLogin_Saml2_Constants.AC_X509
+        saml_settings['security']['requestedAuthnContext'] = True
         settings = OneLogin_Saml2_Settings(saml_settings)
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         decoded = b64decode(authn_request_encoded)
         inflated = decompress(decoded, -15)
         self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
-        self.assertNotIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
+        self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
+
+        del saml_settings['security']['requestedAuthnContext']
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
+
+        saml_settings['security']['requestedAuthnContext'] = False
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
+
+        saml_settings['security']['requestedAuthnContext'] = (OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, OneLogin_Saml2_Constants.AC_X509)
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
     def testCreateDeflatedSAMLRequestURLParameter(self):

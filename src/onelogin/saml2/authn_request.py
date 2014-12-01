@@ -58,7 +58,17 @@ class OneLogin_Saml2_Authn_Request(object):
             if 'displayname' in organization_data[lang] and organization_data[lang]['displayname'] is not None:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
-        auth_context_class_ref = sp_data['AuthnContextClassRef']
+        requested_authn_context_str = ''
+        if 'requestedAuthnContext' in security.keys() and security['requestedAuthnContext'] != False:
+            if security['requestedAuthnContext'] == True:
+                requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+    </samlp:RequestedAuthnContext>"""
+            else:
+                requested_authn_context_str = '     <samlp:RequestedAuthnContext Comparison="exact">'
+                for authn_context in security['requestedAuthnContext']:
+                    requested_authn_context_str += '<saml:AuthnContextClassRef>%s</saml:AuthnContextClassRef>' % authn_context
+                requested_authn_context_str += '    </samlp:RequestedAuthnContext>'
 
         request = """<samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -74,9 +84,7 @@ class OneLogin_Saml2_Authn_Request(object):
     <samlp:NameIDPolicy
         Format="%(name_id_policy)s"
         AllowCreate="true" />
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>%(auth_context_class_ref)s</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>
+%(requested_authn_context_str)s
 </samlp:AuthnRequest>""" % \
             {
                 'id': uid,
@@ -86,7 +94,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 'assertion_url': sp_data['assertionConsumerService']['url'],
                 'entity_id': sp_data['entityId'],
                 'name_id_policy': name_id_policy_format,
-                'auth_context_class_ref': auth_context_class_ref,
+                'requested_authn_context_str': requested_authn_context_str,
             }
 
         self.__authn_request = request

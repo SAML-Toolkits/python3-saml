@@ -212,8 +212,6 @@ This is the settings.json file:
         // represent the requested subject.
         // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
         "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
-        // Specifies the AuthnContextClassRef that will be sent in the login request 
-        'AuthnContextClassRef' => 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password',
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
         'x509cert' => '',
@@ -300,7 +298,13 @@ In addition to the required settings data (idp, sp), there is extra information 
 
         // Indicates a requirement for the NameID received by
         // this SP to be encrypted.
-        "wantNameIdEncrypted": false
+        "wantNameIdEncrypted": false,
+
+        // Authentication context.
+        // Set to false and no AuthContext will be sent in the AuthNRequest,
+        // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
+        'requestedAuthnContext' => true,
     },
 
     // Contact information template, it is recommended to suply a

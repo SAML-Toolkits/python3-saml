@@ -57,6 +57,7 @@ class OneLogin_Saml2_Constants(object):
     # Auth Context Class
     AC_UNSPECIFIED = 'urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified'
     AC_PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
+    AC_PASSWORD_PROTECTED = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
     AC_X509 = 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'
     AC_SMARTCARD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard'
     AC_KERBEROS = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos'

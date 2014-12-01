@@ -58,6 +58,8 @@ class OneLogin_Saml2_Authn_Request(object):
             if 'displayname' in organization_data[lang] and organization_data[lang]['displayname'] is not None:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
+        auth_context_class_ref = sp_data['AuthnContextClassRef']
+
         request = """<samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
@@ -73,7 +75,7 @@ class OneLogin_Saml2_Authn_Request(object):
         Format="%(name_id_policy)s"
         AllowCreate="true" />
     <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+        <saml:AuthnContextClassRef>%(auth_context_class_ref)s</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
 </samlp:AuthnRequest>""" % \
             {
@@ -84,6 +86,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 'assertion_url': sp_data['assertionConsumerService']['url'],
                 'entity_id': sp_data['entityId'],
                 'name_id_policy': name_id_policy_format,
+                'auth_context_class_ref': auth_context_class_ref,
             }
 
         self.__authn_request = request

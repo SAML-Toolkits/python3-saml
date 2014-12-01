@@ -212,10 +212,12 @@ This is the settings.json file:
         // represent the requested subject.
         // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
         "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
+        // Specifies the AuthnContextClassRef that will be sent in the login request 
+        'AuthnContextClassRef' => 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password',
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
         'x509cert' => '',
-        'privateKey' > ''
+        'privateKey' => ''
     },
 
     // Identity Provider Data that we want connected with our SP.

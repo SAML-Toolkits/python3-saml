@@ -11,6 +11,7 @@ from urlparse import urlparse, parse_qs
 from zlib import decompress
 
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
@@ -60,6 +61,31 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         inflated = decompress(decoded, -15)
         self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ProviderName="SP test"', inflated)
+
+    def testCreateRequestAuthContext(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        The creation of a deflated SAML Request with defined AuthContext
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
+
+        saml_settings['sp']['AuthnContextClassRef'] = OneLogin_Saml2_Constants.AC_X509
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
+        self.assertIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
     def testCreateDeflatedSAMLRequestURLParameter(self):
         """

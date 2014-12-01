@@ -266,6 +266,10 @@ class OneLogin_Saml2_Settings(object):
         if 'nameIdEncrypted' not in self.__security:
             self.__security['nameIdEncrypted'] = False
 
+        # AuthnContextClassRef
+        if 'AuthnContextClassRef' not in self.__sp:
+            self.__sp['AuthnContextClassRef'] = OneLogin_Saml2_Constants.AC_PASSWORD
+
         # Sign provided
         if 'authnRequestsSigned' not in self.__security.keys():
             self.__security['authnRequestsSigned'] = False

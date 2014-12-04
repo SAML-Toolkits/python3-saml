@@ -11,7 +11,7 @@ install:
 script: 
   - 'coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
   - 'coverage report -m --rcfile=tests/coverage.rc'
-  - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
+# - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
   - 'pep8 tests/src/OneLogin/saml2_tests/*.py demo-flask/*.py demo-django/*.py src/onelogin/saml2/*.py --config=tests/pep8.rc'
   - 'pyflakes src/onelogin/saml2 demo-django demo-flask tests/src/OneLogin/saml2_tests'
 

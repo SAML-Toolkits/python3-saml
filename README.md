@@ -439,7 +439,7 @@ auth.login()      # Method that builds and sends the AuthNRequest
 
 The AuthNRequest will be sent signed or unsigned based on the security info of the advanced_settings.json ('authnRequestsSigned').
 
-The IdP will return the SAML Response to the Attribute Consumer Service of the SP.
+The IdP will then return the SAML Response to the user's client. The client is then forwarded to the Attribute Consumer Service of the SP with this information.
 
 We can set a 'return_to' url parameter to the login function and that will be converted as a 'RelayState' parameter:
 
@@ -475,7 +475,7 @@ Before the XML metadata is exposed, a check takes place to ensure that the info 
 
 ***Attribute Consumer Service(ACS)***
 
-This code handles the SAML response that the IdP returns to the SP.
+This code handles the SAML response that the IdP forwards to the SP through the user's client.
 
 ```python
 req = prepare_request_for_toolkit(request)
@@ -569,7 +569,7 @@ elif not keep_local_session:
     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)  
 ```
 
-If the SLS endpoints receives an Logout Request, the request is validated, the session is closed and a Logout Response is sent to the SLS endpoint of the idP.
+If the SLS endpoints receives an Logout Request, the request is validated, the session is closed and a Logout Response is sent to the SLS endpoint of the IdP.
 
 ```python
 # Part of the process_slo method
@@ -610,7 +610,7 @@ In order to send a Logout Request to the IdP:
 
 The Logout Request will be sent signed or unsigned based on the security info of the advanced_settings.json ('logoutRequestSigned').
 
-The IdP will return the Logout Response to the Single Logout Service of the SP. 
+The IdP will return the Logout Response through the user's client to the Single Logout Service of the SP. 
 
 We can set a 'return_to' url parameter to the logout function and that will be converted as a 'RelayState' parameter:
 
@@ -915,7 +915,7 @@ Once the SP is configured, the metadata of the SP is published at the /metadata 
 
  2. When you click:
 
-    2.1 in the first link, we access to /?sso (index view). An AuthNRequest is sent to the IdP, we authenticate at the IdP and then a Response is sent to the SP, specifically the Assertion Consumer Service view: /?acs, notice that a RelayState parameter is set to the url that initiated the process, the index view.
+    2.1 in the first link, we access to /?sso (index view). An AuthNRequest is sent to the IdP, we authenticate at the IdP and then a Response is sent through the user's client to the SP, specifically the Assertion Consumer Service view: /?acs. Notice that a RelayState parameter is set to the url that initiated the process, the index view.
 
     2.2 in the second link we access to /?attrs (attrs view), we will expetience have the same process described at 2.1 with the diference that as RelayState is set the attrs url.
 
@@ -925,9 +925,9 @@ Once the SP is configured, the metadata of the SP is published at the /metadata 
 
  The single log out funcionality could be tested by 2 ways.
 
-    5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies to the SP a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
+    5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies through the client to the SP with a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
 
-    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the idP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
+    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the IdP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
 
 Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET paramters are used to know the action that must be done.
 
@@ -948,7 +948,9 @@ Later, with the virtualenv loaded, you can run the demo like this:
  python manage.py runserver 0.0.0.0:8000
 ```
 
-You'll have the demo running at http://localhost:8000
+You'll have the demo running at http://localhost:8000.
+
+Note that many of the configuration files expect HTTPS. This is not required by the demo, as replacing these SP URLs with HTTP will work just fine. HTTPS is however highly encouraged, and left as an exercise for the reader for their specific needs.
 
 ####Content####
 

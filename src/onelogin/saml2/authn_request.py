@@ -59,8 +59,8 @@ class OneLogin_Saml2_Authn_Request(object):
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
         requested_authn_context_str = ''
-        if 'requestedAuthnContext' in security.keys() and security['requestedAuthnContext'] != False:
-            if security['requestedAuthnContext'] == True:
+        if 'requestedAuthnContext' in security.keys() and security['requestedAuthnContext'] is not False:
+            if security['requestedAuthnContext'] is True:
                 requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>"""

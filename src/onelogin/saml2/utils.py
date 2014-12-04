@@ -684,7 +684,11 @@ class OneLogin_Saml2_Utils(object):
 
         message_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', status_entry[0])
         if len(message_entry) == 0:
-            status['msg'] = ''
+            subcode_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', status_entry[0])
+            if len(subcode_entry) > 0:
+                status['msg'] = subcode_entry[0].values()[0]
+            else:
+                status['msg'] = ''
         else:
             status['msg'] = message_entry[0].text
 

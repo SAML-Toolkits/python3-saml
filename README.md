@@ -483,7 +483,7 @@ auth = OneLogin_Saml2_Auth(req)
 auth.process_response()
 errors = auth.get_errors()
 if not errors:
-    if not auth.is_authenticated():
+    if auth.is_authenticated():
         request.session['samlUserdata'] = auth.get_attributes()
         if 'RelayState' in req['post_data'] and 
           OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:

@@ -143,6 +143,22 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="saml2.auth.OneLogin_Saml2_Auth.get_last_error_reason">
+<tt class="descname">get_last_error_reason</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.get_last_error_reason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.get_last_error_reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reason for the last error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Error</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="saml2.auth.OneLogin_Saml2_Auth.get_nameid">
 <tt class="descname">get_nameid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.get_nameid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.get_nameid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the nameID.</p>
@@ -232,13 +248,18 @@
 
 <dl class="method">
 <dt id="saml2.auth.OneLogin_Saml2_Auth.logout">
-<tt class="descname">logout</tt><big>(</big><em>return_to=None</em><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.logout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.logout" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">logout</tt><big>(</big><em>return_to=None</em>, <em>name_id=None</em>, <em>session_index=None</em><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.logout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.logout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initiates the SLO process.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>return_to</strong> (<em>string</em>) &#8211; Optional argument. The target URL the user should be redirected to after logout.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th>
+  <td class="field-body"><ul class="first simple">
+<li><strong>return_to</strong> (<em>string</em>) &#8211; Optional argument. The target URL the user should be redirected to after logout.</li>
+<li><strong>name_id</strong> (<em>string</em>) &#8211; Optional argument. The NameID that will be set in the LogoutRequest.</li>
+<li><strong>session_index</strong> (<em>string</em>) &#8211; Optional argument. SessionIndex that identifies the session of the user.</li>
+</ul></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Redirection url</td>
 </tr>
@@ -633,7 +654,7 @@
 <span id="logout-request-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">logout_request</span></tt> Class<a class="headerlink" href="#module-saml2.logout_request" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="saml2.logout_request.OneLogin_Saml2_Logout_Request">
-<em class="property">class </em><tt class="descclassname">onelogin.saml2.logout_request.</tt><tt class="descname">OneLogin_Saml2_Logout_Request</tt><big>(</big><em>settings</em><big>)</big><a class="reference internal" href="_modules/saml2/logout_request.html#OneLogin_Saml2_Logout_Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.logout_request.OneLogin_Saml2_Logout_Request" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">onelogin.saml2.logout_request.</tt><tt class="descname">OneLogin_Saml2_Logout_Request</tt><big>(</big><em>settings</em>, <em>request=None</em>, <em>name_id=None</em>, <em>session_index=None</em><big>)</big><a class="reference internal" href="_modules/saml2/logout_request.html#OneLogin_Saml2_Logout_Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.logout_request.OneLogin_Saml2_Logout_Request" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="staticmethod">
 <dt id="saml2.logout_request.OneLogin_Saml2_Logout_Request.get_id">
 <em class="property">static </em><tt class="descname">get_id</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/saml2/logout_request.html#OneLogin_Saml2_Logout_Request.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.logout_request.OneLogin_Saml2_Logout_Request.get_id" title="Permalink to this definition">¶</a></dt>
@@ -708,6 +729,13 @@
 :rtype: boolean</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="saml2.logout_request.OneLogin_Saml2_Logout_Request.get_error">
+<tt class="descname">get_error</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/saml2/logout_request.html#OneLogin_Saml2_Logout_Request.get_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.logout_request.OneLogin_Saml2_Logout_Request.get_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>After execute a validation process, if fails this method returns the cause
+:rtype: str object</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -756,6 +784,13 @@
 :type request_id: string
 :return: Returns if the SAML LogoutResponse is or not valid
 :rtype: boolean</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="saml2.logout_response.OneLogin_Saml2_Logout_Response.get_error">
+<tt class="descname">get_error</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/saml2/logout_response.html#OneLogin_Saml2_Logout_Response.get_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.logout_response.OneLogin_Saml2_Logout_Response.get_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>After execute a validation process, if fails this method returns the cause
+:rtype: str object</p>
 </dd></dl>
 
 </dd></dl>

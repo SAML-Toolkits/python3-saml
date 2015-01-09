@@ -33,8 +33,17 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         Constructs the Logout Request object.
 
-        Arguments are:
-            * (OneLogin_Saml2_Settings)   settings. Setting data
+        :param settings: Setting data
+        :type request_data: OneLogin_Saml2_Settings
+
+        :param request: Optional. A LogoutRequest to be loaded instead build one.
+        :type request: string
+
+        :param name_id: The NameID that will be set in the LogoutRequest.
+        :type name_id: string
+
+        :param session_index: SessionIndex that identifies the session of the user.
+        :type session_index: string
         """
         self.__settings = settings
         self.__error = None

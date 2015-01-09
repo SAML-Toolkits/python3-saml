@@ -680,7 +680,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SAMLRequest', parsed_query)
 
         logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
-        name_id_from_request =  OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        name_id_from_request = OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
         sessions_index_in_request = OneLogin_Saml2_Logout_Request.get_session_indexes(logout_request)
         self.assertIn(session_index, sessions_index_in_request)
         self.assertEqual(name_id, name_id_from_request)
@@ -706,7 +706,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SAMLRequest', parsed_query)
         logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
 
-        name_id_from_request =  OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        name_id_from_request = OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
         self.assertEqual(name_id_from_response, name_id_from_request)
 
     def testSetStrict(self):

@@ -280,13 +280,16 @@
             <span class="n">parameters</span><span class="p">[</span><span class="s">&#39;Signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_request_signature</span><span class="p">(</span><span class="n">saml_request</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s">&#39;RelayState&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sso_url</span><span class="p">(),</span> <span class="n">parameters</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="OneLogin_Saml2_Auth.logout"><a class="viewcode-back" href="../../saml2.html#saml2.auth.OneLogin_Saml2_Auth.logout">[docs]</a>    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_to</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.logout"><a class="viewcode-back" href="../../saml2.html#saml2.auth.OneLogin_Saml2_Auth.logout">[docs]</a>    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_to</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initiates the SLO process.</span>
 
 <span class="sd">        :param return_to: Optional argument. The target URL the user should be redirected to after logout.</span>
 <span class="sd">        :type return_to: string</span>
-
+<span class="sd">        :param name_id: Optional argument. The NameID that will be set in the LogoutRequest.</span>
+<span class="sd">        :type name_id: string</span>
+<span class="sd">        :param session_index: Optional argument. SessionIndex that identifies the session of the user.</span>
+<span class="sd">        :type session_index: string</span>
 <span class="sd">        :returns: Redirection url</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">slo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slo_url</span><span class="p">()</span>

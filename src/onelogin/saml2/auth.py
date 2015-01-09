@@ -224,7 +224,7 @@ class OneLogin_Saml2_Auth(object):
 
     def get_last_error_reason(self):
         """
-        Return the reason for the last error
+        Returns the reason for the last error
 
         :returns: Reason of the last error
         :rtype: None | string
@@ -278,6 +278,12 @@ class OneLogin_Saml2_Auth(object):
 
         :param return_to: Optional argument. The target URL the user should be redirected to after logout.
         :type return_to: string
+
+        :param name_id: The NameID that will be set in the LogoutRequest.
+        :type name_id: string
+
+        :param session_index: SessionIndex that identifies the session of the user.
+        :type session_index: string
 
         :returns: Redirection url
         """

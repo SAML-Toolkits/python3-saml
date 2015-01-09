@@ -619,6 +619,12 @@ target_url = 'https://example.com'
 auth.logout(return_to=target_url)
 ```
 
+Also there are 2 optional parameters that can be set:
+
+* name_id. That will be used to build the LogoutRequest. If not name_id parameter is set and the auth object processed a 
+SAML Response with a NameId, then this NameId will be used.
+* session_index. SessionIndex that identifies the session of the user.
+
 ####Example of a view that initiates the SSO request and handles the response (is the acs target)####
 
 We can code a unique file that initiates the SSO process, handle the response, get the attributes, initiate the slo and processes the logout response.

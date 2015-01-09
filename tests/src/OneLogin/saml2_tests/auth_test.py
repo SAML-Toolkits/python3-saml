@@ -13,6 +13,7 @@ from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 
 
 class OneLogin_Saml2_Auth_Test(unittest.TestCase):
@@ -95,9 +96,25 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth2.process_response()
         self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', auth2.get_session_index())
 
+    def testGetLastErrorReason(self):
+        """
+        Tests the get_last_error_reason method of the OneLogin_Saml2_Auth class
+        Case Invalid Response
+        """
+        request_data = self.get_request()
+        message = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        auth.process_response()
+
+        self.assertEqual(auth.get_last_error_reason(), 'Signature validation failed. SAML Response rejected')
+
     def testProcessNoResponse(self):
         """
-        Tests the processResponse method of the OneLogin_Saml2_Auth class
+        Tests the process_response method of the OneLogin_Saml2_Auth class
         Case No Response, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
@@ -644,6 +661,53 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             self.assertIn('The IdP does not support Single Log Out', e.message)
+
+    def testLogoutNameIDandSessionIndex(self):
+        """
+        Tests the logout method of the OneLogin_Saml2_Auth class
+        Case nameID and sessionIndex as parameters.
+        """
+        settings_info = self.loadSettingsJSON()
+        request_data = self.get_request()
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
+
+        name_id = 'name_id_example'
+        session_index = 'session_index_example'
+        target_url = auth.logout(name_id=name_id, session_index=session_index)
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        slo_url = settings_info['idp']['singleLogoutService']['url']
+        self.assertIn(slo_url, target_url)
+        self.assertIn('SAMLRequest', parsed_query)
+
+        logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
+        name_id_from_request =  OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        sessions_index_in_request = OneLogin_Saml2_Logout_Request.get_session_indexes(logout_request)
+        self.assertIn(session_index, sessions_index_in_request)
+        self.assertEqual(name_id, name_id_from_request)
+
+    def testLogoutNameID(self):
+        """
+        Tests the logout method of the OneLogin_Saml2_Auth class
+        Case nameID loaded after process SAML Response
+        """
+        request_data = self.get_request()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        auth.process_response()
+
+        name_id_from_response = auth.get_nameid()
+
+        target_url = auth.logout()
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        self.assertIn('SAMLRequest', parsed_query)
+        logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
+
+        name_id_from_request =  OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        self.assertEqual(name_id_from_response, name_id_from_request)
 
     def testSetStrict(self):
         """

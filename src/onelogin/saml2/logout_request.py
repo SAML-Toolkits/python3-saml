@@ -29,7 +29,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     """
 
-    def __init__(self, settings, request=None):
+    def __init__(self, settings, request=None, name_id=None, session_index=None):
         """
         Constructs the Logout Request object.
 
@@ -45,19 +45,29 @@ class OneLogin_Saml2_Logout_Request(object):
             security = self.__settings.get_security_data()
 
             uid = OneLogin_Saml2_Utils.generate_unique_id()
-            name_id_value = OneLogin_Saml2_Utils.generate_unique_id()
             issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
             cert = None
             if 'nameIdEncrypted' in security and security['nameIdEncrypted']:
                 cert = idp_data['x509cert']
 
-            name_id = OneLogin_Saml2_Utils.generate_name_id(
-                name_id_value,
+            if name_id is not None:
+                nameIdFormat = sp_data['NameIDFormat']
+            else:
+                name_id = idp_data['entityId']
+                nameIdFormat = OneLogin_Saml2_Constants.NAMEID_ENTITY
+
+            name_id_obj = OneLogin_Saml2_Utils.generate_name_id(
+                name_id,
                 sp_data['entityId'],
-                sp_data['NameIDFormat'],
+                nameIdFormat,
                 cert
             )
+
+            if session_index:
+                session_index_str = '<samlp:SessionIndex>%s</samlp:SessionIndex>' % session_index
+            else:
+                session_index_str = ''
 
             logout_request = """<samlp:LogoutRequest
         xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -68,13 +78,15 @@ class OneLogin_Saml2_Logout_Request(object):
         Destination="%(single_logout_url)s">
         <saml:Issuer>%(entity_id)s</saml:Issuer>
         %(name_id)s
+        %(session_index)s
     </samlp:LogoutRequest>""" % \
                 {
                     'id': uid,
                     'issue_instant': issue_instant,
                     'single_logout_url': idp_data['singleLogoutService']['url'],
                     'entity_id': sp_data['entityId'],
-                    'name_id': name_id,
+                    'name_id': name_id_obj,
+                    'session_index': session_index_str,
                 }
         else:
             decoded = b64decode(request)

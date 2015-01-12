@@ -314,11 +314,13 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
 
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
         self.assertFalse(response_2.is_valid(request_data))
+        self.assertEqual('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd', response_2.get_error())
 
     def testValidateNumAssertions(self):
         """
@@ -408,7 +410,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'expired_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        self.assertTrue(response.is_valid(self.get_request_data()))
+        response.is_valid(self.get_request_data())
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
@@ -426,7 +429,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_signature.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        self.assertTrue(response.is_valid(self.get_request_data()))
+        response.is_valid(self.get_request_data())
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
@@ -473,7 +477,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_attrs.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        self.assertTrue(response.is_valid(self.get_request_data()))
+        response.is_valid(self.get_request_data())
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
@@ -491,7 +496,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(self.get_request_data()))
+        response.is_valid(self.get_request_data())
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
@@ -524,7 +530,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         message = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_audience.xml.base64'))
 
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
@@ -554,10 +561,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         message_2 = b64encode(plain_message_2)
 
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         response_2 = OneLogin_Saml2_Response(settings, message_2)
-        self.assertTrue(response_2.is_valid(request_data))
+        response_2.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_2.get_error())
 
         settings.set_strict(True)
         response_3 = OneLogin_Saml2_Response(settings, message)
@@ -591,7 +600,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         message = b64encode(plain_message)
 
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
@@ -619,7 +629,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = b64encode(plain_message)
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
     def testIsInValidSubjectConfirmation(self):
         """
@@ -663,22 +674,28 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         message_6 = b64encode(plain_message_6)
 
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         response_2 = OneLogin_Saml2_Response(settings, message_2)
-        self.assertTrue(response_2.is_valid(request_data))
+        response_2.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_2.get_error())
 
         response_3 = OneLogin_Saml2_Response(settings, message_3)
-        self.assertTrue(response_3.is_valid(request_data))
+        response_3.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_3.get_error())
 
         response_4 = OneLogin_Saml2_Response(settings, message_4)
-        self.assertTrue(response_4.is_valid(request_data))
+        response_4.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_4.get_error())
 
         response_5 = OneLogin_Saml2_Response(settings, message_5)
-        self.assertTrue(response_5.is_valid(request_data))
+        response_5.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_5.get_error())
 
         response_6 = OneLogin_Saml2_Response(settings, message_6)
-        self.assertTrue(response_6.is_valid(request_data))
+        response_6.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_6.get_error())
 
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
@@ -735,7 +752,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         response = OneLogin_Saml2_Response(settings, message)
         request_id = 'invalid'
-        self.assertTrue(response.is_valid(request_data, request_id))
+        response.is_valid(request_data, request_id)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
@@ -745,7 +763,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             self.assertEqual('The InResponseTo of the Response', e.message)
 
         valid_request_id = '_57bcbf70-7b1f-012e-c821-782bcb13bb38'
-        self.assertTrue(response.is_valid(request_data, valid_request_id))
+        response.is_valid(request_data, valid_request_id)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
     def testIsInValidSignIssues(self):
         """
@@ -766,18 +785,21 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['security']['wantAssertionsSigned'] = False
         settings = OneLogin_Saml2_Settings(settings_info)
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings_info['security']['wantAssertionsSigned'] = True
         settings_2 = OneLogin_Saml2_Settings(settings_info)
         response_2 = OneLogin_Saml2_Response(settings_2, message)
-        self.assertTrue(response_2.is_valid(request_data))
+        response_2.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_2.get_error())
 
         settings_info['strict'] = True
         settings_info['security']['wantAssertionsSigned'] = False
         settings_3 = OneLogin_Saml2_Settings(settings_info)
         response_3 = OneLogin_Saml2_Response(settings_3, message)
-        self.assertTrue(response_3.is_valid(request_data))
+        response_3.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_3.get_error())
 
         settings_info['security']['wantAssertionsSigned'] = True
         settings_4 = OneLogin_Saml2_Settings(settings_info)
@@ -793,18 +815,21 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['security']['wantMessagesSigned'] = False
         settings_5 = OneLogin_Saml2_Settings(settings_info)
         response_5 = OneLogin_Saml2_Response(settings_5, message)
-        self.assertTrue(response_5.is_valid(request_data))
+        response_5.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_5.get_error())
 
         settings_info['security']['wantMessagesSigned'] = True
         settings_6 = OneLogin_Saml2_Settings(settings_info)
         response_6 = OneLogin_Saml2_Response(settings_6, message)
-        self.assertTrue(response_6.is_valid(request_data))
+        response_6.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_6.get_error())
 
         settings_info['strict'] = True
         settings_info['security']['wantMessagesSigned'] = False
         settings_7 = OneLogin_Saml2_Settings(settings_info)
         response_7 = OneLogin_Saml2_Response(settings_7, message)
-        self.assertTrue(response_7.is_valid(request_data))
+        response_7.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_7.get_error())
 
         settings_info['security']['wantMessagesSigned'] = True
         settings_8 = OneLogin_Saml2_Settings(settings_info)
@@ -833,13 +858,15 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['security']['wantAssertionsEncrypted'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
         response = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response.is_valid(request_data))
+        response.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
         settings_info['strict'] = True
         settings_info['security']['wantAssertionsEncrypted'] = False
         settings = OneLogin_Saml2_Settings(settings_info)
         response_2 = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response_2.is_valid(request_data))
+        response_2.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_2.get_error())
 
         settings_info['security']['wantAssertionsEncrypted'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
@@ -853,7 +880,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['strict'] = False
         settings = OneLogin_Saml2_Settings(settings_info)
         response_4 = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response_4.is_valid(request_data))
+        response_4.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_4.get_error())
 
         settings_info['strict'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
@@ -916,7 +944,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml = self.file_contents(join(self.data_path, 'responses', 'valid_unsigned_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        self.assertTrue(response.is_valid(self.get_request_data()))
+        response.is_valid(self.get_request_data())
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
     def testIsValid2(self):
         """
@@ -992,7 +1021,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = b64encode(plain_message)
         response_7 = OneLogin_Saml2_Response(settings, message)
-        self.assertTrue(response_7.is_valid(request_data))
+        response_7.is_valid(request_data)
+        self.assertEqual('No Signature found. SAML Response rejected', response_7.get_error())
 
     def testIsValidSign(self):
         """

@@ -166,15 +166,16 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
         request_id = 'invalid'
         auth.process_response(request_id)
-        self.assertEqual(len(auth.get_errors()), 0)
+        self.assertEqual('No Signature found. SAML Response rejected', auth.get_last_error_reason())
 
         auth.set_strict(True)
         auth.process_response(request_id)
         self.assertEqual(auth.get_errors(), ['invalid_response'])
+        self.assertEqual('The InResponseTo of the Response: _57bcbf70-7b1f-012e-c821-782bcb13bb38, does not match the ID of the AuthNRequest sent by the SP: invalid', auth.get_last_error_reason())
 
         valid_request_id = '_57bcbf70-7b1f-012e-c821-782bcb13bb38'
         auth.process_response(valid_request_id)
-        self.assertEqual(len(auth.get_errors()), 0)
+        self.assertEqual('No Signature found. SAML Response rejected', auth.get_last_error_reason())
 
     def testProcessResponseValid(self):
         """
@@ -184,28 +185,22 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         the error array is empty
         """
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        plain_message = b64decode(message)
-        current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
-        plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         del request_data['get_data']
         request_data['post_data'] = {
-            'SAMLResponse': b64encode(plain_message)
+            'SAMLResponse': message
         }
         auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
 
         auth.process_response()
-
         self.assertTrue(auth.is_authenticated())
         self.assertEqual(len(auth.get_errors()), 0)
-        self.assertEqual('someone@example.com', auth.get_nameid())
+        self.assertEqual('492882615acf31c8096b627245d76ae53036c090', auth.get_nameid())
         attributes = auth.get_attributes()
         self.assertNotEqual(len(attributes), 0)
         self.assertEqual(auth.get_attribute('mail'), attributes['mail'])
-
-        auth.set_strict(True)
-        auth.process_response()
-        self.assertEqual(len(auth.get_errors()), 0)
+        session_index = auth.get_session_index()
+        self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', session_index)
 
     def testRedirectTo(self):
         """

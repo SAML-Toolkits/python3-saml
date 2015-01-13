@@ -117,6 +117,62 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
+    def testCreateRequestForceAuthN(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        The creation of a deflated SAML Request with ForceAuthn="true"
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn('ForceAuthn="true"', inflated)
+
+        authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False)
+        authn_request_encoded_2 = authn_request_2.get_request()
+        decoded_2 = b64decode(authn_request_encoded_2)
+        inflated_2 = decompress(decoded_2, -15)
+        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertNotIn('ForceAuthn="true"', inflated_2)
+
+        authn_request_3 = OneLogin_Saml2_Authn_Request(settings, True, False)
+        authn_request_encoded_3 = authn_request_3.get_request()
+        decoded_3 = b64decode(authn_request_encoded_3)
+        inflated_3 = decompress(decoded_3, -15)
+        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertIn('ForceAuthn="true"', inflated_3)
+
+    def testCreateRequestIsPassive(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        The creation of a deflated SAML Request with IsPassive="true"
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        decoded = b64decode(authn_request_encoded)
+        inflated = decompress(decoded, -15)
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn('IsPassive="true"', inflated)
+
+        authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False)
+        authn_request_encoded_2 = authn_request_2.get_request()
+        decoded_2 = b64decode(authn_request_encoded_2)
+        inflated_2 = decompress(decoded_2, -15)
+        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertNotIn('IsPassive="true"', inflated_2)
+
+        authn_request_3 = OneLogin_Saml2_Authn_Request(settings, False, True)
+        authn_request_encoded_3 = authn_request_3.get_request()
+        decoded_3 = b64decode(authn_request_encoded_3)
+        inflated_3 = decompress(decoded_3, -15)
+        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertIn('IsPassive="true"', inflated_3)
+
     def testCreateDeflatedSAMLRequestURLParameter(self):
         """
         Tests the OneLogin_Saml2_Authn_Request Constructor.

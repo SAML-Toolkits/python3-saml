@@ -247,16 +247,22 @@ class OneLogin_Saml2_Auth(object):
             value = self.__attributes[name]
         return value
 
-    def login(self, return_to=None):
+    def login(self, return_to=None, force_authn=False, is_passive=False):
         """
         Initiates the SSO process.
 
         :param return_to: Optional argument. The target URL the user should be redirected to after login.
         :type return_to: string
 
+        :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
+        :type force_authn: string
+
+        :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
+        :type is_passive: string
+
         :returns: Redirection url
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive)
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}

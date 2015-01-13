@@ -24,12 +24,18 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings):
+    def __init__(self, settings, force_authn=False, is_passive=False):
         """
         Constructs the AuthnRequest object.
 
-        Arguments are:
-            * (OneLogin_Saml2_Settings)   settings. Setting data
+        :param settings: OSetting data
+        :type return_to: OneLogin_Saml2_Settings
+
+        :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
+        :type force_authn: bool
+
+        :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
+        :type is_passive: bool
         """
         self.__settings = settings
 
@@ -58,6 +64,14 @@ class OneLogin_Saml2_Authn_Request(object):
             if 'displayname' in organization_data[lang] and organization_data[lang]['displayname'] is not None:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
+        force_authn_str = ''
+        if force_authn is True:
+            force_authn_str = 'ForceAuthn="true"'
+
+        is_passive_str = ''
+        if is_passive is True:
+            is_passive_str = 'IsPassive="true"'
+
         requested_authn_context_str = ''
         if 'requestedAuthnContext' in security.keys() and security['requestedAuthnContext'] is not False:
             if security['requestedAuthnContext'] is True:
@@ -76,6 +90,8 @@ class OneLogin_Saml2_Authn_Request(object):
     ID="%(id)s"
     Version="2.0"
     %(provider_name)s
+    %(force_authn_str)s
+    %(is_passive_str)s
     IssueInstant="%(issue_instant)s"
     Destination="%(destination)s"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -89,6 +105,8 @@ class OneLogin_Saml2_Authn_Request(object):
             {
                 'id': uid,
                 'provider_name': provider_name_str,
+                'force_authn_str': force_authn_str,
+                'is_passive_str': is_passive_str,
                 'issue_instant': issue_instant,
                 'destination': destination,
                 'assertion_url': sp_data['assertionConsumerService']['url'],

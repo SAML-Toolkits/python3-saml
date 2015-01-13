@@ -582,6 +582,74 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn(return_to, parsed_query['RelayState'])
         self.assertIn(OneLogin_Saml2_Constants.RSA_SHA1, parsed_query['SigAlg'])
 
+    def testLoginForceAuthN(self):
+        """
+        Tests the login method of the OneLogin_Saml2_Auth class
+        Case Logout with no parameters. A AuthN Request is built with ForceAuthn and redirect executed
+        """
+        settings_info = self.loadSettingsJSON()
+        return_to = u'http://example.com/returnto'
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url = auth.login(return_to)
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+        self.assertIn(sso_url, target_url)
+        self.assertIn('SAMLRequest', parsed_query)
+        request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
+        self.assertNotIn('ForceAuthn="true"', request)
+
+        auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_2 = auth_2.login(return_to, False, False)
+        parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
+        self.assertIn(sso_url, target_url_2)
+        self.assertIn('SAMLRequest', parsed_query_2)
+        request_2 = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0])
+        self.assertNotIn('ForceAuthn="true"', request_2)
+
+        auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_3 = auth_3.login(return_to, True, False)
+        parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
+        self.assertIn(sso_url, target_url_3)
+        self.assertIn('SAMLRequest', parsed_query_3)
+        request_3 = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0])
+        self.assertIn('ForceAuthn="true"', request_3)
+
+    def testLoginIsPassive(self):
+        """
+        Tests the login method of the OneLogin_Saml2_Auth class
+        Case Logout with no parameters. A AuthN Request is built with IsPassive and redirect executed
+        """
+        settings_info = self.loadSettingsJSON()
+        return_to = u'http://example.com/returnto'
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url = auth.login(return_to)
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+        self.assertIn(sso_url, target_url)
+        self.assertIn('SAMLRequest', parsed_query)
+        request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
+        self.assertNotIn('IsPassive="true"', request)
+
+        auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_2 = auth_2.login(return_to, False, False)
+        parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
+        self.assertIn(sso_url, target_url_2)
+        self.assertIn('SAMLRequest', parsed_query_2)
+        request_2 = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0])
+        self.assertNotIn('IsPassive="true"', request_2)
+
+        auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_3 = auth_3.login(return_to, False, True)
+        parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
+        self.assertIn(sso_url, target_url_3)
+        self.assertIn('SAMLRequest', parsed_query_3)
+        request_3 = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0])
+        self.assertIn('IsPassive="true"', request_3)
+
     def testLogout(self):
         """
         Tests the logout method of the OneLogin_Saml2_Auth class

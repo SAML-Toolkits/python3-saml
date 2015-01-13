@@ -232,13 +232,18 @@
 
 <dl class="method">
 <dt id="saml2.auth.OneLogin_Saml2_Auth.login">
-<tt class="descname">login</tt><big>(</big><em>return_to=None</em><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.login" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">login</tt><big>(</big><em>return_to=None</em>, <em>force_authn=False</em>, <em>is_passive=False</em><big>)</big><a class="reference internal" href="_modules/saml2/auth.html#OneLogin_Saml2_Auth.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.auth.OneLogin_Saml2_Auth.login" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initiates the SSO process.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>return_to</strong> (<em>string</em>) &#8211; Optional argument. The target URL the user should be redirected to after login.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>return_to</strong> (<em>string</em>) &#8211; Optional argument. The target URL the user should be redirected to after login.</li>
+<li><strong>force_authn</strong> (<em>bool</em>) &#8211; Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.</li>
+<li><strong>is_passive</strong> (<em>bool</em>) &#8211; Optional argument. When true the AuthNReuqest will set the Ispassive='true'.</li>
+</ul>
+</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Redirection url</td>
 </tr>
@@ -346,7 +351,7 @@
 <span id="authn-request-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">authn_request</span></tt> Class<a class="headerlink" href="#module-saml2.authn_request" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="saml2.authn_request.OneLogin_Saml2_Authn_Request">
-<em class="property">class </em><tt class="descclassname">onelogin.saml2.authn_request.</tt><tt class="descname">OneLogin_Saml2_Authn_Request</tt><big>(</big><em>settings</em><big>)</big><a class="reference internal" href="_modules/saml2/authn_request.html#OneLogin_Saml2_Authn_Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.authn_request.OneLogin_Saml2_Authn_Request" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">onelogin.saml2.authn_request.</tt><tt class="descname">OneLogin_Saml2_Authn_Request</tt><big>(</big><em>settings</em>, <em>force_authn=False</em>, <em>is_passive=False</em><big>)</big><a class="reference internal" href="_modules/saml2/authn_request.html#OneLogin_Saml2_Authn_Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.authn_request.OneLogin_Saml2_Authn_Request" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="saml2.authn_request.OneLogin_Saml2_Authn_Request.get_request">
 <tt class="descname">get_request</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/saml2/authn_request.html#OneLogin_Saml2_Authn_Request.get_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#saml2.authn_request.OneLogin_Saml2_Authn_Request.get_request" title="Permalink to this definition">¶</a></dt>

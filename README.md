@@ -96,6 +96,13 @@ You can install it executing:
 If you want to know how a project can handle python packages review this [guide](https://packaging.python.org/en/latest/tutorial.html) and review this [sampleproject](https://github.com/pypa/sampleproject)
 
 
+Security warning
+----------------
+
+In production, the **strict** parameter MUST be set as **"true"**. Otherwise 
+your environment is not secure and will be exposed to attacks.
+
+
 Getting started
 ---------------
 
@@ -447,6 +454,10 @@ We can set a 'return_to' url parameter to the login function and that will be co
 target_url = 'https://example.com'
 auth.login(return_to=target_url)
 ```
+The login method can recieve 2 more optional parameters:
+
+* force_authn  When true the AuthNReuqest will set the ForceAuthn='true'
+* is_passive   When true the AuthNReuqest will set the Ispassive='true'
 
 #### The SP Endpoints ####
 

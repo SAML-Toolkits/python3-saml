@@ -5,7 +5,7 @@
 [![PyPi Version](https://pypip.in/v/python-saml/badge.png)](https://pypi.python.org/pypi/python-saml)
 ![PyPi Downloads](https://pypip.in/d/python-saml/badge.png)
 
-Add SAML support to your Python softwares using this library.
+Add SAML support to your Python software using this library.
 Forget those complicated libraries and use that open source library provided
 and supported by OneLogin Inc.
 

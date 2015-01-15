@@ -75,8 +75,8 @@ class OneLogin_Saml2_Metadata(object):
 
         sls = ''
         if 'singleLogoutService' in sp:
-            sls = """<md:SingleLogoutService Binding="%(binding)s"
-                                Location="%(location)s" />""" % \
+            sls = """        <md:SingleLogoutService Binding="%(binding)s"
+                                Location="%(location)s" />\n""" % \
                 {
                     'binding': sp['singleLogoutService']['binding'],
                     'location': sp['singleLogoutService']['url'],
@@ -125,11 +125,10 @@ class OneLogin_Saml2_Metadata(object):
                      cacheDuration="%(cache)s"
                      entityID="%(entity_id)s">
     <md:SPSSODescriptor AuthnRequestsSigned="%(authnsign)s" WantAssertionsSigned="%(wsign)s" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-        <md:NameIDFormat>%(name_id_format)s</md:NameIDFormat>
+%(sls)s        <md:NameIDFormat>%(name_id_format)s</md:NameIDFormat>
         <md:AssertionConsumerService Binding="%(binding)s"
                                      Location="%(location)s"
                                      index="1" />
-%(sls)s
     </md:SPSSODescriptor>
 %(organization)s
 %(contacts)s
@@ -204,10 +203,9 @@ class OneLogin_Saml2_Metadata(object):
 
         key_descriptor = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'md:KeyDescriptor')
 
-        entity_descriptor = sp_sso_descriptor = xml.getElementsByTagName('md:EntityDescriptor')[0]
-        entity_descriptor.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
+        entity_descriptor = xml.getElementsByTagName('md:EntityDescriptor')[0]
 
-        sp_sso_descriptor = xml.getElementsByTagName('md:SPSSODescriptor')[0]
+        sp_sso_descriptor = entity_descriptor.getElementsByTagName('md:SPSSODescriptor')[0]
         sp_sso_descriptor.insertBefore(key_descriptor.cloneNode(True), sp_sso_descriptor.firstChild)
         sp_sso_descriptor.insertBefore(key_descriptor.cloneNode(True), sp_sso_descriptor.firstChild)
 
@@ -219,5 +217,8 @@ class OneLogin_Saml2_Metadata(object):
 
         signing.appendChild(key_info)
         encryption.appendChild(key_info.cloneNode(True))
+
+        signing.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
+        encryption.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
 
         return xml.toxml()

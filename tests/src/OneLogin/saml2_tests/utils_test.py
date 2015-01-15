@@ -55,6 +55,14 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         res = OneLogin_Saml2_Utils.validate_xml(metadata_ok, 'saml-schema-metadata-2.0.xsd')
         self.assertTrue(isinstance(res, Document))
 
+        metadata_bad_order = self.file_contents(join(self.data_path, 'metadata', 'metadata_bad_order_settings1.xml'))
+        res = OneLogin_Saml2_Utils.validate_xml(metadata_bad_order, 'saml-schema-metadata-2.0.xsd')
+        self.assertFalse(isinstance(res, Document))
+
+        metadata_signed = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings1.xml'))
+        res = OneLogin_Saml2_Utils.validate_xml(metadata_signed, 'saml-schema-metadata-2.0.xsd')
+        self.assertTrue(isinstance(res, Document))
+
         dom = parseString(metadata_ok)
         res = OneLogin_Saml2_Utils.validate_xml(dom, 'saml-schema-metadata-2.0.xsd')
         self.assertTrue(isinstance(res, Document))

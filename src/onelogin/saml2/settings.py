@@ -635,6 +635,8 @@ class OneLogin_Saml2_Settings(object):
                     if expire_time is not None and int(datetime.now().strftime('%s')) > int(expire_time):
                         errors.append('expired_xml')
 
+        # TODO: Validate Sign
+
         return errors
 
     def format_idp_cert(self):

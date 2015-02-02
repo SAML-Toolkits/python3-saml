@@ -40,13 +40,22 @@ def index(request):
         return_to = OneLogin_Saml2_Utils.get_self_url(req) + reverse('attrs')
         return HttpResponseRedirect(auth.login(return_to))
     elif 'slo' in req['get_data']:
-        return HttpResponseRedirect(auth.logout())
+        name_id = None
+        session_index = None
+        if 'samlNameId' in request.session:
+            name_id = request.session['samlNameId']
+        if 'samlSessionIndex' in request.session:
+            session_index = request.session['samlSessionIndex']
+
+        return HttpResponseRedirect(auth.logout(name_id=name_id, session_index=session_index))
     elif 'acs' in req['get_data']:
         auth.process_response()
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
         if not errors:
             request.session['samlUserdata'] = auth.get_attributes()
+            request.session['samlNameId'] = auth.get_nameid()
+            request.session['samlSessionIndex'] = auth.get_session_index()
             if 'RelayState' in req['post_data'] and OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:
                 return HttpResponseRedirect(auth.redirect_to(req['post_data']['RelayState']))
     elif 'sls' in req['get_data']:

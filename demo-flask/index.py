@@ -46,13 +46,22 @@ def index():
         return_to = '%sattrs/' % request.host_url
         return redirect(auth.login(return_to))
     elif 'slo' in request.args:
-        return redirect(auth.logout())
+        name_id = None
+        session_index = None
+        if 'samlNameId' in request.session:
+            name_id = request.session['samlNameId']
+        if 'samlSessionIndex' in request.session:
+            session_index = request.session['samlSessionIndex']
+
+        return redirect(auth.logout(name_id=name_id, session_index=session_index))
     elif 'acs' in request.args:
         auth.process_response()
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
         if len(errors) == 0:
             session['samlUserdata'] = auth.get_attributes()
+            request.session['samlNameId'] = auth.get_nameid()
+            request.session['samlSessionIndex'] = auth.get_session_index()
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
                 return redirect(auth.redirect_to(request.form['RelayState']))

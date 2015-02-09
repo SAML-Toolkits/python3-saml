@@ -278,7 +278,14 @@ class OneLogin_Saml2_Logout_Request(object):
                     destination = dom.get('Destination')
                     if destination != '':
                         if current_url not in destination:
-                            raise Exception('The LogoutRequest was received at $currentURL instead of $destination')
+                            raise Exception(
+                                'The LogoutRequest was received at '
+                                '%(currentURL)s instead of %(destination)s' %
+                                {
+                                    'currentURL': current_url,
+                                    'destination': destination,
+                                }
+                            )
 
                 # Check issuer
                 issuer = OneLogin_Saml2_Logout_Request.get_issuer(dom)

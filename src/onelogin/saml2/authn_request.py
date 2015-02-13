@@ -9,9 +9,6 @@ AuthNRequest class of OneLogin's Python Toolkit.
 
 """
 
-from base64 import b64encode
-from zlib import compress
-
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
@@ -56,11 +53,11 @@ class OneLogin_Saml2_Authn_Request(object):
         provider_name_str = ''
         organization_data = settings.get_organization()
         if isinstance(organization_data, dict) and organization_data:
-            langs = organization_data.keys()
+            langs = organization_data
             if 'en-US' in langs:
                 lang = 'en-US'
             else:
-                lang = langs[0]
+                lang = sorted(langs)[0]
             if 'displayname' in organization_data[lang] and organization_data[lang]['displayname'] is not None:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
@@ -123,8 +120,7 @@ class OneLogin_Saml2_Authn_Request(object):
         :return: Unsigned AuthnRequest
         :rtype: str object
         """
-        deflated_request = compress(self.__authn_request)[2:-4]
-        return b64encode(deflated_request)
+        return OneLogin_Saml2_Utils.deflate_and_base64_encode(self.__authn_request)
 
     def get_id(self):
         """

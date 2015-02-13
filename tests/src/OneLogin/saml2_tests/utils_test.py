@@ -152,12 +152,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         target_url3 = OneLogin_Saml2_Utils.redirect(url3, {}, request_data)
         self.assertIn('test=true', target_url3)
-
-        try:
-            target_url4 = OneLogin_Saml2_Utils.redirect(url4, {}, request_data)
-            self.assertTrue(target_url4 == 42)
-        except Exception as e:
-            self.assertIn('Redirect to invalid URL', e.message)
+        self.assertRaisesRegexp(Exception, 'Redirect to invalid URL',
+                                OneLogin_Saml2_Utils.redirect, url4, {}, request_data)
 
         # Review parameter prefix
         parameters1 = {
@@ -178,26 +174,27 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         }
 
         target_url7 = OneLogin_Saml2_Utils.redirect(url, parameters2, request_data)
-        self.assertEqual('http://%s/example?numvaluelist[]=1&numvaluelist[]=2&testing&alphavalue=a' % hostname, target_url7)
+        parameters2_decoded = {"alphavalue": "alphavalue=a", "numvaluelist": "numvaluelist[]=1&numvaluelist[]=2", "testing": "testing"}
+        parameters2_str = "&".join(parameters2_decoded[x] for x in parameters2)
+        self.assertEqual('http://%s/example?%s' % (hostname, parameters2_str), target_url7)
 
         parameters3 = {
             'alphavalue': 'a',
             'emptynumvaluelist': [],
             'numvaluelist': [''],
         }
+        parameters3_decoded = {"alphavalue": "alphavalue=a", "numvaluelist": "numvaluelist[]="}
+        parameters3_str = "&".join((parameters3_decoded[x] for x in parameters3.keys() if x in parameters3_decoded))
         target_url8 = OneLogin_Saml2_Utils.redirect(url, parameters3, request_data)
-        self.assertEqual('http://%s/example?numvaluelist[]=&alphavalue=a' % hostname, target_url8)
+        self.assertEqual('http://%s/example?%s' % (hostname, parameters3_str), target_url8)
 
     def testGetselfhost(self):
         """
         Tests the get_self_host method of the OneLogin_Saml2_Utils
         """
         request_data = {}
-        try:
-            OneLogin_Saml2_Utils.get_self_host(request_data)
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertEqual('No hostname defined', e.message)
+        self.assertRaisesRegexp(Exception, 'No hostname defined',
+                                OneLogin_Saml2_Utils.get_self_host, request_data)
 
         request_data = {
             'server_name': 'example.com'
@@ -287,11 +284,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         request_data2 = {
             'request_uri': 'example.com/onelogin/sso'
         }
-        try:
-            self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data2))
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertEqual('No hostname defined', e.message)
+        self.assertRaisesRegexp(Exception, 'No hostname defined',
+                                OneLogin_Saml2_Utils.get_self_url_host, request_data2)
 
     def testGetSelfURL(self):
         """
@@ -420,21 +414,15 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_inv = b64decode(xml_inv)
         dom_inv = etree.fromstring(xml_inv)
 
-        try:
-            status_inv = OneLogin_Saml2_Utils.get_status(dom_inv)
-            self.assertEqual(status_inv, 42)
-        except Exception as e:
-            self.assertEqual('Missing Status on response', e.message)
+        self.assertRaisesRegexp(Exception, 'Missing Status on response',
+                                OneLogin_Saml2_Utils.get_status, dom_inv)
 
         xml_inv2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_status_code.xml.base64'))
         xml_inv2 = b64decode(xml_inv2)
         dom_inv2 = etree.fromstring(xml_inv2)
 
-        try:
-            status_inv2 = OneLogin_Saml2_Utils.get_status(dom_inv2)
-            self.assertEqual(status_inv2, 42)
-        except Exception as e:
-            self.assertEqual('Missing Status Code on response', e.message)
+        self.assertRaisesRegexp(Exception, 'Missing Status Code on response',
+                                OneLogin_Saml2_Utils.get_status, dom_inv2)
 
     def testParseDuration(self):
         """
@@ -450,11 +438,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertTrue(parsed_duration_2 > parsed_duration)
 
         invalid_duration = 'PT1Y'
-        try:
-            parsed_duration_3 = OneLogin_Saml2_Utils.parse_duration(invalid_duration)
-            self.assertEqual(parsed_duration_3, 42)
-        except Exception as e:
-            self.assertIn('Unrecognised ISO 8601 date format', e.message)
+        self.assertRaisesRegexp(Exception, 'Unrecognised ISO 8601 date format',
+                                OneLogin_Saml2_Utils.parse_duration, invalid_duration)
 
         new_duration = 'P1Y1M'
         parsed_duration_4 = OneLogin_Saml2_Utils.parse_duration(new_duration, timestamp)
@@ -472,11 +457,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         saml_time = '2013-12-10T04:39:31Z'
         self.assertEqual(time, OneLogin_Saml2_Utils.parse_SAML_to_time(saml_time))
 
-        try:
-            OneLogin_Saml2_Utils.parse_SAML_to_time('invalidSAMLTime')
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertIn('does not match format', e.message)
+        self.assertRaisesRegexp(Exception, 'does not match format',
+                                OneLogin_Saml2_Utils.parse_SAML_to_time, 'invalidSAMLTime')
 
         # Now test if toolkit supports miliseconds
         saml_time2 = '2013-12-10T04:39:31.120Z'
@@ -490,11 +472,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         saml_time = '2013-12-10T04:39:31Z'
         self.assertEqual(saml_time, OneLogin_Saml2_Utils.parse_time_to_SAML(time))
 
-        try:
-            OneLogin_Saml2_Utils.parse_time_to_SAML('invalidtime')
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertIn('could not convert string to float', e.message)
+        self.assertRaisesRegexp(Exception, 'could not convert string to float',
+                                OneLogin_Saml2_Utils.parse_time_to_SAML, 'invalidtime')
 
     def testGetExpireTime(self):
         """
@@ -574,7 +553,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         key = OneLogin_Saml2_Utils.format_cert(x509cert)
 
         name_id_enc = OneLogin_Saml2_Utils.generate_name_id(name_id_value, entity_id, name_id_format, key)
-        expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>'
+        expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">\n<xenc:EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
         self.assertIn(expected_name_id_enc, name_id_enc)
 
     def testCalculateX509Fingerprint(self):
@@ -635,11 +614,11 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         encrypted_data = encrypted_nameid_nodes[0].firstChild
         encrypted_data_str = str(encrypted_nameid_nodes[0].firstChild.toxml())
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
-        self.assertEqual('{%s}NameID' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_nameid.tag)
+        self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
         self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
 
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data_str, key)
-        self.assertEqual('{%s}NameID' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_nameid.tag)
+        self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
         self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
 
         xml_assertion_enc = b64decode(self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64')))
@@ -648,14 +627,14 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         encrypted_data_assert = encrypted_assertion_enc_nodes[0].firstChild
 
         decrypted_assertion = OneLogin_Saml2_Utils.decrypt_element(encrypted_data_assert, key)
-        self.assertEqual('{%s}Assertion' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_assertion.tag)
+        self.assertEqual('{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML, decrypted_assertion.tag)
         self.assertEqual('_6fe189b1c241827773902f2b1d3a843418206a5c97', decrypted_assertion.get('ID'))
 
         decrypted_assertion.xpath('/saml:Assertion/saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
         encrypted_nameid_nodes = decrypted_assertion.xpath('/saml:Assertion/saml:Subject/saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
         encrypted_data = encrypted_nameid_nodes[0][0]
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
-        self.assertEqual('{%s}NameID' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_nameid.tag)
+        self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
         self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
 
         key_2_file_name = join(self.data_path, 'misc', 'sp2.key')
@@ -663,41 +642,24 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         key2 = f.read()
         f.close()
 
-        try:
-            OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key2)
-            self.assertTrue(False)
-        except:
-            pass
+        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data, key2)
 
         key_3_file_name = join(self.data_path, 'misc', 'sp2.key')
         f = open(key_3_file_name, 'r')
         key3 = f.read()
         f.close()
-        try:
-            OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key3)
-            self.assertTrue(False)
-        except:
-            pass
-
+        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data, key3)
         xml_nameid_enc_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_EncMethod.xml.base64')))
         dom_nameid_enc_2 = parseString(xml_nameid_enc_2)
         encrypted_nameid_nodes_2 = dom_nameid_enc_2.getElementsByTagName('saml:EncryptedID')
         encrypted_data_2 = encrypted_nameid_nodes_2[0].firstChild
-        try:
-            OneLogin_Saml2_Utils.decrypt_element(encrypted_data_2, key)
-            self.assertTrue(False)
-        except:
-            pass
+        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_2, key)
 
         xml_nameid_enc_3 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_keyinfo.xml.base64')))
         dom_nameid_enc_3 = parseString(xml_nameid_enc_3)
         encrypted_nameid_nodes_3 = dom_nameid_enc_3.getElementsByTagName('saml:EncryptedID')
         encrypted_data_3 = encrypted_nameid_nodes_3[0].firstChild
-        try:
-            OneLogin_Saml2_Utils.decrypt_element(encrypted_data_3, key)
-            self.assertTrue(False)
-        except:
-            pass
+        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_3, key)
 
     def testAddSign(self):
         """
@@ -765,7 +727,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         try:
             OneLogin_Saml2_Utils.add_sign(1, key, cert)
         except Exception as e:
-            self.assertEqual('Error parsing xml string', e.message)
+            self.assertEqual('Error parsing xml string', str(e))
 
     def testValidateSign(self):
         """
@@ -783,12 +745,12 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         try:
             self.assertFalse(OneLogin_Saml2_Utils.validate_sign('', cert))
         except Exception as e:
-            self.assertEqual('Empty string supplied as input', e.message)
+            self.assertEqual('Empty string supplied as input', str(e))
 
         try:
             self.assertFalse(OneLogin_Saml2_Utils.validate_sign(1, cert))
         except Exception as e:
-            self.assertEqual('Error parsing xml string', e.message)
+            self.assertEqual('Error parsing xml string', str(e))
 
         # expired cert
         xml_metadata_signed = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings1.xml'))

@@ -11,7 +11,7 @@ Metadata class of OneLogin's Python Toolkit.
 
 from time import gmtime, strftime
 from datetime import datetime
-from defusedxml.minidom import parseString
+from xml.dom.minidom import parseString
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -55,7 +55,7 @@ class OneLogin_Saml2_Metadata(object):
         """
         if valid_until is None:
             valid_until = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_VALID
-        if not isinstance(valid_until, basestring):
+        if not isinstance(valid_until, OneLogin_Saml2_Utils.str_type):
             valid_until_time = gmtime(valid_until)
             valid_until_time = strftime(r'%Y-%m-%dT%H:%M:%SZ', valid_until_time)
         else:
@@ -63,7 +63,7 @@ class OneLogin_Saml2_Metadata(object):
 
         if cache_duration is None:
             cache_duration = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_CACHED
-        if not isinstance(cache_duration, basestring):
+        if not isinstance(cache_duration, OneLogin_Saml2_Utils.str_type):
             cache_duration_str = 'PT%sS' % cache_duration
         else:
             cache_duration_str = cache_duration
@@ -188,7 +188,7 @@ class OneLogin_Saml2_Metadata(object):
         try:
             xml = parseString(metadata)
         except Exception as e:
-            raise Exception('Error parsing metadata. ' + e.message)
+            raise Exception('Error parsing metadata. ' + str(e))
 
         formated_cert = OneLogin_Saml2_Utils.format_cert(cert, False)
         x509_certificate = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'ds:X509Certificate')

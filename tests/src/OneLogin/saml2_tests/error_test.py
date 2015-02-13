@@ -14,4 +14,4 @@ class OneLogin_Saml2_Error_Test(unittest.TestCase):
 
     def runTest(self):
         exception = OneLogin_Saml2_Error('test')
-        self.assertEqual(exception.message, 'test')
+        self.assertEqual(str(exception), 'test')

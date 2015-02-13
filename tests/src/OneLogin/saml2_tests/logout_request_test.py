@@ -3,16 +3,19 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
-from base64 import b64encode
 import json
 from os.path import dirname, join, exists
 import unittest
-from urlparse import urlparse, parse_qs
 from xml.dom.minidom import parseString
 
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
 
 
 class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
@@ -50,7 +53,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
-        inflated = OneLogin_Saml2_Utils.decode_base64_and_inflate(payload)
+        inflated = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
 
     def testCreateDeflatedSAMLLogoutRequestURLParameter(self):
@@ -67,7 +70,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
-        inflated = OneLogin_Saml2_Utils.decode_base64_and_inflate(payload)
+        inflated = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
 
     def testGetIDFromSAMLLogoutRequest(self):
@@ -75,8 +78,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the get_id method of the OneLogin_Saml2_LogoutRequest
         """
         logout_request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
-        id = OneLogin_Saml2_Logout_Request.get_id(logout_request)
-        self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id)
+        id1 = OneLogin_Saml2_Logout_Request.get_id(logout_request)
+        self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id1)
 
         dom = parseString(logout_request)
         id2 = OneLogin_Saml2_Logout_Request.get_id(dom)
@@ -88,8 +91,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         """
         deflated_logout_request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(deflated_logout_request)
-        id = OneLogin_Saml2_Logout_Request.get_id(logout_request)
-        self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id)
+        id1 = OneLogin_Saml2_Logout_Request.get_id(logout_request)
+        self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id1)
 
     def testGetNameIdData(self):
         """
@@ -110,11 +113,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        try:
-            OneLogin_Saml2_Logout_Request.get_nameid_data(request_2)
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertIn('Key is required in order to decrypt the NameID', e.message)
+        self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID',
+                                OneLogin_Saml2_Logout_Request.get_nameid_data, request_2)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
@@ -130,18 +130,12 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         encrypted_id_nodes = dom_2.getElementsByTagName('saml:EncryptedID')
         encrypted_data = encrypted_id_nodes[0].firstChild.nextSibling
         encrypted_id_nodes[0].removeChild(encrypted_data)
-        try:
-            OneLogin_Saml2_Logout_Request.get_nameid_data(dom_2.toxml(), key)
-            self.assertTre(False)
-        except Exception as e:
-            self.assertIn('Not NameID found in the Logout Request', e.message)
+        self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request',
+                                OneLogin_Saml2_Logout_Request.get_nameid_data, dom_2.toxml(), key)
 
         inv_request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'no_nameId.xml'))
-        try:
-            OneLogin_Saml2_Logout_Request.get_nameid_data(inv_request)
-            self.assertTre(False)
-        except Exception as e:
-            self.assertIn('Not NameID found in the Logout Request', e.message)
+        self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request',
+                                OneLogin_Saml2_Logout_Request.get_nameid_data, inv_request)
 
     def testGetNameId(self):
         """
@@ -152,11 +146,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(name_id, 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c')
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        try:
-            OneLogin_Saml2_Logout_Request.get_nameid(request_2)
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertIn('Key is required in order to decrypt the NameID', e.message)
+        self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID',
+                                OneLogin_Saml2_Logout_Request.get_nameid, request_2)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
@@ -203,7 +194,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
         Case Invalid XML
         """
-        request = b64encode('<xml>invalid</xml>')
+        request = OneLogin_Saml2_Utils.b64encode('<xml>invalid</xml>')
         request_data = {
             'http_host': 'example.com',
             'script_name': 'index.html',
@@ -231,16 +222,16 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
             valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Invalid issuer in the Logout Request', e.message)
+            self.assertIn('Invalid issuer in the Logout Request', str(e))
 
     def testIsInvalidDestination(self):
         """
@@ -253,24 +244,24 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         }
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
             valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('The LogoutRequest was received at', e.message)
+            self.assertIn('The LogoutRequest was received at', str(e))
 
         dom = parseString(request)
         dom.documentElement.setAttribute('Destination', None)
-        logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        logout_request3 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(dom.toxml()))
         self.assertTrue(logout_request3.is_valid(request_data))
 
         dom.documentElement.removeAttribute('Destination')
-        logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        logout_request4 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(dom.toxml()))
         self.assertTrue(logout_request4.is_valid(request_data))
 
     def testIsInvalidNotOnOrAfter(self):
@@ -287,16 +278,16 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
 
-        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
         try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
             valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Timing issues (please check your clock settings)', e.message)
+            self.assertIn('Timing issues (please check your clock settings)', str(e))
 
     def testIsValid(self):
         """
@@ -309,25 +300,25 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
 
-        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
-        logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertFalse(logout_request2.is_valid(request_data))
 
         settings.set_strict(False)
         dom = parseString(request)
-        logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        logout_request3 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(dom.toxml()))
         self.assertTrue(logout_request3.is_valid(request_data))
 
         settings.set_strict(True)
-        logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(dom.toxml()))
+        logout_request4 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(dom.toxml()))
         self.assertFalse(logout_request4.is_valid(request_data))
 
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
-        logout_request5 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request5 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request5.is_valid(request_data))
 
     def testIsValidSign(self):
@@ -347,34 +338,33 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
-        request = OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest'])
+        request = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest']))
 
         settings.set_strict(False)
-        logout_request = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+        logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
 
-        relayState = request_data['get_data']['RelayState']
+        relay_state = request_data['get_data']['RelayState']
         del request_data['get_data']['RelayState']
         self.assertFalse(logout_request.is_valid(request_data))
-        request_data['get_data']['RelayState'] = relayState
+        request_data['get_data']['RelayState'] = relay_state
 
         settings.set_strict(True)
         try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
+            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
             valid = logout_request2.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('The LogoutRequest was received at', e.message)
+            self.assertIn('The LogoutRequest was received at', str(e))
 
         settings.set_strict(False)
         old_signature = request_data['get_data']['Signature']
         request_data['get_data']['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333='
+        logout_request3 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         try:
-            logout_request3 = OneLogin_Saml2_Logout_Request(settings, b64encode(request))
-            valid = logout_request3.is_valid(request_data)
-            self.assertFalse(valid)
+            self.assertFalse(logout_request3.is_valid(request_data))
         except Exception as e:
-            self.assertIn('Signature validation failed. Logout Request rejected', e.message)
+            self.assertIn('Signature validation failed. Logout Request rejected', str(e))
 
         request_data['get_data']['Signature'] = old_signature
         old_signature_algorithm = request_data['get_data']['SigAlg']
@@ -386,33 +376,33 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
             valid = logout_request3.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Signature validation failed. Logout Request rejected', e.message)
+            self.assertIn('Signature validation failed. Logout Request rejected', str(e))
 
         settings.set_strict(True)
         request_2 = request.replace('https://pitbulk.no-ip.org/newonelogin/demo1/index.php?sls', current_url)
         request_2 = request_2.replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/')
         request_data['get_data']['SAMLRequest'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(request_2)
         try:
-            logout_request4 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
+            logout_request4 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request_2))
             valid = logout_request4.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Signature validation failed. Logout Request rejected', e.message)
+            self.assertIn('Signature validation failed. Logout Request rejected', str(e))
 
         settings.set_strict(False)
+        logout_request5 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request_2))
         try:
-            logout_request5 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
             valid = logout_request5.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Signature validation failed. Logout Request rejected', e.message)
+            self.assertIn('Signature validation failed. Logout Request rejected', str(e))
 
         request_data['get_data']['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
         try:
             valid = logout_request5.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('Invalid signAlg in the recieved Logout Request', e.message)
+            self.assertIn('Invalid signAlg in the recieved Logout Request', str(e))
 
         settings_info = self.loadSettingsJSON()
         settings_info['strict'] = True
@@ -422,19 +412,19 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         old_signature = request_data['get_data']['Signature']
         del request_data['get_data']['Signature']
         try:
-            logout_request6 = OneLogin_Saml2_Logout_Request(settings, b64encode(request_2))
+            logout_request6 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request_2))
             valid = logout_request6.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('The Message of the Logout Request is not signed and the SP require it', e.message)
+            self.assertIn('The Message of the Logout Request is not signed and the SP require it', str(e))
 
         request_data['get_data']['Signature'] = old_signature
         settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'
         del settings_info['idp']['x509cert']
         settings_2 = OneLogin_Saml2_Settings(settings_info)
         try:
-            logout_request7 = OneLogin_Saml2_Logout_Request(settings_2, b64encode(request_2))
+            logout_request7 = OneLogin_Saml2_Logout_Request(settings_2, OneLogin_Saml2_Utils.b64encode(request_2))
             valid = logout_request7.is_valid(request_data)
             self.assertFalse(valid)
         except Exception as e:
-            self.assertIn('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', e.message)
+            self.assertIn('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', str(e))

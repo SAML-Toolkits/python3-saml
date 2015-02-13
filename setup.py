@@ -16,26 +16,23 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 2.7, 3.x',
     ],
     author='OneLogin',
     author_email='support@onelogin.com',
     license='MIT',
     url='https://github.com/onelogin/python-saml',
-    packages=['onelogin','onelogin/saml2'],
+    packages=['onelogin', 'onelogin/saml2'],
     include_package_data=True,
-    package_data = {
-            'onelogin/saml2/schemas': ['*.xsd'],
+    package_data={
+        'onelogin/saml2/schemas': ['*.xsd'],
     },
     package_dir={
         '': 'src',
     },
     test_suite='tests',
     install_requires=[
-        'M2Crypto==0.22.3',
-        'dm.xmlsec.binding==1.3.2',
-        'isodate==0.5.0',
-        'defusedxml==0.4.1',
+        'isodate>=0.5.0',
     ],
     extras_require={
         'test': (

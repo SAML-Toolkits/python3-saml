@@ -9,30 +9,32 @@ Auxiliary class of OneLogin's Python Toolkit.
 
 """
 
+from __future__ import absolute_import, print_function, with_statement
+
 import base64
 from datetime import datetime
 import calendar
 from hashlib import sha1
 from isodate import parse_duration as duration_parser
 from lxml import etree
-from defusedxml.lxml import tostring, fromstring
-from os.path import basename, dirname, join
+from lxml.etree import tostring, fromstring
+from os.path import dirname, join
 import re
 from sys import stderr
-from tempfile import NamedTemporaryFile
 from textwrap import wrap
-from urllib import quote_plus
 from uuid import uuid4
-from xml.dom.minidom import Document, Element
-from defusedxml.minidom import parseString
+from xml.dom.minidom import Document, Element, parseString
 
 import zlib
-
-import dm.xmlsec.binding as xmlsec
-from dm.xmlsec.binding.tmpl import EncData, Signature
+import xmlsec
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
+
+try:
+    from urllib.parse import quote_plus  # py3
+except ImportError:
+    from urllib import quote_plus  # py2
 
 
 def print_xmlsec_errors(filename, line, func, error_object, error_subject, reason, msg):
@@ -50,7 +52,7 @@ def print_xmlsec_errors(filename, line, func, error_object, error_subject, reaso
     if reason != 1:
         info.append("errno=%d" % reason)
     if info:
-        print "%s:%d(%s)" % (filename, line, func), " ".join(info)
+        print("%s:%d(%s)" % (filename, line, func), " ".join(info))
 
 
 class OneLogin_Saml2_Utils(object):
@@ -60,18 +62,91 @@ class OneLogin_Saml2_Utils(object):
     urls, add sign, encrypt, decrypt, sign validation, handle xml ...
 
     """
+    if isinstance(b'', type('')):  # py 2.x
+        text_types = (basestring,)  # noqa
+        str_type = basestring  # noqa
+
+        @staticmethod
+        def utf8(s):
+            """  return utf8-encoded string """
+            if isinstance(s, basestring):
+                return s.decode("utf8")
+            return unicode(s)
+
+        @staticmethod
+        def string(s):
+            """ return string """
+            if isinstance(s, unicode):
+                return s.encode("utf8")
+            return str(s)
+
+        @staticmethod
+        def bytes(s):
+            """ return bytes """
+            return str(s)
+    else:  # py 3.x
+        str_type = str
+        text_types = (bytes, str)
+
+        @staticmethod
+        def utf8(s):
+            """ return utf8-encoded string """
+            if isinstance(s, bytes):
+                return s.decode("utf8")
+            return str(s)
+
+        @staticmethod
+        def string(s):
+            """convert to string"""
+            if isinstance(s, bytes):
+                return s.decode("utf8")
+            return str(s)
+
+        @staticmethod
+        def bytes(s):
+            """return bytes"""
+            if isinstance(s, str):
+                return s.encode("utf8")
+            return bytes(s)
 
     @staticmethod
-    def decode_base64_and_inflate(value):
+    def escape_url(url):
+        """
+        escape the non-safe symbols in url
+        :param url: the url to escape
+        :type url: str
+        :return: the escaped url
+        :rtype str
+        """
+        return quote_plus(url)
+
+    @staticmethod
+    def b64encode(s):
+        """base64 encode"""
+        return OneLogin_Saml2_Utils.string(base64.b64encode(OneLogin_Saml2_Utils.bytes(s)))
+
+    @staticmethod
+    def b64decode(s):
+        """base64 decode"""
+        return base64.b64decode(s)
+
+    @staticmethod
+    def decode_base64_and_inflate(value, ignore_zip=False):
         """
         base64 decodes and then inflates according to RFC1951
         :param value: a deflated and encoded string
         :type value: string
+        :param ignore_zip: ignore zip errors
         :returns: the string after decoding and inflating
         :rtype: string
         """
-
-        return zlib.decompress(base64.b64decode(value), -15)
+        encoded = OneLogin_Saml2_Utils.b64decode(value)
+        try:
+            return zlib.decompress(encoded, -15)
+        except zlib.error:
+            if not ignore_zip:
+                raise
+        return encoded
 
     @staticmethod
     def deflate_and_base64_encode(value):
@@ -82,7 +157,7 @@ class OneLogin_Saml2_Utils(object):
         :returns: The deflated and encoded string
         :rtype: string
         """
-        return base64.b64encode(zlib.compress(value)[2:-4])
+        return OneLogin_Saml2_Utils.b64encode(zlib.compress(OneLogin_Saml2_Utils.bytes(value))[2:-4])
 
     @staticmethod
     def validate_xml(xml, schema, debug=False):
@@ -97,8 +172,8 @@ class OneLogin_Saml2_Utils(object):
         :returns: Error code or the DomDocument of the xml
         :rtype: string
         """
-        assert isinstance(xml, basestring) or isinstance(xml, Document) or isinstance(xml, etree._Element)
-        assert isinstance(schema, basestring)
+        assert isinstance(xml, OneLogin_Saml2_Utils.text_types) or isinstance(xml, Document) or isinstance(xml, etree._Element)
+        assert isinstance(schema, OneLogin_Saml2_Utils.str_type)
 
         if isinstance(xml, Document):
             xml = xml.toxml()
@@ -107,7 +182,7 @@ class OneLogin_Saml2_Utils(object):
 
         # Switch to lxml for schema validation
         try:
-            dom = fromstring(str(xml))
+            dom = fromstring(xml)
         except Exception:
             return 'unloaded_xml'
 
@@ -204,7 +279,7 @@ class OneLogin_Saml2_Utils(object):
         :returns: Url
         :rtype: string
         """
-        assert isinstance(url, basestring)
+        assert isinstance(url, OneLogin_Saml2_Utils.str_type)
         assert isinstance(parameters, dict)
 
         if url.startswith('/'):
@@ -226,15 +301,15 @@ class OneLogin_Saml2_Utils(object):
         for name, value in parameters.items():
 
             if value is None:
-                param = quote_plus(name)
+                param = OneLogin_Saml2_Utils.escape_url(name)
             elif isinstance(value, list):
                 param = ''
                 for val in value:
-                    param += quote_plus(name) + '[]=' + quote_plus(val) + '&'
+                    param += OneLogin_Saml2_Utils.escape_url(name) + '[]=' + OneLogin_Saml2_Utils.escape_url(val) + '&'
                 if len(param) > 0:
                     param = param[0:-1]
             else:
-                param = quote_plus(name) + '=' + quote_plus(value)
+                param = OneLogin_Saml2_Utils.escape_url(name) + '=' + OneLogin_Saml2_Utils.escape_url(value)
 
             if param:
                 url += param_prefix + param
@@ -294,7 +369,7 @@ class OneLogin_Saml2_Utils(object):
             current_host_data = current_host.split(':')
             possible_port = current_host_data[-1]
             try:
-                possible_port = float(possible_port)
+                int(possible_port)
                 current_host = current_host_data[0]
             except ValueError:
                 current_host = ':'.join(current_host_data)
@@ -391,7 +466,7 @@ class OneLogin_Saml2_Utils(object):
         :return: A unique string
         :rtype: string
         """
-        return 'ONELOGIN_%s' % sha1(uuid4().hex).hexdigest()
+        return 'ONELOGIN_%s' % sha1(OneLogin_Saml2_Utils.bytes(uuid4().hex)).hexdigest()
 
     @staticmethod
     def parse_time_to_SAML(time):
@@ -414,7 +489,7 @@ class OneLogin_Saml2_Utils(object):
         Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z
         to a UNIX timestamp. The sub-second part is ignored.
 
-        :param time: The time we should convert (SAML Timestamp).
+        :param timestr: The time we should convert (SAML Timestamp).
         :type: string
 
         :return: Converted to a unix timestamp.
@@ -449,7 +524,7 @@ class OneLogin_Saml2_Utils(object):
         :return: The new timestamp, after the duration is applied.
         :rtype: int
         """
-        assert isinstance(duration, basestring)
+        assert isinstance(duration, OneLogin_Saml2_Utils.str_type)
         assert timestamp is None or isinstance(timestamp, int)
 
         timedelta = duration_parser(duration)
@@ -532,7 +607,7 @@ class OneLogin_Saml2_Utils(object):
         :returns: Formated fingerprint
         :rtype: string
         """
-        assert isinstance(x509_cert, basestring)
+        assert isinstance(x509_cert, OneLogin_Saml2_Utils.str_type)
 
         lines = x509_cert.split('\n')
         data = ''
@@ -554,7 +629,7 @@ class OneLogin_Saml2_Utils(object):
                 data += line
         # "data" now contains the certificate as a base64-encoded string. The
         # fingerprint of the certificate is the sha1-hash of the certificate.
-        return sha1(base64.b64decode(data)).hexdigest().lower()
+        return sha1(base64.b64decode(OneLogin_Saml2_Utils.bytes(data))).hexdigest().lower()
 
     @staticmethod
     def format_finger_print(fingerprint):
@@ -607,32 +682,25 @@ class OneLogin_Saml2_Utils(object):
             xml = name_id_container.toxml()
             elem = fromstring(xml)
 
-            xmlsec.initialize()
-
-            if debug:
-                xmlsec.set_error_callback(print_xmlsec_errors)
+            xmlsec.enable_debug_trace(debug)
 
             # Load the public cert
-            mngr = xmlsec.KeysMngr()
-            file_cert = OneLogin_Saml2_Utils.write_temp_file(cert)
-            key_data = xmlsec.Key.load(file_cert.name, xmlsec.KeyDataFormatCertPem, None)
-            key_data.name = basename(file_cert.name)
-            mngr.addKey(key_data)
-            file_cert.close()
+            manager = xmlsec.KeysManager()
+            manager.add_key(xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None))
 
             # Prepare for encryption
-            enc_data = EncData(xmlsec.TransformAes128Cbc, type=xmlsec.TypeEncElement)
-            enc_data.ensureCipherValue()
-            key_info = enc_data.ensureKeyInfo()
-            # enc_key = key_info.addEncryptedKey(xmlsec.TransformRsaPkcs1)
-            enc_key = key_info.addEncryptedKey(xmlsec.TransformRsaOaep)
-            enc_key.ensureCipherValue()
+            enc_data = xmlsec.template.encrypted_data_create(
+                elem, xmlsec.Transform.AES128, type=xmlsec.EncryptionType.ELEMENT)
+            xmlsec.template.encrypted_data_ensure_cipher_value(enc_data)
+            key_info = xmlsec.template.encrypted_data_ensure_key_info(enc_data)
+            enc_key = xmlsec.template.add_encrypted_key(key_info, xmlsec.Transform.RSA_OAEP)
+            xmlsec.template.encrypted_data_ensure_cipher_value(enc_key)
 
             # Encrypt!
-            enc_ctx = xmlsec.EncCtx(mngr)
-            enc_ctx.encKey = xmlsec.Key.generate(xmlsec.KeyDataAes, 128, xmlsec.KeyDataTypeSession)
+            enc_ctx = xmlsec.EncryptionContext(manager)
+            enc_ctx.key = xmlsec.Key.generate(xmlsec.KeyData.AES, 128, xmlsec.KeyDataType.SESSION)
 
-            edata = enc_ctx.encryptXml(enc_data, elem[0])
+            edata = enc_ctx.encrypt_xml(enc_data, elem[0])
 
             newdoc = parseString(etree.tostring(edata))
 
@@ -645,9 +713,9 @@ class OneLogin_Saml2_Utils(object):
 
             nodes = newdoc.getElementsByTagName("*")
             for node in nodes:
-                if node.tagName == 'ns0:KeyInfo':
+                if node.tagName == 'KeyInfo':
                     node.tagName = 'dsig:KeyInfo'
-                    node.removeAttribute('xmlns:ns0')
+                    node.removeAttribute('xmlns')
                     node.setAttribute('xmlns:dsig', OneLogin_Saml2_Constants.NS_DS)
                 else:
                     node.tagName = 'xenc:' + node.tagName
@@ -713,37 +781,16 @@ class OneLogin_Saml2_Utils(object):
         """
         if isinstance(encrypted_data, Element):
             encrypted_data = fromstring(str(encrypted_data.toxml()))
-        elif isinstance(encrypted_data, basestring):
-            encrypted_data = fromstring(str(encrypted_data))
+        elif isinstance(encrypted_data, OneLogin_Saml2_Utils.str_type):
+            encrypted_data = fromstring(encrypted_data)
 
-        xmlsec.initialize()
+        xmlsec.enable_debug_trace(debug)
+        manager = xmlsec.KeysManager()
 
-        if debug:
-            xmlsec.set_error_callback(print_xmlsec_errors)
-
-        mngr = xmlsec.KeysMngr()
-
-        key = xmlsec.Key.loadMemory(key, xmlsec.KeyDataFormatPem, None)
-        mngr.addKey(key)
-        enc_ctx = xmlsec.EncCtx(mngr)
+        manager.add_key(xmlsec.Key.from_memory(key, xmlsec.KeyFormat.PEM, None))
+        enc_ctx = xmlsec.EncryptionContext(manager)
 
         return enc_ctx.decrypt(encrypted_data)
-
-    @staticmethod
-    def write_temp_file(content):
-        """
-        Writes some content into a temporary file and returns it.
-
-        :param content: The file content
-        :type: string
-
-        :returns: The temporary file
-        :rtype: file-like object
-        """
-        f_temp = NamedTemporaryFile(delete=True)
-        f_temp.file.write(content)
-        f_temp.file.flush()
-        return f_temp
 
     @staticmethod
     def add_sign(xml, key, cert, debug=False):
@@ -769,32 +816,29 @@ class OneLogin_Saml2_Utils(object):
             elem = xml
         elif isinstance(xml, Document):
             xml = xml.toxml()
-            elem = fromstring(str(xml))
+            elem = fromstring(xml)
         elif isinstance(xml, Element):
             xml.setAttributeNS(
-                unicode(OneLogin_Saml2_Constants.NS_SAMLP),
+                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP),
                 'xmlns:samlp',
-                unicode(OneLogin_Saml2_Constants.NS_SAMLP)
+                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP)
             )
             xml.setAttributeNS(
-                unicode(OneLogin_Saml2_Constants.NS_SAML),
+                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML),
                 'xmlns:saml',
-                unicode(OneLogin_Saml2_Constants.NS_SAML)
+                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML)
             )
             xml = xml.toxml()
-            elem = fromstring(str(xml))
-        elif isinstance(xml, basestring):
-            elem = fromstring(str(xml))
+            elem = fromstring(xml)
+        elif isinstance(xml, OneLogin_Saml2_Utils.text_types):
+            elem = fromstring(xml)
         else:
             raise Exception('Error parsing xml string')
 
-        xmlsec.initialize()
-
-        if debug:
-            xmlsec.set_error_callback(print_xmlsec_errors)
-
+        xmlsec.enable_debug_trace(debug)
+        xmlsec.tree.add_ids(elem, ["ID"])
         # Sign the metadacta with our private key.
-        signature = Signature(xmlsec.TransformExclC14N, xmlsec.TransformRsaSha1)
+        signature = xmlsec.template.create(elem, xmlsec.Transform.EXCL_C14N, xmlsec.Transform.RSA_SHA1, ns='ds')
 
         issuer = OneLogin_Saml2_Utils.query(elem, '//saml:Issuer')
         if len(issuer) > 0:
@@ -803,37 +847,24 @@ class OneLogin_Saml2_Utils(object):
         else:
             elem[0].insert(0, signature)
 
-        ref = signature.addReference(xmlsec.TransformSha1)
-        ref.addTransform(xmlsec.TransformEnveloped)
-        ref.addTransform(xmlsec.TransformExclC14N)
+        elem_id = elem.get('ID', None)
+        if elem_id:
+            elem_id = '#' + elem_id
 
-        key_info = signature.ensureKeyInfo()
-        key_info.addX509Data()
+        ref = xmlsec.template.add_reference(signature, xmlsec.Transform.SHA1, uri=elem_id)
+        xmlsec.template.add_transform(ref, xmlsec.Transform.ENVELOPED)
+        xmlsec.template.add_transform(ref, xmlsec.Transform.EXCL_C14N)
+        key_info = xmlsec.template.ensure_key_info(signature)
+        xmlsec.template.add_x509_data(key_info)
 
-        dsig_ctx = xmlsec.DSigCtx()
-        sign_key = xmlsec.Key.loadMemory(key, xmlsec.KeyDataFormatPem, None)
+        dsig_ctx = xmlsec.SignatureContext()
+        sign_key = xmlsec.Key.from_memory(key, xmlsec.KeyFormat.PEM, None)
+        sign_key.load_cert_from_memory(cert, xmlsec.KeyFormat.PEM)
 
-        file_cert = OneLogin_Saml2_Utils.write_temp_file(cert)
-        sign_key.loadCert(file_cert.name, xmlsec.KeyDataFormatCertPem)
-        file_cert.close()
-
-        dsig_ctx.signKey = sign_key
+        dsig_ctx.key = sign_key
         dsig_ctx.sign(signature)
 
         newdoc = parseString(etree.tostring(elem))
-
-        signature_nodes = newdoc.getElementsByTagName("Signature")
-
-        for signature in signature_nodes:
-            signature.removeAttribute('xmlns')
-            signature.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
-            if not signature.tagName.startswith('ds:'):
-                signature.tagName = 'ds:' + signature.tagName
-            nodes = signature.getElementsByTagName("*")
-            for node in nodes:
-                if not node.tagName.startswith('ds:'):
-                    node.tagName = 'ds:' + node.tagName
-
         return newdoc.saveXML(newdoc.firstChild)
 
     @staticmethod
@@ -863,31 +894,27 @@ class OneLogin_Saml2_Utils(object):
                 elem = xml
             elif isinstance(xml, Document):
                 xml = xml.toxml()
-                elem = fromstring(str(xml))
+                elem = fromstring(xml)
             elif isinstance(xml, Element):
                 xml.setAttributeNS(
-                    unicode(OneLogin_Saml2_Constants.NS_SAMLP),
+                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP),
                     'xmlns:samlp',
-                    unicode(OneLogin_Saml2_Constants.NS_SAMLP)
+                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP)
                 )
                 xml.setAttributeNS(
-                    unicode(OneLogin_Saml2_Constants.NS_SAML),
+                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML),
                     'xmlns:saml',
-                    unicode(OneLogin_Saml2_Constants.NS_SAML)
+                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML)
                 )
                 xml = xml.toxml()
                 elem = fromstring(str(xml))
-            elif isinstance(xml, basestring):
-                elem = fromstring(str(xml))
+            elif isinstance(xml, OneLogin_Saml2_Utils.text_types):
+                elem = fromstring(xml)
             else:
                 raise Exception('Error parsing xml string')
 
-            xmlsec.initialize()
-
-            if debug:
-                xmlsec.set_error_callback(print_xmlsec_errors)
-
-            xmlsec.addIDs(elem, ["ID"])
+            xmlsec.enable_debug_trace(debug)
+            xmlsec.tree.add_ids(elem, ["ID"])
 
             signature_nodes = OneLogin_Saml2_Utils.query(elem, '//ds:Signature')
 
@@ -906,30 +933,27 @@ class OneLogin_Saml2_Utils(object):
                 if cert is None or cert == '':
                     return False
 
-                dsig_ctx = xmlsec.DSigCtx()
-
-                file_cert = OneLogin_Saml2_Utils.write_temp_file(cert)
-
                 if validatecert:
-                    mngr = xmlsec.KeysMngr()
-                    mngr.loadCert(file_cert.name, xmlsec.KeyDataFormatCertPem, xmlsec.KeyDataTypeTrusted)
-                    dsig_ctx = xmlsec.DSigCtx(mngr)
+                    manager = xmlsec.KeysManager()
+                    manager.load_cert_from_memory(cert, xmlsec.KeyFormat.CERT_PEM, xmlsec.KeyDataType.TRUSTED)
+                    dsig_ctx = xmlsec.SignatureContext(manager)
                 else:
-                    dsig_ctx = xmlsec.DSigCtx()
-                    dsig_ctx.signKey = xmlsec.Key.load(file_cert.name, xmlsec.KeyDataFormatCertPem, None)
+                    dsig_ctx = xmlsec.SignatureContext()
+                    dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
 
-                file_cert.close()
-
-                dsig_ctx.setEnabledKeyData([xmlsec.KeyDataX509])
+                dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
                 dsig_ctx.verify(signature_node)
                 return True
             else:
                 return False
-        except Exception:
+        except xmlsec.Error as e:
+            if debug:
+                print(e)
+
             return False
 
     @staticmethod
-    def validate_binary_sign(signed_query, signature, cert=None, algorithm=xmlsec.TransformRsaSha1, debug=False):
+    def validate_binary_sign(signed_query, signature, cert=None, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):
         """
         Validates signed bynary data (Used to validate GET Signature).
 
@@ -950,18 +974,14 @@ class OneLogin_Saml2_Utils(object):
         :type: bool
         """
         try:
-            xmlsec.initialize()
-
-            if debug:
-                xmlsec.set_error_callback(print_xmlsec_errors)
-
-            dsig_ctx = xmlsec.DSigCtx()
-
-            file_cert = OneLogin_Saml2_Utils.write_temp_file(cert)
-            dsig_ctx.signKey = xmlsec.Key.load(file_cert.name, xmlsec.KeyDataFormatCertPem, None)
-            file_cert.close()
-
-            dsig_ctx.verifyBinary(signed_query, algorithm, signature)
+            xmlsec.enable_debug_trace(debug)
+            dsig_ctx = xmlsec.SignatureContext()
+            dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
+            dsig_ctx.verify_binary(OneLogin_Saml2_Utils.bytes(signed_query),
+                                   algorithm,
+                                   OneLogin_Saml2_Utils.bytes(signature))
             return True
-        except Exception:
+        except xmlsec.Error as e:
+            if debug:
+                print(e)
             return False

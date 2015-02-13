@@ -424,7 +424,7 @@ class OneLogin_Saml2_Settings(object):
                     break
         # Restores the value that had the self.__sp
         if 'old_sp' in locals():
-            self.__sp = old_sp
+            self.__sp = locals()['old_sp']
 
         return errors
 
@@ -606,7 +606,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: list
         """
 
-        assert isinstance(xml, basestring)
+        assert isinstance(xml, OneLogin_Saml2_Utils.str_type)
 
         if len(xml) == 0:
             raise Exception('Empty string supplied as input')
@@ -624,7 +624,7 @@ class OneLogin_Saml2_Settings(object):
                 if len(element.getElementsByTagName('md:SPSSODescriptor')) != 1:
                     errors.append('onlySPSSODescriptor_allowed_xml')
                 else:
-                    valid_until = cache_duration = expire_time = None
+                    valid_until = cache_duration = None
 
                     if element.hasAttribute('validUntil'):
                         valid_until = OneLogin_Saml2_Utils.parse_SAML_to_time(element.getAttribute('validUntil'))
@@ -671,7 +671,7 @@ class OneLogin_Saml2_Settings(object):
         Activates or deactivates the strict mode.
 
         :param value: Strict parameter
-        :type xml: boolean
+        :type value: boolean
         """
         assert isinstance(value, bool)
 

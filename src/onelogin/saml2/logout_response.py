@@ -9,12 +9,8 @@ Logout Response class of OneLogin's Python Toolkit.
 
 """
 
-from base64 import b64decode
-from defusedxml.lxml import fromstring
-
-from urllib import quote_plus
-from xml.dom.minidom import Document
-from defusedxml.minidom import parseString
+from lxml.etree import fromstring
+from xml.dom.minidom import Document, parseString
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -123,25 +119,25 @@ class OneLogin_Saml2_Logout_Response(object):
                 if sign_alg != OneLogin_Saml2_Constants.RSA_SHA1:
                     raise Exception('Invalid signAlg in the recieved Logout Response')
 
-                signed_query = 'SAMLResponse=%s' % quote_plus(get_data['SAMLResponse'])
+                signed_query = 'SAMLResponse=%s' % OneLogin_Saml2_Utils.escape_url(get_data['SAMLResponse'])
                 if 'RelayState' in get_data:
-                    signed_query = '%s&RelayState=%s' % (signed_query, quote_plus(get_data['RelayState']))
-                signed_query = '%s&SigAlg=%s' % (signed_query, quote_plus(sign_alg))
+                    signed_query = '%s&RelayState=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(get_data['RelayState']))
+                signed_query = '%s&SigAlg=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(sign_alg))
 
                 if 'x509cert' not in idp_data or idp_data['x509cert'] is None:
                     raise Exception('In order to validate the sign on the Logout Response, the x509cert of the IdP is required')
                 cert = idp_data['x509cert']
 
-                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, b64decode(get_data['Signature']), cert):
+                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, OneLogin_Saml2_Utils.b64decode(get_data['Signature']), cert):
                     raise Exception('Signature validation failed. Logout Response rejected')
 
             return True
         # pylint: disable=R0801
         except Exception as err:
-            self.__error = err.__str__()
+            self.__error = str(err)
             debug = self.__settings.is_debug_active()
             if debug:
-                print err.__str__()
+                print(err)
             return False
 
     def __query(self, query):

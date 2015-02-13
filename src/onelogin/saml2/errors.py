@@ -43,7 +43,6 @@ class OneLogin_Saml2_Error(Exception):
             * (str)   message.   Describes the error.
             * (int)   code.      The code error (defined in the error class).
         """
-        assert isinstance(message, basestring)
         assert isinstance(code, int)
 
         if errors is not None:

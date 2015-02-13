@@ -19,6 +19,7 @@ __pycache_
 /venv
 .coverage
 .pypirc
+/.idea
 
 *.key
 *.crt

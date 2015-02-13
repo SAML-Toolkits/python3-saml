@@ -10,6 +10,12 @@ import unittest
 
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
+
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
 
 
 class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
@@ -38,9 +44,9 @@ class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'responses', 'open_saml_response.xml'))
-        response = OneLogin_Saml2_Response(settings, b64encode(message))
+        response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
 
-        self.assertEquals('someone@example.org', response.get_nameid())
+        self.assertEqual('someone@example.org', response.get_nameid())
 
     def testResponseAndAssertionSigned(self):
         """
@@ -49,6 +55,6 @@ class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'responses', 'simple_saml_php.xml'))
-        response = OneLogin_Saml2_Response(settings, b64encode(message))
+        response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
 
-        self.assertEquals('someone@example.com', response.get_nameid())
+        self.assertEqual('someone@example.com', response.get_nameid())

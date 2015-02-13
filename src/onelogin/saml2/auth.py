@@ -11,11 +11,6 @@ Initializes the SP SAML instance
 
 """
 
-from base64 import b64encode
-from urllib import quote_plus
-
-import dm.xmlsec.binding as xmlsec
-
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.errors import OneLogin_Saml2_Error
@@ -24,6 +19,8 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
+
+import xmlsec
 
 
 class OneLogin_Saml2_Auth(object):
@@ -51,7 +48,7 @@ class OneLogin_Saml2_Auth(object):
         """
         self.__request_data = request_data
         self.__settings = OneLogin_Saml2_Settings(old_settings, custom_base_path)
-        self.__attributes = []
+        self.__attributes = dict()
         self.__nameid = None
         self.__session_index = None
         self.__authenticated = False
@@ -241,11 +238,8 @@ class OneLogin_Saml2_Auth(object):
         :returns: Attribute value if exists or []
         :rtype: string
         """
-        assert isinstance(name, basestring)
-        value = None
-        if self.__attributes and name in self.__attributes.keys():
-            value = self.__attributes[name]
-        return value
+        assert isinstance(name, OneLogin_Saml2_Utils.str_type)
+        return self.__attributes.get(name)
 
     def login(self, return_to=None, force_authn=False, is_passive=False):
         """
@@ -388,17 +382,16 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Error.SP_CERTS_NOT_FOUND
             )
 
-        xmlsec.initialize()
+        xmlsec.enable_debug_trace(self.__settings.is_debug_active())
+        dsig_ctx = xmlsec.SignatureContext()
+        dsig_ctx.key = xmlsec.Key.from_memory(key, xmlsec.KeyFormat.PEM, None)
 
-        dsig_ctx = xmlsec.DSigCtx()
-        dsig_ctx.signKey = xmlsec.Key.loadMemory(key, xmlsec.KeyDataFormatPem, None)
-
-        saml_data_str = '%s=%s' % (saml_type, quote_plus(saml_data))
-        relay_state_str = 'RelayState=%s' % quote_plus(relay_state)
-        alg_str = 'SigAlg=%s' % quote_plus(OneLogin_Saml2_Constants.RSA_SHA1)
+        saml_data_str = '%s=%s' % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data))
+        relay_state_str = 'RelayState=%s' % OneLogin_Saml2_Utils.escape_url(relay_state)
+        alg_str = 'SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(OneLogin_Saml2_Constants.RSA_SHA1)
 
         sign_data = [saml_data_str, relay_state_str, alg_str]
         msg = '&'.join(sign_data)
 
-        signature = dsig_ctx.signBinary(str(msg), xmlsec.TransformRsaSha1)
-        return b64encode(signature)
+        signature = dsig_ctx.sign_binary(OneLogin_Saml2_Utils.bytes(msg), xmlsec.Transform.RSA_SHA1)
+        return OneLogin_Saml2_Utils.b64encode(signature)

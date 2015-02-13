@@ -9,11 +9,7 @@ Logout Request class of OneLogin's Python Toolkit.
 
 """
 
-from zlib import decompress
-from base64 import b64decode
 from lxml import etree
-from defusedxml.lxml import fromstring
-from urllib import quote_plus
 from xml.dom.minidom import Document
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
@@ -34,7 +30,7 @@ class OneLogin_Saml2_Logout_Request(object):
         Constructs the Logout Request object.
 
         :param settings: Setting data
-        :type request_data: OneLogin_Saml2_Settings
+        :type settings: OneLogin_Saml2_Settings
 
         :param request: Optional. A LogoutRequest to be loaded instead build one.
         :type request: string
@@ -98,13 +94,7 @@ class OneLogin_Saml2_Logout_Request(object):
                     'session_index': session_index_str,
                 }
         else:
-            decoded = b64decode(request)
-            # We try to inflate
-            try:
-                inflated = decompress(decoded, -15)
-                logout_request = inflated
-            except Exception:
-                logout_request = decoded
+            logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(request, ignore_zip=True)
 
         self.__logout_request = logout_request
 
@@ -130,7 +120,7 @@ class OneLogin_Saml2_Logout_Request(object):
         else:
             if isinstance(request, Document):
                 request = request.toxml()
-            elem = fromstring(request)
+            elem = etree.fromstring(request)
         return elem.get('ID', None)
 
     @staticmethod
@@ -149,7 +139,7 @@ class OneLogin_Saml2_Logout_Request(object):
         else:
             if isinstance(request, Document):
                 request = request.toxml()
-            elem = fromstring(request)
+            elem = etree.fromstring(request)
 
         name_id = None
         encrypted_entries = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:EncryptedID')
@@ -207,7 +197,7 @@ class OneLogin_Saml2_Logout_Request(object):
         else:
             if isinstance(request, Document):
                 request = request.toxml()
-            elem = fromstring(request)
+            elem = etree.fromstring(request)
 
         issuer = None
         issuer_nodes = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:Issuer')
@@ -229,7 +219,7 @@ class OneLogin_Saml2_Logout_Request(object):
         else:
             if isinstance(request, Document):
                 request = request.toxml()
-            elem = fromstring(request)
+            elem = etree.fromstring(request)
 
         session_indexes = []
         session_index_nodes = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/samlp:SessionIndex')
@@ -248,7 +238,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         self.__error = None
         try:
-            dom = fromstring(self.__logout_request)
+            dom = etree.fromstring(self.__logout_request)
 
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
@@ -305,25 +295,25 @@ class OneLogin_Saml2_Logout_Request(object):
                 if sign_alg != OneLogin_Saml2_Constants.RSA_SHA1:
                     raise Exception('Invalid signAlg in the recieved Logout Request')
 
-                signed_query = 'SAMLRequest=%s' % quote_plus(get_data['SAMLRequest'])
+                signed_query = 'SAMLRequest=%s' % OneLogin_Saml2_Utils.escape_url(get_data['SAMLRequest'])
                 if 'RelayState' in get_data:
-                    signed_query = '%s&RelayState=%s' % (signed_query, quote_plus(get_data['RelayState']))
-                signed_query = '%s&SigAlg=%s' % (signed_query, quote_plus(sign_alg))
+                    signed_query = '%s&RelayState=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(get_data['RelayState']))
+                signed_query = '%s&SigAlg=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(sign_alg))
 
                 if 'x509cert' not in idp_data or idp_data['x509cert'] is None:
                     raise Exception('In order to validate the sign on the Logout Request, the x509cert of the IdP is required')
                 cert = idp_data['x509cert']
 
-                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, b64decode(get_data['Signature']), cert):
+                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, OneLogin_Saml2_Utils.b64decode(get_data['Signature']), cert):
                     raise Exception('Signature validation failed. Logout Request rejected')
 
             return True
         except Exception as err:
             # pylint: disable=R0801
-            self.__error = err.__str__()
+            self.__error = str(err)
             debug = self.__settings.is_debug_active()
             if debug:
-                print err.__str__()
+                print(err)
             return False
 
     def get_error(self):

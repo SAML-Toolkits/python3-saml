@@ -9,10 +9,8 @@ SAML Response class of OneLogin's Python Toolkit.
 
 """
 
-from base64 import b64decode
 from copy import deepcopy
 from lxml import etree
-from defusedxml.lxml import fromstring
 from xml.dom.minidom import Document
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
@@ -39,8 +37,8 @@ class OneLogin_Saml2_Response(object):
         """
         self.__settings = settings
         self.__error = None
-        self.response = b64decode(response)
-        self.document = fromstring(self.response)
+        self.response = OneLogin_Saml2_Utils.b64decode(response)
+        self.document = etree.fromstring(self.response)
         self.decrypted_document = None
         self.encrypted = None
 
@@ -212,10 +210,10 @@ class OneLogin_Saml2_Response(object):
 
             return True
         except Exception as err:
-            self.__error = err.__str__()
+            self.__error = str(err)
             debug = self.__settings.is_debug_active()
             if debug:
-                print err.__str__()
+                print(err)
             return False
 
     def check_status(self):
@@ -256,17 +254,17 @@ class OneLogin_Saml2_Response(object):
         :returns: The issuers
         :rtype: list
         """
-        issuers = []
+        issuers = set()
 
         message_issuer_nodes = self.__query('/samlp:Response/saml:Issuer')
         if message_issuer_nodes:
-            issuers.append(message_issuer_nodes[0].text)
+            issuers.add(message_issuer_nodes[0].text)
 
         assertion_issuer_nodes = self.__query_assertion('/saml:Issuer')
         if assertion_issuer_nodes:
-            issuers.append(assertion_issuer_nodes[0].text)
+            issuers.add(assertion_issuer_nodes[0].text)
 
-        return list(set(issuers))
+        return list(issuers)
 
     def get_nameid_data(self):
         """
@@ -383,8 +381,8 @@ class OneLogin_Saml2_Response(object):
         """
         Extracts nodes that match the query from the Assertion
 
-        :param query: Xpath Expresion
-        :type query: String
+        :param xpath_expr: Xpath Expresion
+        :type xpath_expr: String
 
         :returns: The queried nodes
         :rtype: list

@@ -33,6 +33,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'isodate>=0.5.0',
+        'xmlsec>=0.2.1'
     ],
     extras_require={
         'test': (

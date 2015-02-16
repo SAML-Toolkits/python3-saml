@@ -40,8 +40,8 @@ class OneLogin_Saml2_Auth(object):
         :param request_data: Request Data
         :type request_data: dict
 
-        :param settings: Optional. SAML Toolkit Settings
-        :type settings: dict|object
+        :param old_settings: Optional. SAML Toolkit Settings
+        :type old_settings: dict|object
 
         :param custom_base_path: Optional. Path where are stored the settings file and the cert folder
         :type custom_base_path: string
@@ -118,8 +118,8 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection url
         """
         self.__errors = []
-
-        if 'get_data' in self.__request_data and 'SAMLResponse' in self.__request_data['get_data']:
+        get_data = self.__request_data.get('get_data')
+        if get_data and 'SAMLResponse' in self.__request_data['get_data']:
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, self.__request_data['get_data']['SAMLResponse'])
             if not logout_response.is_valid(self.__request_data, request_id):
                 self.__errors.append('invalid_logout_response')
@@ -129,7 +129,7 @@ class OneLogin_Saml2_Auth(object):
             elif not keep_local_session:
                 OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
-        elif 'get_data' in self.__request_data and 'SAMLRequest' in self.__request_data['get_data']:
+        elif get_data and 'SAMLRequest' in self.__request_data['get_data']:
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, self.__request_data['get_data']['SAMLRequest'])
             if not logout_request.is_valid(self.__request_data):
                 self.__errors.append('invalid_logout_request')
@@ -148,7 +148,7 @@ class OneLogin_Saml2_Auth(object):
                     parameters['RelayState'] = self.__request_data['get_data']['RelayState']
 
                 security = self.__settings.get_security_data()
-                if 'logoutResponseSigned' in security and security['logoutResponseSigned']:
+                if security['logoutResponseSigned']:
                     parameters['SigAlg'] = OneLogin_Saml2_Constants.RSA_SHA1
                     parameters['Signature'] = self.build_response_signature(logout_response, parameters.get('RelayState', None))
 
@@ -171,8 +171,12 @@ class OneLogin_Saml2_Auth(object):
 
         :returns: Redirection url
         """
-        if url is None and 'RelayState' in self.__request_data['get_data']:
-            url = self.__request_data['get_data']['RelayState']
+        if url is None:
+            try:
+                url = self.__request_data['get_data']['RelayState']
+            except KeyError:
+                pass
+
         return OneLogin_Saml2_Utils.redirect(url, parameters, request_data=self.__request_data)
 
     def is_authenticated(self):
@@ -330,11 +334,11 @@ class OneLogin_Saml2_Auth(object):
         :returns: An URL, the SLO endpoint of the IdP
         :rtype: string
         """
-        url = None
         idp_data = self.__settings.get_idp_data()
-        if 'singleLogoutService' in idp_data.keys() and 'url' in idp_data['singleLogoutService']:
-            url = idp_data['singleLogoutService']['url']
-        return url
+        try:
+            return idp_data['singleLogoutService']['url']
+        except KeyError:
+            pass
 
     def build_request_signature(self, saml_request, relay_state):
         """
@@ -351,8 +355,8 @@ class OneLogin_Saml2_Auth(object):
     def build_response_signature(self, saml_response, relay_state):
         """
         Builds the Signature of the SAML Response.
-        :param saml_request: The SAML Response
-        :type saml_request: string
+        :param saml_response: The SAML Response
+        :type saml_response: string
 
         :param relay_state: The target URL the user should be redirected to
         :type relay_state: string

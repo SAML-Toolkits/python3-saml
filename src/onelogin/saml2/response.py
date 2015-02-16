@@ -80,9 +80,9 @@ class OneLogin_Saml2_Response(object):
             self.check_status()
 
             idp_data = self.__settings.get_idp_data()
-            idp_entity_id = idp_data.get('entityId', '')
+            idp_entity_id = idp_data['entityId']
             sp_data = self.__settings.get_sp_data()
-            sp_entity_id = sp_data.get('entityId', '')
+            sp_entity_id = sp_data['entityId']
 
             sign_nodes = self.__query('//ds:Signature')
 
@@ -104,10 +104,10 @@ class OneLogin_Saml2_Response(object):
                     if in_response_to != request_id:
                         raise Exception('The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id))
 
-                if not self.encrypted and security.get('wantAssertionsEncrypted', False):
+                if not self.encrypted and security['wantAssertionsEncrypted']:
                     raise Exception('The assertion of the Response is not encrypted and the SP require it')
 
-                if security.get('wantNameIdEncrypted', False):
+                if security['wantNameIdEncrypted']:
                     encrypted_nameid_nodes = self.__query_assertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')
                     if len(encrypted_nameid_nodes) == 0:
                         raise Exception('The NameID of the Response is not encrypted and the SP require it')
@@ -185,15 +185,15 @@ class OneLogin_Saml2_Response(object):
                 if not any_subject_confirmation:
                     raise Exception('A valid SubjectConfirmation was not found on this Response')
 
-                if security.get('wantAssertionsSigned', False) and ('{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML) not in signed_elements:
+                if security['wantAssertionsSigned'] and ('{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML) not in signed_elements:
                     raise Exception('The Assertion of the Response is not signed and the SP require it')
 
-                if security.get('wantMessagesSigned', False) and ('{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP) not in signed_elements:
+                if security['wantMessagesSigned'] and ('{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP) not in signed_elements:
                     raise Exception('The Message of the Response is not signed and the SP require it')
 
             if len(signed_elements) > 0:
-                cert = idp_data.get('x509cert', None)
-                fingerprint = idp_data.get('certFingerprint', None)
+                cert = idp_data['x509cert']
+                fingerprint = idp_data['certFingerprint']
 
                 # Only validates the first sign found
                 if '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements:

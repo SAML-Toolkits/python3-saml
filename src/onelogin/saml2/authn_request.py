@@ -26,7 +26,7 @@ class OneLogin_Saml2_Authn_Request(object):
         Constructs the AuthnRequest object.
 
         :param settings: OSetting data
-        :type return_to: OneLogin_Saml2_Settings
+        :type settings: OneLogin_Saml2_Settings
 
         :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
         :type force_authn: bool
@@ -47,7 +47,7 @@ class OneLogin_Saml2_Authn_Request(object):
         destination = idp_data['singleSignOnService']['url']
 
         name_id_policy_format = sp_data['NameIDFormat']
-        if 'wantNameIdEncrypted' in security and security['wantNameIdEncrypted']:
+        if security['wantNameIdEncrypted']:
             name_id_policy_format = OneLogin_Saml2_Constants.NAMEID_ENCRYPTED
 
         provider_name_str = ''
@@ -58,7 +58,9 @@ class OneLogin_Saml2_Authn_Request(object):
                 lang = 'en-US'
             else:
                 lang = sorted(langs)[0]
-            if 'displayname' in organization_data[lang] and organization_data[lang]['displayname'] is not None:
+
+            display_name = organization_data[lang].get('displayname')
+            if display_name is not None:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
         force_authn_str = ''
@@ -70,7 +72,7 @@ class OneLogin_Saml2_Authn_Request(object):
             is_passive_str = 'IsPassive="true"'
 
         requested_authn_context_str = ''
-        if 'requestedAuthnContext' in security.keys() and security['requestedAuthnContext'] is not False:
+        if security['requestedAuthnContext'] is not False:
             if security['requestedAuthnContext'] is True:
                 requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>

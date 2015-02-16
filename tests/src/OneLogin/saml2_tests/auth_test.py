@@ -617,7 +617,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         """
         settings_info = self.loadSettingsJSON()
         return_to = u'http://example.com/returnto'
-        sso_url = settings_info['idp']['singleSignOnService']['url']
+        settings_info['idp']['singleSignOnService']['url']
 
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
         target_url = auth.login(return_to)
@@ -796,7 +796,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         valid_signature = 'E17GU1STzanOXxBTKjweB1DovP8aMJdj5BEy0fnGoEslKdP6hpPc3enjT/bu7I8D8QzLoir8SxZVWdUDXgIxJIEgfK5snr+jJwfc5U2HujsOa/Xb3c4swoyPcyQhcxLRDhDjPq5cQxJfYoPeElvCuI6HAD1mtdd5PS/xDvbIxuw='
         self.assertEqual(signature, valid_signature)
 
-        settings['sp']['privatekey'] = ''
+        settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
         self.assertRaisesRegexp(Exception, "Trying to sign the SAMLRequest but can't load the SP private key",
@@ -815,7 +815,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         valid_signature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM='
         self.assertEqual(signature, valid_signature)
 
-        settings['sp']['privatekey'] = ''
+        settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
         self.assertRaisesRegexp(Exception, "Trying to sign the SAMLRequest but can't load the SP private key",

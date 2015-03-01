@@ -164,7 +164,7 @@ class OneLogin_Saml2_Logout_Request(object):
             'Value': name_id.text
         }
         for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
-            if attr in name_id.attrib.keys():
+            if attr in name_id.attrib:
                 name_id_data[attr] = name_id.attrib[attr]
 
         return name_id_data
@@ -243,7 +243,7 @@ class OneLogin_Saml2_Logout_Request(object):
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
 
-            get_data = request_data.get('get_data', dict())
+            get_data = ('get_data' in request_data and request_data['get_data']) or dict()
 
             if self.__settings.is_strict():
                 res = OneLogin_Saml2_Utils.validate_xml(dom, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())

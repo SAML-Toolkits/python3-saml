@@ -195,11 +195,20 @@ class OneLogin_Saml2_Settings(object):
             self.__errors = []
             self.__sp = settings['sp']
             self.__idp = settings['idp']
-            self.__strict = settings.get('strict', self.__strict)
-            self.__debug = settings.get('debug', self.__debug)
-            self.__security = settings.get('security', dict())
-            self.__contacts = settings.get('contactPerson', self.__contacts)
-            self.__organization = settings.get('organization', self.__organization)
+
+            if 'strict' in settings:
+                self.__strict = settings['strict']
+            if 'debug' in settings:
+                self.__debug = settings['debug']
+            if 'security' in settings:
+                self.__security = settings['security']
+            else:
+                self.__security = {}
+            if 'contactPerson' in settings:
+                self.__contacts = settings['contactPerson']
+            if 'organization' in settings:
+                self.__organization = settings['organization']
+
             self.__add_default_values()
             return True
 
@@ -240,34 +249,59 @@ class OneLogin_Saml2_Settings(object):
         """
         Add default values if the settings info is not complete
         """
-        self.__sp.setdefault('assertionConsumerService', dict()).setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
-        self.__sp.setdefault('singleLogoutService', dict()).setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+        if 'assertionConsumerService' not in self.__sp:
+            self.__sp['assertionConsumerService'] = {}
+        if 'binding' not in self.__sp['assertionConsumerService']:
+            self.__sp['assertionConsumerService']['binding'] = OneLogin_Saml2_Constants.BINDING_HTTP_POST
+
+        if 'singleLogoutService' not in self.__sp:
+            self.__sp['singleLogoutService'] = {}
+        if 'binding' not in self.__sp['singleLogoutService']:
+            self.__sp['singleLogoutService']['binding'] = OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
+
+        if 'singleLogoutService' not in self.__idp:
+            self.__idp['singleLogoutService'] = {}
 
         # Related to nameID
-        self.__sp.setdefault('NameIDFormat', OneLogin_Saml2_Constants.NAMEID_PERSISTENT)
-        self.__security.setdefault('nameIdEncrypted', False)
+        if 'NameIDFormat' not in self.__sp:
+            self.__sp['NameIDFormat'] = OneLogin_Saml2_Constants.NAMEID_PERSISTENT
+        if 'nameIdEncrypted' not in self.__security:
+            self.__security['nameIdEncrypted'] = False
 
         # Sign provided
-        self.__security.setdefault('authnRequestsSigned', False)
-        self.__security.setdefault('logoutRequestSigned', False)
-        self.__security.setdefault('logoutResponseSigned', False)
-        self.__security.setdefault('signMetadata', False)
+        if 'authnRequestsSigned' not in self.__security:
+            self.__security['authnRequestsSigned'] = False
+        if 'logoutRequestSigned' not in self.__security:
+            self.__security['logoutRequestSigned'] = False
+        if 'logoutResponseSigned' not in self.__security:
+            self.__security['logoutResponseSigned'] = False
+        if 'signMetadata' not in self.__security:
+            self.__security['signMetadata'] = False
 
         # Sign expected
-        self.__security.setdefault('wantMessagesSigned', False)
-        self.__security.setdefault('wantAssertionsSigned', False)
+        if 'wantMessagesSigned' not in self.__security:
+            self.__security['wantMessagesSigned'] = False
+        if 'wantAssertionsSigned' not in self.__security:
+            self.__security['wantAssertionsSigned'] = False
 
         # Encrypt expected
-        self.__security.setdefault('wantAssertionsEncrypted', False)
-        self.__security.setdefault('wantNameIdEncrypted', False)
+        if 'wantAssertionsEncrypted' not in self.__security:
+            self.__security['wantAssertionsEncrypted'] = False
+        if 'wantNameIdEncrypted' not in self.__security:
+            self.__security['wantNameIdEncrypted'] = False
 
-        self.__idp.setdefault('x509cert', '')
-        self.__idp.setdefault('certFingerprint', '')
+        if 'x509cert' not in self.__idp:
+            self.__idp['x509cert'] = ''
+        if 'certFingerprint' not in self.__idp:
+            self.__idp['certFingerprint'] = ''
 
-        self.__sp.setdefault('x509cert', '')
-        self.__sp.setdefault('privateKey', '')
+        if 'x509cert' not in self.__sp:
+            self.__sp['x509cert'] = ''
+        if 'privateKey' not in self.__sp:
+            self.__sp['privateKey'] = ''
 
-        self.__security.setdefault('requestedAuthnContext', True)
+        if 'requestedAuthnContext' not in self.__security:
+            self.__security['requestedAuthnContext'] = True
 
     def check_settings(self, settings):
         """
@@ -290,10 +324,12 @@ class OneLogin_Saml2_Settings(object):
             errors.append('idp_not_found')
         else:
             idp = settings['idp']
-            if len(idp.get('entityId', '')) == 0:
+            if 'entityId' not in idp or len(idp['entityId']) == 0:
                 errors.append('idp_entityId_not_found')
 
-            if len(idp.get('singleSignOnService', dict()).get('url', '')) == 0:
+            if 'singleSignOnService' not in idp or \
+                'url' not in idp['singleSignOnService'] or \
+                    len(idp['singleSignOnService']['url']) == 0:
                 errors.append('idp_sso_not_found')
             elif not validate_url(idp['singleSignOnService']['url']):
                 errors.append('idp_sso_url_invalid')
@@ -316,10 +352,12 @@ class OneLogin_Saml2_Settings(object):
             if 'security' in settings:
                 security = settings['security']
 
-            if len(sp.get('entityId', '')) == 0:
+            if 'entityId' not in sp or len(sp['entityId']) == 0:
                 errors.append('sp_entityId_not_found')
 
-            if len(sp.get('assertionConsumerService', dict()).get('url', '')) == 0:
+            if 'assertionConsumerService' not in sp or \
+                'url' not in sp['assertionConsumerService'] or \
+                    len(sp['assertionConsumerService']['url']) == 0:
                 errors.append('sp_acs_not_found')
             elif not validate_url(sp['assertionConsumerService']['url']):
                 errors.append('sp_acs_url_invalid')
@@ -335,11 +373,11 @@ class OneLogin_Saml2_Settings(object):
                         'certFileName' not in security['signMetadata']:
                     errors.append('sp_signMetadata_invalid')
 
-            authn_sign = security.get('authnRequestsSigned', False)
-            logout_req_sign = security.get('logoutRequestSigned', False)
-            logout_res_sign = security.get('logoutResponseSigned', False)
-            want_assert_enc = security.get('wantAssertionsEncrypted', False)
-            want_nameid_enc = security.get('wantNameIdEncrypted', False)
+            authn_sign = 'authnRequestsSigned' in security and security['authnRequestsSigned']
+            logout_req_sign = 'logoutRequestSigned' in security and security['logoutRequestSigned']
+            logout_res_sign = 'logoutResponseSigned' in security and security['logoutResponseSigned']
+            want_assert_enc = 'wantAssertionsEncrypted' in security and security['wantAssertionsEncrypted']
+            want_nameid_enc = 'wantNameIdEncrypted' in security and security['wantNameIdEncrypted']
 
             if not self.check_sp_certs():
                 if authn_sign or logout_req_sign or logout_res_sign or \
@@ -353,9 +391,9 @@ class OneLogin_Saml2_Settings(object):
                                   'certFingerprint' in settings['idp'] and
                                   len(settings['idp']['certFingerprint']) > 0)
 
-            want_assert_sign = 'wantAssertionsSigned' in security.keys() and security['wantAssertionsSigned']
-            want_mes_signed = 'wantMessagesSigned' in security.keys() and security['wantMessagesSigned']
-            nameid_enc = 'nameIdEncrypted' in security.keys() and security['nameIdEncrypted']
+            want_assert_sign = 'wantAssertionsSigned' in security and security['wantAssertionsSigned']
+            want_mes_signed = 'wantMessagesSigned' in security and security['wantMessagesSigned']
+            nameid_enc = 'nameIdEncrypted' in security and security['nameIdEncrypted']
 
             if (want_assert_sign or want_mes_signed) and \
                     not(exists_x509 or exists_fingerprint):
@@ -364,7 +402,7 @@ class OneLogin_Saml2_Settings(object):
                 errors.append('idp_cert_not_found_and_required')
 
         if 'contactPerson' in settings:
-            types = settings['contactPerson'].keys()
+            types = settings['contactPerson']
             valid_types = ['technical', 'support', 'administrative', 'billing', 'other']
             for c_type in types:
                 if c_type not in valid_types:

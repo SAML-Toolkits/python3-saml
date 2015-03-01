@@ -59,8 +59,8 @@ class OneLogin_Saml2_Authn_Request(object):
             else:
                 lang = sorted(langs)[0]
 
-            display_name = organization_data[lang].get('displayname')
-            if display_name is not None:
+            display_name = 'displayname' in organization_data[lang] and organization_data[lang]['displayname']
+            if display_name:
                 provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
 
         force_authn_str = ''

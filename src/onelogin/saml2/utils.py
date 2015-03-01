@@ -318,15 +318,14 @@ class OneLogin_Saml2_Utils(object):
         else:
             protocol = 'http'
 
-        server_port = request_data.get('server_port')
-        if server_port:
-            port_number = str(server_port)
+        if 'server_port' in request_data:
+            port_number = str(request_data['server_port'])
+            port = ':' + port_number
+
             if protocol == 'http' and port_number == '80':
                 port = ''
             elif protocol == 'https' and port_number == '443':
                 port = ''
-            else:
-                port = ':' + port_number
 
         return '%s://%s%s' % (protocol, current_host, port)
 
@@ -341,8 +340,11 @@ class OneLogin_Saml2_Utils(object):
         :return: The current host
         :rtype: string
         """
-        current_host = request_data.get('http_host') or request_data.get('server_name')
-        if not current_host:
+        if 'http_host' in request_data:
+            current_host = request_data['http_host']
+        elif 'server_name' in request_data:
+            current_host = request_data['server_name']
+        else:
             raise Exception('No hostname defined')
 
         if ':' in current_host:
@@ -367,8 +369,8 @@ class OneLogin_Saml2_Utils(object):
         :return: False if https is not active
         :rtype: boolean
         """
-        is_https = request_data.get('https', 'off') != 'off'
-        is_https = is_https or (str(request_data.get('server_port', '')) == '443')
+        is_https = 'https' in request_data and request_data['https'] != 'off'
+        is_https = is_https or ('server_port' in request_data and str(request_data['server_port']) == '443')
         return is_https
 
     @staticmethod
@@ -407,11 +409,11 @@ class OneLogin_Saml2_Utils(object):
         :rtype: string
         """
         self_url_host = OneLogin_Saml2_Utils.get_self_url_host(request_data)
-        route = request_data.get('request_uri', '')
-        if route:
-            query_string = request_data.get('query_string', '')
-            if query_string:
-                route = route.replace(query_string, '')
+        route = ''
+        if 'request_uri' in request_data and request_data['request_uri']:
+            route = request_data['request_uri']
+            if 'query_string' in request_data and request_data['query_string']:
+                route = route.replace(request_data['query_string'], '')
 
         return self_url_host + route
 
@@ -428,8 +430,9 @@ class OneLogin_Saml2_Utils(object):
         """
         self_url_host = OneLogin_Saml2_Utils.get_self_url_host(request_data)
 
-        request_uri = request_data.get('request_uri', '')
-        if request_uri:
+        request_uri = ''
+        if 'request_uri' in request_data:
+            request_uri = request_data['request_uri']
             if not request_uri.startswith('/'):
                 match = re.search('^https?://[^/]*(/.*)', request_uri)
                 if match is not None:

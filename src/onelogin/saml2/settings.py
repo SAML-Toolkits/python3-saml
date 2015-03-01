@@ -8,18 +8,22 @@ All rights reserved.
 Setting class of OneLogin's Python Toolkit.
 
 """
+from __future__ import absolute_import, print_function, with_statement
 
 from datetime import datetime
-import json
 import re
 from os.path import dirname, exists, join, sep
-from xml.dom.minidom import Document
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 # Regex from Django Software Foundation and individual contributors.
 # Released under a BSD 3-Clause License
@@ -233,15 +237,13 @@ class OneLogin_Saml2_Settings(object):
 
         # In the php toolkit instead of being a json file it is a php file and
         # it is directly included
-        json_data = open(filename, 'r')
-        settings = json.load(json_data)
-        json_data.close()
+        with open(filename, 'r') as json_data:
+            settings = json.loads(json_data.read())
 
         advanced_filename = self.get_base_path() + 'advanced_settings.json'
         if exists(advanced_filename):
-            json_data = open(advanced_filename, 'r')
-            settings.update(json.load(json_data))  # Merge settings
-            json_data.close()
+            with open(advanced_filename, 'r') as json_data:
+                settings.update(json.loads(json_data.read()))  # Merge settings
 
         return self.__load_settings_from_dict(settings)
 

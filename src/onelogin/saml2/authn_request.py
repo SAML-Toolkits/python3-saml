@@ -9,8 +9,9 @@ AuthNRequest class of OneLogin's Python Toolkit.
 
 """
 
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 
 
 class OneLogin_Saml2_Authn_Request(object):
@@ -83,24 +84,7 @@ class OneLogin_Saml2_Authn_Request(object):
                     requested_authn_context_str += '<saml:AuthnContextClassRef>%s</saml:AuthnContextClassRef>' % authn_context
                 requested_authn_context_str += '    </samlp:RequestedAuthnContext>'
 
-        request = """<samlp:AuthnRequest
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="%(id)s"
-    Version="2.0"
-    %(provider_name)s
-    %(force_authn_str)s
-    %(is_passive_str)s
-    IssueInstant="%(issue_instant)s"
-    Destination="%(destination)s"
-    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    AssertionConsumerServiceURL="%(assertion_url)s">
-    <saml:Issuer>%(entity_id)s</saml:Issuer>
-    <samlp:NameIDPolicy
-        Format="%(name_id_policy)s"
-        AllowCreate="true" />
-%(requested_authn_context_str)s
-</samlp:AuthnRequest>""" % \
+        request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {
                 'id': uid,
                 'provider_name': provider_name_str,

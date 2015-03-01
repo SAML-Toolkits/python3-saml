@@ -11,6 +11,7 @@ Logout Request class of OneLogin's Python Toolkit.
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -72,17 +73,7 @@ class OneLogin_Saml2_Logout_Request(object):
             else:
                 session_index_str = ''
 
-            logout_request = """<samlp:LogoutRequest
-        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-        ID="%(id)s"
-        Version="2.0"
-        IssueInstant="%(issue_instant)s"
-        Destination="%(single_logout_url)s">
-        <saml:Issuer>%(entity_id)s</saml:Issuer>
-        %(name_id)s
-        %(session_index)s
-    </samlp:LogoutRequest>""" % \
+            logout_request = OneLogin_Saml2_Templates.LOGOUT_REQUEST % \
                 {
                     'id': uid,
                     'issue_instant': issue_instant,

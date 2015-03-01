@@ -11,6 +11,7 @@ Logout Response class of OneLogin's Python Toolkit.
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -153,25 +154,14 @@ class OneLogin_Saml2_Logout_Response(object):
         uid = OneLogin_Saml2_Utils.generate_unique_id()
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
-        logout_response = """<samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                      xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                      ID="%(id)s"
-                      Version="2.0"
-                      IssueInstant="%(issue_instant)s"
-                      Destination="%(destination)s"
-                      InResponseTo="%(in_response_to)s"
->
-    <saml:Issuer>%(entity_id)s</saml:Issuer>
-    <samlp:Status>
-        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
-    </samlp:Status>
-</samlp:LogoutResponse>""" % \
+        logout_response = OneLogin_Saml2_Templates.LOGOUT_RESPONSE % \
             {
                 'id': uid,
                 'issue_instant': issue_instant,
                 'destination': idp_data['singleLogoutService']['url'],
                 'in_response_to': in_response_to,
                 'entity_id': sp_data['entityId'],
+                'status': "urn:oasis:names:tc:SAML:2.0:status:Success"
             }
 
         self.__logout_response = logout_response

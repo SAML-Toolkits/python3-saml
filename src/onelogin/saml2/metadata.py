@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_Metadata class
+""" OneLoginSaml2Metadata class
 
 Copyright (c) 2014, OneLogin, Inc.
 All rights reserved.
@@ -14,6 +14,7 @@ from datetime import datetime
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -89,11 +90,7 @@ class OneLogin_Saml2_Metadata(object):
         if len(organization) > 0:
             organization_info = []
             for (lang, info) in organization.items():
-                org = """    <md:Organization>
-        <md:OrganizationName xml:lang="%(lang)s">%(name)s</md:OrganizationName>
-        <md:OrganizationDisplayName xml:lang="%(lang)s">%(display_name)s</md:OrganizationDisplayName>
-        <md:OrganizationURL xml:lang="%(lang)s">%(url)s</md:OrganizationURL>
-    </md:Organization>""" % \
+                org = OneLogin_Saml2_Templates.MD_ORGANISATION % \
                     {
                         'lang': lang,
                         'name': info['name'],
@@ -107,10 +104,7 @@ class OneLogin_Saml2_Metadata(object):
         if len(contacts) > 0:
             contacts_info = []
             for (ctype, info) in contacts.items():
-                contact = """    <md:ContactPerson contactType="%(type)s">
-        <md:GivenName>%(name)s</md:GivenName>
-        <md:EmailAddress>%(email)s</md:EmailAddress>
-    </md:ContactPerson>""" % \
+                contact = OneLogin_Saml2_Templates.MD_CONTACT_PERSON % \
                     {
                         'type': ctype,
                         'name': info['givenName'],
@@ -119,20 +113,7 @@ class OneLogin_Saml2_Metadata(object):
                 contacts_info.append(contact)
             str_contacts = '\n'.join(contacts_info)
 
-        metadata = """<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     validUntil="%(valid)s"
-                     cacheDuration="%(cache)s"
-                     entityID="%(entity_id)s">
-    <md:SPSSODescriptor AuthnRequestsSigned="%(authnsign)s" WantAssertionsSigned="%(wsign)s" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-%(sls)s        <md:NameIDFormat>%(name_id_format)s</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="%(binding)s"
-                                     Location="%(location)s"
-                                     index="1" />
-    </md:SPSSODescriptor>
-%(organization)s
-%(contacts)s
-</md:EntityDescriptor>""" % \
+        metadata = OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR % \
             {
                 'valid': valid_until_time,
                 'cache': cache_duration_str,

@@ -11,10 +11,10 @@ Metadata class of OneLogin's Python Toolkit.
 
 from time import gmtime, strftime
 from datetime import datetime
-from xml.dom.minidom import parseString
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Metadata(object):
@@ -186,7 +186,7 @@ class OneLogin_Saml2_Metadata(object):
         if cert is None or cert == '':
             return metadata
         try:
-            xml = parseString(metadata)
+            xml = OneLogin_Saml2_XML.to_dom(metadata)
         except Exception as e:
             raise Exception('Error parsing metadata. ' + str(e))
 
@@ -221,4 +221,4 @@ class OneLogin_Saml2_Metadata(object):
         signing.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
         encryption.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
 
-        return xml.toxml()
+        return OneLogin_Saml2_XML.to_string(xml)

@@ -378,7 +378,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info['security']['signMetadata'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
 
-        metadata = settings.get_sp_metadata()
+        metadata = OneLogin_Saml2_Utils.string(settings.get_sp_metadata())
         self.assertIn('<md:SPSSODescriptor', metadata)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', metadata)
         self.assertIn('AuthnRequestsSigned="false"', metadata)

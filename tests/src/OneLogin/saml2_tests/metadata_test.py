@@ -9,6 +9,7 @@ import unittest
 
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -117,7 +118,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         key = self.file_contents(join(cert_path, 'sp.key'))
         cert = self.file_contents(join(cert_path, 'sp.crt'))
 
-        signed_metadata = OneLogin_Saml2_Metadata.sign_metadata(metadata, key, cert)
+        signed_metadata = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Metadata.sign_metadata(metadata, key, cert))
 
         self.assertIn('<md:SPSSODescriptor', signed_metadata)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', signed_metadata)

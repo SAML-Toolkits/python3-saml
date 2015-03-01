@@ -8,7 +8,7 @@ import json
 from lxml import etree
 from os.path import dirname, join, exists
 import unittest
-from xml.dom.minidom import Document, parseString
+from xml.dom.minidom import parseString
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
@@ -36,36 +36,6 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         content = f.read()
         f.close()
         return content
-
-    def testValidateXML(self):
-        """
-        Tests the validate_xml method of the OneLogin_Saml2_Utils
-        """
-        metadata_unloaded = '<xml><EntityDescriptor>'
-        self.assertEqual(OneLogin_Saml2_Utils.validate_xml(metadata_unloaded, 'saml-schema-metadata-2.0.xsd'), 'unloaded_xml')
-
-        metadata_invalid = self.file_contents(join(self.data_path, 'metadata', 'noentity_metadata_settings1.xml'))
-        self.assertEqual(OneLogin_Saml2_Utils.validate_xml(metadata_invalid, 'saml-schema-metadata-2.0.xsd'), 'invalid_xml')
-
-        metadata_expired = self.file_contents(join(self.data_path, 'metadata', 'expired_metadata_settings1.xml'))
-        res = OneLogin_Saml2_Utils.validate_xml(metadata_expired, 'saml-schema-metadata-2.0.xsd')
-        self.assertTrue(isinstance(res, Document))
-
-        metadata_ok = self.file_contents(join(self.data_path, 'metadata', 'metadata_settings1.xml'))
-        res = OneLogin_Saml2_Utils.validate_xml(metadata_ok, 'saml-schema-metadata-2.0.xsd')
-        self.assertTrue(isinstance(res, Document))
-
-        metadata_bad_order = self.file_contents(join(self.data_path, 'metadata', 'metadata_bad_order_settings1.xml'))
-        res = OneLogin_Saml2_Utils.validate_xml(metadata_bad_order, 'saml-schema-metadata-2.0.xsd')
-        self.assertFalse(isinstance(res, Document))
-
-        metadata_signed = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings1.xml'))
-        res = OneLogin_Saml2_Utils.validate_xml(metadata_signed, 'saml-schema-metadata-2.0.xsd')
-        self.assertTrue(isinstance(res, Document))
-
-        dom = parseString(metadata_ok)
-        res = OneLogin_Saml2_Utils.validate_xml(dom, 'saml-schema-metadata-2.0.xsd')
-        self.assertTrue(isinstance(res, Document))
 
     def testFormatCert(self):
         """
@@ -488,54 +458,6 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', '2074-12-10T04:39:31Z'))
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', 1418186371))
 
-    def testQuery(self):
-        """
-        Tests the query method of the OneLogin_Saml2_Utils
-        """
-        xml = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
-        xml = b64decode(xml)
-        dom = etree.fromstring(xml)
-
-        assertion_nodes = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/saml:Assertion')
-        self.assertEqual(1, len(assertion_nodes))
-        assertion = assertion_nodes[0]
-        self.assertIn('Assertion', assertion.tag)
-
-        attribute_statement_nodes = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/saml:Assertion/saml:AttributeStatement')
-        self.assertEqual(1, len(assertion_nodes))
-        attribute_statement = attribute_statement_nodes[0]
-        self.assertIn('AttributeStatement', attribute_statement.tag)
-
-        attribute_statement_nodes_2 = OneLogin_Saml2_Utils.query(dom, './saml:AttributeStatement', assertion)
-        self.assertEqual(1, len(attribute_statement_nodes_2))
-        attribute_statement_2 = attribute_statement_nodes_2[0]
-        self.assertEqual(attribute_statement, attribute_statement_2)
-
-        signature_res_nodes = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/ds:Signature')
-        self.assertEqual(1, len(signature_res_nodes))
-        signature_res = signature_res_nodes[0]
-        self.assertIn('Signature', signature_res.tag)
-
-        signature_nodes = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/saml:Assertion/ds:Signature')
-        self.assertEqual(1, len(signature_nodes))
-        signature = signature_nodes[0]
-        self.assertIn('Signature', signature.tag)
-
-        signature_nodes_2 = OneLogin_Saml2_Utils.query(dom, './ds:Signature', assertion)
-        self.assertEqual(1, len(signature_nodes_2))
-        signature2 = signature_nodes_2[0]
-        self.assertNotEqual(signature_res, signature2)
-        self.assertEqual(signature, signature2)
-
-        signature_nodes_3 = OneLogin_Saml2_Utils.query(dom, './ds:SignatureValue', assertion)
-        self.assertEqual(0, len(signature_nodes_3))
-
-        signature_nodes_4 = OneLogin_Saml2_Utils.query(dom, './ds:Signature/ds:SignatureValue', assertion)
-        self.assertEqual(1, len(signature_nodes_4))
-
-        signature_nodes_5 = OneLogin_Saml2_Utils.query(dom, './/ds:SignatureValue', assertion)
-        self.assertEqual(1, len(signature_nodes_5))
-
     def testGenerateNameId(self):
         """
         Tests the generateNameId method of the OneLogin_Saml2_Utils
@@ -670,7 +592,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         cert = settings.get_sp_cert()
 
         xml_authn = b64decode(self.file_contents(join(self.data_path, 'requests', 'authn_request.xml.base64')))
-        xml_authn_signed = OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert)
+        xml_authn_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed)
 
         res = parseString(xml_authn_signed)
@@ -678,56 +600,51 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertIn('ds:Signature', ds_signature.tagName)
 
         xml_authn_dom = parseString(xml_authn)
-        xml_authn_signed_2 = OneLogin_Saml2_Utils.add_sign(xml_authn_dom, key, cert)
+        xml_authn_signed_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_2)
         res_2 = parseString(xml_authn_signed_2)
         ds_signature_2 = res_2.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_2.tagName)
 
-        xml_authn_signed_3 = OneLogin_Saml2_Utils.add_sign(xml_authn_dom.firstChild, key, cert)
+        xml_authn_signed_3 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.firstChild, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_3)
         res_3 = parseString(xml_authn_signed_3)
         ds_signature_3 = res_3.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_3.tagName)
 
         xml_authn_etree = etree.fromstring(xml_authn)
-        xml_authn_signed_4 = OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert)
+        xml_authn_signed_4 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_4)
         res_4 = parseString(xml_authn_signed_4)
         ds_signature_4 = res_4.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_4.tagName)
 
-        xml_authn_signed_5 = OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert)
+        xml_authn_signed_5 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_5)
         res_5 = parseString(xml_authn_signed_5)
         ds_signature_5 = res_5.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_5.tagName)
 
         xml_logout_req = b64decode(self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml.base64')))
-        xml_logout_req_signed = OneLogin_Saml2_Utils.add_sign(xml_logout_req, key, cert)
+        xml_logout_req_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_logout_req, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_req_signed)
         res_6 = parseString(xml_logout_req_signed)
         ds_signature_6 = res_6.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_6.tagName)
 
         xml_logout_res = b64decode(self.file_contents(join(self.data_path, 'logout_responses', 'logout_response.xml.base64')))
-        xml_logout_res_signed = OneLogin_Saml2_Utils.add_sign(xml_logout_res, key, cert)
+        xml_logout_res_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_logout_res, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_res_signed)
         res_7 = parseString(xml_logout_res_signed)
         ds_signature_7 = res_7.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_7.tagName)
 
         xml_metadata = self.file_contents(join(self.data_path, 'metadata', 'metadata_settings1.xml'))
-        xml_metadata_signed = OneLogin_Saml2_Utils.add_sign(xml_metadata, key, cert)
+        xml_metadata_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_metadata, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_metadata_signed)
         res_8 = parseString(xml_metadata_signed)
         ds_signature_8 = res_8.firstChild.firstChild.nextSibling.firstChild.nextSibling
         self.assertIn('ds:Signature', ds_signature_8.tagName)
-
-        try:
-            OneLogin_Saml2_Utils.add_sign(1, key, cert)
-        except Exception as e:
-            self.assertEqual('Error parsing xml string', str(e))
 
     def testValidateSign(self):
         """
@@ -746,11 +663,6 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
             self.assertFalse(OneLogin_Saml2_Utils.validate_sign('', cert))
         except Exception as e:
             self.assertEqual('Empty string supplied as input', str(e))
-
-        try:
-            self.assertFalse(OneLogin_Saml2_Utils.validate_sign(1, cert))
-        except Exception as e:
-            self.assertEqual('Error parsing xml string', str(e))
 
         # expired cert
         xml_metadata_signed = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings1.xml'))

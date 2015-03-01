@@ -19,7 +19,7 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 # Regex from Django Software Foundation and individual contributors.
 # Released under a BSD 3-Clause License
@@ -601,11 +601,10 @@ class OneLogin_Saml2_Settings(object):
             raise Exception('Empty string supplied as input')
 
         errors = []
-        res = OneLogin_Saml2_Utils.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self.__debug)
-        if not isinstance(res, Document):
-            errors.append(res)
+        dom = OneLogin_Saml2_XML.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self.__debug)
+        if isinstance(dom, str):
+            errors.append(dom)
         else:
-            dom = res
             element = dom.documentElement
             if element.tagName not in 'md:EntityDescriptor':
                 errors.append('noEntityDescriptor_xml')

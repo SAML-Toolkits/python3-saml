@@ -16,20 +16,16 @@ from datetime import datetime
 import calendar
 from hashlib import sha1
 from isodate import parse_duration as duration_parser
-from lxml import etree
-from lxml.etree import tostring, fromstring
-from os.path import dirname, join
 import re
-from sys import stderr
 from textwrap import wrap
 from uuid import uuid4
-from xml.dom.minidom import Document, Element, parseString
 
 import zlib
 import xmlsec
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 try:
     from urllib.parse import quote_plus  # py3
@@ -140,50 +136,6 @@ class OneLogin_Saml2_Utils(object):
         :rtype: string
         """
         return OneLogin_Saml2_Utils.b64encode(zlib.compress(OneLogin_Saml2_Utils.bytes(value))[2:-4])
-
-    @staticmethod
-    def validate_xml(xml, schema, debug=False):
-        """
-        Validates a xml against a schema
-        :param xml: The xml that will be validated
-        :type: string|DomDocument
-        :param schema: The schema
-        :type: string
-        :param debug: If debug is active, the parse-errors will be showed
-        :type: bool
-        :returns: Error code or the DomDocument of the xml
-        :rtype: string
-        """
-        assert isinstance(xml, OneLogin_Saml2_Utils.text_types) or isinstance(xml, Document) or isinstance(xml, etree._Element)
-        assert isinstance(schema, OneLogin_Saml2_Utils.str_type)
-
-        if isinstance(xml, Document):
-            xml = xml.toxml()
-        elif isinstance(xml, etree._Element):
-            xml = tostring(xml)
-
-        # Switch to lxml for schema validation
-        try:
-            dom = fromstring(xml)
-        except Exception:
-            return 'unloaded_xml'
-
-        schema_file = join(dirname(__file__), 'schemas', schema)
-        f_schema = open(schema_file, 'r')
-        schema_doc = etree.parse(f_schema)
-        f_schema.close()
-        xmlschema = etree.XMLSchema(schema_doc)
-
-        if not xmlschema.validate(dom):
-            if debug:
-                stderr.write('Errors validating the metadata')
-                stderr.write(':\n\n')
-                for error in xmlschema.error_log:
-                    stderr.write('%s\n' % error.message)
-
-            return 'invalid_xml'
-
-        return parseString(etree.tostring(dom))
 
     @staticmethod
     def format_cert(cert, heads=True):
@@ -548,28 +500,6 @@ class OneLogin_Saml2_Utils(object):
         return None
 
     @staticmethod
-    def query(dom, query, context=None):
-        """
-        Extracts nodes that match the query from the Element
-
-        :param dom: The root of the lxml objet
-        :type: Element
-
-        :param query: Xpath Expresion
-        :type: string
-
-        :param context: Context Node
-        :type: DOMElement
-
-        :returns: The queried nodes
-        :rtype: list
-        """
-        if context is None:
-            return dom.xpath(query, namespaces=OneLogin_Saml2_Constants.NSMAP)
-        else:
-            return context.xpath(query, namespaces=OneLogin_Saml2_Constants.NSMAP)
-
-    @staticmethod
     def delete_local_session(callback=None):
         """
         Deletes the local session.
@@ -650,7 +580,7 @@ class OneLogin_Saml2_Utils(object):
         :returns: DOMElement | XMLSec nameID
         :rtype: string
         """
-        doc = Document()
+        doc = OneLogin_Saml2_XML.make_dom()
         name_id_container = doc.createElementNS(OneLogin_Saml2_Constants.NS_SAML, 'container')
         name_id_container.setAttribute("xmlns:saml", OneLogin_Saml2_Constants.NS_SAML)
 
@@ -662,7 +592,7 @@ class OneLogin_Saml2_Utils(object):
 
         if cert is not None:
             xml = name_id_container.toxml()
-            elem = fromstring(xml)
+            elem = OneLogin_Saml2_XML.to_etree(xml)
 
             xmlsec.enable_debug_trace(debug)
 
@@ -684,8 +614,7 @@ class OneLogin_Saml2_Utils(object):
 
             edata = enc_ctx.encrypt_xml(enc_data, elem[0])
 
-            newdoc = parseString(etree.tostring(edata))
-
+            newdoc = OneLogin_Saml2_XML.to_dom(edata)
             if newdoc.hasChildNodes():
                 child = newdoc.firstChild
                 child.removeAttribute('xmlns')
@@ -722,19 +651,19 @@ class OneLogin_Saml2_Utils(object):
         """
         status = {}
 
-        status_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status')
+        status_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status')
         if len(status_entry) == 0:
             raise Exception('Missing Status on response')
 
-        code_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode', status_entry[0])
+        code_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode', status_entry[0])
         if len(code_entry) == 0:
             raise Exception('Missing Status Code on response')
         code = code_entry[0].values()[0]
         status['code'] = code
 
-        message_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', status_entry[0])
+        message_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', status_entry[0])
         if len(message_entry) == 0:
-            subcode_entry = OneLogin_Saml2_Utils.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', status_entry[0])
+            subcode_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', status_entry[0])
             if len(subcode_entry) > 0:
                 status['msg'] = subcode_entry[0].values()[0]
             else:
@@ -761,11 +690,7 @@ class OneLogin_Saml2_Utils(object):
         :returns: The decrypted element.
         :rtype: lxml.etree.Element
         """
-        if isinstance(encrypted_data, Element):
-            encrypted_data = fromstring(str(encrypted_data.toxml()))
-        elif isinstance(encrypted_data, OneLogin_Saml2_Utils.str_type):
-            encrypted_data = fromstring(encrypted_data)
-
+        encrypted_data = OneLogin_Saml2_XML.to_etree(encrypted_data)
         xmlsec.enable_debug_trace(debug)
         manager = xmlsec.KeysManager()
 
@@ -794,35 +719,14 @@ class OneLogin_Saml2_Utils(object):
         """
         if xml is None or xml == '':
             raise Exception('Empty string supplied as input')
-        elif isinstance(xml, etree._Element):
-            elem = xml
-        elif isinstance(xml, Document):
-            xml = xml.toxml()
-            elem = fromstring(xml)
-        elif isinstance(xml, Element):
-            xml.setAttributeNS(
-                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP),
-                'xmlns:samlp',
-                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP)
-            )
-            xml.setAttributeNS(
-                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML),
-                'xmlns:saml',
-                OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML)
-            )
-            xml = xml.toxml()
-            elem = fromstring(xml)
-        elif isinstance(xml, OneLogin_Saml2_Utils.text_types):
-            elem = fromstring(xml)
-        else:
-            raise Exception('Error parsing xml string')
 
+        elem = OneLogin_Saml2_XML.to_etree(OneLogin_Saml2_XML.set_node_ns_attributes(xml))
         xmlsec.enable_debug_trace(debug)
         xmlsec.tree.add_ids(elem, ["ID"])
         # Sign the metadacta with our private key.
         signature = xmlsec.template.create(elem, xmlsec.Transform.EXCL_C14N, xmlsec.Transform.RSA_SHA1, ns='ds')
 
-        issuer = OneLogin_Saml2_Utils.query(elem, '//saml:Issuer')
+        issuer = OneLogin_Saml2_XML.query(elem, '//saml:Issuer')
         if len(issuer) > 0:
             issuer = issuer[0]
             issuer.addnext(signature)
@@ -846,8 +750,7 @@ class OneLogin_Saml2_Utils(object):
         dsig_ctx.key = sign_key
         dsig_ctx.sign(signature)
 
-        newdoc = parseString(etree.tostring(elem))
-        return newdoc.saveXML(newdoc.firstChild)
+        return OneLogin_Saml2_XML.to_string(elem)
 
     @staticmethod
     def validate_sign(xml, cert=None, fingerprint=None, validatecert=False, debug=False):
@@ -872,39 +775,18 @@ class OneLogin_Saml2_Utils(object):
         try:
             if xml is None or xml == '':
                 raise Exception('Empty string supplied as input')
-            elif isinstance(xml, etree._Element):
-                elem = xml
-            elif isinstance(xml, Document):
-                xml = xml.toxml()
-                elem = fromstring(xml)
-            elif isinstance(xml, Element):
-                xml.setAttributeNS(
-                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP),
-                    'xmlns:samlp',
-                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAMLP)
-                )
-                xml.setAttributeNS(
-                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML),
-                    'xmlns:saml',
-                    OneLogin_Saml2_Utils.utf8(OneLogin_Saml2_Constants.NS_SAML)
-                )
-                xml = xml.toxml()
-                elem = fromstring(str(xml))
-            elif isinstance(xml, OneLogin_Saml2_Utils.text_types):
-                elem = fromstring(xml)
-            else:
-                raise Exception('Error parsing xml string')
 
+            elem = OneLogin_Saml2_XML.to_etree(OneLogin_Saml2_XML.set_node_ns_attributes(xml))
             xmlsec.enable_debug_trace(debug)
             xmlsec.tree.add_ids(elem, ["ID"])
 
-            signature_nodes = OneLogin_Saml2_Utils.query(elem, '//ds:Signature')
+            signature_nodes = OneLogin_Saml2_XML.query(elem, '//ds:Signature')
 
             if len(signature_nodes) > 0:
                 signature_node = signature_nodes[0]
 
                 if (cert is None or cert == '') and fingerprint:
-                    x509_certificate_nodes = OneLogin_Saml2_Utils.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
+                    x509_certificate_nodes = OneLogin_Saml2_XML.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
                     if len(x509_certificate_nodes) > 0:
                         x509_certificate_node = x509_certificate_nodes[0]
                         x509_cert_value = x509_certificate_node.text

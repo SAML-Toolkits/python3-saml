@@ -9,11 +9,9 @@ Logout Response class of OneLogin's Python Toolkit.
 
 """
 
-from lxml.etree import fromstring
-from xml.dom.minidom import Document, parseString
-
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Logout_Response(object):
@@ -39,7 +37,7 @@ class OneLogin_Saml2_Logout_Response(object):
 
         if response is not None:
             self.__logout_response = OneLogin_Saml2_Utils.decode_base64_and_inflate(response)
-            self.document = parseString(self.__logout_response)
+            self.document = OneLogin_Saml2_XML.to_etree(self.__logout_response)
 
     def get_issuer(self):
         """
@@ -80,17 +78,16 @@ class OneLogin_Saml2_Logout_Response(object):
             get_data = request_data['get_data']
 
             if self.__settings.is_strict():
-                res = OneLogin_Saml2_Utils.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
-                if not isinstance(res, Document):
+                res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+                if isinstance(res, str):
                     raise Exception('Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd')
 
                 security = self.__settings.get_security_data()
 
                 # Check if the InResponseTo of the Logout Response matchs the ID of the Logout Request (requestId) if provided
-                if request_id is not None and self.document.documentElement.hasAttribute('InResponseTo'):
-                    in_response_to = self.document.documentElement.getAttribute('InResponseTo')
-                    if request_id != in_response_to:
-                        raise Exception('The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id))
+                in_response_to = self.document.get('InResponseTo', None)
+                if request_id is not None and in_response_to and in_response_to != request_id:
+                    raise Exception('The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id))
 
                 # Check issuer
                 issuer = self.get_issuer()
@@ -100,11 +97,9 @@ class OneLogin_Saml2_Logout_Response(object):
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
                 # Check destination
-                if self.document.documentElement.hasAttribute('Destination'):
-                    destination = self.document.documentElement.getAttribute('Destination')
-                    if destination != '':
-                        if current_url not in destination:
-                            raise Exception('The LogoutRequest was received at $currentURL instead of $destination')
+                destination = self.document.get('Destination', None)
+                if destination and current_url not in destination:
+                    raise Exception('The LogoutRequest was received at $currentURL instead of $destination')
 
                 if security['wantMessagesSigned']:
                     if 'Signature' not in get_data:
@@ -138,15 +133,13 @@ class OneLogin_Saml2_Logout_Response(object):
 
     def __query(self, query):
         """
-        Extracts a node from the DOMDocument (Logout Response Menssage)
-        :param query: Xpath Expresion
+        Extracts a node from the Etree (Logout Response Message)
+        :param query: Xpath Expression
         :type query: string
         :return: The queried node
-        :rtype: DOMNodeList
+        :rtype: Element
         """
-        # Switch to lxml for querying
-        xml = self.document.toxml()
-        return OneLogin_Saml2_Utils.query(fromstring(xml), query)
+        return OneLogin_Saml2_XML.query(self.document, query)
 
     def build(self, in_response_to):
         """

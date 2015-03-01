@@ -12,6 +12,7 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_XML
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -45,7 +46,8 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         response = OneLogin_Saml2_Logout_Response(settings, message)
-        self.assertRegexpMatches(response.document.toxml(), '<samlp:LogoutResponse')
+        self.assertRegexpMatches(OneLogin_Saml2_Utils.string(OneLogin_Saml2_XML.to_string(response.document)),
+                                 '<samlp:LogoutResponse')
 
     def testCreateDeflatedSAMLLogoutResponseURLParameter(self):
         """

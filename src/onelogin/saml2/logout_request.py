@@ -9,11 +9,9 @@ Logout Request class of OneLogin's Python Toolkit.
 
 """
 
-from lxml import etree
-from xml.dom.minidom import Document
-
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Logout_Request(object):
@@ -115,12 +113,8 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: string ID
         :rtype: str object
         """
-        if isinstance(request, etree._Element):
-            elem = request
-        else:
-            if isinstance(request, Document):
-                request = request.toxml()
-            elem = etree.fromstring(request)
+
+        elem = OneLogin_Saml2_XML.to_etree(request)
         return elem.get('ID', None)
 
     @staticmethod
@@ -134,26 +128,20 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
         :rtype: dict
         """
-        if isinstance(request, etree._Element):
-            elem = request
-        else:
-            if isinstance(request, Document):
-                request = request.toxml()
-            elem = etree.fromstring(request)
-
+        elem = OneLogin_Saml2_XML.to_etree(request)
         name_id = None
-        encrypted_entries = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:EncryptedID')
+        encrypted_entries = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:EncryptedID')
 
         if len(encrypted_entries) == 1:
             if key is None:
                 raise Exception('Key is required in order to decrypt the NameID')
 
-            encrypted_data_nodes = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:EncryptedID/xenc:EncryptedData')
+            encrypted_data_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:EncryptedID/xenc:EncryptedData')
             if len(encrypted_data_nodes) == 1:
                 encrypted_data = encrypted_data_nodes[0]
                 name_id = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
         else:
-            entries = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:NameID')
+            entries = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:NameID')
             if len(entries) == 1:
                 name_id = entries[0]
 
@@ -192,15 +180,10 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: The Issuer
         :rtype: string
         """
-        if isinstance(request, etree._Element):
-            elem = request
-        else:
-            if isinstance(request, Document):
-                request = request.toxml()
-            elem = etree.fromstring(request)
 
+        elem = OneLogin_Saml2_XML.to_etree(request)
         issuer = None
-        issuer_nodes = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/saml:Issuer')
+        issuer_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:Issuer')
         if len(issuer_nodes) == 1:
             issuer = issuer_nodes[0].text
         return issuer
@@ -214,15 +197,10 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: The SessionIndex value
         :rtype: list
         """
-        if isinstance(request, etree._Element):
-            elem = request
-        else:
-            if isinstance(request, Document):
-                request = request.toxml()
-            elem = etree.fromstring(request)
 
+        elem = OneLogin_Saml2_XML.to_etree(request)
         session_indexes = []
-        session_index_nodes = OneLogin_Saml2_Utils.query(elem, '/samlp:LogoutRequest/samlp:SessionIndex')
+        session_index_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/samlp:SessionIndex')
         for session_index_node in session_index_nodes:
             session_indexes.append(session_index_node.text)
         return session_indexes
@@ -238,7 +216,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         self.__error = None
         try:
-            dom = etree.fromstring(self.__logout_request)
+            dom = OneLogin_Saml2_XML.to_etree(self.__logout_request)
 
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
@@ -246,8 +224,8 @@ class OneLogin_Saml2_Logout_Request(object):
             get_data = ('get_data' in request_data and request_data['get_data']) or dict()
 
             if self.__settings.is_strict():
-                res = OneLogin_Saml2_Utils.validate_xml(dom, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
-                if not isinstance(res, Document):
+                res = OneLogin_Saml2_XML.validate_xml(dom, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+                if isinstance(res, str):
                     raise Exception('Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd')
 
                 security = self.__settings.get_security_data()

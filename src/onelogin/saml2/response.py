@@ -10,11 +10,9 @@ SAML Response class of OneLogin's Python Toolkit.
 """
 
 from copy import deepcopy
-from lxml import etree
-from xml.dom.minidom import Document
-
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Response(object):
@@ -38,7 +36,7 @@ class OneLogin_Saml2_Response(object):
         self.__settings = settings
         self.__error = None
         self.response = OneLogin_Saml2_Utils.b64decode(response)
-        self.document = etree.fromstring(self.response)
+        self.document = OneLogin_Saml2_XML.to_etree(self.response)
         self.decrypted_document = None
         self.encrypted = None
 
@@ -91,8 +89,8 @@ class OneLogin_Saml2_Response(object):
                 signed_elements.append(sign_node.getparent().tag)
 
             if self.__settings.is_strict():
-                res = OneLogin_Saml2_Utils.validate_xml(etree.tostring(self.document), 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
-                if not isinstance(res, Document):
+                res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+                if isinstance(res, str):
                     raise Exception('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd')
 
                 security = self.__settings.get_security_data()
@@ -425,7 +423,7 @@ class OneLogin_Saml2_Response(object):
             document = self.decrypted_document
         else:
             document = self.document
-        return OneLogin_Saml2_Utils.query(document, query)
+        return OneLogin_Saml2_XML.query(document, query)
 
     def __decrypt_assertion(self, dom):
         """
@@ -442,9 +440,9 @@ class OneLogin_Saml2_Response(object):
         if not key:
             raise Exception('No private key available, check settings')
 
-        encrypted_assertion_nodes = OneLogin_Saml2_Utils.query(dom, '//saml:EncryptedAssertion')
+        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(dom, '//saml:EncryptedAssertion')
         if encrypted_assertion_nodes:
-            encrypted_data_nodes = OneLogin_Saml2_Utils.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
+            encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
                 encrypted_data = encrypted_data_nodes[0]
                 OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)

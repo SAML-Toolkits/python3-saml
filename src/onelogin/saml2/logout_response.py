@@ -105,24 +105,6 @@ class OneLogin_Saml2_Logout_Response(object):
                 if security['wantMessagesSigned']:
                     if 'Signature' not in get_data:
                         raise Exception('The Message of the Logout Response is not signed and the SP require it')
-
-            if 'Signature' in get_data:
-                sign_alg = get_data.get('SigAlg', OneLogin_Saml2_Constants.RSA_SHA1)
-                if sign_alg != OneLogin_Saml2_Constants.RSA_SHA1:
-                    raise Exception('Invalid signAlg in the recieved Logout Response')
-
-                signed_query = 'SAMLResponse=%s' % OneLogin_Saml2_Utils.escape_url(get_data['SAMLResponse'])
-                if 'RelayState' in get_data:
-                    signed_query = '%s&RelayState=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(get_data['RelayState']))
-                signed_query = '%s&SigAlg=%s' % (signed_query, OneLogin_Saml2_Utils.escape_url(sign_alg))
-
-                cert = idp_data['x509cert']
-                if not cert:
-                    raise Exception('In order to validate the sign on the Logout Response, the x509cert of the IdP is required')
-
-                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, OneLogin_Saml2_Utils.b64decode(get_data['Signature']), cert):
-                    raise Exception('Signature validation failed. Logout Response rejected')
-
             return True
         # pylint: disable=R0801
         except Exception as err:

@@ -791,17 +791,18 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings = self.loadSettingsJSON()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         relay_state = 'http://relaystate.com'
+        parameters = {"SAMLRequest": message, "RelayState": relay_state}
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
 
-        signature = auth.build_request_signature(message, relay_state)
+        auth.add_request_signature(parameters)
         valid_signature = 'E17GU1STzanOXxBTKjweB1DovP8aMJdj5BEy0fnGoEslKdP6hpPc3enjT/bu7I8D8QzLoir8SxZVWdUDXgIxJIEgfK5snr+jJwfc5U2HujsOa/Xb3c4swoyPcyQhcxLRDhDjPq5cQxJfYoPeElvCuI6HAD1mtdd5PS/xDvbIxuw='
-        self.assertEqual(signature, valid_signature)
+        self.assertEqual(valid_signature, parameters["Signature"])
 
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
         self.assertRaisesRegexp(Exception, "Trying to sign the SAMLRequest but can't load the SP private key",
-                                auth2.build_request_signature, message, relay_state)
+                                auth2.add_request_signature, parameters)
 
     def testBuildResponseSignature(self):
         """
@@ -812,12 +813,199 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         relay_state = 'http://relaystate.com'
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
 
-        signature = auth.build_response_signature(message, relay_state)
+        parameters = {"SAMLResponse": message, 'RelayState': relay_state}
+
+        auth.add_response_signature(parameters)
         valid_signature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM='
-        self.assertEqual(signature, valid_signature)
+        self.assertEqual(valid_signature, parameters['Signature'])
 
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
-        self.assertRaisesRegexp(Exception, "Trying to sign the SAMLRequest but can't load the SP private key",
-                                auth2.build_request_signature, message, relay_state)
+        self.assertRaisesRegexp(Exception, "Trying to sign the SAMLResponse but can't load the SP private key",
+                                auth2.add_response_signature, parameters)
+
+    def testIsInValidLogoutResponseSign(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_LogoutResponse
+        """
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {}
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        settings.set_strict(False)
+        request_data['get_data'] = {
+            'SAMLResponse': 'fZJva8IwEMa/Ssl7TZrW/gnqGHMMwSlM8cXeyLU9NaxNQi9lfvxVZczB5ptwSe733MPdjQma2qmFPdjOvyE5awiDU1MbUpevCetaoyyQJmWgQVK+VOvH14WSQ6Fca70tbc1ukPsEEGHrtTUsmM8mbDfKUhnFci8gliGINI/yXIAAiYnsw6JIRgWWAKlkwRZb6skJ64V6nKjDuSEPxvdPIowHIhpIsQkTFaYqSt9ZMEPy2oC/UEfvHSnOnfZFV38MjR1oN7TtgRv8tAZre9CGV9jYkGtT4Wnoju6Bauprme/ebOyErZbPi9XLfLnDoohwhHGc5WVSVhjCKM6rBMpYQpWJrIizfZ4IZNPxuTPqYrmd/m+EdONqPOfy8yG5rhxv0EMFHs52xvxWaHyd3tqD7+j37clWGGyh7vD+POiSrdZdWSIR49NrhR9R/teGTL8A',
+            'RelayState': 'https://pitbulk.no-ip.org/newonelogin/demo1/index.php',
+            'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+            'Signature': 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVfNKGA='
+        }
+
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertEqual([], auth.get_errors())
+
+        relay_state = request_data['get_data']['RelayState']
+        del request_data['get_data']['RelayState']
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn("invalid_logout_response_signature", auth.get_errors())
+        request_data['get_data']['RelayState'] = relay_state
+
+        settings.set_strict(True)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response', auth.get_errors())
+
+        settings.set_strict(False)
+        old_signature = request_data['get_data']['Signature']
+        request_data['get_data']['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333='
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        request_data['get_data']['Signature'] = old_signature
+        old_signature_algorithm = request_data['get_data']['SigAlg']
+        del request_data['get_data']['SigAlg']
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertEqual([], auth.get_errors())
+
+        request_data['get_data']['RelayState'] = 'http://example.com/relaystate'
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        settings.set_strict(True)
+        current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
+        plain_message_6 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLResponse']))
+        plain_message_6 = plain_message_6.replace('https://pitbulk.no-ip.org/newonelogin/demo1/index.php?sls', current_url)
+        plain_message_6 = plain_message_6.replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/')
+        request_data['get_data']['SAMLResponse'] = compat.to_string(OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message_6))
+
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        settings.set_strict(False)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        request_data['get_data']['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        settings_info = self.loadSettingsJSON()
+        settings_info['strict'] = True
+        settings_info['security']['wantMessagesSigned'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+
+        request_data['get_data']['SigAlg'] = old_signature_algorithm
+        old_signature = request_data['get_data']['Signature']
+        del request_data['get_data']['Signature']
+        request_data['get_data']['SAMLResponse'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message_6)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+
+        request_data['get_data']['Signature'] = old_signature
+        settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'
+        del settings_info['idp']['x509cert']
+        settings_2 = OneLogin_Saml2_Settings(settings_info)
+
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
+        auth.process_slo()
+        self.assertIn('In order to validate the sign on the SAMLResponse, the x509cert of the IdP is required', auth.get_errors())
+
+    def testIsValidLogoutRequestSign(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        """
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {
+                'SAMLRequest': 'lVLBitswEP0Vo7tjeWzJtki8LIRCYLvbNksPewmyPc6K2pJqyXQ/v1LSQlroQi/DMJr33rwZbZ2cJysezNms/gt+X9H55G2etBOXlx1ZFy2MdMoJLWd0wvfieP/xQcCGCrsYb3ozkRvI+wjpHC5eGU2Sw35HTg3lA8hqZFwWFcMKsStpxbEsxoLXeQN9OdY1VAgk+YqLC8gdCUQB7tyKB+281D6UaF6mtEiBPudcABcMXkiyD26Ulv6CevXeOpFlVvlunb5ttEmV3ZjlnGn8YTRO5qx0NuBs8kzpAd829tXeucmR5NH4J/203I8el6gFRUqbFPJnyEV51Wq30by4TLW0/9ZyarYTxt4sBsjUYLMZvRykl1Fxm90SXVkfwx4P++T4KSafVzmpUcVJ/sfSrQZJPphllv79W8WKGtLx0ir8IrVTqD1pT2MH3QAMSs4KTvui71jeFFiwirOmprwPkYW063+5uRq4urHiiC4e8hCX3J5wqAEGaPpw9XB5JmkBdeDqSlkz6CmUXdl0Qae5kv2F/1384wu3PwE=',
+                'RelayState': '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
+                'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+                'Signature': 'XCwCyI5cs7WhiJlB5ktSlWxSBxv+6q2xT3c8L7dLV6NQG9LHWhN7gf8qNsahSXfCzA0Ey9dp5BQ0EdRvAk2DIzKmJY6e3hvAIEp1zglHNjzkgcQmZCcrkK9Czi2Y1WkjOwR/WgUTUWsGJAVqVvlRZuS3zk3nxMrLH6f7toyvuJc='
+            }
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
+
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest']))
+
+        settings.set_strict(False)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertEqual([], auth.get_errors())
+
+        relay_state = request_data['get_data']['RelayState']
+        del request_data['get_data']['RelayState']
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        request_data['get_data']['RelayState'] = relay_state
+
+        settings.set_strict(True)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request', auth.get_errors())
+
+        settings.set_strict(False)
+        old_signature = request_data['get_data']['Signature']
+        request_data['get_data']['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333='
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        request_data['get_data']['Signature'] = old_signature
+        old_signature_algorithm = request_data['get_data']['SigAlg']
+        del request_data['get_data']['SigAlg']
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertEqual([], auth.get_errors())
+
+        settings.set_strict(True)
+        request_2 = request.replace('https://pitbulk.no-ip.org/newonelogin/demo1/index.php?sls', current_url)
+        request_2 = request_2.replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/')
+        request_data['get_data']['SAMLRequest'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(request_2)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        settings.set_strict(False)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        request_data['get_data']['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        settings_info = self.loadSettingsJSON()
+        settings_info['strict'] = True
+        settings_info['security']['wantMessagesSigned'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+        request_data['get_data']['SigAlg'] = old_signature_algorithm
+        old_signature = request_data['get_data']['Signature']
+        del request_data['get_data']['Signature']
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+
+        request_data['get_data']['Signature'] = old_signature
+        settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'
+        del settings_info['idp']['x509cert']
+        settings_2 = OneLogin_Saml2_Settings(settings_info)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
+        auth.process_slo()
+        self.assertIn('In order to validate the sign on the SAMLRequest, the x509cert of the IdP is required', auth.get_errors())

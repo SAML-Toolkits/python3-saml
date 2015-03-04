@@ -744,6 +744,32 @@ class OneLogin_Saml2_Utils(object):
             return False
 
     @staticmethod
+    def sign_binary(msg, key, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):
+        """
+        Sign binary message
+
+        :param msg: The element we should validate
+        :type: bytes
+
+        :param key: The private key
+        :type: string
+
+        :param debug: Activate the xmlsec debug
+        :type: bool
+
+        :return signed message
+        :rtype str
+        """
+
+        if isinstance(msg, str):
+            msg = msg.encode('utf8')
+
+        xmlsec.enable_debug_trace(debug)
+        dsig_ctx = xmlsec.SignatureContext()
+        dsig_ctx.key = xmlsec.Key.from_memory(key, xmlsec.KeyFormat.PEM, None)
+        return dsig_ctx.sign_binary(compat.to_bytes(msg), algorithm)
+
+    @staticmethod
     def validate_binary_sign(signed_query, signature, cert=None, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):
         """
         Validates signed bynary data (Used to validate GET Signature).

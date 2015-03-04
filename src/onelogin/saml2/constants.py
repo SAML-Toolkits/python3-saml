@@ -83,5 +83,6 @@ class OneLogin_Saml2_Constants(object):
         'samlp': NS_SAMLP,
         'saml': NS_SAML,
         'ds': NS_DS,
-        'xenc': NS_XENC
+        'xenc': NS_XENC,
+        'md': NS_MD
     }

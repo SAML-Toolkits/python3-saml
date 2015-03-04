@@ -425,13 +425,13 @@ class OneLogin_Saml2_Response(object):
             document = self.document
         return OneLogin_Saml2_XML.query(document, query)
 
-    def __decrypt_assertion(self, dom):
+    def __decrypt_assertion(self, xml):
         """
         Decrypts the Assertion
 
         :raises: Exception if no private key available
-        :param dom: Encrypted Assertion
-        :type dom: Element
+        :param xml: Encrypted Assertion
+        :type xml: Element
         :returns: Decrypted Assertion
         :rtype: Element
         """
@@ -440,13 +440,13 @@ class OneLogin_Saml2_Response(object):
         if not key:
             raise Exception('No private key available, check settings')
 
-        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(dom, '//saml:EncryptedAssertion')
+        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(xml, '//saml:EncryptedAssertion')
         if encrypted_assertion_nodes:
             encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
                 encrypted_data = encrypted_data_nodes[0]
                 OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
-        return dom
+        return xml
 
     def get_error(self):
         """

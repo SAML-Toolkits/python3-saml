@@ -3,12 +3,13 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
-from base64 import b64decode, b64encode
+from base64 import b64decode
 import json
 from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
 
+from onelogin.saml2 import compat
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -310,7 +311,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         Tests the is_valid method of the OneLogin_Saml2_Response
         Case Invalid XML
         """
-        message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64encode('<samlp:Response Version="2.0" ID="_8e8dc5f69a98cc4c1ff3427e5ce34606fd672f91e6" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion>invalid</saml:Assertion></samlp:Response>'))
+        message = compat.to_string(OneLogin_Saml2_Utils.b64encode('<samlp:Response Version="2.0" ID="_8e8dc5f69a98cc4c1ff3427e5ce34606fd672f91e6" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion>invalid</saml:Assertion></samlp:Response>'))
         request_data = {
             'http_host': 'example.com',
             'script_name': 'index.html',
@@ -556,12 +557,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_issuer_assertion.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_issuer_message.xml.base64'))
-        plain_message_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_2))
+        plain_message_2 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_2))
         plain_message_2 = plain_message_2.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_2 = OneLogin_Saml2_Utils.b64encode(plain_message_2)
 
@@ -600,7 +601,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_sessionindex.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
@@ -630,7 +631,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
         xml = self.file_contents(join(self.data_path, 'responses', 'unsigned_response_with_miliseconds.xm.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
         response = OneLogin_Saml2_Response(settings, message)
@@ -649,32 +650,32 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_subjectconfirmation_method.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_subjectconfirmation_data.xml.base64'))
-        plain_message_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_2))
+        plain_message_2 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_2))
         plain_message_2 = plain_message_2.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_2 = OneLogin_Saml2_Utils.b64encode(plain_message_2)
 
         xml_3 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_subjectconfirmation_inresponse.xml.base64'))
-        plain_message_3 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_3))
+        plain_message_3 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_3))
         plain_message_3 = plain_message_3.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_3 = OneLogin_Saml2_Utils.b64encode(plain_message_3)
 
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_subjectconfirmation_recipient.xml.base64'))
-        plain_message_4 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_4))
+        plain_message_4 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_4))
         plain_message_4 = plain_message_4.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_4 = OneLogin_Saml2_Utils.b64encode(plain_message_4)
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_subjectconfirmation_noa.xml.base64'))
-        plain_message_5 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_5))
+        plain_message_5 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_5))
         plain_message_5 = plain_message_5.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_5 = OneLogin_Saml2_Utils.b64encode(plain_message_5)
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'invalid_subjectconfirmation_nb.xml.base64'))
-        plain_message_6 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_6))
+        plain_message_6 = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_6))
         plain_message_6 = plain_message_6.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message_6 = OneLogin_Saml2_Utils.b64encode(plain_message_6)
 
@@ -751,7 +752,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
@@ -783,7 +784,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
@@ -856,7 +857,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         message = OneLogin_Saml2_Utils.b64encode(plain_message)
 
@@ -1017,14 +1018,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         xml_7 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64decode(xml_7))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml_7))
         request_data = {
             'http_host': 'example.com',
             'script_name': 'index.html'
         }
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
-        message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.b64encode(plain_message))
+        message = compat.to_string(OneLogin_Saml2_Utils.b64encode(plain_message))
         response_7 = OneLogin_Saml2_Response(settings, message)
         response_7.is_valid(request_data)
         self.assertEqual('No Signature found. SAML Response rejected', response_7.get_error())

@@ -7,9 +7,9 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
+from onelogin.saml2 import compat
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -118,7 +118,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         key = self.file_contents(join(cert_path, 'sp.key'))
         cert = self.file_contents(join(cert_path, 'sp.crt'))
 
-        signed_metadata = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Metadata.sign_metadata(metadata, key, cert))
+        signed_metadata = compat.to_string(OneLogin_Saml2_Metadata.sign_metadata(metadata, key, cert))
 
         self.assertIn('<md:SPSSODescriptor', signed_metadata)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', signed_metadata)
@@ -162,7 +162,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         cert_path = settings.get_cert_path()
         cert = self.file_contents(join(cert_path, 'sp.crt'))
 
-        metadata_with_descriptors = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert)
+        metadata_with_descriptors = compat.to_string(OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert))
         self.assertIn('<md:KeyDescriptor use="signing"', metadata_with_descriptors)
         self.assertIn('<md:KeyDescriptor use="encryption"', metadata_with_descriptors)
 

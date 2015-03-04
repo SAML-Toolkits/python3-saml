@@ -8,6 +8,7 @@ from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
@@ -46,7 +47,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         response = OneLogin_Saml2_Logout_Response(settings, message)
-        self.assertRegexpMatches(OneLogin_Saml2_Utils.string(OneLogin_Saml2_XML.to_string(response.document)),
+        self.assertRegexpMatches(compat.to_string(OneLogin_Saml2_XML.to_string(response.document)),
                                  '<samlp:LogoutResponse')
 
     def testCreateDeflatedSAMLLogoutResponseURLParameter(self):
@@ -65,7 +66,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=')
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
-        inflated = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(exploded['SAMLResponse'][0]))
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(exploded['SAMLResponse'][0]))
         self.assertRegexpMatches(inflated, '^<samlp:LogoutResponse')
 
     def testGetStatus(self):
@@ -150,7 +151,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
 
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -182,7 +183,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
 
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         plain_message = plain_message.replace('http://idp.example.com/', 'http://invalid.issuer.example.com')
@@ -301,10 +302,10 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
-        plain_message_6 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLResponse']))
+        plain_message_6 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLResponse']))
         plain_message_6 = plain_message_6.replace('https://pitbulk.no-ip.org/newonelogin/demo1/index.php?sls', current_url)
         plain_message_6 = plain_message_6.replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/')
-        request_data['get_data']['SAMLResponse'] = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message_6))
+        request_data['get_data']['SAMLResponse'] = compat.to_string(OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message_6))
 
         response_6 = OneLogin_Saml2_Logout_Response(settings, request_data['get_data']['SAMLResponse'])
         try:
@@ -380,7 +381,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn('The LogoutRequest was received at', str(e))
 
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message_3 = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)

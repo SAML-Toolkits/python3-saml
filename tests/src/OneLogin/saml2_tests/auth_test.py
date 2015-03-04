@@ -8,6 +8,7 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
+from onelogin.saml2 import compat
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
@@ -154,12 +155,12 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        plain_message = OneLogin_Saml2_Utils.string(b64decode(message))
+        plain_message = compat.to_string(b64decode(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
         del request_data['get_data']
         request_data['post_data'] = {
-            'SAMLResponse': OneLogin_Saml2_Utils.string(b64encode(OneLogin_Saml2_Utils.bytes(plain_message)))
+            'SAMLResponse': compat.to_string(b64encode(compat.to_bytes(plain_message)))
         }
         auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
         request_id = 'invalid'
@@ -268,7 +269,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_responses', 'invalids', 'status_code_responder.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -287,7 +288,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -311,7 +312,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -348,7 +349,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         # $_SESSION['samltest'] = true;
 
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -403,7 +404,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'not_after_failed.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -424,7 +425,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -472,7 +473,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -500,7 +501,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         # In order to avoid the destination problem
-        plain_message = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         message = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message)
@@ -591,7 +592,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         sso_url = settings_info['idp']['singleSignOnService']['url']
         self.assertIn(sso_url, target_url)
         self.assertIn('SAMLRequest', parsed_query)
-        request = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
         self.assertNotIn('ForceAuthn="true"', request)
 
         auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
@@ -599,7 +600,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
         self.assertIn(sso_url, target_url_2)
         self.assertIn('SAMLRequest', parsed_query_2)
-        request_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
+        request_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
         self.assertNotIn('ForceAuthn="true"', request_2)
 
         auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
@@ -607,7 +608,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
         self.assertIn(sso_url, target_url_3)
         self.assertIn('SAMLRequest', parsed_query_3)
-        request_3 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
+        request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
         self.assertIn('ForceAuthn="true"', request_3)
 
     def testLoginIsPassive(self):
@@ -625,7 +626,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         sso_url = settings_info['idp']['singleSignOnService']['url']
         self.assertIn(sso_url, target_url)
         self.assertIn('SAMLRequest', parsed_query)
-        request = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
         self.assertNotIn('IsPassive="true"', request)
 
         auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
@@ -633,7 +634,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
         self.assertIn(sso_url, target_url_2)
         self.assertIn('SAMLRequest', parsed_query_2)
-        request_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
+        request_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
         self.assertNotIn('IsPassive="true"', request_2)
 
         auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
@@ -641,7 +642,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
         self.assertIn(sso_url, target_url_3)
         self.assertIn('SAMLRequest', parsed_query_3)
-        request_3 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
+        request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
         self.assertIn('IsPassive="true"', request_3)
 
     def testLogout(self):

@@ -7,6 +7,7 @@ import json
 from os.path import dirname, join, exists, sep
 import unittest
 
+from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
@@ -356,7 +357,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         Case unsigned metadata
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        metadata = settings.get_sp_metadata()
+        metadata = compat.to_string(settings.get_sp_metadata())
 
         self.assertNotEqual(len(metadata), 0)
         self.assertIn('<md:SPSSODescriptor', metadata)
@@ -378,7 +379,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info['security']['signMetadata'] = True
         settings = OneLogin_Saml2_Settings(settings_info)
 
-        metadata = OneLogin_Saml2_Utils.string(settings.get_sp_metadata())
+        metadata = compat.to_string(settings.get_sp_metadata())
         self.assertIn('<md:SPSSODescriptor', metadata)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', metadata)
         self.assertIn('AuthnRequestsSigned="false"', metadata)
@@ -389,7 +390,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('<ds:SignedInfo>\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', metadata)
         self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', metadata)
         self.assertIn('<ds:Reference', metadata)
-        self.assertIn('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', metadata)
+        self.assertIn('<ds:KeyInfo>\n<ds:X509Data>\n<ds:X509Certificate>', metadata)
 
     def testGetSPMetadataSignedNoMetadataCert(self):
         """

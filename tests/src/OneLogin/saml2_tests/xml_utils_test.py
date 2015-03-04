@@ -9,8 +9,6 @@ import unittest
 from base64 import b64decode
 from lxml import etree
 from os.path import dirname, join, exists
-from xml.dom.minidom import Document, parseString
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_XML
 
 
@@ -53,66 +51,32 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
 
         metadata_expired = self.file_contents(join(self.data_path, 'metadata', 'expired_metadata_settings1.xml'))
         res = OneLogin_Saml2_XML.validate_xml(metadata_expired, 'saml-schema-metadata-2.0.xsd')
-        self.assertIsInstance(res, Document)
+        self.assertIsInstance(res, OneLogin_Saml2_XML._element_class)
 
         metadata_ok = self.file_contents(join(self.data_path, 'metadata', 'metadata_settings1.xml'))
         res = OneLogin_Saml2_XML.validate_xml(metadata_ok, 'saml-schema-metadata-2.0.xsd')
-        self.assertIsInstance(res, Document)
-
-        dom = parseString(metadata_ok)
-        res = OneLogin_Saml2_XML.validate_xml(dom, 'saml-schema-metadata-2.0.xsd')
-        self.assertIsInstance(res, Document)
+        self.assertIsInstance(res, OneLogin_Saml2_XML._element_class)
 
     def testToString(self):
         """
         Tests the to_string method of the OneLogin_Saml2_XML
         """
         xml = '<test>test1</test>'
-        doc = parseString(xml)
         elem = etree.fromstring(xml)
         bxml = xml.encode('utf8')
 
         self.assertIs(xml, OneLogin_Saml2_XML.to_string(xml))
         self.assertIs(bxml, OneLogin_Saml2_XML.to_string(bxml))
         self.assertEqual(etree.tostring(elem), OneLogin_Saml2_XML.to_string(elem))
-        self.assertEqual(doc.toxml(), OneLogin_Saml2_XML.to_string(doc))
-        self.assertRaisesRegex(ValueError,
-                               'unsupported type',
-                               OneLogin_Saml2_XML.to_string, 1)
-
-    def testToDom(self):
-        """
-        Tests the to_dom method of the OneLogin_Saml2_XML
-        """
-        xml = '<test>test1</test>'
-        doc = parseString(xml)
-        elem = etree.fromstring(xml)
-
-        res = OneLogin_Saml2_XML.to_dom(xml)
-        self.assertIsInstance(res, Document)
-        self.assertEqual(doc.toxml(), res.toxml())
-
-        res = OneLogin_Saml2_XML.to_dom(xml.encode('utf8'))
-        self.assertIsInstance(res, Document)
-        self.assertEqual(doc.toxml(), res.toxml())
-
-        res = OneLogin_Saml2_XML.to_dom(elem)
-        self.assertIsInstance(res, Document)
-        self.assertEqual(doc.toxml(), res.toxml())
-
-        res = OneLogin_Saml2_XML.to_dom(doc)
-        self.assertIs(res, doc)
-
-        self.assertRaisesRegex(ValueError,
-                               'unsupported type',
-                               OneLogin_Saml2_XML.to_dom, 1)
+        self.assertRaisesRegexp(ValueError,
+                                'unsupported type',
+                                OneLogin_Saml2_XML.to_string, 1)
 
     def testToElement(self):
         """
         Tests the to_etree method of the OneLogin_Saml2_XML
         """
         xml = '<test>test1</test>'
-        doc = parseString(xml)
         elem = etree.fromstring(xml)
         xml_expected = etree.tostring(elem)
 
@@ -124,32 +88,15 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
         self.assertIsInstance(res, etree._Element)
         self.assertEqual(xml_expected, etree.tostring(res))
 
-        res = OneLogin_Saml2_XML.to_etree(doc)
         self.assertIsInstance(res, etree._Element)
         self.assertEqual(xml_expected, etree.tostring(res))
 
         res = OneLogin_Saml2_XML.to_etree(elem)
         self.assertIs(res, elem)
 
-        self.assertRaisesRegex(ValueError,
-                               'unsupported type',
-                               OneLogin_Saml2_XML.to_etree, 1)
-
-    def testSetNodeAttributeNS(self):
-        """
-        Tests the set_node_attribute_ns method of the OneLogin_Saml2_XML
-        """
-        xml = '<test>test1</test>'
-        doc = parseString(xml)
-        elem = etree.fromstring(xml)
-
-        res = OneLogin_Saml2_XML.set_node_ns_attributes(doc.createElement('test2'))
-        self.assertEqual(OneLogin_Saml2_Constants.NS_SAMLP, res.getAttributeNS(OneLogin_Saml2_Constants.NS_SAMLP, 'samlp'))
-        self.assertEqual(OneLogin_Saml2_Constants.NS_SAML, res.getAttributeNS(OneLogin_Saml2_Constants.NS_SAML, 'saml'))
-
-        self.assertIs(xml, OneLogin_Saml2_XML.set_node_ns_attributes(xml))
-        self.assertIs(elem, OneLogin_Saml2_XML.set_node_ns_attributes(elem))
-        self.assertIs(doc, OneLogin_Saml2_XML.set_node_ns_attributes(doc))
+        self.assertRaisesRegexp(ValueError,
+                                'unsupported type',
+                                OneLogin_Saml2_XML.to_etree, 1)
 
     def testQuery(self):
         """

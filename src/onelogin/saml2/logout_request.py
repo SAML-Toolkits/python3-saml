@@ -207,7 +207,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         self.__error = None
         try:
-            dom = OneLogin_Saml2_XML.to_etree(self.__logout_request)
+            root = OneLogin_Saml2_XML.to_etree(self.__logout_request)
 
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
@@ -215,7 +215,7 @@ class OneLogin_Saml2_Logout_Request(object):
             get_data = ('get_data' in request_data and request_data['get_data']) or dict()
 
             if self.__settings.is_strict():
-                res = OneLogin_Saml2_XML.validate_xml(dom, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+                res = OneLogin_Saml2_XML.validate_xml(root, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                 if isinstance(res, str):
                     raise Exception('Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd')
 
@@ -224,14 +224,14 @@ class OneLogin_Saml2_Logout_Request(object):
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
                 # Check NotOnOrAfter
-                if dom.get('NotOnOrAfter', None):
-                    na = OneLogin_Saml2_Utils.parse_SAML_to_time(dom.get('NotOnOrAfter'))
+                if root.get('NotOnOrAfter', None):
+                    na = OneLogin_Saml2_Utils.parse_SAML_to_time(root.get('NotOnOrAfter'))
                     if na <= OneLogin_Saml2_Utils.now():
                         raise Exception('Timing issues (please check your clock settings)')
 
                 # Check destination
-                if dom.get('Destination', None):
-                    destination = dom.get('Destination')
+                if root.get('Destination', None):
+                    destination = root.get('Destination')
                     if destination != '':
                         if current_url not in destination:
                             raise Exception(
@@ -244,7 +244,7 @@ class OneLogin_Saml2_Logout_Request(object):
                             )
 
                 # Check issuer
-                issuer = OneLogin_Saml2_Logout_Request.get_issuer(dom)
+                issuer = OneLogin_Saml2_Logout_Request.get_issuer(root)
                 if issuer is not None and issuer != idp_entity_id:
                     raise Exception('Invalid issuer in the Logout Request')
 

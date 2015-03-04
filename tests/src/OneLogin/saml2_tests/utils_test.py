@@ -10,6 +10,7 @@ from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -467,15 +468,15 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         name_id_format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
 
         name_id = OneLogin_Saml2_Utils.generate_name_id(name_id_value, entity_id, name_id_format)
-        expected_name_id = '<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified" SPNameQualifier="http://stuff.com/endpoints/metadata.php">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
-        self.assertEqual(name_id, expected_name_id)
+        expected_name_id = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
+        self.assertEqual(expected_name_id, name_id)
 
         settings_info = self.loadSettingsJSON()
         x509cert = settings_info['idp']['x509cert']
         key = OneLogin_Saml2_Utils.format_cert(x509cert)
 
         name_id_enc = OneLogin_Saml2_Utils.generate_name_id(name_id_value, entity_id, name_id_format, key)
-        expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">\n<xenc:EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
+        expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Type="http://www.w3.org/2001/04/xmlenc#Element">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo>\n<xenc:EncryptedKey>\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
         self.assertIn(expected_name_id_enc, name_id_enc)
 
     def testCalculateX509Fingerprint(self):
@@ -531,29 +532,23 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         key = settings.get_sp_key()
 
         xml_nameid_enc = b64decode(self.file_contents(join(self.data_path, 'responses', 'response_encrypted_nameid.xml.base64')))
-        dom_nameid_enc = parseString(xml_nameid_enc)
-        encrypted_nameid_nodes = dom_nameid_enc.getElementsByTagName('saml:EncryptedID')
-        encrypted_data = encrypted_nameid_nodes[0].firstChild
-        encrypted_data_str = str(encrypted_nameid_nodes[0].firstChild.toxml())
+        dom_nameid_enc = etree.fromstring(xml_nameid_enc)
+        encrypted_nameid_nodes = dom_nameid_enc.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
+        encrypted_data = encrypted_nameid_nodes[0]
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
         self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
         self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
 
-        decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data_str, key)
-        self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
-        self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
-
         xml_assertion_enc = b64decode(self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64')))
-        dom_assertion_enc = parseString(xml_assertion_enc)
-        encrypted_assertion_enc_nodes = dom_assertion_enc.getElementsByTagName('saml:EncryptedAssertion')
-        encrypted_data_assert = encrypted_assertion_enc_nodes[0].firstChild
+        dom_assertion_enc = etree.fromstring(xml_assertion_enc)
+        encrypted_assertion_enc_nodes = dom_assertion_enc.find('.//saml:EncryptedAssertion', namespaces=OneLogin_Saml2_Constants.NSMAP)
+        encrypted_data_assert = encrypted_assertion_enc_nodes[0]
 
         decrypted_assertion = OneLogin_Saml2_Utils.decrypt_element(encrypted_data_assert, key)
         self.assertEqual('{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML, decrypted_assertion.tag)
         self.assertEqual('_6fe189b1c241827773902f2b1d3a843418206a5c97', decrypted_assertion.get('ID'))
 
-        decrypted_assertion.xpath('/saml:Assertion/saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
-        encrypted_nameid_nodes = decrypted_assertion.xpath('/saml:Assertion/saml:Subject/saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
+        encrypted_nameid_nodes = decrypted_assertion.xpath('./saml:Subject/saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
         encrypted_data = encrypted_nameid_nodes[0][0]
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
         self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
@@ -572,15 +567,15 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         f.close()
         self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data, key3)
         xml_nameid_enc_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_EncMethod.xml.base64')))
-        dom_nameid_enc_2 = parseString(xml_nameid_enc_2)
-        encrypted_nameid_nodes_2 = dom_nameid_enc_2.getElementsByTagName('saml:EncryptedID')
-        encrypted_data_2 = encrypted_nameid_nodes_2[0].firstChild
+        dom_nameid_enc_2 = etree.fromstring(xml_nameid_enc_2)
+        encrypted_nameid_nodes_2 = dom_nameid_enc_2.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
+        encrypted_data_2 = encrypted_nameid_nodes_2[0]
         self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_2, key)
 
         xml_nameid_enc_3 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_keyinfo.xml.base64')))
-        dom_nameid_enc_3 = parseString(xml_nameid_enc_3)
-        encrypted_nameid_nodes_3 = dom_nameid_enc_3.getElementsByTagName('saml:EncryptedID')
-        encrypted_data_3 = encrypted_nameid_nodes_3[0].firstChild
+        dom_nameid_enc_3 = etree.fromstring(xml_nameid_enc_3)
+        encrypted_nameid_nodes_3 = dom_nameid_enc_3.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
+        encrypted_data_3 = encrypted_nameid_nodes_3[0]
         self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_3, key)
 
     def testAddSign(self):
@@ -592,7 +587,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         cert = settings.get_sp_cert()
 
         xml_authn = b64decode(self.file_contents(join(self.data_path, 'requests', 'authn_request.xml.base64')))
-        xml_authn_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert))
+        xml_authn_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed)
 
         res = parseString(xml_authn_signed)
@@ -600,47 +595,47 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertIn('ds:Signature', ds_signature.tagName)
 
         xml_authn_dom = parseString(xml_authn)
-        xml_authn_signed_2 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom, key, cert))
+        xml_authn_signed_2 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.toxml(), key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_2)
         res_2 = parseString(xml_authn_signed_2)
         ds_signature_2 = res_2.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_2.tagName)
 
-        xml_authn_signed_3 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.firstChild, key, cert))
+        xml_authn_signed_3 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.firstChild.toxml(), key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_3)
         res_3 = parseString(xml_authn_signed_3)
         ds_signature_3 = res_3.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_3.tagName)
 
         xml_authn_etree = etree.fromstring(xml_authn)
-        xml_authn_signed_4 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
+        xml_authn_signed_4 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_4)
         res_4 = parseString(xml_authn_signed_4)
         ds_signature_4 = res_4.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_4.tagName)
 
-        xml_authn_signed_5 = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
+        xml_authn_signed_5 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_5)
         res_5 = parseString(xml_authn_signed_5)
         ds_signature_5 = res_5.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_5.tagName)
 
         xml_logout_req = b64decode(self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml.base64')))
-        xml_logout_req_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_logout_req, key, cert))
+        xml_logout_req_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_logout_req, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_req_signed)
         res_6 = parseString(xml_logout_req_signed)
         ds_signature_6 = res_6.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_6.tagName)
 
         xml_logout_res = b64decode(self.file_contents(join(self.data_path, 'logout_responses', 'logout_response.xml.base64')))
-        xml_logout_res_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_logout_res, key, cert))
+        xml_logout_res_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_logout_res, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_res_signed)
         res_7 = parseString(xml_logout_res_signed)
         ds_signature_7 = res_7.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_7.tagName)
 
         xml_metadata = self.file_contents(join(self.data_path, 'metadata', 'metadata_settings1.xml'))
-        xml_metadata_signed = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.add_sign(xml_metadata, key, cert))
+        xml_metadata_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_metadata, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_metadata_signed)
         res_8 = parseString(xml_metadata_signed)
         ds_signature_8 = res_8.firstChild.firstChild.nextSibling.firstChild.nextSibling
@@ -716,27 +711,28 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_double_signed_2, None, fingerprint_2))
 
         dom = parseString(xml_response_msg_signed_2)
-        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(dom, cert_2))
+        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(dom.toxml(), cert_2))
 
         dom.firstChild.firstChild.firstChild.nodeValue = 'https://idp.example.com/simplesaml/saml2/idp/metadata.php'
 
         dom.firstChild.getAttributeNode('ID').nodeValue = u'_34fg27g212d63k1f923845324475802ac0fc24530b'
         # Reference validation failed
-        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(dom, cert_2))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(dom.toxml(), cert_2))
 
         invalid_fingerprint = 'afe71c34ef740bc87434be13a2263d31271da1f9'
         # Wrong fingerprint
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_metadata_signed_2, None, invalid_fingerprint))
 
         dom_2 = parseString(xml_response_double_signed_2)
-        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(dom_2, cert_2))
+        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(dom_2.toxml(), cert_2))
         dom_2.firstChild.firstChild.firstChild.nodeValue = 'https://example.com/other-idp'
         # Modified message
-        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(dom_2, cert_2))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(dom_2.toxml(), cert_2))
 
         dom_3 = parseString(xml_response_double_signed_2)
         assert_elem_3 = dom_3.firstChild.firstChild.nextSibling.nextSibling.nextSibling
-        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(assert_elem_3, cert_2))
+        assert_elem_3.setAttributeNS(OneLogin_Saml2_Constants.NS_SAML, 'xmlns:saml', OneLogin_Saml2_Constants.NS_SAML)
+        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(assert_elem_3.toxml(), cert_2))
 
         no_signed = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_signature.xml.base64')))
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(no_signed, cert))

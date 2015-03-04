@@ -8,12 +8,11 @@ All rights reserved.
 Setting class of OneLogin's Python Toolkit.
 
 """
-from __future__ import absolute_import, print_function, with_statement
-
 from datetime import datetime
 import re
 from os.path import dirname, exists, join, sep
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
@@ -597,30 +596,26 @@ class OneLogin_Saml2_Settings(object):
         :rtype: list
         """
 
-        assert isinstance(xml, OneLogin_Saml2_Utils.str_type)
+        assert isinstance(xml, compat.text_types)
 
         if len(xml) == 0:
             raise Exception('Empty string supplied as input')
 
         errors = []
-        dom = OneLogin_Saml2_XML.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self.__debug)
-        if isinstance(dom, str):
-            errors.append(dom)
+        root = OneLogin_Saml2_XML.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self.__debug)
+        if isinstance(root, str):
+            errors.append(root)
         else:
-            element = dom.documentElement
-            if element.tagName not in 'md:EntityDescriptor':
+            if root.tag != '{%s}EntityDescriptor' % OneLogin_Saml2_Constants.NS_MD:
                 errors.append('noEntityDescriptor_xml')
             else:
-                if len(element.getElementsByTagName('md:SPSSODescriptor')) != 1:
+                if (len(root.findall('.//md:SPSSODescriptor', namespaces=OneLogin_Saml2_Constants.NSMAP))) != 1:
                     errors.append('onlySPSSODescriptor_allowed_xml')
                 else:
-                    valid_until = cache_duration = None
+                    valid_until, cache_duration = root.get('validUntil'), root.get('cacheDuration')
 
-                    if element.hasAttribute('validUntil'):
-                        valid_until = OneLogin_Saml2_Utils.parse_SAML_to_time(element.getAttribute('validUntil'))
-                    if element.hasAttribute('cacheDuration'):
-                        cache_duration = element.getAttribute('cacheDuration')
-
+                    if valid_until:
+                        valid_until = OneLogin_Saml2_Utils.parse_SAML_to_time(valid_until)
                     expire_time = OneLogin_Saml2_Utils.get_expire_time(cache_duration, valid_until)
                     if expire_time is not None and int(datetime.now().strftime('%s')) > int(expire_time):
                         errors.append('expired_xml')

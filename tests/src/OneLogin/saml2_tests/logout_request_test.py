@@ -8,6 +8,7 @@ from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
 
+from onelogin.saml2 import compat
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -53,7 +54,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
-        inflated = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
 
     def testCreateDeflatedSAMLLogoutRequestURLParameter(self):
@@ -70,7 +71,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
-        inflated = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
 
     def testGetIDFromSAMLLogoutRequest(self):
@@ -82,7 +83,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id1)
 
         dom = parseString(logout_request)
-        id2 = OneLogin_Saml2_Logout_Request.get_id(dom)
+        id2 = OneLogin_Saml2_Logout_Request.get_id(dom.toxml())
         self.assertEqual('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', id2)
 
     def testGetIDFromDeflatedSAMLLogoutRequest(self):
@@ -109,7 +110,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data)
 
         dom = parseString(request)
-        name_id_data_2 = OneLogin_Saml2_Logout_Request.get_nameid_data(dom)
+        name_id_data_2 = OneLogin_Saml2_Logout_Request.get_nameid_data(dom.toxml())
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
@@ -164,12 +165,12 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual('http://idp.example.com/', issuer)
 
         dom = parseString(request)
-        issuer_2 = OneLogin_Saml2_Logout_Request.get_issuer(dom)
+        issuer_2 = OneLogin_Saml2_Logout_Request.get_issuer(dom.toxml())
         self.assertEqual('http://idp.example.com/', issuer_2)
 
         issuer_node = dom.getElementsByTagName('saml:Issuer')[0]
         issuer_node.parentNode.removeChild(issuer_node)
-        issuer_3 = OneLogin_Saml2_Logout_Request.get_issuer(dom)
+        issuer_3 = OneLogin_Saml2_Logout_Request.get_issuer(dom.toxml())
         self.assertIsNone(issuer_3)
 
     def testGetSessionIndexes(self):
@@ -182,7 +183,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(len(session_indexes), 0)
 
         dom = parseString(request)
-        session_indexes_2 = OneLogin_Saml2_Logout_Request.get_session_indexes(dom)
+        session_indexes_2 = OneLogin_Saml2_Logout_Request.get_session_indexes(dom.toxml())
         self.assertEqual(len(session_indexes_2), 0)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_with_sessionindex.xml'))
@@ -338,7 +339,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
-        request = OneLogin_Saml2_Utils.string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest']))
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(request_data['get_data']['SAMLRequest']))
 
         settings.set_strict(False)
         logout_request = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))

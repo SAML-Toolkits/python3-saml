@@ -11,24 +11,28 @@ Auxiliary class of OneLogin's Python Toolkit.
 
 from os.path import join, dirname
 from lxml import etree
-from xml.dom import minidom
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
 
-class OneLogin_Saml2_XML(object):
-    _document_class = minidom.Document
-    _element_class = type(etree.Element('root'))
-    _node_class = minidom.Element
-    _fromstring = etree.fromstring
-    _parse_document = minidom.parseString
-    _schema_class = etree.XMLSchema
-    _text_class = (str, bytes)
-    _tostring = etree.tostring
+for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
+    etree.register_namespace(prefix, url)
 
-    make_dom = _document_class
+
+class OneLogin_Saml2_XML(object):
+    _element_class = type(etree.Element('root'))
+    _parse_etree = staticmethod(etree.fromstring)
+    _schema_class = etree.XMLSchema
+    _text_class = compat.text_types
+    _unparse_etree = staticmethod(etree.tostring)
+
+    dump = staticmethod(etree.dump)
+    make_root = etree.Element
+    make_child = etree.SubElement
+    cleanup_namespaces = etree.cleanup_namespaces
 
     @staticmethod
-    def to_string(xml):
+    def to_string(xml, **kwargs):
         """
         Serialize an element to an encoded string representation of its XML tree.
         :param xml: The root node
@@ -39,31 +43,11 @@ class OneLogin_Saml2_XML(object):
 
         if isinstance(xml, OneLogin_Saml2_XML._text_class):
             return xml
-        if isinstance(xml, (OneLogin_Saml2_XML._document_class, OneLogin_Saml2_XML._node_class)):
-            return xml.toxml()
 
         if isinstance(xml, OneLogin_Saml2_XML._element_class):
-            return OneLogin_Saml2_XML._tostring(xml)
+            OneLogin_Saml2_XML.cleanup_namespaces(xml)
+            return OneLogin_Saml2_XML._unparse_etree(xml, **kwargs)
 
-        raise ValueError("unsupported type %r" % type(xml))
-
-    @staticmethod
-    def to_dom(xml):
-        """
-        Convert xml to dom
-        :param xml: The root node
-        :type xml: str|bytes|xml.dom.minidom.Document|etree.Element
-        :returns: dom
-        :rtype: xml.dom.minidom.Document
-        """
-        if isinstance(xml, OneLogin_Saml2_XML._document_class):
-            return xml
-        if isinstance(xml, OneLogin_Saml2_XML._node_class):
-            return OneLogin_Saml2_XML._parse_document(xml.toxml())
-        if isinstance(xml, OneLogin_Saml2_XML._element_class):
-            return OneLogin_Saml2_XML._parse_document(OneLogin_Saml2_XML._tostring(xml))
-        if isinstance(xml, OneLogin_Saml2_XML._text_class):
-            return OneLogin_Saml2_XML._parse_document(xml)
         raise ValueError("unsupported type %r" % type(xml))
 
     @staticmethod
@@ -77,35 +61,10 @@ class OneLogin_Saml2_XML(object):
         """
         if isinstance(xml, OneLogin_Saml2_XML._element_class):
             return xml
-        if isinstance(xml, (OneLogin_Saml2_XML._document_class, OneLogin_Saml2_XML._node_class)):
-            return OneLogin_Saml2_XML._fromstring(xml.toxml())
         if isinstance(xml, OneLogin_Saml2_XML._text_class):
-            return OneLogin_Saml2_XML._fromstring(xml)
+            return OneLogin_Saml2_XML._parse_etree(xml)
 
         raise ValueError('unsupported type %r' % type(xml))
-
-    @staticmethod
-    def set_node_ns_attributes(xml):
-        """
-        Set minidom.Element Attribute NS
-        Note: function does not affect if input is not instance of Element
-        :param xml: the element
-        :type xml: xml.dom.minidom.Element
-        :returns: the input
-        :rtype: xml.dom.minidom.Element
-        """
-        if isinstance(xml, OneLogin_Saml2_XML._node_class):
-            xml.setAttributeNS(
-                OneLogin_Saml2_Constants.NS_SAMLP,
-                'xmlns:samlp',
-                OneLogin_Saml2_Constants.NS_SAMLP
-            )
-            xml.setAttributeNS(
-                OneLogin_Saml2_Constants.NS_SAML,
-                'xmlns:saml',
-                OneLogin_Saml2_Constants.NS_SAML
-            )
-        return xml
 
     @staticmethod
     def validate_xml(xml, schema, debug=False):
@@ -120,10 +79,10 @@ class OneLogin_Saml2_XML(object):
         :returns: Error code or the DomDocument of the xml
         :rtype: xml.dom.minidom.Document
         """
-        assert isinstance(schema, str)
 
+        assert isinstance(schema, compat.str_type)
         try:
-            dom = OneLogin_Saml2_XML.to_etree(xml)
+            xml = OneLogin_Saml2_XML.to_etree(xml)
         except Exception as e:
             if debug:
                 print(e)
@@ -133,13 +92,13 @@ class OneLogin_Saml2_XML(object):
         with open(schema_file, 'r') as f_schema:
             xmlschema = OneLogin_Saml2_XML._schema_class(etree.parse(f_schema))
 
-        if not xmlschema.validate(dom):
+        if not xmlschema.validate(xml):
             if debug:
                 print('Errors validating the metadata: ')
                 for error in xmlschema.error_log:
                     print(error.message)
             return 'invalid_xml'
-        return OneLogin_Saml2_XML.to_dom(dom)
+        return xml
 
     @staticmethod
     def query(dom, query, context=None):
@@ -162,3 +121,16 @@ class OneLogin_Saml2_XML(object):
             return dom.xpath(query, namespaces=OneLogin_Saml2_Constants.NSMAP)
         else:
             return context.xpath(query, namespaces=OneLogin_Saml2_Constants.NSMAP)
+
+    @staticmethod
+    def extract_tag_text(xml, tagname):
+        open_tag = compat.to_bytes("<%s" % tagname)
+        close_tag = compat.to_bytes("</%s>" % tagname)
+
+        xml = OneLogin_Saml2_XML.to_string(xml)
+        start = xml.find(open_tag)
+        assert start != -1
+
+        end = xml.find(close_tag, start) + len(close_tag)
+        assert end != -1
+        return compat.to_string(xml[start:end])

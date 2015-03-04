@@ -12,6 +12,7 @@ Metadata class of OneLogin's Python Toolkit.
 from time import gmtime, strftime
 from datetime import datetime
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
@@ -56,7 +57,7 @@ class OneLogin_Saml2_Metadata(object):
         """
         if valid_until is None:
             valid_until = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_VALID
-        if not isinstance(valid_until, OneLogin_Saml2_Utils.str_type):
+        if not isinstance(valid_until, compat.str_type):
             valid_until_time = gmtime(valid_until)
             valid_until_time = strftime(r'%Y-%m-%dT%H:%M:%SZ', valid_until_time)
         else:
@@ -64,7 +65,7 @@ class OneLogin_Saml2_Metadata(object):
 
         if cache_duration is None:
             cache_duration = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_CACHED
-        if not isinstance(cache_duration, OneLogin_Saml2_Utils.str_type):
+        if not isinstance(cache_duration, compat.str_type):
             cache_duration_str = 'PT%sS' % cache_duration
         else:
             cache_duration_str = cache_duration
@@ -150,6 +151,18 @@ class OneLogin_Saml2_Metadata(object):
         return OneLogin_Saml2_Utils.add_sign(metadata, key, cert)
 
     @staticmethod
+    def __add_x509_key_descriptors(root, cert, signing):
+        key_descriptor = OneLogin_Saml2_XML.make_child(root, '{%s}KeyDescriptor' % OneLogin_Saml2_Constants.NS_MD)
+        root.remove(key_descriptor)
+        root.insert(0, key_descriptor)
+        key_info = OneLogin_Saml2_XML.make_child(key_descriptor, '{%s}KeyInfo' % OneLogin_Saml2_Constants.NS_DS)
+        key_data = OneLogin_Saml2_XML.make_child(key_info, '{%s}X509Data' % OneLogin_Saml2_Constants.NS_DS)
+
+        x509_certificate = OneLogin_Saml2_XML.make_child(key_data, '{%s}X509Certificate' % OneLogin_Saml2_Constants.NS_DS)
+        x509_certificate.text = OneLogin_Saml2_Utils.format_cert(cert, False)
+        key_descriptor.set('use', ('encryption', 'signing')[signing])
+
+    @staticmethod
     def add_x509_key_descriptors(metadata, cert=None):
         """
         Adds the x509 descriptors (sign/encriptation) to the metadata
@@ -167,39 +180,16 @@ class OneLogin_Saml2_Metadata(object):
         if cert is None or cert == '':
             return metadata
         try:
-            xml = OneLogin_Saml2_XML.to_dom(metadata)
+            root = OneLogin_Saml2_XML.to_etree(metadata)
         except Exception as e:
             raise Exception('Error parsing metadata. ' + str(e))
 
-        formated_cert = OneLogin_Saml2_Utils.format_cert(cert, False)
-        x509_certificate = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'ds:X509Certificate')
-        content = xml.createTextNode(formated_cert)
-        x509_certificate.appendChild(content)
+        assert root.tag == '{%s}EntityDescriptor' % OneLogin_Saml2_Constants.NS_MD
+        try:
+            sp_sso_descriptor = next(root.iterfind('.//md:SPSSODescriptor', namespaces=OneLogin_Saml2_Constants.NSMAP))
+        except StopIteration:
+            raise Exception('Malformed metadata.')
 
-        key_data = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'ds:X509Data')
-        key_data.appendChild(x509_certificate)
-
-        key_info = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'ds:KeyInfo')
-        key_info.appendChild(key_data)
-
-        key_descriptor = xml.createElementNS(OneLogin_Saml2_Constants.NS_DS, 'md:KeyDescriptor')
-
-        entity_descriptor = xml.getElementsByTagName('md:EntityDescriptor')[0]
-
-        sp_sso_descriptor = entity_descriptor.getElementsByTagName('md:SPSSODescriptor')[0]
-        sp_sso_descriptor.insertBefore(key_descriptor.cloneNode(True), sp_sso_descriptor.firstChild)
-        sp_sso_descriptor.insertBefore(key_descriptor.cloneNode(True), sp_sso_descriptor.firstChild)
-
-        signing = xml.getElementsByTagName('md:KeyDescriptor')[0]
-        signing.setAttribute('use', 'signing')
-
-        encryption = xml.getElementsByTagName('md:KeyDescriptor')[1]
-        encryption.setAttribute('use', 'encryption')
-
-        signing.appendChild(key_info)
-        encryption.appendChild(key_info.cloneNode(True))
-
-        signing.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
-        encryption.setAttribute('xmlns:ds', OneLogin_Saml2_Constants.NS_DS)
-
-        return OneLogin_Saml2_XML.to_string(xml)
+        OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
+        OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, True)
+        return OneLogin_Saml2_XML.to_string(root)

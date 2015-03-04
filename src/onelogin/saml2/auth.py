@@ -11,6 +11,7 @@ Initializes the SP SAML instance
 
 """
 
+from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.errors import OneLogin_Saml2_Error
@@ -239,7 +240,7 @@ class OneLogin_Saml2_Auth(object):
         :returns: Attribute value if exists or []
         :rtype: string
         """
-        assert isinstance(name, OneLogin_Saml2_Utils.str_type)
+        assert isinstance(name, compat.str_type)
         return self.__attributes.get(name)
 
     def login(self, return_to=None, force_authn=False, is_passive=False):
@@ -392,5 +393,5 @@ class OneLogin_Saml2_Auth(object):
         sign_data = [saml_data_str, relay_state_str, alg_str]
         msg = '&'.join(sign_data)
 
-        signature = dsig_ctx.sign_binary(OneLogin_Saml2_Utils.bytes(msg), xmlsec.Transform.RSA_SHA1)
+        signature = dsig_ctx.sign_binary(compat.to_bytes(msg), xmlsec.Transform.RSA_SHA1)
         return OneLogin_Saml2_Utils.b64encode(signature)

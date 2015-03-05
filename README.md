@@ -969,6 +969,8 @@ You'll have the demo running at http://localhost:8000.
 
 Note that many of the configuration files expect HTTPS. This is not required by the demo, as replacing these SP URLs with HTTP will work just fine. HTTPS is however highly encouraged, and left as an exercise for the reader for their specific needs.
 
+If you want to integrate a production django application, take a look on this SAMLServiceProviderBackend that uses our toolkit to add SAML support: https://github.com/KristianOellegaard/django-saml-service-provider
+
 ####Content####
 
 The django project contains:

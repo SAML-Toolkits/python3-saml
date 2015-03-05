@@ -30,7 +30,7 @@ class OneLogin_Saml2_Metadata(object):
     TIME_CACHED = 604800  # 1 week
 
     @staticmethod
-    def builder(sp, authnsign=False, wsign=False, valid_until=None, cache_duration=None, contacts=None, organization=None):
+    def builder(sp, authnsign=False, wsign=False, valid_until=None, cache_duration=None, contacts=None, organization=None, request_data=None):
         """
         Builds the metadata of the SP
 
@@ -54,6 +54,9 @@ class OneLogin_Saml2_Metadata(object):
 
         :param organization: Organization ingo
         :type organization: dict
+
+        :param request_data: the request data
+        :type request_data: dict
         """
         if valid_until is None:
             valid_until = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_VALID
@@ -81,7 +84,7 @@ class OneLogin_Saml2_Metadata(object):
                                 Location="%(location)s" />\n""" % \
                 {
                     'binding': sp['singleLogoutService']['binding'],
-                    'location': sp['singleLogoutService']['url'],
+                    'location': OneLogin_Saml2_Utils.abs_url(sp['singleLogoutService']['url'], request_data)
                 }
 
         str_authnsign = 'true' if authnsign else 'false'
@@ -96,7 +99,7 @@ class OneLogin_Saml2_Metadata(object):
                         'lang': lang,
                         'name': info['name'],
                         'display_name': info['displayname'],
-                        'url': info['url'],
+                        'url': OneLogin_Saml2_Utils.abs_url(info['url'], request_data)
                     }
                 organization_info.append(org)
             str_organization = '\n'.join(organization_info)
@@ -118,12 +121,12 @@ class OneLogin_Saml2_Metadata(object):
             {
                 'valid': valid_until_time,
                 'cache': cache_duration_str,
-                'entity_id': sp['entityId'],
+                'entity_id': OneLogin_Saml2_Utils.abs_url(sp['entityId'], request_data),
                 'authnsign': str_authnsign,
                 'wsign': str_wsign,
                 'name_id_format': sp['NameIDFormat'],
                 'binding': sp['assertionConsumerService']['binding'],
-                'location': sp['assertionConsumerService']['url'],
+                'location': OneLogin_Saml2_Utils.abs_url(sp['assertionConsumerService']['url'], request_data),
                 'sls': sls,
                 'organization': str_organization,
                 'contacts': str_contacts,

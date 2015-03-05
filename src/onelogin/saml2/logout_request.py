@@ -24,7 +24,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     """
 
-    def __init__(self, settings, request=None, name_id=None, session_index=None):
+    def __init__(self, settings, request=None, name_id=None, session_index=None, request_data=None):
         """
         Constructs the Logout Request object.
 
@@ -39,6 +39,8 @@ class OneLogin_Saml2_Logout_Request(object):
 
         :param session_index: SessionIndex that identifies the session of the user.
         :type session_index: string
+        :param request_data: the request data
+        :type request_data: dict
         """
         self.__settings = settings
         self.__error = None
@@ -58,12 +60,12 @@ class OneLogin_Saml2_Logout_Request(object):
             if name_id is not None:
                 name_id_format = sp_data['NameIDFormat']
             else:
-                name_id = idp_data['entityId']
+                name_id = OneLogin_Saml2_Utils.abs_url(idp_data['entityId'], request_data)
                 name_id_format = OneLogin_Saml2_Constants.NAMEID_ENTITY
 
             name_id_obj = OneLogin_Saml2_Utils.generate_name_id(
                 name_id,
-                sp_data['entityId'],
+                OneLogin_Saml2_Utils.abs_url(sp_data['entityId'], request_data),
                 name_id_format,
                 cert
             )
@@ -77,8 +79,8 @@ class OneLogin_Saml2_Logout_Request(object):
                 {
                     'id': uid,
                     'issue_instant': issue_instant,
-                    'single_logout_url': idp_data['singleLogoutService']['url'],
-                    'entity_id': sp_data['entityId'],
+                    'single_logout_url': OneLogin_Saml2_Utils.abs_url(idp_data['singleLogoutService']['url'], request_data),
+                    'entity_id': OneLogin_Saml2_Utils.abs_url(sp_data['entityId'], request_data),
                     'name_id': name_id_obj,
                     'session_index': session_index_str,
                 }
@@ -210,7 +212,7 @@ class OneLogin_Saml2_Logout_Request(object):
             root = OneLogin_Saml2_XML.to_etree(self.__logout_request)
 
             idp_data = self.__settings.get_idp_data()
-            idp_entity_id = idp_data['entityId']
+            idp_entity_id = OneLogin_Saml2_Utils.abs_url(idp_data['entityId'], request_data)
 
             get_data = ('get_data' in request_data and request_data['get_data']) or dict()
 
@@ -247,10 +249,6 @@ class OneLogin_Saml2_Logout_Request(object):
                 issuer = OneLogin_Saml2_Logout_Request.get_issuer(root)
                 if issuer is not None and issuer != idp_entity_id:
                     raise Exception('Invalid issuer in the Logout Request')
-
-                if security['wantMessagesSigned']:
-                    if 'Signature' not in get_data:
-                        raise Exception('The Message of the Logout Request is not signed and the SP require it')
             return True
         except Exception as err:
             # pylint: disable=R0801

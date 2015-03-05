@@ -34,10 +34,13 @@ url_regex = re.compile(
     r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
     r'(?::\d+)?'  # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+uri_regex = re.compile(r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
 url_schemes = ['http', 'https', 'ftp', 'ftps']
 
 
-def validate_url(url):
+def validate_uri(url):
     """
     Auxiliary method to validate an urllib
     :param url: An url to be validated
@@ -45,6 +48,9 @@ def validate_url(url):
     :returns: True if the url is valid
     :rtype: bool
     """
+
+    if url.startswith("/"):
+        return bool(uri_regex.match(url))
 
     scheme = url.split('://')[0].lower()
     if scheme not in url_schemes:
@@ -332,13 +338,13 @@ class OneLogin_Saml2_Settings(object):
                 'url' not in idp['singleSignOnService'] or \
                     len(idp['singleSignOnService']['url']) == 0:
                 errors.append('idp_sso_not_found')
-            elif not validate_url(idp['singleSignOnService']['url']):
+            elif not validate_uri(idp['singleSignOnService']['url']):
                 errors.append('idp_sso_url_invalid')
 
             if 'singleLogoutService' in idp and \
                 'url' in idp['singleLogoutService'] and \
                 len(idp['singleLogoutService']['url']) > 0 and \
-                    not validate_url(idp['singleLogoutService']['url']):
+                    not validate_uri(idp['singleLogoutService']['url']):
                 errors.append('idp_slo_url_invalid')
 
         if 'sp' not in settings or len(settings['sp']) == 0:
@@ -360,13 +366,13 @@ class OneLogin_Saml2_Settings(object):
                 'url' not in sp['assertionConsumerService'] or \
                     len(sp['assertionConsumerService']['url']) == 0:
                 errors.append('sp_acs_not_found')
-            elif not validate_url(sp['assertionConsumerService']['url']):
+            elif not validate_uri(sp['assertionConsumerService']['url']):
                 errors.append('sp_acs_url_invalid')
 
             if 'singleLogoutService' in sp and \
                 'url' in sp['singleLogoutService'] and \
                 len(sp['singleLogoutService']['url']) > 0 and \
-                    not validate_url(sp['singleLogoutService']['url']):
+                    not validate_uri(sp['singleLogoutService']['url']):
                 errors.append('sp_sls_url_invalid')
 
             if 'signMetadata' in security and isinstance(security['signMetadata'], dict):
@@ -527,7 +533,7 @@ class OneLogin_Saml2_Settings(object):
         """
         return self.__organization
 
-    def get_sp_metadata(self):
+    def get_sp_metadata(self, request_data=None):
         """
         Gets the SP metadata. The XML representation.
 
@@ -537,7 +543,8 @@ class OneLogin_Saml2_Settings(object):
         metadata = OneLogin_Saml2_Metadata.builder(
             self.__sp, self.__security['authnRequestsSigned'],
             self.__security['wantAssertionsSigned'], None, None,
-            self.get_contacts(), self.get_organization()
+            self.get_contacts(), self.get_organization(),
+            request_data=request_data
         )
         cert = self.get_sp_cert()
         metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert)

@@ -591,7 +591,7 @@ else:
     if not keep_local_session:
         OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
-    in_response_to = OneLogin_Saml2_Logout_Request.get_id(request)
+    in_response_to = request.id
     response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
     response_builder.build(in_response_to)
     logout_response = response_builder.get_response()
@@ -748,7 +748,7 @@ SAML 2 Logout Request class
 
 * `__init__` Constructs the Logout Request object.
 * ***get_request*** Returns the Logout Request defated, base64encoded.
-* ***get_id*** Returns the ID of the Logout Request.
+* ***get_id*** Returns the ID of the Logout Request. (If you have the object you can access to the id attribute)
 * ***get_nameid_data*** Gets the NameID Data of the the Logout Request (returns a dict).
 * ***get_nameid*** Gets the NameID of the Logout Request Message (returns a string).
 * ***get_issuer*** Gets the Issuer of the Logout Request Message.
@@ -875,7 +875,7 @@ toolkit on it in development mode executing this:
 Using this method of deployment the toolkit files will be linked instead of
 copied, so if you make changes on them you won't need to reinstall the toolkit.
 
-If you want install it in a nomal mode, execute:
+If you want install it in a normal mode, execute:
 ```
  python setup.py install
 ```

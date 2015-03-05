@@ -47,6 +47,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         self.__settings = settings
         self.__error = None
+        self.id = None
 
         if request is None:
             sp_data = self.__settings.get_sp_data()
@@ -54,6 +55,8 @@ class OneLogin_Saml2_Logout_Request(object):
             security = self.__settings.get_security_data()
 
             uid = OneLogin_Saml2_Utils.generate_unique_id()
+            self.id = uid
+
             issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
             cert = None
@@ -105,6 +108,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 logout_request = inflated
             except Exception:
                 logout_request = decoded
+            self.id = self.get_id(logout_request)
 
         self.__logout_request = logout_request
 

@@ -22,7 +22,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings, force_authn=False, is_passive=False, request_data=None):
+    def __init__(self, settings, force_authn=False, is_passive=False):
         """
         Constructs the AuthnRequest object.
 
@@ -34,8 +34,6 @@ class OneLogin_Saml2_Authn_Request(object):
 
         :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
         :type is_passive: bool
-        :param request_data: Optional, the request data
-        :type request_data: dict
         """
         self.__settings = settings
 
@@ -47,7 +45,7 @@ class OneLogin_Saml2_Authn_Request(object):
         self.__id = uid
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
-        destination = OneLogin_Saml2_Utils.abs_url(idp_data['singleSignOnService']['url'], request_data)
+        destination = idp_data['singleSignOnService']['url']
 
         name_id_policy_format = sp_data['NameIDFormat']
         if security['wantNameIdEncrypted']:
@@ -94,8 +92,8 @@ class OneLogin_Saml2_Authn_Request(object):
                 'is_passive_str': is_passive_str,
                 'issue_instant': issue_instant,
                 'destination': destination,
-                'assertion_url': OneLogin_Saml2_Utils.abs_url(sp_data['assertionConsumerService']['url'], request_data),
-                'entity_id': OneLogin_Saml2_Utils.abs_url(sp_data['entityId'], request_data),
+                'assertion_url': sp_data['assertionConsumerService']['url'],
+                'entity_id': sp_data['entityId'],
                 'name_id_policy': name_id_policy_format,
                 'requested_authn_context_str': requested_authn_context_str,
             }

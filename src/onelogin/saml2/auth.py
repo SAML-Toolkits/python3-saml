@@ -135,7 +135,7 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
         elif get_data and 'SAMLRequest' in get_data:
-            logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'], request_data=self.__request_data)
+            logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
             if not self.validate_request_signature(get_data):
                 self.__errors.append("invalid_logout_request_signature")
             elif not logout_request.is_valid(self.__request_data):
@@ -147,7 +147,7 @@ class OneLogin_Saml2_Auth(object):
 
                 in_response_to = OneLogin_Saml2_Logout_Request.get_id(OneLogin_Saml2_Utils.decode_base64_and_inflate(self.__request_data['get_data']['SAMLRequest']))
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
-                response_builder.build(in_response_to, self.__request_data)
+                response_builder.build(in_response_to)
                 logout_response = response_builder.get_response()
 
                 parameters = {'SAMLResponse': logout_response}
@@ -262,7 +262,7 @@ class OneLogin_Saml2_Auth(object):
 
         :returns: Redirection url
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, request_data=self.__request_data)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive)
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}
@@ -302,7 +302,7 @@ class OneLogin_Saml2_Auth(object):
         if name_id is None and self.__nameid is not None:
             name_id = self.__nameid
 
-        logout_request = OneLogin_Saml2_Logout_Request(self.__settings, name_id=name_id, session_index=session_index, request_data=self.__request_data)
+        logout_request = OneLogin_Saml2_Logout_Request(self.__settings, name_id=name_id, session_index=session_index)
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         if return_to is not None:
@@ -443,7 +443,7 @@ class OneLogin_Saml2_Auth(object):
         signature = data.get('Signature', None)
         if signature is None:
             if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
-                self.__errors.append('The %s is not signed. Rejected.' % saml_type)
+                self._error_reason = 'The %s is not signed. Rejected.' % saml_type
                 return False
             return True
 
@@ -473,5 +473,5 @@ class OneLogin_Saml2_Auth(object):
                 raise Exception('Signature validation failed. %s rejected.' % saml_type)
             return True
         except Exception as e:
-            self.__errors.append(str(e))
+            self._error_reason = str(e)
             return False

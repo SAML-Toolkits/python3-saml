@@ -78,9 +78,9 @@ class OneLogin_Saml2_Response(object):
             self.check_status()
 
             idp_data = self.__settings.get_idp_data()
-            idp_entity_id = OneLogin_Saml2_Utils.abs_url(idp_data['entityId'], request_data)
+            idp_entity_id = idp_data['entityId']
             sp_data = self.__settings.get_sp_data()
-            sp_entity_id = OneLogin_Saml2_Utils.abs_url(sp_data['entityId'], request_data)
+            sp_entity_id = sp_data['entityId']
 
             sign_nodes = self.__query('//ds:Signature')
 

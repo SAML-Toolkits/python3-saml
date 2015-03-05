@@ -104,8 +104,6 @@ class OneLogin_Saml2_Utils(object):
         :returns: Formated cert
         :rtype: string
         """
-
-        cert = compat.to_string(cert)
         x509_cert = cert.replace('\x0D', '')
         x509_cert = x509_cert.replace('\r', '')
         x509_cert = x509_cert.replace('\n', '')
@@ -133,8 +131,6 @@ class OneLogin_Saml2_Utils(object):
         :returns: Formated private key
         :rtype: string
         """
-
-        key = compat.to_string(key)
         private_key = key.replace('\x0D', '')
         private_key = private_key.replace('\r', '')
         private_key = private_key.replace('\n', '')
@@ -207,21 +203,6 @@ class OneLogin_Saml2_Utils(object):
                 param_prefix = '&'
 
         return url
-
-    @staticmethod
-    def abs_url(uri, request_data=None):
-        """
-        get absolute url by local uri
-        :param uri: the uri
-        :param request_data: the request data
-        :return: the absolute url for resource
-        """
-        if uri.startswith('/'):
-            if request_data is None:
-                request_data = dict()
-            uri = '%s%s' % (OneLogin_Saml2_Utils.get_self_url_host(request_data), uri)
-
-        return uri
 
     @staticmethod
     def get_self_url_host(request_data):

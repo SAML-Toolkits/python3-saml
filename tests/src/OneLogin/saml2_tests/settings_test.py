@@ -75,11 +75,6 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn('Invalid dict settings: idp_sso_url_invalid', str(e))
 
-        settings_info['idp']['singleSignOnService']['url'] = '/valid/uri'
-        self.assertEqual([], OneLogin_Saml2_Settings(settings_info).get_errors())
-        settings_info['sp']['singleLogoutService']['url'] = '/valid/uri'
-        self.assertEqual([], OneLogin_Saml2_Settings(settings_info).get_errors())
-
         del settings_info['sp']
         del settings_info['idp']
         try:

@@ -75,7 +75,7 @@ class OneLogin_Saml2_Logout_Response(object):
         self.__error = None
         try:
             idp_data = self.__settings.get_idp_data()
-            idp_entity_id = OneLogin_Saml2_Utils.abs_url(idp_data['entityId'], request_data)
+            idp_entity_id = idp_data['entityId']
             get_data = request_data['get_data']
 
             if self.__settings.is_strict():
@@ -124,13 +124,11 @@ class OneLogin_Saml2_Logout_Response(object):
         """
         return OneLogin_Saml2_XML.query(self.document, query)
 
-    def build(self, in_response_to, request_data=None):
+    def build(self, in_response_to):
         """
         Creates a Logout Response object.
         :param in_response_to: InResponseTo value for the Logout Response.
         :type in_response_to: string
-        :param request_data: the request data
-        :type request_data: dict
         """
         sp_data = self.__settings.get_sp_data()
         idp_data = self.__settings.get_idp_data()
@@ -142,9 +140,9 @@ class OneLogin_Saml2_Logout_Response(object):
             {
                 'id': uid,
                 'issue_instant': issue_instant,
-                'destination': OneLogin_Saml2_Utils.abs_url(idp_data['singleLogoutService']['url'], request_data),
+                'destination': idp_data['singleLogoutService']['url'],
                 'in_response_to': in_response_to,
-                'entity_id': OneLogin_Saml2_Utils.abs_url(sp_data['entityId'], request_data),
+                'entity_id': sp_data['entityId'],
                 'status': "urn:oasis:names:tc:SAML:2.0:status:Success"
             }
 

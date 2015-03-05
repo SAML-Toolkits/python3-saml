@@ -35,6 +35,7 @@ setup(
         'isodate>=0.5.0',
         'xmlsec>=0.2.1'
     ],
+    dependency_links=['http://github.com/bgaifullin/python-xmlsec/tarball/master'],
     extras_require={
         'test': (
             'coverage==3.7.1',

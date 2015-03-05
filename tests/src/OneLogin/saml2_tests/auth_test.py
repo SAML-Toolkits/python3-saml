@@ -911,7 +911,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_data['get_data']['SAMLResponse'] = OneLogin_Saml2_Utils.deflate_and_base64_encode(plain_message_6)
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
         auth.process_slo()
-        self.assertIn('invalid_logout_response_signature', auth.get_errors())
+        self.assertIn('Signature validation failed. Logout Response rejected', auth.get_errors())
 
         request_data['get_data']['Signature'] = old_signature
         settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'
@@ -1000,7 +1000,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         del request_data['get_data']['Signature']
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
         auth.process_slo()
-        self.assertIn('invalid_logout_request_signature', auth.get_errors())
+        self.assertIn('Signature validation failed. Logout Request rejected', auth.get_errors())
 
         request_data['get_data']['Signature'] = old_signature
         settings_info['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9'

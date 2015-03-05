@@ -126,6 +126,7 @@ class OneLogin_Saml2_Auth(object):
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, get_data['SAMLResponse'])
             if not self.validate_response_signature(get_data):
                 self.__errors.append('invalid_logout_response_signature')
+                self.__errors.append('Signature validation failed. Logout Response rejected')
             elif not logout_response.is_valid(self.__request_data, request_id):
                 self.__errors.append('invalid_logout_response')
                 self.__error_reason = logout_response.get_error()
@@ -138,6 +139,7 @@ class OneLogin_Saml2_Auth(object):
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
             if not self.validate_request_signature(get_data):
                 self.__errors.append("invalid_logout_request_signature")
+                self.__errors.append('Signature validation failed. Logout Request rejected')
             elif not logout_request.is_valid(self.__request_data):
                 self.__errors.append('invalid_logout_request')
                 self.__error_reason = logout_request.get_error()

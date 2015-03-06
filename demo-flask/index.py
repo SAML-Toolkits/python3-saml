@@ -123,5 +123,4 @@ def metadata():
 
 
 if __name__ == "__main__":
-    ssl_context = ('/home/pitbulk/proyectos/python-saml/demo-flask/saml/certs/sp.crt', '/home/pitbulk/proyectos/python-saml/demo-flask/saml/certs/sp.key')
-    app.run(host='0.0.0.0', port=444, debug=True, ssl_context=ssl_context)
+    app.run(host='0.0.0.0', port=8000, debug=True)

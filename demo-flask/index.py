@@ -20,8 +20,10 @@ def init_saml_auth(req):
 
 
 def prepare_flask_request(request):
+    # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
     url_data = urlparse(request.url)
     return {
+        'https': 'on' if request.scheme == 'https' else 'off',
         'http_host': request.host,
         'server_port': url_data.port,
         'script_name': request.path,
@@ -121,4 +123,5 @@ def metadata():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    ssl_context = ('/home/pitbulk/proyectos/python-saml/demo-flask/saml/certs/sp.crt', '/home/pitbulk/proyectos/python-saml/demo-flask/saml/certs/sp.key')
+    app.run(host='0.0.0.0', port=444, debug=True, ssl_context=ssl_context)

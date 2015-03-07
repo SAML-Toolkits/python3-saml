@@ -549,20 +549,18 @@ class OneLogin_Saml2_Utils(object):
 
             # Prepare for encryption
             enc_data = xmlsec.template.encrypted_data_create(
-                root, xmlsec.Transform.AES128, type=xmlsec.EncryptionType.ELEMENT)
+                root, xmlsec.Transform.AES128, type=xmlsec.EncryptionType.ELEMENT, ns="xenc")
 
             xmlsec.template.encrypted_data_ensure_cipher_value(enc_data)
-            key_info = xmlsec.template.encrypted_data_ensure_key_info(enc_data)
+            key_info = xmlsec.template.encrypted_data_ensure_key_info(enc_data, ns="dsig")
             enc_key = xmlsec.template.add_encrypted_key(key_info, xmlsec.Transform.RSA_OAEP)
             xmlsec.template.encrypted_data_ensure_cipher_value(enc_key)
 
             # Encrypt!
             enc_ctx = xmlsec.EncryptionContext(manager)
             enc_ctx.key = xmlsec.Key.generate(xmlsec.KeyData.AES, 128, xmlsec.KeyDataType.SESSION)
-            enc_ctx.encrypt_xml(enc_data, name_id)
-            new_root = OneLogin_Saml2_XML.make_root(root.tag, nsmap={"dsig": OneLogin_Saml2_Constants.NS_DS, "xenc": OneLogin_Saml2_Constants.NS_XENC})
-            new_root[:] = root[:]
-            return '<saml:EncryptedID>' + compat.to_string(OneLogin_Saml2_XML.to_string(new_root[0])) + '</saml:EncryptedID>'
+            enc_data = enc_ctx.encrypt_xml(enc_data, name_id)
+            return '<saml:EncryptedID>' + compat.to_string(OneLogin_Saml2_XML.to_string(enc_data)) + '</saml:EncryptedID>'
         else:
             return OneLogin_Saml2_XML.extract_tag_text(root, "saml:NameID")
 

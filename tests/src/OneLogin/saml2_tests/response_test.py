@@ -967,11 +967,28 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_2 = OneLogin_Saml2_Response(settings_2, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
-        settings_info_2['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(settings_info_2['idp']['x509cert'])
-        settings_info_2['idp']['x509cert'] = ''
-        settings_3 = OneLogin_Saml2_Settings(settings_info_2)
+        settings_info_3 = self.loadSettingsJSON('settings2.json')
+        idp_cert = settings_info_3['idp']['x509cert'];
+        settings_info_3['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(idp_cert)
+        settings_info_3['idp']['x509cert'] = ''
+        settings_3 = OneLogin_Saml2_Settings(settings_info_3)
         response_3 = OneLogin_Saml2_Response(settings_3, xml_2)
         self.assertTrue(response_3.is_valid(self.get_request_data()))
+
+        settings_info_3['idp']['certFingerprintAlgorithm'] = 'sha1'
+        settings_4 = OneLogin_Saml2_Settings(settings_info_3)
+        response_4 = OneLogin_Saml2_Response(settings_4, xml_2)
+        self.assertTrue(response_4.is_valid(self.get_request_data()))
+
+        settings_info_3['idp']['certFingerprintAlgorithm'] = 'sha256'
+        settings_5 = OneLogin_Saml2_Settings(settings_info_3)
+        response_5 = OneLogin_Saml2_Response(settings_5, xml_2)
+        self.assertFalse(response_5.is_valid(self.get_request_data()))
+
+        settings_info_3['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(idp_cert, 'sha256')
+        settings_6 = OneLogin_Saml2_Settings(settings_info_3)
+        response_6 = OneLogin_Saml2_Response(settings_6, xml_2)
+        self.assertTrue(response_6.is_valid(self.get_request_data()))
 
     def testIsValidEnc(self):
         """

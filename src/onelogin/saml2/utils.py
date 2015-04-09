@@ -12,7 +12,7 @@ Auxiliary class of OneLogin's Python Toolkit.
 import base64
 from datetime import datetime
 import calendar
-from hashlib import sha1
+from hashlib import sha1, sha256, sha384, sha512
 from isodate import parse_duration as duration_parser
 from lxml import etree
 from defusedxml.lxml import tostring, fromstring
@@ -522,14 +522,17 @@ class OneLogin_Saml2_Utils(object):
             callback()
 
     @staticmethod
-    def calculate_x509_fingerprint(x509_cert):
+    def calculate_x509_fingerprint(x509_cert, alg='sha1'):
         """
         Calculates the fingerprint of a x509cert.
 
         :param x509_cert: x509 cert
         :type: string
 
-        :returns: Formated fingerprint
+        :param alg: The algorithm to build the fingerprint
+        :type: string
+
+        :returns: fingerprint
         :rtype: string
         """
         assert isinstance(x509_cert, basestring)
@@ -552,9 +555,19 @@ class OneLogin_Saml2_Utils(object):
             else:
                 # Append the current line to the certificate data.
                 data += line
-        # "data" now contains the certificate as a base64-encoded string. The
-        # fingerprint of the certificate is the sha1-hash of the certificate.
-        return sha1(base64.b64decode(data)).hexdigest().lower()
+
+        decoded_data = base64.b64decode(data)
+
+        if alg == 'sha512':
+            fingerprint = sha512(decoded_data)
+        elif alg == 'sha384':
+            fingerprint = sha384(decoded_data)
+        elif alg == 'sha256':
+            fingerprint = sha256(decoded_data)
+        else:
+            fingerprint = sha1(decoded_data)
+
+        return fingerprint.hexdigest().lower()
 
     @staticmethod
     def format_finger_print(fingerprint):
@@ -837,7 +850,7 @@ class OneLogin_Saml2_Utils(object):
         return newdoc.saveXML(newdoc.firstChild)
 
     @staticmethod
-    def validate_sign(xml, cert=None, fingerprint=None, validatecert=False, debug=False):
+    def validate_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False):
         """
         Validates a signature (Message or Assertion).
 
@@ -848,6 +861,9 @@ class OneLogin_Saml2_Utils(object):
         :type: string
 
         :param fingerprint: The fingerprint of the public cert
+        :type: string
+
+        :param fingerprintalg: The algorithm used to build the fingerprint
         :type: string
 
         :param validatecert: If true, will verify the signature and if the cert is valid.
@@ -899,7 +915,7 @@ class OneLogin_Saml2_Utils(object):
                     if len(x509_certificate_nodes) > 0:
                         x509_certificate_node = x509_certificate_nodes[0]
                         x509_cert_value = x509_certificate_node.text
-                        x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value)
+                        x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value, fingerprintalg)
                         if fingerprint == x509_fingerprint_value:
                             cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
 

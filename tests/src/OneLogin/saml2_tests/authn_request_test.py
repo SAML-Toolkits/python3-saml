@@ -12,6 +12,8 @@ from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -211,3 +213,15 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertRegexpMatches(inflated, '<saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>')
         self.assertRegexpMatches(inflated, 'Format="urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"')
         self.assertRegexpMatches(inflated, 'ProviderName="SP prueba"')
+
+    def testGetID(self):
+        """
+        Tests the get_id method of the OneLogin_Saml2_Authn_Request.
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+        document = OneLogin_Saml2_XML.to_etree(inflated)
+        self.assertEqual(authn_request.get_id(), document.get('ID', None))

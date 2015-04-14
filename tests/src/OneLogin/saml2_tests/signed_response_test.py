@@ -3,7 +3,6 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
-from base64 import b64encode
 import json
 from os.path import dirname, join, exists
 import unittest
@@ -11,11 +10,6 @@ import unittest
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
 
 
 class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):

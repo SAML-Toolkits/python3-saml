@@ -445,7 +445,7 @@ class OneLogin_Saml2_Auth(object):
         signature = data.get('Signature', None)
         if signature is None:
             if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
-                self._error_reason = 'The %s is not signed. Rejected.' % saml_type
+                self.__error_reason = 'The %s is not signed. Rejected.' % saml_type
                 return False
             return True
 
@@ -475,5 +475,5 @@ class OneLogin_Saml2_Auth(object):
                 raise Exception('Signature validation failed. %s rejected.' % saml_type)
             return True
         except Exception as e:
-            self._error_reason = str(e)
+            self.__error_reason = str(e)
             return False

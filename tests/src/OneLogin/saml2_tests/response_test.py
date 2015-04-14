@@ -14,11 +14,6 @@ from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
-
 
 class OneLogin_Saml2_Response_Test(unittest.TestCase):
     data_path = join(dirname(__file__), '..', '..', '..', 'data')
@@ -974,7 +969,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
         settings_info_3 = self.loadSettingsJSON('settings2.json')
-        idp_cert = settings_info_3['idp']['x509cert'];
+        idp_cert = settings_info_3['idp']['x509cert']
         settings_info_3['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(idp_cert)
         settings_info_3['idp']['x509cert'] = ''
         settings_3 = OneLogin_Saml2_Settings(settings_info_3)

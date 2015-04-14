@@ -429,7 +429,7 @@ class OneLogin_Saml2_Settings(object):
                     break
         # Restores the value that had the self.__sp
         if 'old_sp' in locals():
-            self.__sp = locals()['old_sp']
+            self.__sp = old_sp
 
         return errors
 

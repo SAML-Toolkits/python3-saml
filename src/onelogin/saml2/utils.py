@@ -52,14 +52,14 @@ class OneLogin_Saml2_Utils(object):
         return quote_plus(url)
 
     @staticmethod
-    def b64encode(s):
+    def b64encode(data):
         """base64 encode"""
-        return compat.to_string(base64.b64encode(compat.to_bytes(s)))
+        return compat.to_string(base64.b64encode(compat.to_bytes(data)))
 
     @staticmethod
-    def b64decode(s):
+    def b64decode(data):
         """base64 decode"""
-        return base64.b64decode(s)
+        return base64.b64decode(data)
 
     @staticmethod
     def decode_base64_and_inflate(value, ignore_zip=False):

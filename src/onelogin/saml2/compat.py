@@ -14,40 +14,40 @@ if isinstance(b'', type('')):  # py 2.x
     text_types = (basestring,)  # noqa
     str_type = basestring  # noqa
 
-    def utf8(s):
+    def utf8(data):
         """  return utf8-encoded string """
-        if isinstance(s, basestring):
-            return s.decode("utf8")
-        return unicode(s)
+        if isinstance(data, basestring):
+            return data.decode("utf8")
+        return unicode(data)
 
-    def to_string(s):
+    def to_string(data):
         """ return string """
-        if isinstance(s, unicode):
-            return s.encode("utf8")
-        return str(s)
+        if isinstance(data, unicode):
+            return data.encode("utf8")
+        return str(data)
 
-    def to_bytes(s):
+    def to_bytes(data):
         """ return bytes """
-        return str(s)
+        return str(data)
 
 else:  # py 3.x
     text_types = (bytes, str)
     str_type = str
 
-    def utf8(s):
+    def utf8(data):
         """ return utf8-encoded string """
-        if isinstance(s, bytes):
-            return s.decode("utf8")
-        return str(s)
+        if isinstance(data, bytes):
+            return data.decode("utf8")
+        return str(data)
 
-    def to_string(s):
+    def to_string(data):
         """convert to string"""
-        if isinstance(s, bytes):
-            return s.decode("utf8")
-        return str(s)
+        if isinstance(data, bytes):
+            return data.decode("utf8")
+        return str(data)
 
-    def to_bytes(s):
+    def to_bytes(data):
         """return bytes"""
-        if isinstance(s, str):
-            return s.encode("utf8")
-        return bytes(s)
+        if isinstance(data, str):
+            return data.encode("utf8")
+        return bytes(data)

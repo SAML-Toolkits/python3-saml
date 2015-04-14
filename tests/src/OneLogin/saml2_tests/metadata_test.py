@@ -11,11 +11,6 @@ from onelogin.saml2 import compat
 from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
-
 
 class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
     def loadSettingsJSON(self):

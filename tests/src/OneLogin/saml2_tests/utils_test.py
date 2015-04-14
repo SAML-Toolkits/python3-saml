@@ -491,6 +491,13 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         self.assertEqual(None, OneLogin_Saml2_Utils.calculate_x509_fingerprint(key))
         self.assertEqual('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert))
+        self.assertEqual('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert, 'sha1'))
+
+        self.assertEqual('c51cfa06c7a49767f6eab18238eae1c56708e29264da3d11f538a12cd2c357ba', OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert, 'sha256'))
+
+        self.assertEqual('bc5826e6f9429247254bae5e3c650e6968a36a62d23075eb168134978d88600559c10830c28711b2c29c7947c0c2eb1d', OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert, 'sha384'))
+
+        self.assertEqual('3db29251b97559c67988ea0754cb0573fc409b6f75d89282d57cfb75089539b0bbdb2dcd9ec6e032549ecbc466439d5992e18db2cf5494ca2fe1b2e16f348dff', OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert, 'sha512'))
 
     def testDeleteLocalSession(self):
         """
@@ -653,6 +660,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         idp_data2 = settings_2.get_idp_data()
         cert_2 = idp_data2['x509cert']
         fingerprint_2 = OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert_2)
+        fingerprint_2_256 = OneLogin_Saml2_Utils.calculate_x509_fingerprint(cert_2, 'sha256')
 
         try:
             self.assertFalse(OneLogin_Saml2_Utils.validate_sign('', cert))
@@ -687,6 +695,8 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_response_msg_signed_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'signed_message_response2.xml.base64')))
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed_2, cert_2))
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed_2, None, fingerprint_2))
+        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed_2, None, fingerprint_2, 'sha1'))
+        self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed_2, None, fingerprint_2_256, 'sha256'))
 
         xml_response_assert_signed = b64decode(self.file_contents(join(self.data_path, 'responses', 'signed_assertion_response.xml.base64')))
 

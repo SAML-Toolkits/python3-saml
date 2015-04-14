@@ -192,6 +192,7 @@ class OneLogin_Saml2_Response(object):
             if len(signed_elements) > 0:
                 cert = idp_data['x509cert']
                 fingerprint = idp_data['certFingerprint']
+                fingerprintalg = idp_data['certFingerprintAlgorithm']
 
                 # Only validates the first sign found
                 if '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements:
@@ -201,7 +202,7 @@ class OneLogin_Saml2_Response(object):
                         document_to_validate = self.decrypted_document
                     else:
                         document_to_validate = self.document
-                if not OneLogin_Saml2_Utils.validate_sign(document_to_validate, cert, fingerprint):
+                if not OneLogin_Saml2_Utils.validate_sign(document_to_validate, cert, fingerprint, fingerprintalg):
                     raise Exception('Signature validation failed. SAML Response rejected')
             else:
                 raise Exception('No Signature found. SAML Response rejected')

@@ -295,6 +295,8 @@ class OneLogin_Saml2_Settings(object):
             self.__idp['x509cert'] = ''
         if 'certFingerprint' not in self.__idp:
             self.__idp['certFingerprint'] = ''
+        if 'certFingerprintAlgorithm' not in self.__idp:
+            self.__idp['certFingerprintAlgorithm'] = 'sha1'
 
         if 'x509cert' not in self.__sp:
             self.__sp['x509cert'] = ''

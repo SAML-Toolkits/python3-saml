@@ -147,7 +147,7 @@ class OneLogin_Saml2_Auth(object):
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
-                in_response_to = OneLogin_Saml2_Logout_Request.get_id(OneLogin_Saml2_Utils.decode_base64_and_inflate(self.__request_data['get_data']['SAMLRequest']))
+                in_response_to = logout_request.id
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
                 response_builder.build(in_response_to)
                 logout_response = response_builder.get_response()

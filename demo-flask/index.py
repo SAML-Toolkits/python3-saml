@@ -20,8 +20,10 @@ def init_saml_auth(req):
 
 
 def prepare_flask_request(request):
+    # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
     url_data = urlparse(request.url)
     return {
+        'https': 'on' if request.scheme == 'https' else 'off',
         'http_host': request.host,
         'server_port': url_data.port,
         'script_name': request.path,

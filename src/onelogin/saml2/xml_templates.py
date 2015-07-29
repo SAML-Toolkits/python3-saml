@@ -76,8 +76,8 @@ class OneLogin_Saml2_Templates(object):
     MD_ENTITY_DESCRIPTOR = """\
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     validUntil="%(valid)s"
-                     cacheDuration="%(cache)s"
+                     %(valid)s
+                     %(cache)s
                      entityID="%(entity_id)s">
     <md:SPSSODescriptor AuthnRequestsSigned="%(authnsign)s" WantAssertionsSigned="%(wsign)s" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
 %(sls)s        <md:NameIDFormat>%(name_id_format)s</md:NameIDFormat>

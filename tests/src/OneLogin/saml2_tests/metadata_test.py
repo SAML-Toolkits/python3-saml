@@ -5,6 +5,8 @@
 
 import json
 from os.path import dirname, join, exists
+from time import strftime
+from datetime import datetime
 import unittest
 
 from onelogin.saml2 import compat
@@ -85,14 +87,57 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
             sp_data, security['authnRequestsSigned'],
             security['wantAssertionsSigned'],
             '2014-10-01T11:04:29Z',
-            'PT1412593469S',
+            'P1Y',
             contacts,
             organization
         )
         self.assertIsNotNone(metadata3)
         self.assertIn('<md:SPSSODescriptor', metadata3)
-        self.assertIn('cacheDuration="PT1412593469S"', metadata3)
+        self.assertIn('cacheDuration="P1Y"', metadata3)
         self.assertIn('validUntil="2014-10-01T11:04:29Z"', metadata3)
+
+        # Test no validUntil, only cacheDuration:
+        metadata4 = OneLogin_Saml2_Metadata.builder(
+            sp_data, security['authnRequestsSigned'],
+            security['wantAssertionsSigned'],
+            '',
+            86400 * 10,  # 10 days
+            contacts,
+            organization
+        )
+        self.assertIsNotNone(metadata4)
+        self.assertIn('<md:SPSSODescriptor', metadata4)
+        self.assertIn('cacheDuration="PT864000S"', metadata4)
+        self.assertNotIn('validUntil', metadata4)
+
+        # Test no cacheDuration, only validUntil:
+        metadata5 = OneLogin_Saml2_Metadata.builder(
+            sp_data, security['authnRequestsSigned'],
+            security['wantAssertionsSigned'],
+            '2014-10-01T11:04:29Z',
+            '',
+            contacts,
+            organization
+        )
+        self.assertIsNotNone(metadata5)
+        self.assertIn('<md:SPSSODescriptor', metadata5)
+        self.assertNotIn('cacheDuration', metadata5)
+        self.assertIn('validUntil="2014-10-01T11:04:29Z"', metadata5)
+
+        datetime_value = datetime.now()
+        metadata6 = OneLogin_Saml2_Metadata.builder(
+            sp_data, security['authnRequestsSigned'],
+            security['wantAssertionsSigned'],
+            datetime_value,
+            'P1Y',
+            contacts,
+            organization
+        )
+        self.assertIsNotNone(metadata5)
+        self.assertIn('<md:SPSSODescriptor', metadata6)
+        self.assertIn('cacheDuration="P1Y"', metadata6)
+        parsed_datetime = strftime(r'%Y-%m-%dT%H:%M:%SZ', datetime_value.timetuple())
+        self.assertIn('validUntil="%s"' % parsed_datetime, metadata6)
 
     def testSignMetadata(self):
         """

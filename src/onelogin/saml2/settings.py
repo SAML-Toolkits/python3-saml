@@ -279,6 +279,12 @@ class OneLogin_Saml2_Settings(object):
         if 'signMetadata' not in self.__security:
             self.__security['signMetadata'] = False
 
+        # Metadata format
+        if 'metadataValidUntil' not in self.__security.keys():
+            self.__security['metadataValidUntil'] = None  # None means use default
+        if 'metadataCacheDuration' not in self.__security.keys():
+            self.__security['metadataCacheDuration'] = None  # None means use default
+
         # Sign expected
         if 'wantMessagesSigned' not in self.__security:
             self.__security['wantMessagesSigned'] = False
@@ -538,7 +544,9 @@ class OneLogin_Saml2_Settings(object):
         """
         metadata = OneLogin_Saml2_Metadata.builder(
             self.__sp, self.__security['authnRequestsSigned'],
-            self.__security['wantAssertionsSigned'], None, None,
+            self.__security['wantAssertionsSigned'],
+            self.__security['metadataValidUntil'],
+            self.__security['metadataCacheDuration'],
             self.get_contacts(), self.get_organization()
         )
         cert = self.get_sp_cert()

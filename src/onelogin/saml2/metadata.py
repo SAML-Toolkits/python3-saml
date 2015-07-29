@@ -18,6 +18,11 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
 
 class OneLogin_Saml2_Metadata(object):
     """
@@ -43,11 +48,11 @@ class OneLogin_Saml2_Metadata(object):
         :param wsign: wantAssertionsSigned attribute
         :type wsign: string
 
-        :param valid_until: Metadata's valid time
-        :type valid_until: string|DateTime
+        :param valid_until: Metadata's expiry date
+        :type valid_until: string|DateTime|Timestamp
 
         :param cache_duration: Duration of the cache in seconds
-        :type cache_duration: string|Timestamp
+        :type cache_duration: int|string
 
         :param contacts: Contacts info
         :type contacts: dict
@@ -57,16 +62,19 @@ class OneLogin_Saml2_Metadata(object):
         """
         if valid_until is None:
             valid_until = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_VALID
-        if not isinstance(valid_until, compat.str_type):
-            valid_until_time = gmtime(valid_until)
-            valid_until_time = strftime(r'%Y-%m-%dT%H:%M:%SZ', valid_until_time)
+        if not isinstance(valid_until, basestring):
+            if isinstance(valid_until, datetime):
+                valid_until_time = valid_until.timetuple()
+            else:
+                valid_until_time = gmtime(valid_until)
+            valid_until_str = strftime(r'%Y-%m-%dT%H:%M:%SZ', valid_until_time)
         else:
-            valid_until_time = valid_until
+            valid_until_str = valid_until
 
         if cache_duration is None:
-            cache_duration = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_CACHED
+            cache_duration = OneLogin_Saml2_Metadata.TIME_CACHED
         if not isinstance(cache_duration, compat.str_type):
-            cache_duration_str = 'PT%sS' % cache_duration
+            cache_duration_str = 'PT%sS' % cache_duration  # Period of Time x Seconds
         else:
             cache_duration_str = cache_duration
 
@@ -116,8 +124,8 @@ class OneLogin_Saml2_Metadata(object):
 
         metadata = OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR % \
             {
-                'valid': valid_until_time,
-                'cache': cache_duration_str,
+                'valid': ('validUntil="%s"' % valid_until_str) if valid_until_str else '',
+                'cache': ('cacheDuration="%s"' % cache_duration_str) if cache_duration_str else '',
                 'entity_id': sp['entityId'],
                 'authnsign': str_authnsign,
                 'wsign': str_wsign,

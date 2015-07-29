@@ -445,6 +445,25 @@ class OneLogin_Saml2_Response(object):
         if encrypted_assertion_nodes:
             encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
+                keyinfo = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData/ds:KeyInfo')
+                if not keyinfo:
+                    raise Exception('No KeyInfo present, invalid Assertion')
+                keyinfo = keyinfo[0]
+                children = keyinfo.getchildren()
+                if not children:
+                    raise Exception('No child to KeyInfo, invalid Assertion')
+                for child in children:
+                    if 'RetrievalMethod' in child.tag:
+                        if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
+                            raise Exception('Unsupported Retrieval Method found')
+                        uri  = child.attrib['URI'] 
+                        if not uri.startswith('#'):
+                            break
+                        uri = uri.split('#')[1]
+                        encrypted_key = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], './xenc:EncryptedKey[@Id="'+uri +'"]')
+                        if encrypted_key:
+                            keyinfo.append(encrypted_key[0])
+
                 encrypted_data = encrypted_data_nodes[0]
                 OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
         return xml

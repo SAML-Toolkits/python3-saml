@@ -538,7 +538,6 @@ class OneLogin_Saml2_Settings(object):
     def get_sp_metadata(self):
         """
         Gets the SP metadata. The XML representation.
-
         :returns: SP metadata (xml)
         :rtype: string
         """
@@ -553,11 +552,23 @@ class OneLogin_Saml2_Settings(object):
         metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert)
 
         # Sign metadata
-        if self.__security['signMetadata'] is not False:
+        if 'signMetadata' in self.__security and self.__security['signMetadata'] is not False:
             if self.__security['signMetadata'] is True:
-                key_file_name = 'sp.key'
-                cert_file_name = 'sp.crt'
+                # Use the SP's normal key to sign the metadata:
+                if not cert:
+                    raise OneLogin_Saml2_Error(
+                        'Cannot sign metadata: missing SP public key certificate.',
+                        OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND
+                    )
+                cert_metadata = cert
+                key_metadata = self.get_sp_key()
+                if not key_metadata:
+                    raise OneLogin_Saml2_Error(
+                        'Cannot sign metadata: missing SP private key.',
+                        OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND
+                    )
             else:
+                # Use a custom key to sign the metadata:
                 if ('keyFileName' not in self.__security['signMetadata'] or
                         'certFileName' not in self.__security['signMetadata']):
                     raise OneLogin_Saml2_Error(
@@ -566,30 +577,28 @@ class OneLogin_Saml2_Settings(object):
                     )
                 key_file_name = self.__security['signMetadata']['keyFileName']
                 cert_file_name = self.__security['signMetadata']['certFileName']
-            key_metadata_file = self.__paths['cert'] + key_file_name
-            cert_metadata_file = self.__paths['cert'] + cert_file_name
+                key_metadata_file = self.__paths['cert'] + key_file_name
+                cert_metadata_file = self.__paths['cert'] + cert_file_name
 
-            if not exists(key_metadata_file):
-                raise OneLogin_Saml2_Error(
-                    'Private key file not found: %s',
-                    OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND,
-                    key_metadata_file
-                )
+                try:
+                    with open(key_metadata_file, 'r') as f_metadata_key:
+                        key_metadata = f_metadata_key.read()
+                except IOError:
+                    raise OneLogin_Saml2_Error(
+                        'Private key file not readable: %s',
+                        OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND,
+                        key_metadata_file
+                    )
 
-            if not exists(cert_metadata_file):
-                raise OneLogin_Saml2_Error(
-                    'Public cert file not found: %s',
-                    OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND,
-                    cert_metadata_file
-                )
-
-            f_metadata_key = open(key_metadata_file, 'r')
-            key_metadata = f_metadata_key.read()
-            f_metadata_key.close()
-
-            f_metadata_cert = open(cert_metadata_file, 'r')
-            cert_metadata = f_metadata_cert.read()
-            f_metadata_cert.close()
+                try:
+                    with open(cert_metadata_file, 'r') as f_metadata_cert:
+                        cert_metadata = f_metadata_cert.read()
+                except IOError:
+                    raise OneLogin_Saml2_Error(
+                        'Public cert file not readable: %s',
+                        OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND,
+                        cert_metadata_file
+                    )
 
             metadata = OneLogin_Saml2_Metadata.sign_metadata(metadata, key_metadata, cert_metadata)
 

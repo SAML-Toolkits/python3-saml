@@ -65,7 +65,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
 
         security['authnRequestsSigned'] = True
         security['wantAssertionsSigned'] = True
-        del sp_data['singleLogoutService']
+        del sp_data['singleLogoutService']['url']
 
         metadata2 = OneLogin_Saml2_Metadata.builder(
             sp_data, security['authnRequestsSigned'],

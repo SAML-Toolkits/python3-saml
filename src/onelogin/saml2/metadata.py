@@ -76,7 +76,7 @@ class OneLogin_Saml2_Metadata(object):
             organization = {}
 
         sls = ''
-        if 'singleLogoutService' in sp:
+        if 'singleLogoutService' in sp and 'url' in sp['singleLogoutService']:
             sls = """        <md:SingleLogoutService Binding="%(binding)s"
                                 Location="%(location)s" />\n""" % \
                 {

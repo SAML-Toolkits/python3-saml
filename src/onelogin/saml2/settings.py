@@ -265,7 +265,7 @@ class OneLogin_Saml2_Settings(object):
 
         # Related to nameID
         if 'NameIDFormat' not in self.__sp:
-            self.__sp['NameIDFormat'] = OneLogin_Saml2_Constants.NAMEID_PERSISTENT
+            self.__sp['NameIDFormat'] = OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED
         if 'nameIdEncrypted' not in self.__security:
             self.__security['nameIdEncrypted'] = False
 

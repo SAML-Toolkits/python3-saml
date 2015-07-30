@@ -61,7 +61,7 @@ class OneLogin_Saml2_Settings(object):
 
     """
 
-    def __init__(self, settings=None, custom_base_path=None):
+    def __init__(self, settings=None, custom_base_path=None, sp_validation_only=False):
         """
         Initializes the settings:
         - Sets the paths of the different folders
@@ -72,7 +72,11 @@ class OneLogin_Saml2_Settings(object):
 
         :param custom_base_path: Path where are stored the settings file and the cert folder
         :type custom_base_path: string
+
+        :param sp_validation_only: Avoid the IdP validation
+        :type sp_validation_only: boolean
         """
+        self.__sp_validation_only = sp_validation_only
         self.__paths = {}
         self.__strict = False
         self.__debug = False
@@ -327,112 +331,148 @@ class OneLogin_Saml2_Settings(object):
         errors = []
         if not isinstance(settings, dict) or len(settings) == 0:
             errors.append('invalid_syntax')
-            return errors
-
-        if 'idp' not in settings or len(settings['idp']) == 0:
-            errors.append('idp_not_found')
         else:
-            idp = settings['idp']
-            if 'entityId' not in idp or len(idp['entityId']) == 0:
-                errors.append('idp_entityId_not_found')
+            if not self.__sp_validation_only:
+                errors += self.check_idp_settings(settings)
+            sp_errors = self.check_sp_settings(settings)
+            errors += sp_errors
 
-            if 'singleSignOnService' not in idp or \
-                'url' not in idp['singleSignOnService'] or \
-                    len(idp['singleSignOnService']['url']) == 0:
-                errors.append('idp_sso_not_found')
-            elif not validate_url(idp['singleSignOnService']['url']):
-                errors.append('idp_sso_url_invalid')
+        return errors
 
-            if 'singleLogoutService' in idp and \
-                'url' in idp['singleLogoutService'] and \
-                len(idp['singleLogoutService']['url']) > 0 and \
-                    not validate_url(idp['singleLogoutService']['url']):
-                errors.append('idp_slo_url_invalid')
+    def check_idp_settings(self, settings):
+        """
+        Checks the IdP settings info.
+        :param settings: Dict with settings data
+        :type settings: dict
+        :returns: Errors found on the IdP settings data
+        :rtype: list
+        """
+        assert isinstance(settings, dict)
 
-        if 'sp' not in settings or len(settings['sp']) == 0:
-            errors.append('sp_not_found')
+        errors = []
+        if not isinstance(settings, dict) or len(settings) == 0:
+            errors.append('invalid_syntax')
         else:
-            # check_sp_certs uses self.__sp so I add it
-            old_sp = self.__sp
-            self.__sp = settings['sp']
+            if 'idp' not in settings or len(settings['idp']) == 0:
+                errors.append('idp_not_found')
+            else:
+                idp = settings['idp']
+                if 'entityId' not in idp or len(idp['entityId']) == 0:
+                    errors.append('idp_entityId_not_found')
 
-            sp = settings['sp']
-            security = {}
-            if 'security' in settings:
-                security = settings['security']
+                if 'singleSignOnService' not in idp or \
+                    'url' not in idp['singleSignOnService'] or \
+                        len(idp['singleSignOnService']['url']) == 0:
+                    errors.append('idp_sso_not_found')
+                elif not validate_url(idp['singleSignOnService']['url']):
+                    errors.append('idp_sso_url_invalid')
 
-            if 'entityId' not in sp or len(sp['entityId']) == 0:
-                errors.append('sp_entityId_not_found')
+                if 'singleLogoutService' in idp and \
+                    'url' in idp['singleLogoutService'] and \
+                    len(idp['singleLogoutService']['url']) > 0 and \
+                        not validate_url(idp['singleLogoutService']['url']):
+                    errors.append('idp_slo_url_invalid')
 
-            if 'assertionConsumerService' not in sp or \
-                'url' not in sp['assertionConsumerService'] or \
-                    len(sp['assertionConsumerService']['url']) == 0:
-                errors.append('sp_acs_not_found')
-            elif not validate_url(sp['assertionConsumerService']['url']):
-                errors.append('sp_acs_url_invalid')
+                if 'security' in settings:
+                    security = settings['security']
 
-            if 'singleLogoutService' in sp and \
-                'url' in sp['singleLogoutService'] and \
-                len(sp['singleLogoutService']['url']) > 0 and \
-                    not validate_url(sp['singleLogoutService']['url']):
-                errors.append('sp_sls_url_invalid')
+                    exists_x509 = ('x509cert' in idp and
+                                   len(idp['x509cert']) > 0)
+                    exists_fingerprint = ('certFingerprint' in idp and
+                                          len(idp['certFingerprint']) > 0)
 
-            if 'signMetadata' in security and isinstance(security['signMetadata'], dict):
-                if 'keyFileName' not in security['signMetadata'] or \
-                        'certFileName' not in security['signMetadata']:
-                    errors.append('sp_signMetadata_invalid')
+                    want_assert_sign = 'wantAssertionsSigned' in security.keys() and security['wantAssertionsSigned']
+                    want_mes_signed = 'wantMessagesSigned' in security.keys() and security['wantMessagesSigned']
+                    nameid_enc = 'nameIdEncrypted' in security.keys() and security['nameIdEncrypted']
 
-            authn_sign = 'authnRequestsSigned' in security and security['authnRequestsSigned']
-            logout_req_sign = 'logoutRequestSigned' in security and security['logoutRequestSigned']
-            logout_res_sign = 'logoutResponseSigned' in security and security['logoutResponseSigned']
-            want_assert_enc = 'wantAssertionsEncrypted' in security and security['wantAssertionsEncrypted']
-            want_nameid_enc = 'wantNameIdEncrypted' in security and security['wantNameIdEncrypted']
+                    if (want_assert_sign or want_mes_signed) and \
+                            not(exists_x509 or exists_fingerprint):
+                        errors.append('idp_cert_or_fingerprint_not_found_and_required')
+                    if nameid_enc and not exists_x509:
+                        errors.append('idp_cert_not_found_and_required')
+        return errors
 
-            if not self.check_sp_certs():
-                if authn_sign or logout_req_sign or logout_res_sign or \
-                   want_assert_enc or want_nameid_enc:
-                    errors.append('sp_cert_not_found_and_required')
+    def check_sp_settings(self, settings):
+        """
+        Checks the SP settings info.
+        :param settings: Dict with settings data
+        :type settings: dict
+        :returns: Errors found on the SP settings data
+        :rtype: list
+        """
+        assert isinstance(settings, dict)
 
-            exists_x509 = ('idp' in settings and
-                           'x509cert' in settings['idp'] and
-                           len(settings['idp']['x509cert']) > 0)
-            exists_fingerprint = ('idp' in settings and
-                                  'certFingerprint' in settings['idp'] and
-                                  len(settings['idp']['certFingerprint']) > 0)
+        errors = []
+        if not isinstance(settings, dict) or len(settings) == 0:
+            errors.append('invalid_syntax')
+        else:
+            if 'sp' not in settings or len(settings['sp']) == 0:
+                errors.append('sp_not_found')
+            else:
+                # check_sp_certs uses self.__sp so I add it
+                old_sp = self.__sp
+                self.__sp = settings['sp']
 
-            want_assert_sign = 'wantAssertionsSigned' in security and security['wantAssertionsSigned']
-            want_mes_signed = 'wantMessagesSigned' in security and security['wantMessagesSigned']
-            nameid_enc = 'nameIdEncrypted' in security and security['nameIdEncrypted']
+                sp = settings['sp']
+                security = {}
+                if 'security' in settings:
+                    security = settings['security']
 
-            if (want_assert_sign or want_mes_signed) and \
-                    not(exists_x509 or exists_fingerprint):
-                errors.append('idp_cert_or_fingerprint_not_found_and_required')
-            if nameid_enc and not exists_x509:
-                errors.append('idp_cert_not_found_and_required')
+                if 'entityId' not in sp or len(sp['entityId']) == 0:
+                    errors.append('sp_entityId_not_found')
 
-        if 'contactPerson' in settings:
-            types = settings['contactPerson']
-            valid_types = ['technical', 'support', 'administrative', 'billing', 'other']
-            for c_type in types:
-                if c_type not in valid_types:
-                    errors.append('contact_type_invalid')
-                    break
+                if 'assertionConsumerService' not in sp or \
+                    'url' not in sp['assertionConsumerService'] or \
+                        len(sp['assertionConsumerService']['url']) == 0:
+                    errors.append('sp_acs_not_found')
+                elif not validate_url(sp['assertionConsumerService']['url']):
+                    errors.append('sp_acs_url_invalid')
 
-            for c_type in settings['contactPerson']:
-                contact = settings['contactPerson'][c_type]
-                if ('givenName' not in contact or len(contact['givenName']) == 0) or \
-                        ('emailAddress' not in contact or len(contact['emailAddress']) == 0):
-                    errors.append('contact_not_enought_data')
-                    break
+                if 'singleLogoutService' in sp and \
+                    'url' in sp['singleLogoutService'] and \
+                    len(sp['singleLogoutService']['url']) > 0 and \
+                        not validate_url(sp['singleLogoutService']['url']):
+                    errors.append('sp_sls_url_invalid')
 
-        if 'organization' in settings:
-            for org in settings['organization']:
-                organization = settings['organization'][org]
-                if ('name' not in organization or len(organization['name']) == 0) or \
-                    ('displayname' not in organization or len(organization['displayname']) == 0) or \
-                        ('url' not in organization or len(organization['url']) == 0):
-                    errors.append('organization_not_enought_data')
-                    break
+                if 'signMetadata' in security and isinstance(security['signMetadata'], dict):
+                    if 'keyFileName' not in security['signMetadata'] or \
+                            'certFileName' not in security['signMetadata']:
+                        errors.append('sp_signMetadata_invalid')
+
+                authn_sign = 'authnRequestsSigned' in security and security['authnRequestsSigned']
+                logout_req_sign = 'logoutRequestSigned' in security and security['logoutRequestSigned']
+                logout_res_sign = 'logoutResponseSigned' in security and security['logoutResponseSigned']
+                want_assert_enc = 'wantAssertionsEncrypted' in security and security['wantAssertionsEncrypted']
+                want_nameid_enc = 'wantNameIdEncrypted' in security and security['wantNameIdEncrypted']
+
+                if not self.check_sp_certs():
+                    if authn_sign or logout_req_sign or logout_res_sign or \
+                       want_assert_enc or want_nameid_enc:
+                        errors.append('sp_cert_not_found_and_required')
+
+            if 'contactPerson' in settings:
+                types = settings['contactPerson']
+                valid_types = ['technical', 'support', 'administrative', 'billing', 'other']
+                for c_type in types:
+                    if c_type not in valid_types:
+                        errors.append('contact_type_invalid')
+                        break
+
+                for c_type in settings['contactPerson']:
+                    contact = settings['contactPerson'][c_type]
+                    if ('givenName' not in contact or len(contact['givenName']) == 0) or \
+                            ('emailAddress' not in contact or len(contact['emailAddress']) == 0):
+                        errors.append('contact_not_enought_data')
+                        break
+
+            if 'organization' in settings:
+                for org in settings['organization']:
+                    organization = settings['organization'][org]
+                    if ('name' not in organization or len(organization['name']) == 0) or \
+                        ('displayname' not in organization or len(organization['displayname']) == 0) or \
+                            ('url' not in organization or len(organization['url']) == 0):
+                        errors.append('organization_not_enought_data')
+                        break
         # Restores the value that had the self.__sp
         if 'old_sp' in locals():
             self.__sp = old_sp

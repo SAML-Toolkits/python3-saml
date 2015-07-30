@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
+from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
@@ -100,9 +101,10 @@ def attrs(request):
 
 
 def metadata(request):
-    req = prepare_django_request(request)
-    auth = init_saml_auth(req)
-    saml_settings = auth.get_settings()
+    # req = prepare_django_request(request)
+    # auth = init_saml_auth(req)
+    # saml_settings = auth.get_settings()
+    saml_settings = OneLogin_Saml2_Settings(settings=None, custom_base_path=settings.SAML_FOLDER, sp_validation_only=True)
     metadata = saml_settings.get_sp_metadata()
     errors = saml_settings.validate_metadata(metadata)
 

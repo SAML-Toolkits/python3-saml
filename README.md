@@ -496,6 +496,12 @@ The get_sp_metadata will return the metadata signed or not based on the security
 
 Before the XML metadata is exposed, a check takes place to ensure that the info to be provided is valid.
 
+Instead of use the Auth object, you can directly use
+```
+saml_settings = OneLogin_Saml2_Settings(settings=None, custom_base_path=None, sp_validation_only=True)
+```
+to get the settings object and with the sp_validation_only=True parameter we will avoid the IdP Settings validation.
+
 ***Attribute Consumer Service(ACS)***
 
 This code handles the SAML response that the IdP forwards to the SP through the user's client.
@@ -787,6 +793,8 @@ Configuration of the OneLogin Python Toolkit
 
 * `__init__`  Initializes the settings: Sets the paths of the different folders and Loads settings info from settings file or array/object provided.
 * ***check_settings*** Checks the settings info.
+* ***check_idp_settings*** Checks the IdP settings info.
+* ***check_sp_settings*** Checks the SP settings info.
 * ***get_errors*** Returns an array with the errors, the array is empty when the settings is ok.
 * ***get_sp_metadata*** Gets the SP metadata. The XML representation.
 * ***validate_metadata*** Validates an XML SP Metadata.

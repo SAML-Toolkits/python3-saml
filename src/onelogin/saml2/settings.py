@@ -301,6 +301,10 @@ class OneLogin_Saml2_Settings(object):
         if 'wantNameIdEncrypted' not in self.__security:
             self.__security['wantNameIdEncrypted'] = False
 
+        # Signature Algorithm
+        if 'signatureAlgorithm' not in self.__security.keys():
+            self.__security['signatureAlgorithm'] = OneLogin_Saml2_Constants.RSA_SHA1
+
         if 'x509cert' not in self.__idp:
             self.__idp['x509cert'] = ''
         if 'certFingerprint' not in self.__idp:

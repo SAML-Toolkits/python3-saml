@@ -7,7 +7,8 @@
         "signMetadata": false,
         "wantMessagesSigned": false,
         "wantAssertionsSigned": false,
-        "wantNameIdEncrypted": false
+        "wantNameIdEncrypted": false,
+        "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
     },
     "contactPerson": {
         "technical": {

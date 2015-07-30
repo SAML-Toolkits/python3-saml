@@ -76,9 +76,7 @@ class OneLogin_Saml2_Constants(object):
     STATUS_PARTIAL_LOGOUT = 'urn:oasis:names:tc:SAML:2.0:status:PartialLogout'
     STATUS_PROXY_COUNT_EXCEEDED = 'urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded'
 
-    # Crypto
-    RSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
-
+    # Namespaces
     NSMAP = {
         'samlp': NS_SAMLP,
         'saml': NS_SAML,
@@ -86,3 +84,23 @@ class OneLogin_Saml2_Constants(object):
         'xenc': NS_XENC,
         'md': NS_MD
     }
+
+    # Sign & Crypto
+    SHA1 = 'http://www.w3.org/2000/09/xmldsig#sha1'
+    SHA256 = 'http://www.w3.org/2001/04/xmlenc#sha256'
+    SHA384 = 'http://www.w3.org/2001/04/xmlencsha384'
+    SHA512 = 'http://www.w3.org/2001/04/xmlenc#sha512'
+
+    DSA_SHA1 = 'http://www.w3.org/2000/09/xmld/sig#dsa-sha1'
+    RSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+    RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+    RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
+    RSA_SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
+
+    # Enc
+    TRIPLEDES_CBC = 'http://www.w3.org/2001/04/xmlenc#tripledes-cbc'
+    AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'
+    AES192_CBC = 'http://www.w3.org/2001/04/xmlenc#aes192-cbc'
+    AES256_CBC = 'http://www.w3.org/2001/04/xmlenc#aes256-cbc'
+    RSA_1_5 = 'http://www.w3.org/2001/04/xmlenc#rsa-1_5'
+    RSA_OAEP_MGF1P = 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'

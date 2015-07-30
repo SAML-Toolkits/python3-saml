@@ -140,7 +140,7 @@ class OneLogin_Saml2_Metadata(object):
         return metadata
 
     @staticmethod
-    def sign_metadata(metadata, key, cert):
+    def sign_metadata(metadata, key, cert, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
         """
         Signs the metadata with the key/cert provided
 
@@ -155,8 +155,11 @@ class OneLogin_Saml2_Metadata(object):
 
         :returns: Signed Metadata
         :rtype: string
+
+        :param sign_algorithm: Signature algorithm method
+        :type sign_algorithm: string
         """
-        return OneLogin_Saml2_Utils.add_sign(metadata, key, cert)
+        return OneLogin_Saml2_Utils.add_sign(metadata, key, cert, False, sign_algorithm)
 
     @staticmethod
     def __add_x509_key_descriptors(root, cert, signing):

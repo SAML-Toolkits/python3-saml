@@ -223,7 +223,7 @@ class OneLogin_Saml2_Utils(object):
         else:
             protocol = 'http'
 
-        if 'server_port' in request_data:
+        if 'server_port' in request_data and request_data['server_port'] is not None:
             port_number = str(request_data['server_port'])
             port = ':' + port_number
 

@@ -1,14 +1,15 @@
 # OneLogin's SAML Python Toolkit
 
-[![Build Status](https://api.travis-ci.org/onelogin/python-saml.png?branch=master)](http://travis-ci.org/onelogin/python-saml)
-[![Coverage Status](https://coveralls.io/repos/onelogin/python-saml/badge.png)](https://coveralls.io/r/onelogin/python-saml)
-[![PyPi Version](https://pypip.in/v/python-saml/badge.png)](https://pypi.python.org/pypi/python-saml)
-![PyPi Downloads](https://pypip.in/d/python-saml/badge.png)
+[![Build Status](https://api.travis-ci.org/onelogin/python3-saml.png?branch=master)](http://travis-ci.org/onelogin/python3-saml)
+[![Coverage Status](https://coveralls.io/repos/onelogin/python3-saml/badge.png)](https://coveralls.io/r/onelogin/python3-saml)
+[![PyPi Version](https://pypip.in/v/python3-saml/badge.png)](https://pypi.python.org/pypi/python3-saml)
+![PyPi Downloads](https://pypip.in/d/python3-saml/badge.png)
 
 Add SAML support to your Python software using this library.
 Forget those complicated libraries and use that open source library provided
 and supported by OneLogin Inc.
 
+This version supports Python3, exists an alternative version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml) 
 
 Why add SAML support to my software?
 ------------------------------------
@@ -65,13 +66,11 @@ Installation
 
 ### Dependences ###
 
- * python 2.7
- * [M2Crypto](https://pypi.python.org/pypi/M2Crypto)  A Python crypto and SSL toolkit (depends on openssl, swig)
- * [dm.xmlsec.binding](https://pypi.python.org/pypi/dm.xmlsec.binding)  Cython/lxml based binding for the XML security library (depends on python-dev libxml2-dev libxmlsec1-dev)
- * [isodate](https://pypi.python.org/pypi/isodate)  An ISO 8601 date/time/duration parser and formater
- * [defusedxml](https://pypi.python.org/pypi/defusedxml)  XML bomb protection for Python stdlib modules
+ * python 2.7 // python 3.3
+ * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
+ * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formater
 
-Review the setup.py file to know the version of the library that python-saml is using
+Review the setup.py file to know the version of the library that python3-saml is using
 
 ### Code ###
 
@@ -79,18 +78,18 @@ Review the setup.py file to know the version of the library that python-saml is 
 
 The toolkit is hosted on github. You can download it from:
 
- * Lastest release: https://github.com/onelogin/python-saml/releases/latest
- * Master repo: https://github.com/onelogin/python-saml/tree/master
+ * Lastest release: https://github.com/onelogin/python3-saml/releases/latest
+ * Master repo: https://github.com/onelogin/python3-saml/tree/master
 
 Copy the core of the library (src/onelogin/saml2 folder) and merge the setup.py inside the python application. (each application has its structure so take your time to locate the Python SAML toolkit in the best place). 
 
 #### Option 2. Download from pypi ####
 
-The toolkit is hosted in pypi, you can find the python-saml package at https://pypi.python.org/pypi/python-saml
+The toolkit is hosted in pypi, you can find the python3-saml package at https://pypi.python.org/pypi/python3-saml
 
 You can install it executing:
 ```
- pip install python-saml
+ pip install python3-saml
 ```
 
 If you want to know how a project can handle python packages review this [guide](https://packaging.python.org/en/latest/tutorial.html) and review this [sampleproject](https://github.com/pypa/sampleproject)

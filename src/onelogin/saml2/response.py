@@ -456,11 +456,11 @@ class OneLogin_Saml2_Response(object):
                     if 'RetrievalMethod' in child.tag:
                         if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
                             raise Exception('Unsupported Retrieval Method found')
-                        uri  = child.attrib['URI'] 
+                        uri = child.attrib['URI']
                         if not uri.startswith('#'):
                             break
                         uri = uri.split('#')[1]
-                        encrypted_key = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], './xenc:EncryptedKey[@Id="'+uri +'"]')
+                        encrypted_key = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], './xenc:EncryptedKey[@Id="' + uri + '"]')
                         if encrypted_key:
                             keyinfo.append(encrypted_key[0])
 

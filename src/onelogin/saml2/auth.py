@@ -491,7 +491,8 @@ class OneLogin_Saml2_Auth(object):
             if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
                                                              OneLogin_Saml2_Utils.b64decode(signature),
                                                              x509cert,
-                                                             debug=self.__settings.is_debug_active()):
+                                                             sign_alg,
+                                                             self.__settings.is_debug_active()):
                 raise Exception('Signature validation failed. %s rejected.' % saml_type)
             return True
         except Exception as e:

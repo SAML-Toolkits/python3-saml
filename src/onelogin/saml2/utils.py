@@ -801,7 +801,7 @@ class OneLogin_Saml2_Utils(object):
         return dsig_ctx.sign_binary(compat.to_bytes(msg), algorithm)
 
     @staticmethod
-    def validate_binary_sign(signed_query, signature, cert=None, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):
+    def validate_binary_sign(signed_query, signature, cert=None, algorithm=OneLogin_Saml2_Constants.RSA_SHA1, debug=False):
         """
         Validates signed bynary data (Used to validate GET Signature).
 
@@ -825,8 +825,18 @@ class OneLogin_Saml2_Utils(object):
             xmlsec.enable_debug_trace(debug)
             dsig_ctx = xmlsec.SignatureContext()
             dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
+
+            sign_algorithm_transform_map = {
+                OneLogin_Saml2_Constants.DSA_SHA1: xmlsec.Transform.DSA_SHA1,
+                OneLogin_Saml2_Constants.RSA_SHA1: xmlsec.Transform.RSA_SHA1,
+                OneLogin_Saml2_Constants.RSA_SHA256: xmlsec.Transform.RSA_SHA256,
+                OneLogin_Saml2_Constants.RSA_SHA384: xmlsec.Transform.RSA_SHA384,
+                OneLogin_Saml2_Constants.RSA_SHA512: xmlsec.Transform.RSA_SHA512
+            }
+            sign_algorithm_transform = sign_algorithm_transform_map.get(algorithm, xmlsec.Transform.RSA_SHA1)
+
             dsig_ctx.verify_binary(compat.to_bytes(signed_query),
-                                   algorithm,
+                                   sign_algorithm_transform,
                                    compat.to_bytes(signature))
             return True
         except xmlsec.Error as e:

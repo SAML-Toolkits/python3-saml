@@ -660,7 +660,7 @@ class OneLogin_Saml2_Utils(object):
         elem = OneLogin_Saml2_XML.to_etree(xml)
         xmlsec.enable_debug_trace(debug)
         xmlsec.tree.add_ids(elem, ["ID"])
-        # Sign the metadacta with our private key.
+        # Sign the metadata with our private key.
         signature = xmlsec.template.create(elem, xmlsec.Transform.EXCL_C14N, xmlsec.Transform.RSA_SHA1, ns='ds')
 
         issuer = OneLogin_Saml2_XML.query(elem, '//saml:Issuer')
@@ -736,6 +736,12 @@ class OneLogin_Saml2_Utils(object):
 
                 if cert is None or cert == '':
                     return False
+
+                # Check if Reference URI is empty
+                reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
+                if len(reference_elem) > 0:
+                    if reference_elem[0].get('URI') == '':
+                        reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
 
                 if validatecert:
                     manager = xmlsec.KeysManager()

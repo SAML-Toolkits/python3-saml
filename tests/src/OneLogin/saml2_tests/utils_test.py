@@ -459,7 +459,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', '2074-12-10T04:39:31Z'))
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', 1418186371))
 
-    def testGenerateNameId(self):
+    def testGenerateNameIdWithSPNameQualifier(self):
         """
         Tests the generateNameId method of the OneLogin_Saml2_Utils
         """
@@ -476,6 +476,25 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         key = OneLogin_Saml2_Utils.format_cert(x509cert)
 
         name_id_enc = OneLogin_Saml2_Utils.generate_name_id(name_id_value, entity_id, name_id_format, key)
+        expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Type="http://www.w3.org/2001/04/xmlenc#Element">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">\n<xenc:EncryptedKey>\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
+        self.assertIn(expected_name_id_enc, name_id_enc)
+
+    def testGenerateNameIdWithSPNameQualifier(self):
+        """
+        Tests the generateNameId method of the OneLogin_Saml2_Utils
+        """
+        name_id_value = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde'
+        name_id_format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
+
+        name_id = OneLogin_Saml2_Utils.generate_name_id(name_id_value, None, name_id_format)
+        expected_name_id = '<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
+        self.assertEqual(expected_name_id, name_id)
+
+        settings_info = self.loadSettingsJSON()
+        x509cert = settings_info['idp']['x509cert']
+        key = OneLogin_Saml2_Utils.format_cert(x509cert)
+
+        name_id_enc = OneLogin_Saml2_Utils.generate_name_id(name_id_value, None, name_id_format, key)
         expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Type="http://www.w3.org/2001/04/xmlenc#Element">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">\n<xenc:EncryptedKey>\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
         self.assertIn(expected_name_id_enc, name_id_enc)
 

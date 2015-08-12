@@ -548,7 +548,8 @@ class OneLogin_Saml2_Utils(object):
 
         root = OneLogin_Saml2_XML.make_root("{%s}container" % OneLogin_Saml2_Constants.NS_SAML)
         name_id = OneLogin_Saml2_XML.make_child(root, '{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML)
-        name_id.set('SPNameQualifier', sp_nq)
+        if sp_nq is not None:
+            name_id.set('SPNameQualifier', sp_nq)
         name_id.set('Format', sp_format)
         name_id.text = value
 

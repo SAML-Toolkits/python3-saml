@@ -3,7 +3,7 @@ import os
 from flask import (Flask, request, render_template, redirect, session,
                    make_response)
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -118,7 +118,7 @@ def metadata():
         resp = make_response(metadata, 200)
         resp.headers['Content-Type'] = 'text/xml'
     else:
-        resp = make_response(errors.join(', '), 500)
+        resp = make_response(', '.join(errors), 500)
     return resp
 
 

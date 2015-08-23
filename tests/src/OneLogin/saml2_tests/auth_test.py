@@ -101,6 +101,26 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth2.process_response()
         self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', auth2.get_session_index())
 
+    def testGetSessionExpiration(self):
+        """
+        Tests the get_session_expiration method of the OneLogin_Saml2_Auth class
+        """
+        settings_info = self.loadSettingsJSON()
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        self.assertIsNone(auth.get_session_expiration())
+
+        request_data = self.get_request()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth2 = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        self.assertIsNone(auth2.get_session_expiration())
+
+        auth2.process_response()
+        self.assertEqual(1392802621, auth2.get_session_expiration())
+
     def testGetLastErrorReason(self):
         """
         Tests the get_last_error_reason method of the OneLogin_Saml2_Auth class

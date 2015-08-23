@@ -60,7 +60,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
             if name_id is not None:
                 name_id_format = sp_data['NameIDFormat']
-                sp_name_qualifier = None                
+                sp_name_qualifier = None
             else:
                 name_id = idp_data['entityId']
                 name_id_format = OneLogin_Saml2_Constants.NAMEID_ENTITY

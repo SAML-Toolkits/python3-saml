@@ -479,7 +479,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         expected_name_id_enc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Type="http://www.w3.org/2001/04/xmlenc#Element">\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>\n<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">\n<xenc:EncryptedKey>\n<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>\n<xenc:CipherData>\n<xenc:CipherValue>'
         self.assertIn(expected_name_id_enc, name_id_enc)
 
-    def testGenerateNameIdWithSPNameQualifier(self):
+    def testGenerateNameIdWithoutSPNameQualifier(self):
         """
         Tests the generateNameId method of the OneLogin_Saml2_Utils
         """

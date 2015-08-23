@@ -74,12 +74,16 @@ class OneLogin_Saml2_Authn_Request(object):
 
         requested_authn_context_str = ''
         if security['requestedAuthnContext'] is not False:
+            authn_comparison = 'exact'
+            if 'requestedAuthnContextComparison' in security.keys():
+                authn_comparison = security['requestedAuthnContextComparison']
+
             if security['requestedAuthnContext'] is True:
-                requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="exact">
+                requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="%s">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>"""
+    </samlp:RequestedAuthnContext>""" % authn_comparison
             else:
-                requested_authn_context_str = '     <samlp:RequestedAuthnContext Comparison="exact">'
+                requested_authn_context_str = '     <samlp:RequestedAuthnContext Comparison="%s">' % authn_comparison
                 for authn_context in security['requestedAuthnContext']:
                     requested_authn_context_str += '<saml:AuthnContextClassRef>%s</saml:AuthnContextClassRef>' % authn_context
                 requested_authn_context_str += '    </samlp:RequestedAuthnContext>'

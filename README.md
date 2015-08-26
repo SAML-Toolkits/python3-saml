@@ -733,6 +733,7 @@ Main class of OneLogin Python Toolkit
 * ***get_attribute*** Returns the requested SAML attribute.
 * ***get_nameid*** Returns the nameID.
 * ***get_session_index*** Gets the SessionIndex from the AuthnStatement.
+* ***get_session_expiration*** Gets the SessionNotOnOrAfter from the AuthnStatement.
 * ***get_errors*** Returns a list with code errors if something went wrong.
 * ***get_last_error_reason*** Returns the reason of the last error
 * ***get_sso_url*** Gets the SSO url.

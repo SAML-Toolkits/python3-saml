@@ -27,9 +27,9 @@ class OneLogin_Saml2_XML(object):
     _unparse_etree = staticmethod(etree.tostring)
 
     dump = staticmethod(etree.dump)
-    make_root = etree.Element
-    make_child = etree.SubElement
-    cleanup_namespaces = etree.cleanup_namespaces
+    make_root = staticmethod(etree.Element)
+    make_child = staticmethod(etree.SubElement)
+    cleanup_namespaces = staticmethod(etree.cleanup_namespaces)
 
     @staticmethod
     def to_string(xml, **kwargs):

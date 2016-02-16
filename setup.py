@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='python3-saml',
-    version='1.0.0',
+    version='1.1.0',
     description='Onelogin Python Toolkit. Add SAML support to your Python software using this library',
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -34,7 +34,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'isodate>=0.5.0',
-        'xmlsec>=0.3.1'
+        'xmlsec>=0.5.0'
     ],
     dependency_links=['http://github.com/mehcode/python-xmlsec/tarball/master'],
     extras_require={

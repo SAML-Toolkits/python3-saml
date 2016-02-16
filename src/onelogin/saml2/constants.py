@@ -19,7 +19,7 @@ class OneLogin_Saml2_Constants(object):
     """
 
     # Value added to the current time in time condition validations
-    ALOWED_CLOCK_DRIFT = 300
+    ALLOWED_CLOCK_DRIFT = 300
 
     # NameID Formats
     NAMEID_EMAIL_ADDRESS = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'

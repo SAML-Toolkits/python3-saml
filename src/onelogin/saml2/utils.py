@@ -733,40 +733,16 @@ class OneLogin_Saml2_Utils(object):
             xmlsec.enable_debug_trace(debug)
             xmlsec.tree.add_ids(elem, ["ID"])
 
-            signature_nodes = OneLogin_Saml2_XML.query(elem, '//ds:Signature')
+            signature_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:Response/ds:Signature')
 
-            if len(signature_nodes) > 0:
+            if not len(signature_nodes) > 0:
+                signature_nodes += OneLogin_Saml2_XML.query(elem, '/samlp:Response/saml:EncryptedAssertion/saml:Assertion/ds:Signature')
+                signature_nodes += OneLogin_Saml2_XML.query(elem, '/samlp:Response/saml:Assertion/ds:Signature')
+
+            if len(signature_nodes) == 1:
                 signature_node = signature_nodes[0]
 
-                if (cert is None or cert == '') and fingerprint:
-                    x509_certificate_nodes = OneLogin_Saml2_XML.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
-                    if len(x509_certificate_nodes) > 0:
-                        x509_certificate_node = x509_certificate_nodes[0]
-                        x509_cert_value = x509_certificate_node.text
-                        x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value, fingerprintalg)
-                        if fingerprint == x509_fingerprint_value:
-                            cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
-
-                if cert is None or cert == '':
-                    return False
-
-                # Check if Reference URI is empty
-                reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
-                if len(reference_elem) > 0:
-                    if reference_elem[0].get('URI') == '':
-                        reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
-
-                if validatecert:
-                    manager = xmlsec.KeysManager()
-                    manager.load_cert_from_memory(cert, xmlsec.KeyFormat.CERT_PEM, xmlsec.KeyDataType.TRUSTED)
-                    dsig_ctx = xmlsec.SignatureContext(manager)
-                else:
-                    dsig_ctx = xmlsec.SignatureContext()
-                    dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
-
-                dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
-                dsig_ctx.verify(signature_node)
-                return True
+                return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug)
             else:
                 return False
         except xmlsec.Error as e:
@@ -774,6 +750,116 @@ class OneLogin_Saml2_Utils(object):
                 print(e)
 
             return False
+
+    @staticmethod
+    def validate_metadata_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False):
+        """
+        Validates a signature of a EntityDescriptor.
+
+        :param xml: The element we should validate
+        :type: string | Document
+
+        :param cert: The pubic cert
+        :type: string
+
+        :param fingerprint: The fingerprint of the public cert
+        :type: string
+
+        :param fingerprintalg: The algorithm used to build the fingerprint
+        :type: string
+
+        :param validatecert: If true, will verify the signature and if the cert is valid.
+        :type: bool
+
+        :param debug: Activate the xmlsec debug
+        :type: bool
+        """
+        try:
+            if xml is None or xml == '':
+                raise Exception('Empty string supplied as input')
+
+            elem = OneLogin_Saml2_XML.to_etree(xml)
+            xmlsec.enable_debug_trace(debug)
+            xmlsec.tree.add_ids(elem, ["ID"])
+
+            signature_nodes = OneLogin_Saml2_XML.query(elem, '/md:EntitiesDescriptor/ds:Signature')
+
+            if len(signature_nodes) == 0:
+                signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/ds:Signature')
+
+                if len(signature_nodes) == 0:
+                    signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:SPSSODescriptor/ds:Signature')
+                    signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:IDPSSODescriptor/ds:Signature')
+
+            if len(signature_nodes) > 0:
+                for signature_node in signature_nodes:
+                    if not OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug):
+                        return False
+                return True
+            else:
+                return False
+        except Exception:
+            return False
+
+    @staticmethod
+    def validate_node_sign(signature_node, elem, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False):
+        """
+        Validates a signature node.
+
+        :param signature_node: The signature node
+        :type: Node
+
+        :param xml: The element we should validate
+        :type: Document
+
+        :param cert: The pubic cert
+        :type: string
+
+        :param fingerprint: The fingerprint of the public cert
+        :type: string
+
+        :param fingerprintalg: The algorithm used to build the fingerprint
+        :type: string
+
+        :param validatecert: If true, will verify the signature and if the cert is valid.
+        :type: bool
+
+        :param debug: Activate the xmlsec debug
+        :type: bool
+        """
+        try:
+            if (cert is None or cert == '') and fingerprint:
+                x509_certificate_nodes = OneLogin_Saml2_XML.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
+                if len(x509_certificate_nodes) > 0:
+                    x509_certificate_node = x509_certificate_nodes[0]
+                    x509_cert_value = x509_certificate_node.text
+                    x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value, fingerprintalg)
+                    if fingerprint == x509_fingerprint_value:
+                        cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
+
+            if cert is None or cert == '':
+                return False
+
+            # Check if Reference URI is empty
+            reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
+            if len(reference_elem) > 0:
+                if reference_elem[0].get('URI') == '':
+                    reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
+
+            if validatecert:
+                manager = xmlsec.KeysManager()
+                manager.load_cert_from_memory(cert, xmlsec.KeyFormat.CERT_PEM, xmlsec.KeyDataType.TRUSTED)
+                dsig_ctx = xmlsec.SignatureContext(manager)
+            else:
+                dsig_ctx = xmlsec.SignatureContext()
+                dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
+
+            dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
+            dsig_ctx.verify(signature_node)
+            return True
+        except xmlsec.Error as e:
+            if debug:
+                print(e)
 
     @staticmethod
     def sign_binary(msg, key, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):

@@ -115,7 +115,7 @@ class OneLogin_Saml2_Response(object):
                 if not attribute_statement_nodes:
                     raise Exception('There is no AttributeStatement on the Response')
 
-                # Validates Asserion timestamps
+                # Validates Assertion timestamps
                 if not self.validate_timestamps():
                     raise Exception('Timing issues (please check your clock settings)')
 
@@ -190,13 +190,17 @@ class OneLogin_Saml2_Response(object):
                     raise Exception('The Message of the Response is not signed and the SP require it')
 
             if len(signed_elements) > 0:
+                if len(signed_elements) > 2:
+                    raise Exception('Too many Signatures found. SAML Response rejected')
+
                 cert = idp_data['x509cert']
                 fingerprint = idp_data['certFingerprint']
                 fingerprintalg = idp_data['certFingerprintAlgorithm']
 
-                # Only validates the first sign found
+                # If find a Signature on the Response, validates it checking the original response
                 if '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements:
                     document_to_validate = self.document
+                # Otherwise validates the assertion (decrypted assertion if was encrypted)
                 else:
                     if self.encrypted:
                         document_to_validate = self.decrypted_document
@@ -354,8 +358,8 @@ class OneLogin_Saml2_Response(object):
         :returns: True if only 1 assertion encrypted or not
         :rtype: bool
         """
-        encrypted_assertion_nodes = self.__query('/samlp:Response/saml:EncryptedAssertion')
-        assertion_nodes = self.__query('/samlp:Response/saml:Assertion')
+        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(self.document, '//saml:EncryptedAssertion')
+        assertion_nodes = OneLogin_Saml2_XML.query(self.document, '//saml:Assertion')
         return (len(encrypted_assertion_nodes) + len(assertion_nodes)) == 1
 
     def validate_timestamps(self):
@@ -370,9 +374,9 @@ class OneLogin_Saml2_Response(object):
         for conditions_node in conditions_nodes:
             nb_attr = conditions_node.get('NotBefore')
             nooa_attr = conditions_node.get('NotOnOrAfter')
-            if nb_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nb_attr) > OneLogin_Saml2_Utils.now() + OneLogin_Saml2_Constants.ALOWED_CLOCK_DRIFT:
+            if nb_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nb_attr) > OneLogin_Saml2_Utils.now() + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT:
                 return False
-            if nooa_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nooa_attr) + OneLogin_Saml2_Constants.ALOWED_CLOCK_DRIFT <= OneLogin_Saml2_Utils.now():
+            if nooa_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nooa_attr) + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT <= OneLogin_Saml2_Utils.now():
                 return False
         return True
 
@@ -441,7 +445,7 @@ class OneLogin_Saml2_Response(object):
         if not key:
             raise Exception('No private key available, check settings')
 
-        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(xml, '//saml:EncryptedAssertion')
+        encrypted_assertion_nodes = OneLogin_Saml2_XML.query(xml, '/samlp:Response/saml:EncryptedAssertion')
         if encrypted_assertion_nodes:
             encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:

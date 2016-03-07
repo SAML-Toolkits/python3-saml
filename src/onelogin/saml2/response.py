@@ -243,12 +243,8 @@ class OneLogin_Saml2_Response(object):
         :returns: The valid audiences for the SAML Response
         :rtype: list
         """
-        audiences = []
-
         audience_nodes = self.__query_assertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience')
-        for audience_node in audience_nodes:
-            audiences.append(audience_node.text)
-        return audiences
+        return [node.text for node in audience_nodes if node.text is not None]
 
     def get_issuers(self):
         """

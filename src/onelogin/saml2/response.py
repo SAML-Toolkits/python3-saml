@@ -110,9 +110,9 @@ class OneLogin_Saml2_Response(object):
                     if len(encrypted_nameid_nodes) == 0:
                         raise Exception('The NameID of the Response is not encrypted and the SP require it')
 
-                # Checks that there is at least one AttributeStatement
+                # Checks that there is at least one AttributeStatement if required
                 attribute_statement_nodes = self.__query_assertion('/saml:AttributeStatement')
-                if not attribute_statement_nodes:
+                if security['wantAttributeStatement'] and not attribute_statement_nodes:
                     raise Exception('There is no AttributeStatement on the Response')
 
                 # Validates Assertion timestamps

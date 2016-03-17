@@ -435,11 +435,40 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
-        try:
-            valid = response_2.is_valid(self.get_request_data())
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertEqual('There is no AttributeStatement on the Response', str(e))
+        self.assertFalse(response_2.is_valid(self.get_request_data()))
+        self.assertEqual('There is no AttributeStatement on the Response', response_2.get_error())
+
+    def testIsValidOptionalStatement(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response
+        Case AttributeStatement is optional
+        """
+        # shortcut
+        json_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(json_settings)
+        settings.set_strict(True)
+
+        # want AttributeStatement True by default
+        self.assertTrue(settings.get_security_data()['wantAttributeStatement'])
+
+        xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'signed_assertion_response.xml.base64'))
+
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertFalse(response.is_valid(self.get_request_data()))
+        self.assertEqual('There is no AttributeStatement on the Response', response.get_error())
+
+        security = settings.get_security_data()
+        # change wantAttributeStatement to optional
+        json_settings['security']['wantAttributeStatement'] = False
+        settings = OneLogin_Saml2_Settings(json_settings)
+
+        # check settings
+        self.assertFalse(settings.get_security_data()['wantAttributeStatement'])
+
+        response = OneLogin_Saml2_Response(settings, xml)
+        response.is_valid(self.get_request_data())
+        self.assertNotEqual('There is no AttributeStatement on the Response', response.get_error())
+        self.assertEqual('Signature validation failed. SAML Response rejected', response.get_error())
 
     def testIsInValidNoKey(self):
         """

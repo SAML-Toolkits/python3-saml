@@ -311,6 +311,9 @@ In addition to the required settings data (idp, sp), there is extra information 
         // this SP to be encrypted.
         "wantNameIdEncrypted": false,
 
+        // Indicates a requirement for the AttributeStatement element
+        "wantAttributeStatement": true,
+
         // Authentication context.
         // Set to false and no AuthContext will be sent in the AuthNRequest,
         // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'

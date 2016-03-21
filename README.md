@@ -1040,13 +1040,19 @@ This demo works very similar to the flask-demo (We did it intentionally).
 
 Getting python3-saml up and running on Heroku will require some extra legwork: python3-saml depends on python-xmlsec which depends on headers from the xmlsec1-dev linux package to install correctly. 
 
-First you will need to add the xmlsec buildpack to your build server:
+First you will need to add the ```apt``` buildpack to your build server:
 
 ```
-heroku buildpacks:set --index=1 -a your-app https://github.com/ABASystems/heroku-buildpack-xmlsec
-heroku buildpacks:set --index=2 -a your-app https://github.com/heroku/heroku-buildpack-python
+heroku buildpacks:set --index=1 -a your-app https://github.com/ABASystems/heroku-buildpack-apt
+heroku buildpacks:set --index=2 -a your-app https://github.com/ABASystems/heroku-buildpack-python
 ```
 
-You can confirm the buildpacks have been added in the correct order with ```heroku buildpacks -a your-app```, you should see the xmlsec buildpack first followed by the python buildpack.
+You can confirm the buildpacks have been added in the correct order with ```heroku buildpacks -a your-app```, you should see the apt buildpack first followed by the python buildpack.
 
-Then simply add python3-saml to your requrements.txt and ```git push``` to trigger a build.
+Then add an ```Aptfile``` into the root of your repository containing the ```libxmlsec1-dev``` package, the file should look like:
+```
+libxmlsec1-dev
+
+```
+
+Finally, add python3-saml to your requrements.txt and ```git push``` to trigger a build.

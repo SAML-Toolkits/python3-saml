@@ -459,6 +459,42 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', '2074-12-10T04:39:31Z'))
         self.assertNotEqual('3311642371', OneLogin_Saml2_Utils.get_expire_time('PT360000S', 1418186371))
 
+    def _generate_name_id_element(self, name_qualifier):
+        name_id_value = 'value'
+        entity_id = 'sp-entity-id'
+        name_id_format = 'name-id-format'
+
+        raw_name_id = OneLogin_Saml2_Utils.generate_name_id(
+            name_id_value,
+            entity_id,
+            name_id_format,
+            nq=name_qualifier,
+        )
+        parser = etree.XMLParser(recover=True)
+        return etree.fromstring(raw_name_id, parser)
+
+    def testNameidGenerationIncludesNameQualifierAttribute(self):
+        """
+        Tests the inclusion of NameQualifier in the generateNameId method of the OneLogin_Saml2_Utils
+        """
+        idp_name_qualifier = 'idp-name-qualifier'
+        idp_name_qualifier_attribute = ('NameQualifier', idp_name_qualifier)
+
+        name_id = self._generate_name_id_element(idp_name_qualifier)
+
+        self.assertIn(idp_name_qualifier_attribute, name_id.attrib.items())
+
+    def testNameidGenerationDoesNotIncludeNameQualifierAttribute(self):
+        """
+        Tests the (not) inclusion of NameQualifier in the generateNameId method of the OneLogin_Saml2_Utils
+        """
+        idp_name_qualifier = None
+        not_expected_attribute = 'NameQualifier'
+
+        name_id = self._generate_name_id_element(idp_name_qualifier)
+
+        self.assertNotIn(not_expected_attribute, name_id.attrib.keys())
+
     def testGenerateNameIdWithSPNameQualifier(self):
         """
         Tests the generateNameId method of the OneLogin_Saml2_Utils

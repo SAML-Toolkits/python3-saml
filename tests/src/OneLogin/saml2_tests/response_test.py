@@ -457,7 +457,6 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response.is_valid(self.get_request_data()))
         self.assertEqual('There is no AttributeStatement on the Response', response.get_error())
 
-        security = settings.get_security_data()
         # change wantAttributeStatement to optional
         json_settings['security']['wantAttributeStatement'] = False
         settings = OneLogin_Saml2_Settings(json_settings)

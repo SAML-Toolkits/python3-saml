@@ -201,7 +201,9 @@ class OneLogin_Saml2_Settings(object):
         if len(errors) == 0:
             self.__errors = []
             self.__sp = settings['sp']
-            self.__idp = settings['idp']
+
+            if 'idp' in settings:
+                self.__idp = settings['idp']
 
             if 'strict' in settings:
                 self.__strict = settings['strict']

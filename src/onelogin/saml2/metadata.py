@@ -57,7 +57,7 @@ class OneLogin_Saml2_Metadata(object):
         :param contacts: Contacts info
         :type contacts: dict
 
-        :param organization: Organization ingo
+        :param organization: Organization info
         :type organization: dict
         """
         if valid_until is None:
@@ -85,8 +85,7 @@ class OneLogin_Saml2_Metadata(object):
 
         sls = ''
         if 'singleLogoutService' in sp and 'url' in sp['singleLogoutService']:
-            sls = """        <md:SingleLogoutService Binding="%(binding)s"
-                                Location="%(location)s" />\n""" % \
+            sls = OneLogin_Saml2_Templates.MD_SLS % \
                 {
                     'binding': sp['singleLogoutService']['binding'],
                     'location': sp['singleLogoutService']['url'],
@@ -105,9 +104,7 @@ class OneLogin_Saml2_Metadata(object):
                 organization_displaynames.append("""        <md:OrganizationDisplayName xml:lang="%s">%s</md:OrganizationDisplayName>""" % (lang, info['displayname']))
                 organization_urls.append("""        <md:OrganizationURL xml:lang="%s">%s</md:OrganizationURL>""" % (lang, info['url']))
             org_data = '\n'.join(organization_names) + '\n' + '\n'.join(organization_displaynames) + '\n' + '\n'.join(organization_urls)
-            str_organization = """    <md:Organization>
-            %(org)s
-                </md:Organization>""" % {'org': org_data}
+            str_organization = """    <md:Organization>\n%(org)s\n    </md:Organization>""" % {'org': org_data}
 
         str_contacts = ''
         if len(contacts) > 0:
@@ -122,6 +119,49 @@ class OneLogin_Saml2_Metadata(object):
                 contacts_info.append(contact)
             str_contacts = '\n'.join(contacts_info)
 
+        str_attribute_consuming_service = ''
+
+        if 'attributeConsumingService' in sp and len(sp['attributeConsumingService']):
+            attr_cs_desc_str = ''
+            if "serviceDescription" in sp['attributeConsumingService']:
+                attr_cs_desc_str = """            <md:ServiceDescription xml:lang="en">%s</md:ServiceDescription>\n""" % sp['attributeConsumingService']['serviceDescription']
+
+            requested_attribute_data = []
+            for req_attribs in sp['attributeConsumingService']['requestedAttributes']:
+                req_attr_nameformat_str = req_attr_friendlyname_str = req_attr_isrequired_str = ''
+                req_attr_aux_str = ' \>'
+
+                if 'nameFormat' in req_attribs.keys() and req_attribs['nameFormat']:
+                    req_attr_nameformat_str = " NameFormat=\"%s\"" % req_attribs['nameFormat']
+                if 'friendlyName' in req_attribs.keys() and req_attribs['friendlyName']:
+                    req_attr_nameformat_str = " FriendlyName=\"%s\"" % req_attribs['friendlyName']
+                if 'isRequired' in req_attribs.keys() and req_attribs['isRequired']:
+                    req_attr_isrequired_str = " isRequired=\"%s\"" % req_attribs['isRequired']
+                if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
+                    req_attr_aux_str = """ >
+            <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>%(attributeValue)</saml:AttributeValue>
+</md:RequestedAttribute>""" % \
+                        {
+                            'attributeValue': req_attribs['attributeValue']
+                        }
+
+                requested_attribute = OneLogin_Saml2_Templates.MD_REQUESTED_ATTRIBUTE % \
+                    {
+                        'req_attr_name': req_attribs['name'],
+                        'req_attr_nameformat_str': req_attr_nameformat_str,
+                        'req_attr_friendlyname_str': req_attr_friendlyname_str,
+                        'req_attr_isrequired_str': req_attr_isrequired_str,
+                        'req_attr_aux_str': req_attr_aux_str
+                    }
+                requested_attribute_data.append(requested_attribute)
+
+            str_attribute_consuming_service = OneLogin_Saml2_Templates.MD_ATTR_CONSUMER_SERVICE % \
+                {
+                    'service_name': sp['attributeConsumingService']['serviceName'],
+                    'attr_cs_desc': attr_cs_desc_str,
+                    'requested_attribute_str': '\n'.join(requested_attribute_data)
+                }
+
         metadata = OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR % \
             {
                 'valid': ('validUntil="%s"' % valid_until_str) if valid_until_str else '',
@@ -135,6 +175,7 @@ class OneLogin_Saml2_Metadata(object):
                 'sls': sls,
                 'organization': str_organization,
                 'contacts': str_contacts,
+                'attribute_consuming_service': str_attribute_consuming_service
             }
 
         return metadata

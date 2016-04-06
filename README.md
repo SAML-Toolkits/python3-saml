@@ -214,6 +214,22 @@ This is the settings.json file:
             // only for this endpoint.
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
+        // If you need to specify requested attributes, set a 
+        // attributeConsumingService. nameFormat, attributeValue and
+        // friendlyName can be ommited
+        "attributeConsumingService": {
+                "ServiceName": "SP test",
+                "serviceDescription": "Test Service",
+                "requestedAttributes": [
+                    {
+                        "name": "",
+                        "isRequired": false,
+                        "nameFormat": "",
+                        "friendlyName": "",
+                        "attributeValue": ""
+                    }
+                ]
+        },
         // Specifies the constraints on the name identifier to be used to
         // represent the requested subject.
         // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.

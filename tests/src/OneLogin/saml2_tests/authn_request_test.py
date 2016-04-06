@@ -22,8 +22,8 @@ except ImportError:
 
 
 class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
-    def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+    def loadSettingsJSON(self, filename='settings1.json'):
+        filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -255,3 +255,24 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
         document = OneLogin_Saml2_XML.to_etree(inflated)
         self.assertEqual(authn_request.get_id(), document.get('ID', None))
+
+    def testAttributeConsumingService(self):
+        """
+        Tests that the attributeConsumingServiceIndex is present as an attribute
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+
+        self.assertNotIn('AttributeConsumingServiceIndex="1"', inflated)
+
+        saml_settings = self.loadSettingsJSON('settings4.json')
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+        self.assertRegexpMatches(inflated, 'AttributeConsumingServiceIndex="1"')

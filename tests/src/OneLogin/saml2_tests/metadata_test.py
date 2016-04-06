@@ -15,8 +15,8 @@ from onelogin.saml2.settings import OneLogin_Saml2_Settings
 
 
 class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
-    def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+    def loadSettingsJSON(self, filename='settings1.json'):
+        filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -138,6 +138,28 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn('cacheDuration="P1Y"', metadata6)
         parsed_datetime = strftime(r'%Y-%m-%dT%H:%M:%SZ', datetime_value.timetuple())
         self.assertIn('validUntil="%s"' % parsed_datetime, metadata6)
+
+    def testBuilderAttributeConsumingService(self):
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings4.json'))
+        sp_data = settings.get_sp_data()
+        security = settings.get_security_data()
+        organization = settings.get_organization()
+        contacts = settings.get_contacts()
+
+        metadata = OneLogin_Saml2_Metadata.builder(
+            sp_data, security['authnRequestsSigned'],
+            security['wantAssertionsSigned'], None, None, contacts,
+            organization
+        )
+        self.assertIn("""        <md:AttributeConsumingService index="1">
+            <md:ServiceName xml:lang="en">Test Service</md:ServiceName>
+            <md:ServiceDescription xml:lang="en">Test Service</md:ServiceDescription>
+            <md:RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" \>
+            <md:RequestedAttribute Name="urn:oid:2.5.4.4" FriendlyName="sn" \>
+            <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" FriendlyName="displayName" \>
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail" \>
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" \>
+        </md:AttributeConsumingService>""", metadata)
 
     def testSignMetadata(self):
         """

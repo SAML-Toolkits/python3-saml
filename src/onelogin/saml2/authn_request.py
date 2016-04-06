@@ -88,6 +88,10 @@ class OneLogin_Saml2_Authn_Request(object):
                     requested_authn_context_str += '<saml:AuthnContextClassRef>%s</saml:AuthnContextClassRef>' % authn_context
                 requested_authn_context_str += '    </samlp:RequestedAuthnContext>'
 
+        attr_consuming_service_str = ''
+        if 'attributeConsumingService' in sp_data and sp_data['attributeConsumingService']:
+            attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"1\""
+
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {
                 'id': uid,
@@ -100,6 +104,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 'entity_id': sp_data['entityId'],
                 'name_id_policy': name_id_policy_format,
                 'requested_authn_context_str': requested_authn_context_str,
+                'attr_consuming_service_str': attr_consuming_service_str,
             }
 
         self.__authn_request = request

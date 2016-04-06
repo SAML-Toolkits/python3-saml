@@ -438,6 +438,31 @@ class OneLogin_Saml2_Settings(object):
                 elif not validate_url(sp['assertionConsumerService']['url']):
                     errors.append('sp_acs_url_invalid')
 
+                if 'attributeConsumingService' in sp and len(sp['attributeConsumingService']):
+                    attributeConsumingService = sp['attributeConsumingService']
+                    if 'serviceName' not in attributeConsumingService:
+                        errors.append('sp_attributeConsumingService_serviceName_not_found')
+                    elif not isinstance(attributeConsumingService['serviceName'], basestring):
+                        errors.append('sp_attributeConsumingService_serviceName_type_invalid')
+
+                    if 'requestedAttributes' not in attributeConsumingService:
+                        errors.append('sp_attributeConsumingService_requestedAttributes_not_found')
+                    elif not isinstance(attributeConsumingService['requestedAttributes'], list):
+                        errors.append('sp_attributeConsumingService_serviceName_type_invalid')
+                    else:
+                        for req_attrib in attributeConsumingService['requestedAttributes']:
+                            if 'name' not in req_attrib:
+                                errors.append('sp_attributeConsumingService_requestedAttributes_name_not_found')
+                            if 'name' in req_attrib and not req_attrib['name'].strip():
+                                errors.append('sp_attributeConsumingService_requestedAttributes_name_invalid')
+                            if 'attributeValue' in req_attrib and type(req_attrib['attributeValue']) != list:
+                                errors.append('sp_attributeConsumingService_requestedAttributes_attributeValue_type_invalid')
+                            if 'isRequired' in req_attrib and type(req_attrib['isRequired']) != bool:
+                                errors.append('sp_attributeConsumingService_requestedAttributes_isRequired_type_invalid')
+
+                    if "serviceDescription" in attributeConsumingService and not isinstance(attributeConsumingService['serviceDescription'], basestring):
+                        errors.append('sp_attributeConsumingService_serviceDescription_type_invalid')
+
                 if 'singleLogoutService' in sp and \
                     'url' in sp['singleLogoutService'] and \
                     len(sp['singleLogoutService']['url']) > 0 and \

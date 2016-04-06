@@ -297,6 +297,38 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
             self.assertIn('sp_entityId_not_found', str(e))
             self.assertIn('sp_acs_not_found', str(e))
 
+        # AttributeConsumingService tests
+        # serviceName, requestedAttributes are required
+        settings_info['sp']['attributeConsumingService'] = {
+            "serviceDescription": "Test Service"
+        }
+        try:
+            OneLogin_Saml2_Settings(settings_info)
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertIn('sp_attributeConsumingService_serviceName_not_found', e.message)
+            self.assertIn('sp_attributeConsumingService_requestedAttributes_not_found', e.message)
+
+        # requestedAttributes/name is required
+        settings_info['sp']['attributeConsumingService'] = {
+            "serviceName": {},
+            "serviceDescription": ["Test Service"],
+            "requestedAttributes": [{
+                "nameFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                "friendlyName": "givenName",
+                "isRequired": "False"
+            }
+            ]
+        }
+        try:
+            OneLogin_Saml2_Settings(settings_info)
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertIn('sp_attributeConsumingService_requestedAttributes_name_not_found', e.message)
+            self.assertIn('sp_attributeConsumingService_requestedAttributes_isRequired_type_invalid', e.message)
+            self.assertIn('sp_attributeConsumingService_serviceDescription_type_invalid', e.message)
+            self.assertIn('sp_attributeConsumingService_serviceName_type_invalid', e.message)
+
         settings_info['idp']['entityID'] = 'entityId'
         settings_info['idp']['singleSignOnService'] = {}
         settings_info['idp']['singleSignOnService']['url'] = 'invalid_value'

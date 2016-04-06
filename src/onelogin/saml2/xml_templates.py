@@ -31,8 +31,9 @@ class OneLogin_Saml2_Templates(object):
     IssueInstant="%(issue_instant)s"
     Destination="%(destination)s"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    AssertionConsumerServiceURL="%(assertion_url)s">
+    AssertionConsumerServiceURL="%(assertion_url)s"%(attr_consuming_service_str)s>
     <saml:Issuer>%(entity_id)s</saml:Issuer>
+
     <samlp:NameIDPolicy
         Format="%(name_id_policy)s"
         AllowCreate="true" />
@@ -73,6 +74,19 @@ class OneLogin_Saml2_Templates(object):
         <md:EmailAddress>%(email)s</md:EmailAddress>
     </md:ContactPerson>"""
 
+    MD_SLS = """\
+        <md:SingleLogoutService Binding="%(binding)s"
+                                Location="%(location)s" />\n"""
+
+    MD_REQUESTED_ATTRIBUTE = """\
+            <md:RequestedAttribute Name="%(req_attr_name)s"%(req_attr_nameformat_str)s%(req_attr_isrequired_str)s%(req_attr_aux_str)s"""
+
+    MD_ATTR_CONSUMER_SERVICE = """\
+        <md:AttributeConsumingService index="1">
+            <md:ServiceName xml:lang="en">%(service_name)s</md:ServiceName>
+%(attr_cs_desc)s%(requested_attribute_str)s
+        </md:AttributeConsumingService>\n"""
+
     MD_ENTITY_DESCRIPTOR = """\
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -84,7 +98,7 @@ class OneLogin_Saml2_Templates(object):
         <md:AssertionConsumerService Binding="%(binding)s"
                                      Location="%(location)s"
                                      index="1" />
-    </md:SPSSODescriptor>
+%(attribute_consuming_service)s    </md:SPSSODescriptor>
 %(organization)s
 %(contacts)s
 </md:EntityDescriptor>"""

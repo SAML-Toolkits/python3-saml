@@ -437,6 +437,7 @@ class OneLogin_Saml2_Response(object):
         :rtype: Element
         """
         key = self.__settings.get_sp_key()
+        debug = self.__settings.is_debug_active()
 
         if not key:
             raise Exception('No private key available, check settings')
@@ -465,7 +466,7 @@ class OneLogin_Saml2_Response(object):
                             keyinfo.append(encrypted_key[0])
 
                 encrypted_data = encrypted_data_nodes[0]
-                OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
+                OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug)
         return xml
 
     def get_error(self):

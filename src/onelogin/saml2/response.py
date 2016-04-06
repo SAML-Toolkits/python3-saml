@@ -162,7 +162,7 @@ class OneLogin_Saml2_Response(object):
                         continue
                     else:
                         irt = sc_data.get('InResponseTo', None)
-                        if irt != in_response_to:
+                        if in_response_to and irt and irt != in_response_to:
                             continue
                         recipient = sc_data.get('Recipient', None)
                         if recipient and current_url not in recipient:

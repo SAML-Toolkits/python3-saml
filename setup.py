@@ -40,6 +40,7 @@ setup(
     extras_require={
         'test': (
             'coverage==3.7.1',
+            'freezegun==0.3.5',
             'pylint==1.3.1',
             'pep8==1.5.7',
             'pyflakes==0.8.1',

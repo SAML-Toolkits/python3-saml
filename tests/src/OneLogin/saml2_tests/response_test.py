@@ -1156,8 +1156,6 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'valid_response_without_inresponseto.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
 
-         
-
         not_on_or_after = datetime.strptime('2014-02-19T09:37:01Z', '%Y-%m-%dT%H:%M:%SZ')
         not_on_or_after -= timedelta(seconds=150)
 
@@ -1167,5 +1165,3 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
                 'http_host': 'pitbulk.no-ip.org',
                 'script_name': 'newonelogin/demo1/index.php?acs'
             }))
-
-

@@ -24,6 +24,11 @@ try:
 except ImportError:
     import json
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
 # Regex from Django Software Foundation and individual contributors.
 # Released under a BSD 3-Clause License
 url_regex = re.compile(

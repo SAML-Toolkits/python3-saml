@@ -866,7 +866,6 @@ Auxiliary class that contains several methods
 
 * ***decode_base64_and_inflate*** Base64 decodes and then inflates according to RFC1951.
 * ***deflate_and_base64_encode*** Deflates and the base64 encodes a string.
-* ***validate_xml*** Validates a xml against a schema.
 * ***format_cert*** Returns a x509 cert (adding header & footer if required).
 * ***format_private_key*** Returns a private key (adding header & footer if required).
 * ***redirect*** Executes a redirection to the provided url (or return the target url).
@@ -882,7 +881,6 @@ Auxiliary class that contains several methods
 * ***now*** Returns unix timestamp of actual time.
 * ***parse_duration*** Interprets a ISO8601 duration value relative to a given timestamp.
 * ***get_expire_time*** Compares 2 dates and returns the earliest.
-* ***query*** Extracts nodes that match the query from the Element.
 * ***delete_local_session*** Deletes the local session.
 * ***calculate_x509_fingerprint*** Calculates the fingerprint of a x509cert.
 * ***format_finger_print*** Formates a fingerprint.
@@ -893,6 +891,16 @@ Auxiliary class that contains several methods
 * ***add_sign*** Adds signature key and senders certificate to an element (Message or Assertion).
 * ***validate_sign*** Validates a signature (Message or Assertion).
 * ***validate_binary_sign*** Validates signed bynary data (Used to validate GET Signature).
+
+####OneLogin_Saml2_XML- xml_utils.py####
+
+A class that contains methods to handle XMLs
+
+* ***to_string*** Serialize an element to an encoded string representation of its XML tree.        
+* ***to_etree*** Parses an XML document or fragment from a string.
+* ***validate_xml*** Validates a xml against a schema
+* ***query*** Extracts nodes that match the query from the Element
+* ***extract_tag_text***
 
 ####OneLogin_Saml2_IdPMetadataParser - idp_metadata_parser.py####
 

@@ -894,6 +894,16 @@ Auxiliary class that contains several methods
 * ***validate_sign*** Validates a signature (Message or Assertion).
 * ***validate_binary_sign*** Validates signed bynary data (Used to validate GET Signature).
 
+####OneLogin_Saml2_IdPMetadataParser - idp_metadata_parser.py####
+
+A class that contains methods to obtain and parse metadata from IdP
+
+* ***get_metadata*** Get the metadata XML from the provided URL
+* ***parse_remote*** Get the metadata XML from the provided URL and parse it, returning a dict with extracted data
+* ***parse*** Parse the Identity Provider metadata and returns a dict with extracted data
+* ***merge_settings*** Will update the settings with the provided new settings data extracted from the IdP metadata
+        
+
 For more info, look at the source code; each method is documented and details about what does and how to use it are provided. Make sure to also check the doc folder where HTML documentation about the classes and methods is provided.
 
 Demos included in the toolkit

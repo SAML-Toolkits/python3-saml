@@ -73,7 +73,7 @@ class OneLogin_Saml2_Settings(object):
         - Loads settings info from settings file or array/object provided
 
         :param settings: SAML Toolkit Settings
-        :type settings: dict|object
+        :type settings: dict
 
         :param custom_base_path: Path where are stored the settings file and the cert folder
         :type custom_base_path: string

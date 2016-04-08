@@ -498,9 +498,6 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
 
-            if sign_alg != OneLogin_Saml2_Constants.RSA_SHA1:
-                raise Exception('Invalid SigAlg, the %s rejected.' % saml_type)
-
             signed_query = self.__build_sign_query(data[saml_type],
                                                    data.get('RelayState', None),
                                                    sign_alg,

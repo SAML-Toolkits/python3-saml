@@ -726,7 +726,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_metadata_signed = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings1.xml'))
         self.assertTrue(OneLogin_Saml2_Utils.validate_metadata_sign(xml_metadata_signed, cert))
         # expired cert, verified it
-        # self.assertFalse(OneLogin_Saml2_Utils.validate_metadata_sign(xml_metadata_signed, cert, validatecert=True))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_metadata_sign(xml_metadata_signed, cert, validatecert=True))
 
         xml_metadata_signed_2 = self.file_contents(join(self.data_path, 'metadata', 'signed_metadata_settings2.xml'))
         self.assertTrue(OneLogin_Saml2_Utils.validate_metadata_sign(xml_metadata_signed_2, cert_2))
@@ -737,7 +737,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         # expired cert
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert))
         # expired cert, verified it
-        # self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert, validatecert=True))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert, validatecert=True))
 
         # modified cert
         other_cert_path = join(dirname(__file__), '..', '..', '..', 'certs')
@@ -745,7 +745,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         cert_x = f.read()
         f.close()
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert_x))
-        # self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert_x, validatecert=True))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert_x, validatecert=True))
 
         xml_response_msg_signed_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'signed_message_response2.xml.base64')))
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed_2, cert_2))
@@ -758,7 +758,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         # expired cert
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_assert_signed, cert))
         # expired cert, verified it
-        # self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_assert_signed, cert, validatecert=True))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_assert_signed, cert, validatecert=True))
 
         xml_response_assert_signed_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'signed_assertion_response2.xml.base64')))
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_assert_signed_2, cert_2))
@@ -769,7 +769,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         # expired cert
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_double_signed, cert))
         # expired cert, verified it
-        # self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_double_signed, cert, validatecert=True))
+        self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_double_signed, cert, validatecert=True))
 
         xml_response_double_signed_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'double_signed_response2.xml.base64')))
         self.assertTrue(OneLogin_Saml2_Utils.validate_sign(xml_response_double_signed_2, cert_2))

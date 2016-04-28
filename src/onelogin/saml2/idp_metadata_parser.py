@@ -109,8 +109,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     if idp_entity_id is not None:
                         data['idp']['entityId'] = idp_entity_id
                     if idp_sso_url is not None:
-                        data['idp']['singleLogoutService'] = {}
-                        data['idp']['singleLogoutService']['url'] = idp_sso_url
+                        data['idp']['singleSignOnService'] = {}
+                        data['idp']['singleSignOnService']['url'] = idp_sso_url
                     if idp_slo_url is not None:
                         data['idp']['singleLogoutService'] = {}
                         data['idp']['singleLogoutService']['url'] = idp_slo_url

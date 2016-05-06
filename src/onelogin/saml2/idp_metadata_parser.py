@@ -48,7 +48,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         return xml
 
     @staticmethod
-    def parse_remote(url):
+    def parse_remote(url, **kwargs):
         """
         Get the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -57,19 +57,41 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :rtype: dict
         """
         idp_metadata = OneLogin_Saml2_IdPMetadataParser.get_metadata(url)
-        return OneLogin_Saml2_IdPMetadataParser.parse(idp_metadata)
+        return OneLogin_Saml2_IdPMetadataParser.parse(idp_metadata, **kwargs)
 
     @staticmethod
-    def parse(idp_metadata):
+    def parse(
+            idp_metadata,
+            required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
+            required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT):
         """
-        Parse the Identity Provider metadata and returns a dict with extracted data
-        If there are multiple IDPSSODescriptor it will only parse the first
+        Parse the Identity Provider metadata and return a dict with extracted data.
+
+        If there are multiple <IDPSSODescriptor> tags, parse only the first.
+
+        Parse only those SSO endpoints with the same binding as given by
+        the `required_sso_binding` parameter.
+
+        Parse only those SLO endpoints with the same binding as given by
+        the `required_slo_binding` parameter.
+
+        If the metadata specifies multiple SSO endpoints with the required
+        binding, extract only the first (the same holds true for SLO
+        endpoints).
+
         :param idp_metadata: XML of the Identity Provider Metadata.
         :type idp_metadata: string
-        :param url: If true and the URL is HTTPs, the cert of the domain is checked.
-        :type url: bool
+
+        :param required_sso_binding: Parse only POST or REDIRECT SSO endpoints.
+        :type required_sso_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
+            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+
+        :param required_slo_binding: Parse only POST or REDIRECT SLO endpoints.
+        :type required_slo_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
+            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+
         :returns: settings dict with extracted data
-        :rtype: string
+        :rtype: dict
         """
         data = {}
 
@@ -92,11 +114,19 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     if len(name_id_format_nodes) > 0:
                         idp_name_id_format = name_id_format_nodes[0].text
 
-                    sso_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, "./md:SingleSignOnService[@Binding='%s']" % OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+                    sso_nodes = OneLogin_Saml2_XML.query(
+                        idp_descriptor_node,
+                        "./md:SingleSignOnService[@Binding='%s']" % required_sso_binding
+                        )
+
                     if len(sso_nodes) > 0:
                         idp_sso_url = sso_nodes[0].get('Location', None)
 
-                    slo_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, "./md:SingleLogoutService[@Binding='%s']" % OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+                    slo_nodes = OneLogin_Saml2_XML.query(
+                        idp_descriptor_node,
+                        "./md:SingleLogoutService[@Binding='%s']" % required_slo_binding
+                        )
+
                     if len(slo_nodes) > 0:
                         idp_slo_url = slo_nodes[0].get('Location', None)
 
@@ -108,12 +138,17 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
                     if idp_entity_id is not None:
                         data['idp']['entityId'] = idp_entity_id
+
                     if idp_sso_url is not None:
                         data['idp']['singleSignOnService'] = {}
                         data['idp']['singleSignOnService']['url'] = idp_sso_url
+                        data['idp']['singleSignOnService']['binding'] = required_sso_binding
+
                     if idp_slo_url is not None:
                         data['idp']['singleLogoutService'] = {}
                         data['idp']['singleLogoutService']['url'] = idp_slo_url
+                        data['idp']['singleLogoutService']['binding'] = required_slo_binding
+
                     if idp_x509_cert is not None:
                         data['idp']['x509cert'] = idp_x509_cert
 

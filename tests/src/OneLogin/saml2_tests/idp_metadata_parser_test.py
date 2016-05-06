@@ -262,8 +262,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         """
         Tests the merge_settings method of the OneLogin_Saml2_IdPMetadataParser
         """
-
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             settings_result = OneLogin_Saml2_IdPMetadataParser.merge_settings(None, {})
 
         with self.assertRaises(TypeError):

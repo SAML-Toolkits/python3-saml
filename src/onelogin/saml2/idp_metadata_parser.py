@@ -6,6 +6,10 @@ All rights reserved.
 Metadata class of OneLogin's Python Toolkit.
 """
 
+
+from copy import deepcopy
+
+
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -174,6 +178,35 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :returns: merged settings
         :rtype: dict
         """
-        result_settings = settings.copy()
-        result_settings.update(new_metadata_settings)
+        for d in (settings, new_metadata_settings):
+            if not isinstance(d, dict):
+                raise TypeError('Both arguments must be dictionaries.')
+
+        # Guarantee to not modify original data (`settings.copy()` would not
+        # be sufficient, as it's just a shallow copy).
+        result_settings = deepcopy(settings)
+        # Merge `new_metadata_settings` into `result_settings`.
+        dict_deep_merge(result_settings, new_metadata_settings)
         return result_settings
+
+
+def dict_deep_merge(a, b, path=None):
+    """Deep-merge dictionary `b` into dictionary `a`.
+
+    Kudos to http://stackoverflow.com/a/7205107/145400
+    """
+    if path is None:
+        path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                dict_deep_merge(a[key], b[key], path + [str(key)])
+            elif a[key] == b[key]:
+                # Key conflict, but equal value.
+                pass
+            else:
+                # Key/value conflict. Prioritize b over a.
+                a[key] = b[key]
+        else:
+            a[key] = b[key]
+    return a

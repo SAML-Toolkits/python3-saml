@@ -269,12 +269,126 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             settings_result = OneLogin_Saml2_IdPMetadataParser.merge_settings({}, None)
 
         xml_idp_metadata = self.file_contents(join(self.data_path, 'metadata', 'idp_metadata.xml'))
-        data = OneLogin_Saml2_IdPMetadataParser.parse(xml_idp_metadata)
-        settings = self.loadSettingsJSON()
-        settings_result = OneLogin_Saml2_IdPMetadataParser.merge_settings(settings, data)
-        expected_data = {u'sp': {'NameIDFormat': 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'}, u'idp': {'singleSignOnService': {'url': 'https://app.onelogin.com/trust/saml2/http-post/sso/383123'}, 'entityId': 'https://app.onelogin.com/saml/metadata/383123', 'x509cert': 'MIIEHjCCAwagAwIBAgIBATANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzET\nMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYD\nVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbTAeFw0xMzA2\nMDUxNzE2MjBaFw0xODA2MDUxNzE2MjBaMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQI\nDApDYWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9u\nZUxvZ2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMIIBIjANBgkqhkiG9w0B\nAQEFAAOCAQ8AMIIBCgKCAQEAse8rnep4qL2GmhH10pMQyJ2Jae+AQHyfgVjaQZ7Z\n0QQog5jX91vcJRSMi0XWJnUtOr6lF0dq1+yckjZ92wyLrH+7fvngNO1aV4Mjk9sT\ngf+iqMrae6y6fRxDt9PXrEFVjvd3vv7QTJf2FuIPy4vVP06Dt8EMkQIr8rmLmU0m\nTr1k2DkrdtdlCuNFTXuAu3QqfvNCRrRwfNObn9MP6JeOUdcGLJsBjGF8exfcN1SF\nzRF0JFr3dmOlx761zK5liD0T1sYWnDquatj/JD9fZMbKecBKni1NglH/LVd+b6aJ\nUAr5LulERULUjLqYJRKW31u91/4Qazdo9tbvwqyFxaoUrwIDAQABo4HUMIHRMAwG\nA1UdEwEB/wQCMAAwHQYDVR0OBBYEFPWcXvQSlTXnzZD2xziuoUvrrDedMIGRBgNV\nHSMEgYkwgYaAFPWcXvQSlTXnzZD2xziuoUvrrDedoWukaTBnMQswCQYDVQQGEwJV\nUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREw\nDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbYIBATAO\nBgNVHQ8BAf8EBAMCBPAwDQYJKoZIhvcNAQEFBQADggEBAB/8xe3rzqXQVxzHyAHu\nAuPa73ClDoL1cko0Fp8CGcqEIyj6Te9gx5z6wyfv+Lo8RFvBLlnB1lXqbC+fTGcV\ngG/4oKLJ5UwRFxInqpZPnOAudVNnd0PYOODn9FWs6u+OTIQIaIcPUv3MhB9lwHIJ\nsTk/bs9xcru5TPyLIxLLd6ib/pRceKH2mTkzUd0DYk9CQNXXeoGx/du5B9nh3ClP\nTbVakRzl3oswgI5MQIphYxkW70SopEh4kOFSRE1ND31NNIq1YrXlgtkguQBFsZWu\nQOPR6cEwFZzP0tHTYbI839WgxX6hfhIUTUz6mLqq4+3P4BG3+1OXeVDg63y8Uh78\n1sE='}, u'strict': False, u'contactPerson': {u'technical': {u'givenName': u'technical_name', u'emailAddress': u'technical@example.com'}, u'support': {u'givenName': u'support_name', u'emailAddress': u'support@example.com'}}, u'debug': False, u'organization': {u'en-US': {u'url': u'http://sp.example.com', u'displayname': u'SP test', u'name': u'sp_test'}}, u'security': {u'signMetadata': False, u'wantAssertionsSigned': False, u'authnRequestsSigned': False}, u'custom_base_path': u'../../../tests/data/customPath/'}
-        self.assertEqual(expected_data, settings_result)
 
-        expected_data2 = {'sp': {u'singleLogoutService': {u'url': u'http://stuff.com/endpoints/endpoints/sls.php'}, u'assertionConsumerService': {u'url': u'http://stuff.com/endpoints/endpoints/acs.php'}, u'entityId': u'http://stuff.com/endpoints/metadata.php', u'NameIDFormat': u'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'}, 'idp': {u'singleLogoutService': {u'url': u'http://idp.example.com/SingleLogoutService.php'}, u'entityId': u'http://idp.example.com/', u'x509cert': u'MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo', u'singleSignOnService': {u'url': u'http://idp.example.com/SSOService.php'}}, u'strict': False, u'contactPerson': {u'technical': {u'givenName': u'technical_name', u'emailAddress': u'technical@example.com'}, u'support': {u'givenName': u'support_name', u'emailAddress': u'support@example.com'}}, u'debug': False, u'organization': {u'en-US': {u'url': u'http://sp.example.com', u'displayname': u'SP test', u'name': u'sp_test'}}, u'security': {u'signMetadata': False, u'wantAssertionsSigned': False, u'authnRequestsSigned': False}, u'custom_base_path': u'../../../tests/data/customPath/'}
+        # Parse XML metadata.
+        data = OneLogin_Saml2_IdPMetadataParser.parse(xml_idp_metadata)
+
+        # Read base settings.
+        settings = self.loadSettingsJSON()
+
+        # Merge settings from XML metadata into base settings,
+        # let XML metadata have priority if there are conflicting
+        # attributes.
+        settings_result = OneLogin_Saml2_IdPMetadataParser.merge_settings(settings, data)
+
+        # Generate readable JSON representation:
+        # print("%s" % json.dumps(settings_result, indent=2).replace(r'\n', r'\\n'))
+
+        expected_settings_json = """
+        {
+          "custom_base_path": "../../../tests/data/customPath/",
+          "contactPerson": {
+            "support": {
+              "emailAddress": "support@example.com",
+              "givenName": "support_name"
+            },
+            "technical": {
+              "emailAddress": "technical@example.com",
+              "givenName": "technical_name"
+            }
+          },
+          "idp": {
+            "singleSignOnService": {
+              "url": "https://app.onelogin.com/trust/saml2/http-post/sso/383123",
+              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            },
+            "entityId": "https://app.onelogin.com/saml/metadata/383123",
+            "singleLogoutService": {
+              "url": "http://idp.example.com/SingleLogoutService.php"
+            },
+            "x509cert": "MIIEHjCCAwagAwIBAgIBATANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzET\\nMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYD\\nVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbTAeFw0xMzA2\\nMDUxNzE2MjBaFw0xODA2MDUxNzE2MjBaMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQI\\nDApDYWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9u\\nZUxvZ2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMIIBIjANBgkqhkiG9w0B\\nAQEFAAOCAQ8AMIIBCgKCAQEAse8rnep4qL2GmhH10pMQyJ2Jae+AQHyfgVjaQZ7Z\\n0QQog5jX91vcJRSMi0XWJnUtOr6lF0dq1+yckjZ92wyLrH+7fvngNO1aV4Mjk9sT\\ngf+iqMrae6y6fRxDt9PXrEFVjvd3vv7QTJf2FuIPy4vVP06Dt8EMkQIr8rmLmU0m\\nTr1k2DkrdtdlCuNFTXuAu3QqfvNCRrRwfNObn9MP6JeOUdcGLJsBjGF8exfcN1SF\\nzRF0JFr3dmOlx761zK5liD0T1sYWnDquatj/JD9fZMbKecBKni1NglH/LVd+b6aJ\\nUAr5LulERULUjLqYJRKW31u91/4Qazdo9tbvwqyFxaoUrwIDAQABo4HUMIHRMAwG\\nA1UdEwEB/wQCMAAwHQYDVR0OBBYEFPWcXvQSlTXnzZD2xziuoUvrrDedMIGRBgNV\\nHSMEgYkwgYaAFPWcXvQSlTXnzZD2xziuoUvrrDedoWukaTBnMQswCQYDVQQGEwJV\\nUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREw\\nDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbYIBATAO\\nBgNVHQ8BAf8EBAMCBPAwDQYJKoZIhvcNAQEFBQADggEBAB/8xe3rzqXQVxzHyAHu\\nAuPa73ClDoL1cko0Fp8CGcqEIyj6Te9gx5z6wyfv+Lo8RFvBLlnB1lXqbC+fTGcV\\ngG/4oKLJ5UwRFxInqpZPnOAudVNnd0PYOODn9FWs6u+OTIQIaIcPUv3MhB9lwHIJ\\nsTk/bs9xcru5TPyLIxLLd6ib/pRceKH2mTkzUd0DYk9CQNXXeoGx/du5B9nh3ClP\\nTbVakRzl3oswgI5MQIphYxkW70SopEh4kOFSRE1ND31NNIq1YrXlgtkguQBFsZWu\\nQOPR6cEwFZzP0tHTYbI839WgxX6hfhIUTUz6mLqq4+3P4BG3+1OXeVDg63y8Uh78\\n1sE="
+          },
+          "sp": {
+            "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+            "entityId": "http://stuff.com/endpoints/metadata.php",
+            "assertionConsumerService": {
+              "url": "http://stuff.com/endpoints/endpoints/acs.php"
+            },
+            "singleLogoutService": {
+              "url": "http://stuff.com/endpoints/endpoints/sls.php"
+            }
+          },
+          "security": {
+            "wantAssertionsSigned": false,
+            "authnRequestsSigned": false,
+            "signMetadata": false
+          },
+          "debug": false,
+          "organization": {
+            "en-US": {
+              "displayname": "SP test",
+              "url": "http://sp.example.com",
+              "name": "sp_test"
+            }
+          },
+          "strict": false
+        }
+        """
+        expected_settings = json.loads(expected_settings_json)
+        self.assertEqual(expected_settings, settings_result)
+
+        # Commute merge operation. As the order determines which settings
+        # dictionary has priority, here we expect a different result.
         settings_result2 = OneLogin_Saml2_IdPMetadataParser.merge_settings(data, settings)
-        self.assertEqual(expected_data2, settings_result2)
+        expected_settings2_json = """
+        {
+          "debug": false,
+          "idp": {
+            "singleLogoutService": {
+              "url": "http://idp.example.com/SingleLogoutService.php"
+            },
+            "singleSignOnService": {
+              "url": "http://idp.example.com/SSOService.php",
+              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            },
+            "entityId": "http://idp.example.com/",
+            "x509cert": "MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo"
+          },
+          "security": {
+            "authnRequestsSigned": false,
+            "wantAssertionsSigned": false,
+            "signMetadata": false
+          },
+          "contactPerson": {
+            "technical": {
+              "emailAddress": "technical@example.com",
+              "givenName": "technical_name"
+            },
+            "support": {
+              "emailAddress": "support@example.com",
+              "givenName": "support_name"
+            }
+          },
+          "strict": false,
+          "sp": {
+            "singleLogoutService": {
+              "url": "http://stuff.com/endpoints/endpoints/sls.php"
+            },
+            "assertionConsumerService": {
+              "url": "http://stuff.com/endpoints/endpoints/acs.php"
+            },
+            "entityId": "http://stuff.com/endpoints/metadata.php",
+            "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified"
+          },
+          "custom_base_path": "../../../tests/data/customPath/",
+          "organization": {
+            "en-US": {
+              "displayname": "SP test",
+              "url": "http://sp.example.com",
+              "name": "sp_test"
+            }
+          }
+        }
+        """
+        expected_settings2 = json.loads(expected_settings2_json)
+        self.assertEqual(expected_settings2, settings_result2)

@@ -61,15 +61,15 @@ class OneLogin_Saml2_Authn_Request(object):
 
             display_name = 'displayname' in organization_data[lang] and organization_data[lang]['displayname']
             if display_name:
-                provider_name_str = 'ProviderName="%s"' % organization_data[lang]['displayname']
+                provider_name_str = "\n" + '    ProviderName="%s"' % organization_data[lang]['displayname']
 
         force_authn_str = ''
         if force_authn is True:
-            force_authn_str = 'ForceAuthn="true"'
+            force_authn_str = "\n" + '    ForceAuthn="true"'
 
         is_passive_str = ''
         if is_passive is True:
-            is_passive_str = 'IsPassive="true"'
+            is_passive_str = "\n" + '    IsPassive="true"'
 
         nameid_policy_str = ''
         if set_nameid_policy:

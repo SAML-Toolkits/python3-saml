@@ -24,10 +24,7 @@ class OneLogin_Saml2_Templates(object):
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     ID="%(id)s"
-    Version="2.0"
-    %(provider_name)s
-    %(force_authn_str)s
-    %(is_passive_str)s
+    Version="2.0"%(provider_name)s%(force_authn_str)s%(is_passive_str)s
     IssueInstant="%(issue_instant)s"
     Destination="%(destination)s"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"

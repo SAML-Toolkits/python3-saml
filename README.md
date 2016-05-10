@@ -498,10 +498,11 @@ We can set a 'return_to' url parameter to the login function and that will be co
 target_url = 'https://example.com'
 auth.login(return_to=target_url)
 ```
-The login method can recieve 2 more optional parameters:
+The login method can recieve 3 more optional parameters:
 
-* force_authn  When true the AuthNReuqest will set the ForceAuthn='true'
-* is_passive   When true the AuthNReuqest will set the Ispassive='true'
+* force_authn       When true the AuthNReuqest will set the ForceAuthn='true'
+* is_passive        When true the AuthNReuqest will set the Ispassive='true'
+* set_nameid_policy When true the AuthNReuqest will set a nameIdPolicy element.
 
 #### The SP Endpoints ####
 

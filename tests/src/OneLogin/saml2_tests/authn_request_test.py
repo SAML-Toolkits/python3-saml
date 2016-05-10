@@ -195,6 +195,31 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
         self.assertIn('IsPassive="true"', inflated_3)
 
+    def testCreateRequestSetNameIDPolicy(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        The creation of a deflated SAML Request with and without NameIDPolicy
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertIn('<samlp:NameIDPolicy', inflated)
+
+        authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False, True)
+        authn_request_encoded_2 = authn_request_2.get_request()
+        inflated_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_2))
+        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertIn('<samlp:NameIDPolicy', inflated_2)
+
+        authn_request_3 = OneLogin_Saml2_Authn_Request(settings, False, False, False)
+        authn_request_encoded_3 = authn_request_3.get_request()
+        inflated_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_3))
+        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertNotIn('<samlp:NameIDPolicy', inflated_3)
+
     def testCreateDeflatedSAMLRequestURLParameter(self):
         """
         Tests the OneLogin_Saml2_Authn_Request Constructor.

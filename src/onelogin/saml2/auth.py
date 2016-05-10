@@ -261,7 +261,7 @@ class OneLogin_Saml2_Auth(object):
         assert isinstance(name, compat.str_type)
         return self.__attributes.get(name)
 
-    def login(self, return_to=None, force_authn=False, is_passive=False):
+    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
         """
         Initiates the SSO process.
 
@@ -269,14 +269,18 @@ class OneLogin_Saml2_Auth(object):
         :type return_to: string
 
         :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
-        :type force_authn: string
+        :type force_authn: bool
 
         :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
-        :type is_passive: string
+        :type is_passive: bool
+
+        :param set_nameid_policy: Optional argument. When true the AuthNReuqest will set a nameIdPolicy element.
+        :type set_nameid_policy: bool
 
         :returns: Redirection url
+        :rtype: string
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}

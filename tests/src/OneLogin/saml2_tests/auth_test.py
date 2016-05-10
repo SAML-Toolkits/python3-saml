@@ -665,6 +665,40 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
         self.assertIn('IsPassive="true"', request_3)
 
+    def testLoginSetNameIDPolicy(self):
+        """
+        Tests the login method of the OneLogin_Saml2_Auth class
+        Case Logout with no parameters. A AuthN Request is built with and without NameIDPolicy
+        """
+        settings_info = self.loadSettingsJSON()
+        return_to = u'http://example.com/returnto'
+        settings_info['idp']['singleSignOnService']['url']
+
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url = auth.login(return_to)
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+        self.assertIn(sso_url, target_url)
+        self.assertIn('SAMLRequest', parsed_query)
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
+        self.assertIn('<samlp:NameIDPolicy', request)
+
+        auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_2 = auth_2.login(return_to, False, False, True)
+        parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
+        self.assertIn(sso_url, target_url_2)
+        self.assertIn('SAMLRequest', parsed_query_2)
+        request_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
+        self.assertIn('<samlp:NameIDPolicy', request_2)
+
+        auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_3 = auth_3.login(return_to, False, False, False)
+        parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
+        self.assertIn(sso_url, target_url_3)
+        self.assertIn('SAMLRequest', parsed_query_3)
+        request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
+        self.assertNotIn('<samlp:NameIDPolicy', request_3)
+
     def testLogout(self):
         """
         Tests the logout method of the OneLogin_Saml2_Auth class

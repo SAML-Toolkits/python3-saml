@@ -32,12 +32,8 @@ class OneLogin_Saml2_Templates(object):
     Destination="%(destination)s"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="%(assertion_url)s"%(attr_consuming_service_str)s>
-    <saml:Issuer>%(entity_id)s</saml:Issuer>
-
-    <samlp:NameIDPolicy
-        Format="%(name_id_policy)s"
-        AllowCreate="true" />
-        %(requested_authn_context_str)s
+    <saml:Issuer>%(entity_id)s</saml:Issuer>%(nameid_policy_str)s
+%(requested_authn_context_str)s
 </samlp:AuthnRequest>"""
 
     LOGOUT_REQUEST = """\

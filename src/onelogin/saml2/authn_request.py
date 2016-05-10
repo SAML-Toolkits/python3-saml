@@ -22,7 +22,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings, force_authn=False, is_passive=False):
+    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True):
         """
         Constructs the AuthnRequest object.
 
@@ -34,6 +34,9 @@ class OneLogin_Saml2_Authn_Request(object):
 
         :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
         :type is_passive: bool
+
+        :param set_nameid_policy: Optional argument. When true the AuthNReuqest will set a nameIdPolicy element.
+        :type set_nameid_policy: bool
         """
         self.__settings = settings
 
@@ -46,10 +49,6 @@ class OneLogin_Saml2_Authn_Request(object):
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
         destination = idp_data['singleSignOnService']['url']
-
-        name_id_policy_format = sp_data['NameIDFormat']
-        if security['wantNameIdEncrypted']:
-            name_id_policy_format = OneLogin_Saml2_Constants.NAMEID_ENCRYPTED
 
         provider_name_str = ''
         organization_data = settings.get_organization()
@@ -71,6 +70,17 @@ class OneLogin_Saml2_Authn_Request(object):
         is_passive_str = ''
         if is_passive is True:
             is_passive_str = 'IsPassive="true"'
+
+        nameid_policy_str = ''
+        if set_nameid_policy:
+            name_id_policy_format = sp_data['NameIDFormat']
+            if security['wantNameIdEncrypted']:
+                name_id_policy_format = OneLogin_Saml2_Constants.NAMEID_ENCRYPTED
+
+            nameid_policy_str = """
+    <samlp:NameIDPolicy
+        Format="%s"
+        AllowCreate="true" />""" % name_id_policy_format
 
         requested_authn_context_str = ''
         if security['requestedAuthnContext'] is not False:
@@ -102,7 +112,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 'destination': destination,
                 'assertion_url': sp_data['assertionConsumerService']['url'],
                 'entity_id': sp_data['entityId'],
-                'name_id_policy': name_id_policy_format,
+                'nameid_policy_str': nameid_policy_str,
                 'requested_authn_context_str': requested_authn_context_str,
                 'attr_consuming_service_str': attr_consuming_service_str,
             }

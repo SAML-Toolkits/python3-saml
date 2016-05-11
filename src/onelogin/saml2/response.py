@@ -273,6 +273,8 @@ class OneLogin_Saml2_Response(object):
         :rtype: dict
         """
         nameid = None
+        nameid_data = {}
+
         encrypted_id_data_nodes = self.__query_assertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')
         if encrypted_id_data_nodes:
             encrypted_data = encrypted_id_data_nodes[0]
@@ -283,13 +285,15 @@ class OneLogin_Saml2_Response(object):
             if nameid_nodes:
                 nameid = nameid_nodes[0]
         if nameid is None:
-            raise Exception('Not NameID found in the assertion of the Response')
-
-        nameid_data = {'Value': nameid.text}
-        for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
-            value = nameid.get(attr, None)
-            if value:
-                nameid_data[attr] = value
+            security = self.__settings.get_security_data()
+            if security.get('wantNameId', True):
+                raise Exception('Not NameID found in the assertion of the Response')
+        else:
+            nameid_data = {'Value': nameid.text}
+            for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
+                value = nameid.get(attr, None)
+                if value:
+                    nameid_data[attr] = value
         return nameid_data
 
     def get_nameid(self):
@@ -297,10 +301,13 @@ class OneLogin_Saml2_Response(object):
         Gets the NameID provided by the SAML Response from the IdP
 
         :returns: NameID (value)
-        :rtype: string
+        :rtype: string|None
         """
+        nameid_value = None
         nameid_data = self.get_nameid_data()
-        return nameid_data['Value']
+        if nameid_data and 'Value' in nameid_data.keys():
+            nameid_value = nameid_data['Value']
+        return nameid_value
 
     def get_session_not_on_or_after(self):
         """

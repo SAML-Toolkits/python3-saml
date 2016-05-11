@@ -590,7 +590,48 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('signMetadata', security)
         self.assertIn('wantMessagesSigned', security)
         self.assertIn('wantAssertionsSigned', security)
+        self.assertIn('requestedAuthnContext', security)
+        self.assertIn('wantNameId', security)
         self.assertIn('wantNameIdEncrypted', security)
+
+    def testGetDefaultSecurityValues(self):
+        """
+        Tests default values of Security advanced sesettings
+        """
+        settings_json = self.loadSettingsJSON()
+        del settings_json['security']
+        settings = OneLogin_Saml2_Settings(settings_json)
+        security = settings.get_security_data()
+
+        self.assertIn('nameIdEncrypted', security)
+        self.assertFalse(security.get('nameIdEncrypted'))
+
+        self.assertIn('authnRequestsSigned', security)
+        self.assertFalse(security.get('authnRequestsSigned'))
+
+        self.assertIn('logoutRequestSigned', security)
+        self.assertFalse(security.get('logoutRequestSigned'))
+
+        self.assertIn('logoutResponseSigned', security)
+        self.assertFalse(security.get('logoutResponseSigned'))
+
+        self.assertIn('signMetadata', security)
+        self.assertFalse(security.get('signMetadata'))
+
+        self.assertIn('wantMessagesSigned', security)
+        self.assertFalse(security.get('wantMessagesSigned'))
+
+        self.assertIn('wantAssertionsSigned', security)
+        self.assertFalse(security.get('wantAssertionsSigned'))
+
+        self.assertIn('requestedAuthnContext', security)
+        self.assertTrue(security.get('requestedAuthnContext'))
+
+        self.assertIn('wantNameId', security)
+        self.assertTrue(security.get('wantNameId'))
+
+        self.assertIn('wantNameIdEncrypted', security)
+        self.assertFalse(security.get('wantNameIdEncrypted'))
 
     def testGetContacts(self):
         """

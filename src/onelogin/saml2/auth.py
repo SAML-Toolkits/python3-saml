@@ -210,7 +210,7 @@ class OneLogin_Saml2_Auth(object):
         Returns the nameID.
 
         :returns: NameID
-        :rtype: string
+        :rtype: string|None
         """
         return self.__nameid
 
@@ -226,7 +226,7 @@ class OneLogin_Saml2_Auth(object):
         """
         Returns the SessionNotOnOrAfter from the AuthnStatement.
         :returns: The SessionNotOnOrAfter of the assertion
-        :rtype: DateTime|null
+        :rtype: DateTime|None
         """
         return self.__session_expiration
 

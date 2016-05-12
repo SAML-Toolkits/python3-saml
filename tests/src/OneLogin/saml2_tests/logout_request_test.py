@@ -126,7 +126,6 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
             exception = context.exception
             self.assertIn("Key is required in order to decrypt the NameID", str(exception))
 
-
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
         name_id_data_4 = OneLogin_Saml2_Logout_Request.get_nameid_data(request_2, key)

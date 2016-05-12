@@ -54,8 +54,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         response = OneLogin_Saml2_Logout_Response(settings, message)
-        self.assertRegex(compat.to_string(OneLogin_Saml2_XML.to_string(response.document)),
-                                 '<samlp:LogoutResponse')
+        self.assertRegex(compat.to_string(OneLogin_Saml2_XML.to_string(response.document)), '<samlp:LogoutResponse')
 
     def testCreateDeflatedSAMLLogoutResponseURLParameter(self):
         """

@@ -73,7 +73,6 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
             exception = context.exception
             self.assertIn("unsupported type", str(exception))
 
-
     def testToElement(self):
         """
         Tests the to_etree method of the OneLogin_Saml2_XML

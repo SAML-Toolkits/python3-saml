@@ -778,7 +778,6 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
             exception = context.exception
             self.assertIn("The IdP does not support Single Log Out", str(exception))
 
-
     def testLogoutNameIDandSessionIndex(self):
         """
         Tests the logout method of the OneLogin_Saml2_Auth class

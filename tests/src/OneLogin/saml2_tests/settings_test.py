@@ -451,29 +451,37 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
             settings_info['security'] = {}
         settings_info['security']['signMetadata'] = {}
 
-        self.assertRaisesRegexp(Exception, 'sp_signMetadata_invalid',
-                                OneLogin_Saml2_Settings, settings_info)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Settings(settings_info)
+            exception = context.exception
+            self.assertIn("sp_signMetadata_invalid", str(exception))
 
         settings_info['security']['signMetadata'] = {
             'keyFileName': 'noexist.key',
             'certFileName': 'sp.crt'
         }
         settings = OneLogin_Saml2_Settings(settings_info)
-        self.assertRaisesRegexp(Exception, 'Private key file not readable',
-                                settings.get_sp_metadata)
+        with self.assertRaises(Exception) as context:
+            settings.get_sp_metadata()
+            exception = context.exception
+            self.assertIn("Private key file not readable", str(exception))
 
         settings_info['security']['signMetadata'] = {
             'keyFileName': 'sp.key',
             'certFileName': 'noexist.crt'
         }
         settings = OneLogin_Saml2_Settings(settings_info)
-        self.assertRaisesRegexp(Exception, 'Public cert file not readable',
-                                settings.get_sp_metadata)
+        with self.assertRaises(Exception) as context:
+            settings.get_sp_metadata()
+            exception = context.exception
+            self.assertIn("Public cert file not readable", str(exception))
 
         settings_info['security']['signMetadata'] = 'invalid_value'
         settings = OneLogin_Saml2_Settings(settings_info)
-        self.assertRaisesRegexp(Exception, 'Invalid Setting: signMetadata value of the sp is not valid',
-                                settings.get_sp_metadata)
+        with self.assertRaises(Exception) as context:
+            settings.get_sp_metadata()
+            exception = context.exception
+            self.assertIn("Invalid Setting: signMetadata value of the sp is not valid", str(exception))
 
     def testValidateMetadata(self):
         """
@@ -516,8 +524,10 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         metadata = ''
-        self.assertRaisesRegexp(Exception, 'Empty string supplied as input',
-                                settings.validate_metadata, metadata)
+        with self.assertRaises(Exception) as context:
+            settings.validate_metadata(metadata)
+            exception = context.exception
+            self.assertIn("t", str(exception))
 
         metadata = '<no xml>'
         errors = settings.validate_metadata(metadata)

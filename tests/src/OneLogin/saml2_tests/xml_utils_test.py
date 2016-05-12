@@ -68,9 +68,11 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
         self.assertIs(xml, OneLogin_Saml2_XML.to_string(xml))
         self.assertIs(bxml, OneLogin_Saml2_XML.to_string(bxml))
         self.assertEqual(etree.tostring(elem), OneLogin_Saml2_XML.to_string(elem))
-        self.assertRaisesRegexp(ValueError,
-                                'unsupported type',
-                                OneLogin_Saml2_XML.to_string, 1)
+        with self.assertRaises(ValueError) as context:
+            OneLogin_Saml2_XML.to_string(1)
+            exception = context.exception
+            self.assertIn("unsupported type", str(exception))
+
 
     def testToElement(self):
         """
@@ -94,9 +96,10 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
         res = OneLogin_Saml2_XML.to_etree(elem)
         self.assertIs(res, elem)
 
-        self.assertRaisesRegexp(ValueError,
-                                'unsupported type',
-                                OneLogin_Saml2_XML.to_etree, 1)
+        with self.assertRaises(ValueError) as context:
+            OneLogin_Saml2_XML.to_etree(1)
+            exception = context.exception
+            self.assertIn("unsupported type", str(exception))
 
     def testQuery(self):
         """

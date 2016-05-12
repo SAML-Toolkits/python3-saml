@@ -140,7 +140,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         settings2 = OneLogin_Saml2_IdPMetadataParser.parse(
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            )
+        )
         expected_settings = json.loads(expected_settings_json)
         self.assertEqual(expected_settings, settings1)
         self.assertEqual(expected_settings, settings2)
@@ -171,7 +171,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         settings = OneLogin_Saml2_IdPMetadataParser.parse(
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
-            )
+        )
         expected_settings = json.loads(expected_settings_json)
         self.assertEqual(expected_settings, settings)
 
@@ -214,7 +214,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            )
+        )
         expected_settings1_2 = deepcopy(expected_settings)
         self.assertEqual(expected_settings1_2, settings1)
         self.assertEqual(expected_settings1_2, settings2)
@@ -223,7 +223,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
-            )
+        )
         # Oktadev does not specify any POST binding endpoint.
         expected_settings3 = deepcopy(expected_settings)
         del expected_settings3['idp']['singleLogoutService']
@@ -234,11 +234,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            )
+        )
         settings5 = OneLogin_Saml2_IdPMetadataParser.parse(
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
-            )
+        )
         expected_settings4_5 = deepcopy(expected_settings)
         del expected_settings4_5['idp']['singleSignOnService']
         self.assertEqual(expected_settings4_5, settings4)
@@ -248,11 +248,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             xmldoc,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
-            )
+        )
         settings7 = OneLogin_Saml2_IdPMetadataParser.parse(
             xmldoc,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
-            )
+        )
         expected_settings6_7 = deepcopy(expected_settings)
         del expected_settings6_7['idp']['singleLogoutService']
         self.assertEqual(expected_settings6_7, settings6)

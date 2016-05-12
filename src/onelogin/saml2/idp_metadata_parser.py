@@ -121,7 +121,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     sso_nodes = OneLogin_Saml2_XML.query(
                         idp_descriptor_node,
                         "./md:SingleSignOnService[@Binding='%s']" % required_sso_binding
-                        )
+                    )
 
                     if len(sso_nodes) > 0:
                         idp_sso_url = sso_nodes[0].get('Location', None)
@@ -129,7 +129,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     slo_nodes = OneLogin_Saml2_XML.query(
                         idp_descriptor_node,
                         "./md:SingleLogoutService[@Binding='%s']" % required_slo_binding
-                        )
+                    )
 
                     if len(slo_nodes) > 0:
                         idp_slo_url = slo_nodes[0].get('Location', None)

@@ -22,6 +22,14 @@ except ImportError:
 
 
 class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
+
+    # assertRegexpMatches deprecated on python3
+    def assertRegex(self, text, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRegex'):
+            return super(OneLogin_Saml2_Authn_Request_Test, self).assertRegex(text, regexp, msg)
+        else:
+            return self.assertRegexpMatches(text, regexp, msg)
+
     def loadSettingsJSON(self, filename='settings1.json'):
         filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
         if exists(filename):
@@ -53,7 +61,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ProviderName="SP test"', inflated)
 
         saml_settings['organization'] = {}
@@ -62,7 +70,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ProviderName="SP test"', inflated)
 
     def testCreateRequestAuthContext(self):
@@ -75,7 +83,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -84,7 +92,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -93,7 +101,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -102,7 +110,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -111,7 +119,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED, inflated)
         self.assertIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -125,7 +133,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn(OneLogin_Saml2_Constants.AC_PASSWORD, inflated)
         self.assertNotIn(OneLogin_Saml2_Constants.AC_X509, inflated)
 
@@ -134,7 +142,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn('RequestedAuthnContext Comparison="exact"', inflated)
 
         saml_settings['security']['requestedAuthnContextComparison'] = 'minimun'
@@ -142,7 +150,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn('RequestedAuthnContext Comparison="minimun"', inflated)
 
     def testCreateRequestForceAuthN(self):
@@ -155,19 +163,19 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ForceAuthn="true"', inflated)
 
         authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False)
         authn_request_encoded_2 = authn_request_2.get_request()
         inflated_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_2))
-        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_2, '^<samlp:AuthnRequest')
         self.assertNotIn('ForceAuthn="true"', inflated_2)
 
         authn_request_3 = OneLogin_Saml2_Authn_Request(settings, True, False)
         authn_request_encoded_3 = authn_request_3.get_request()
         inflated_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_3))
-        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_3, '^<samlp:AuthnRequest')
         self.assertIn('ForceAuthn="true"', inflated_3)
 
     def testCreateRequestIsPassive(self):
@@ -180,19 +188,19 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('IsPassive="true"', inflated)
 
         authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False)
         authn_request_encoded_2 = authn_request_2.get_request()
         inflated_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_2))
-        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_2, '^<samlp:AuthnRequest')
         self.assertNotIn('IsPassive="true"', inflated_2)
 
         authn_request_3 = OneLogin_Saml2_Authn_Request(settings, False, True)
         authn_request_encoded_3 = authn_request_3.get_request()
         inflated_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_3))
-        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_3, '^<samlp:AuthnRequest')
         self.assertIn('IsPassive="true"', inflated_3)
 
     def testCreateRequestSetNameIDPolicy(self):
@@ -205,19 +213,19 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn('<samlp:NameIDPolicy', inflated)
 
         authn_request_2 = OneLogin_Saml2_Authn_Request(settings, False, False, True)
         authn_request_encoded_2 = authn_request_2.get_request()
         inflated_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_2))
-        self.assertRegexpMatches(inflated_2, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_2, '^<samlp:AuthnRequest')
         self.assertIn('<samlp:NameIDPolicy', inflated_2)
 
         authn_request_3 = OneLogin_Saml2_Authn_Request(settings, False, False, False)
         authn_request_encoded_3 = authn_request_3.get_request()
         inflated_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_3))
-        self.assertRegexpMatches(inflated_3, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated_3, '^<samlp:AuthnRequest')
         self.assertNotIn('<samlp:NameIDPolicy', inflated_3)
 
     def testCreateDeflatedSAMLRequestURLParameter(self):
@@ -230,12 +238,12 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
             'SAMLRequest': authn_request.get_request()
         }
         auth_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SSOService.php', parameters, True)
-        self.assertRegexpMatches(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
+        self.assertRegex(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
         exploded = urlparse(auth_url)
         exploded = parse_qs(exploded[4])
         payload = exploded['SAMLRequest'][0]
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
 
     def testCreateEncSAMLRequest(self):
         """
@@ -258,16 +266,16 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
             'SAMLRequest': authn_request.get_request()
         }
         auth_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SSOService.php', parameters, True)
-        self.assertRegexpMatches(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
+        self.assertRegex(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
         exploded = urlparse(auth_url)
         exploded = parse_qs(exploded[4])
         payload = exploded['SAMLRequest'][0]
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
-        self.assertRegexpMatches(inflated, 'AssertionConsumerServiceURL="http://stuff.com/endpoints/endpoints/acs.php">')
-        self.assertRegexpMatches(inflated, '<saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>')
-        self.assertRegexpMatches(inflated, 'Format="urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"')
-        self.assertRegexpMatches(inflated, 'ProviderName="SP prueba"')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, 'AssertionConsumerServiceURL="http://stuff.com/endpoints/endpoints/acs.php">')
+        self.assertRegex(inflated, '<saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>')
+        self.assertRegex(inflated, 'Format="urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"')
+        self.assertRegex(inflated, 'ProviderName="SP prueba"')
 
     def testGetID(self):
         """
@@ -300,4 +308,5 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         authn_request_encoded = authn_request.get_request()
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
-        self.assertRegexpMatches(inflated, 'AttributeConsumingServiceIndex="1"')
+
+        self.assertRegex(inflated, 'AttributeConsumingServiceIndex="1"')

@@ -123,8 +123,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         target_url3 = OneLogin_Saml2_Utils.redirect(url3, {}, request_data)
         self.assertIn('test=true', target_url3)
-        self.assertRaisesRegexp(Exception, 'Redirect to invalid URL',
-                                OneLogin_Saml2_Utils.redirect, url4, {}, request_data)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.redirect(url4, {}, request_data)
+            exception = context.exception
+            self.assertIn("Redirect to invalid URL", str(exception))
 
         # Review parameter prefix
         parameters1 = {
@@ -164,8 +166,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         Tests the get_self_host method of the OneLogin_Saml2_Utils
         """
         request_data = {}
-        self.assertRaisesRegexp(Exception, 'No hostname defined',
-                                OneLogin_Saml2_Utils.get_self_host, request_data)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.get_self_url_host(request_data)
+            exception = context.exception
+            self.assertIn("No hostname defined", str(exception))
 
         request_data = {
             'server_name': 'example.com'
@@ -255,8 +259,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         request_data2 = {
             'request_uri': 'example.com/onelogin/sso'
         }
-        self.assertRaisesRegexp(Exception, 'No hostname defined',
-                                OneLogin_Saml2_Utils.get_self_url_host, request_data2)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.get_self_url_host(request_data2)
+            exception = context.exception
+            self.assertIn("No hostname defined", str(exception))
 
     def testGetSelfURL(self):
         """
@@ -385,15 +391,19 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_inv = b64decode(xml_inv)
         dom_inv = etree.fromstring(xml_inv)
 
-        self.assertRaisesRegexp(Exception, 'Missing Status on response',
-                                OneLogin_Saml2_Utils.get_status, dom_inv)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.get_status(dom_inv)
+            exception = context.exception
+            self.assertIn("Missing Status on response", str(exception))
 
         xml_inv2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_status_code.xml.base64'))
         xml_inv2 = b64decode(xml_inv2)
         dom_inv2 = etree.fromstring(xml_inv2)
 
-        self.assertRaisesRegexp(Exception, 'Missing Status Code on response',
-                                OneLogin_Saml2_Utils.get_status, dom_inv2)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.get_status(dom_inv2)
+            exception = context.exception
+            self.assertIn("Missing Status Code on response", str(exception))
 
     def testParseDuration(self):
         """
@@ -409,8 +419,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertTrue(parsed_duration_2 > parsed_duration)
 
         invalid_duration = 'PT1Y'
-        self.assertRaisesRegexp(Exception, 'Unrecognised ISO 8601 date format',
-                                OneLogin_Saml2_Utils.parse_duration, invalid_duration)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.parse_duration(invalid_duration)
+            exception = context.exception
+            self.assertIn("Unrecognised ISO 8601 date format", str(exception))
 
         new_duration = 'P1Y1M'
         parsed_duration_4 = OneLogin_Saml2_Utils.parse_duration(new_duration, timestamp)
@@ -427,9 +439,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         time = 1386650371
         saml_time = '2013-12-10T04:39:31Z'
         self.assertEqual(time, OneLogin_Saml2_Utils.parse_SAML_to_time(saml_time))
-
-        self.assertRaisesRegexp(Exception, 'does not match format',
-                                OneLogin_Saml2_Utils.parse_SAML_to_time, 'invalidSAMLTime')
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.parse_SAML_to_time('invalidSAMLTime')
+            exception = context.exception
+            self.assertIn("does not match format", str(exception))
 
         # Now test if toolkit supports miliseconds
         saml_time2 = '2013-12-10T04:39:31.120Z'
@@ -442,9 +455,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         time = 1386650371
         saml_time = '2013-12-10T04:39:31Z'
         self.assertEqual(saml_time, OneLogin_Saml2_Utils.parse_time_to_SAML(time))
-
-        self.assertRaisesRegexp(Exception, 'could not convert string to float',
-                                OneLogin_Saml2_Utils.parse_time_to_SAML, 'invalidtime')
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Utils.parse_time_to_SAML('invalidtime')
+            exception = context.exception
+            self.assertIn("could not convert string to float", str(exception))
 
     def testGetExpireTime(self):
         """

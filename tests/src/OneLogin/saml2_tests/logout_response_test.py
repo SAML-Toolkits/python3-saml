@@ -24,6 +24,13 @@ except ImportError:
 class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
     data_path = join(dirname(__file__), '..', '..', '..', 'data')
 
+    # assertRegexpMatches deprecated on python3
+    def assertRegex(self, text, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRegex'):
+            return super(OneLogin_Saml2_Logout_Response_Test, self).assertRegex(text, regexp, msg)
+        else:
+            return self.assertRegexpMatches(text, regexp, msg)
+
     def loadSettingsJSON(self):
         filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
         if exists(filename):
@@ -47,8 +54,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response_deflated.xml.base64'))
         response = OneLogin_Saml2_Logout_Response(settings, message)
-        self.assertRegexpMatches(compat.to_string(OneLogin_Saml2_XML.to_string(response.document)),
-                                 '<samlp:LogoutResponse')
+        self.assertRegex(compat.to_string(OneLogin_Saml2_XML.to_string(response.document)), '<samlp:LogoutResponse')
 
     def testCreateDeflatedSAMLLogoutResponseURLParameter(self):
         """
@@ -63,11 +69,11 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         logout_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SingleLogoutService.php', parameters, True)
 
-        self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=')
+        self.assertRegex(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=')
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(exploded['SAMLResponse'][0]))
-        self.assertRegexpMatches(inflated, '^<samlp:LogoutResponse')
+        self.assertRegex(inflated, '^<samlp:LogoutResponse')
 
     def testGetStatus(self):
         """

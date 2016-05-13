@@ -22,6 +22,13 @@ except ImportError:
 class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
     data_path = join(dirname(__file__), '..', '..', '..', 'data')
 
+    # assertRegexpMatches deprecated on python3
+    def assertRegex(self, text, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRegex'):
+            return super(OneLogin_Saml2_Logout_Request_Test, self).assertRegex(text, regexp, msg)
+        else:
+            return self.assertRegexpMatches(text, regexp, msg)
+
     def loadSettingsJSON(self):
         filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
         if exists(filename):
@@ -50,12 +57,12 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         logout_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SingleLogoutService.php', parameters, True)
-        self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
+        self.assertRegex(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
-        self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
+        self.assertRegex(inflated, '^<samlp:LogoutRequest')
 
     def testCreateDeflatedSAMLLogoutRequestURLParameter(self):
         """
@@ -67,12 +74,12 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         logout_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SingleLogoutService.php', parameters, True)
-        self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
+        self.assertRegex(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
-        self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
+        self.assertRegex(inflated, '^<samlp:LogoutRequest')
 
     def testGetIDFromSAMLLogoutRequest(self):
         """
@@ -114,8 +121,10 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID',
-                                OneLogin_Saml2_Logout_Request.get_nameid_data, request_2)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Logout_Request.get_nameid(request_2)
+            exception = context.exception
+            self.assertIn("Key is required in order to decrypt the NameID", str(exception))
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
@@ -131,12 +140,16 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         encrypted_id_nodes = dom_2.getElementsByTagName('saml:EncryptedID')
         encrypted_data = encrypted_id_nodes[0].firstChild.nextSibling
         encrypted_id_nodes[0].removeChild(encrypted_data)
-        self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request',
-                                OneLogin_Saml2_Logout_Request.get_nameid_data, dom_2.toxml(), key)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Logout_Request.get_nameid(dom_2.toxml(), key)
+            exception = context.exception
+            self.assertIn("Not NameID found in the Logout Request", str(exception))
 
         inv_request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'no_nameId.xml'))
-        self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request',
-                                OneLogin_Saml2_Logout_Request.get_nameid_data, inv_request)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Logout_Request.get_nameid(inv_request)
+            exception = context.exception
+            self.assertIn("Not NameID found in the Logout Request", str(exception))
 
     def testGetNameId(self):
         """
@@ -147,8 +160,10 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(name_id, 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c')
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID',
-                                OneLogin_Saml2_Logout_Request.get_nameid, request_2)
+        with self.assertRaises(Exception) as context:
+            OneLogin_Saml2_Logout_Request.get_nameid(request_2)
+            exception = context.exception
+            self.assertIn("Key is required in order to decrypt the NameID", str(exception))
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()

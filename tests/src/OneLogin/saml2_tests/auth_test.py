@@ -143,7 +143,10 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         Case No Response, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
-        self.assertRaisesRegexp(Exception, 'SAML Response not found', auth.process_response)
+        with self.assertRaises(Exception) as context:
+            auth.process_response()
+            exception = context.exception
+            self.assertIn("SAML Response not found", str(exception))
         self.assertEqual(auth.get_errors(), ['invalid_binding'])
 
     def testProcessResponseInvalid(self):
@@ -256,7 +259,10 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         Case No Message, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
-        self.assertRaisesRegexp(Exception, 'SAML LogoutRequest/LogoutResponse not found', auth.process_slo, True)
+        with self.assertRaises(Exception) as context:
+            auth.process_slo(True)
+            exception = context.exception
+            self.assertIn("SAML LogoutRequest/LogoutResponse not found", str(exception))
         self.assertEqual(auth.get_errors(), ['invalid_binding'])
 
     def testProcessSLOResponseInvalid(self):
@@ -767,8 +773,10 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         del settings_info['idp']['singleLogoutService']
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
         # The Header of the redirect produces an Exception
-        self.assertRaisesRegexp(Exception, 'The IdP does not support Single Log Out',
-                                auth.logout, 'http://example.com/returnto')
+        with self.assertRaises(Exception) as context:
+            auth.logout('http://example.com/returnto')
+            exception = context.exception
+            self.assertIn("The IdP does not support Single Log Out", str(exception))
 
     def testLogoutNameIDandSessionIndex(self):
         """
@@ -855,8 +863,10 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
-        self.assertRaisesRegexp(Exception, "Trying to sign the SAMLRequest but can't load the SP private key",
-                                auth2.add_request_signature, parameters)
+        with self.assertRaises(Exception) as context:
+            auth2.add_request_signature(parameters)
+            exception = context.exception
+            self.assertIn("Trying to sign the SAMLRequest but can't load the SP private key", str(exception))
 
     def testBuildResponseSignature(self):
         """
@@ -876,8 +886,10 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
-        self.assertRaisesRegexp(Exception, "Trying to sign the SAMLResponse but can't load the SP private key",
-                                auth2.add_response_signature, parameters)
+        with self.assertRaises(Exception) as context:
+            auth2.add_response_signature(parameters)
+            exception = context.exception
+            self.assertIn("Trying to sign the SAMLResponse but can't load the SP private key", str(exception))
 
     def testIsInValidLogoutResponseSign(self):
         """

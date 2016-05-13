@@ -93,7 +93,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_5.get_nameid()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('Not NameID found in the assertion of the Response', e.message)
+            self.assertIn('Not NameID found in the assertion of the Response', str(e))
 
         json_settings['security']['wantNameId'] = False
         settings = OneLogin_Saml2_Settings(json_settings)
@@ -110,7 +110,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_7.get_nameid()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('Not NameID found in the assertion of the Response', e.message)
+            self.assertIn('Not NameID found in the assertion of the Response', str(e))
 
     def testGetNameIdData(self):
         """
@@ -163,7 +163,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_5.get_nameid_data()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('Not NameID found in the assertion of the Response', e.message)
+            self.assertIn('Not NameID found in the assertion of the Response', str(e))
 
         json_settings['security']['wantNameId'] = False
         settings = OneLogin_Saml2_Settings(json_settings)
@@ -180,7 +180,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_7.get_nameid_data()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('Not NameID found in the assertion of the Response', e.message)
+            self.assertIn('Not NameID found in the assertion of the Response', str(e))
 
     def testCheckStatus(self):
         """

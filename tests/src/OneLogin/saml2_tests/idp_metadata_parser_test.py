@@ -9,6 +9,7 @@ import json
 from os.path import dirname, join, exists
 from lxml.etree import XMLSyntaxError
 import unittest
+import urllib
 
 from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
@@ -46,8 +47,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         with self.assertRaises(Exception):
             data = OneLogin_Saml2_IdPMetadataParser.get_metadata('http://google.es')
 
-        data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://www.testshib.org/metadata/testshib-providers.xml')
-        self.assertTrue(data is not None and data is not {})
+        try:
+            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://www.testshib.org/metadata/testshib-providers.xml')
+            self.assertTrue(data is not None and data is not {})
+        except urllib.error.URLError:
+            pass
 
     def testParseRemote(self):
         """
@@ -56,7 +60,12 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         with self.assertRaises(Exception):
             data = OneLogin_Saml2_IdPMetadataParser.parse_remote('http://google.es')
 
-        data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://www.testshib.org/metadata/testshib-providers.xml')
+        try:
+            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://www.testshib.org/metadata/testshib-providers.xml')
+        except urllib.error.URLError:
+            xml = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
+            data = OneLogin_Saml2_IdPMetadataParser.parse(xml)
+
         self.assertTrue(data is not None and data is not {})
         expected_settings_json = """
         {
@@ -132,8 +141,12 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
           }
         }
         """
-        xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
-            'https://www.testshib.org/metadata/testshib-providers.xml')
+        try:
+            xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
+                'https://www.testshib.org/metadata/testshib-providers.xml')
+        except urllib.error.URLError:
+            xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
+
         # Parse, require SSO REDIRECT binding, implicitly.
         settings1 = OneLogin_Saml2_IdPMetadataParser.parse(xmldoc)
         # Parse, require SSO REDIRECT binding, explicitly.
@@ -165,8 +178,12 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
           }
         }
         """
-        xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
-            'https://www.testshib.org/metadata/testshib-providers.xml')
+        try:
+            xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
+                'https://www.testshib.org/metadata/testshib-providers.xml')
+        except urllib.error.URLError:
+            xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
+
         # Parse, require POST binding.
         settings = OneLogin_Saml2_IdPMetadataParser.parse(
             xmldoc,
@@ -175,12 +192,12 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         expected_settings = json.loads(expected_settings_json)
         self.assertEqual(expected_settings, settings)
 
-    def test_parse_oktadev_required_binding_all(self):
+    def test_parse_required_binding_all(self):
         """
         Test all combinations of the `require_slo_binding` and
-        `require_sso_binding` parameters with the oktadev IdP metadata.
+        `require_sso_binding` parameters.
 
-        Note: Oktadev's dev IdP metadata contains a single logout (SLO)
+        Note: IdP metadata contains a single logout (SLO)
         service and does not specify any endpoint for the POST binding.
         """
         expected_settings_json = """
@@ -192,18 +209,18 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             "entityId": "urn:example:idp",
             "x509cert": "MIIDPDCCAiQCCQDydJgOlszqbzANBgkqhkiG9w0BAQUFADBgMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEQMA4GA1UEChMHSmFua3lDbzESMBAGA1UEAxMJbG9jYWxob3N0MB4XDTE0MDMxMjE5NDYzM1oXDTI3MTExOTE5NDYzM1owYDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xEDAOBgNVBAoTB0phbmt5Q28xEjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMGvJpRTTasRUSPqcbqCG+ZnTAurnu0vVpIG9lzExnh11o/BGmzu7lB+yLHcEdwrKBBmpepDBPCYxpVajvuEhZdKFx/Fdy6j5mH3rrW0Bh/zd36CoUNjbbhHyTjeM7FN2yF3u9lcyubuvOzr3B3gX66IwJlU46+wzcQVhSOlMk2tXR+fIKQExFrOuK9tbX3JIBUqItpI+HnAow509CnM134svw8PTFLkR6/CcMqnDfDK1m993PyoC1Y+N4X9XkhSmEQoAlAHPI5LHrvuujM13nvtoVYvKYoj7ScgumkpWNEvX652LfXOnKYlkB8ZybuxmFfIkzedQrbJsyOhfL03cMECAwEAATANBgkqhkiG9w0BAQUFAAOCAQEAeHwzqwnzGEkxjzSD47imXaTqtYyETZow7XwBc0ZaFS50qRFJUgKTAmKS1xQBP/qHpStsROT35DUxJAE6NY1Kbq3ZbCuhGoSlY0L7VzVT5tpu4EY8+Dq/u2EjRmmhoL7UkskvIZ2n1DdERtd+YUMTeqYl9co43csZwDno/IKomeN5qaPc39IZjikJ+nUC6kPFKeu/3j9rgHNlRtocI6S1FdtFz9OZMQlpr0JbUt2T3xS/YoQJn6coDmJL5GTiiKM6cOe+Ur1VwzS1JEDbSS2TWWhzq8ojLdrotYLGd9JOsoQhElmz+tMfCFQUFLExinPAyy7YHlSiVX13QH2XTu/iQQ==",
             "singleSignOnService": {
-              "url": "http://idp.oktadev.com",
+              "url": "http://idp.example.com",
               "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
             },
             "singleLogoutService": {
-              "url": "http://idp.oktadev.com/logout",
+              "url": "http://idp.example.com/logout",
               "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
             }
           }
         }
         """
-        xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
-            'http://idp.oktadev.com/metadata')
+        xmldoc = self.file_contents(join(self.data_path, 'metadata', 'idp_metadata2.xml'))
+
         expected_settings = json.loads(expected_settings_json)
 
         # Parse, require SLO and SSO REDIRECT binding, implicitly.
@@ -224,7 +241,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST
         )
-        # Oktadev does not specify any POST binding endpoint.
+
         expected_settings3 = deepcopy(expected_settings)
         del expected_settings3['idp']['singleLogoutService']
         del expected_settings3['idp']['singleSignOnService']

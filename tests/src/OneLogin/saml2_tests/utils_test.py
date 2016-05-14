@@ -515,10 +515,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         """
         name_id_value = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde'
         entity_id = 'http://stuff.com/endpoints/metadata.php'
-        name_id_format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
+        name_id_format = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
 
         name_id = OneLogin_Saml2_Utils.generate_name_id(name_id_value, entity_id, name_id_format)
-        expected_name_id = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
+        expected_name_id = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
         self.assertEqual(expected_name_id, name_id)
 
         settings_info = self.loadSettingsJSON()
@@ -534,10 +534,10 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         Tests the generateNameId method of the OneLogin_Saml2_Utils
         """
         name_id_value = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde'
-        name_id_format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
+        name_id_format = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
 
         name_id = OneLogin_Saml2_Utils.generate_name_id(name_id_value, None, name_id_format)
-        expected_name_id = '<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
+        expected_name_id = '<saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
         self.assertEqual(expected_name_id, name_id)
 
         settings_info = self.loadSettingsJSON()

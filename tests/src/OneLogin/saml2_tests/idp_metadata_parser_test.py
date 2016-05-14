@@ -398,7 +398,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
               "url": "http://stuff.com/endpoints/endpoints/acs.php"
             },
             "entityId": "http://stuff.com/endpoints/metadata.php",
-            "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified"
+            "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
           },
           "custom_base_path": "../../../tests/data/customPath/",
           "organization": {

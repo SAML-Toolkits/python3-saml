@@ -233,7 +233,7 @@ This is the settings.json file:
         // Specifies the constraints on the name identifier to be used to
         // represent the requested subject.
         // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
-        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified",
+        "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
         "x509cert": "",

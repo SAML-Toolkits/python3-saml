@@ -394,7 +394,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('WantAssertionsSigned="false"', metadata)
         self.assertIn('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', metadata)
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', metadata)
-        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', metadata)
+        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', metadata)
 
     def testGetSPMetadataSigned(self):
         """
@@ -435,7 +435,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('WantAssertionsSigned="false"', metadata)
         self.assertIn('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', metadata)
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', metadata)
-        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', metadata)
+        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', metadata)
         self.assertIn('<ds:SignedInfo>\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', metadata)
         self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', metadata)
         self.assertIn('<ds:Reference', metadata)
@@ -583,7 +583,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertEqual('http://stuff.com/endpoints/metadata.php', sp_data['entityId'])
         self.assertEqual('http://stuff.com/endpoints/endpoints/acs.php', sp_data['assertionConsumerService']['url'])
         self.assertEqual('http://stuff.com/endpoints/endpoints/sls.php', sp_data['singleLogoutService']['url'])
-        self.assertEqual('urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified', sp_data['NameIDFormat'])
+        self.assertEqual('urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified', sp_data['NameIDFormat'])
 
     def testGetSecurityData(self):
         """

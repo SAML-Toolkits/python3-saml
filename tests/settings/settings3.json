@@ -10,7 +10,7 @@
         "singleLogoutService": {
             "url": "http://pytoolkit.com:8000/?sls"
         },
-        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified"
+        "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
     },
     "idp": {
         "entityId": "https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php",

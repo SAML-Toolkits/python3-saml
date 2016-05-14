@@ -59,7 +59,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', metadata)
         self.assertIn('Location="http://stuff.com/endpoints/endpoints/sls.php"', metadata)
 
-        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', metadata)
+        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', metadata)
 
         self.assertIn('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', metadata)
         self.assertIn('<md:ContactPerson contactType="technical">', metadata)
@@ -192,7 +192,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', signed_metadata)
         self.assertIn(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', signed_metadata)
 
-        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', signed_metadata)
+        self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', signed_metadata)
 
         self.assertIn('<ds:SignedInfo>\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', signed_metadata)
         self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', signed_metadata)

@@ -3,13 +3,16 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
+try:
+    from urllib.error import URLError
+except:
+    from urllib2 import URLError
 
 from copy import deepcopy
 import json
 from os.path import dirname, join, exists
 from lxml.etree import XMLSyntaxError
 import unittest
-import urllib
 
 from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
@@ -50,7 +53,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://www.testshib.org/metadata/testshib-providers.xml')
             self.assertTrue(data is not None and data is not {})
-        except urllib.error.URLError:
+        except URLError:
             pass
 
     def testParseRemote(self):
@@ -62,7 +65,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
 
         try:
             data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://www.testshib.org/metadata/testshib-providers.xml')
-        except urllib.error.URLError:
+        except URLError:
             xml = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
             data = OneLogin_Saml2_IdPMetadataParser.parse(xml)
 
@@ -144,7 +147,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
                 'https://www.testshib.org/metadata/testshib-providers.xml')
-        except urllib.error.URLError:
+        except URLError:
             xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
 
         # Parse, require SSO REDIRECT binding, implicitly.
@@ -181,7 +184,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
                 'https://www.testshib.org/metadata/testshib-providers.xml')
-        except urllib.error.URLError:
+        except URLError:
             xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
 
         # Parse, require POST binding.

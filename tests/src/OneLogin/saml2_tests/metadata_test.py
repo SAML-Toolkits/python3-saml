@@ -154,11 +154,11 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn("""        <md:AttributeConsumingService index="1">
             <md:ServiceName xml:lang="en">Test Service</md:ServiceName>
             <md:ServiceDescription xml:lang="en">Test Service</md:ServiceDescription>
-            <md:RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" \>
-            <md:RequestedAttribute Name="urn:oid:2.5.4.4" FriendlyName="sn" \>
-            <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" FriendlyName="displayName" \>
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail" \>
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" \>
+            <md:RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" />
+            <md:RequestedAttribute Name="urn:oid:2.5.4.4" FriendlyName="sn" />
+            <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" FriendlyName="displayName" />
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail" />
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" />
         </md:AttributeConsumingService>""", metadata)
 
     def testSignMetadata(self):

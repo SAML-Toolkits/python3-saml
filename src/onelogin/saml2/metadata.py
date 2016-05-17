@@ -129,14 +129,14 @@ class OneLogin_Saml2_Metadata(object):
             requested_attribute_data = []
             for req_attribs in sp['attributeConsumingService']['requestedAttributes']:
                 req_attr_nameformat_str = req_attr_friendlyname_str = req_attr_isrequired_str = ''
-                req_attr_aux_str = ' \>'
+                req_attr_aux_str = ' />'
 
                 if 'nameFormat' in req_attribs.keys() and req_attribs['nameFormat']:
                     req_attr_nameformat_str = " NameFormat=\"%s\"" % req_attribs['nameFormat']
                 if 'friendlyName' in req_attribs.keys() and req_attribs['friendlyName']:
                     req_attr_nameformat_str = " FriendlyName=\"%s\"" % req_attribs['friendlyName']
                 if 'isRequired' in req_attribs.keys() and req_attribs['isRequired']:
-                    req_attr_isrequired_str = " isRequired=\"%s\"" % req_attribs['isRequired']
+                    req_attr_isrequired_str = " isRequired=\"%s\"" % 'true' if req_attribs['isRequired'] else 'false'
                 if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
                     req_attr_aux_str = """ >
             <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>%(attributeValue)</saml:AttributeValue>

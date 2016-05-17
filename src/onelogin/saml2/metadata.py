@@ -9,7 +9,7 @@ Metadata class of OneLogin's Python Toolkit.
 
 """
 
-from time import gmtime, strftime
+from time import gmtime, strftime, time
 from datetime import datetime
 
 from onelogin.saml2 import compat
@@ -61,7 +61,7 @@ class OneLogin_Saml2_Metadata(object):
         :type organization: dict
         """
         if valid_until is None:
-            valid_until = int(datetime.now().strftime("%s")) + OneLogin_Saml2_Metadata.TIME_VALID
+            valid_until = int(time()) + OneLogin_Saml2_Metadata.TIME_VALID
         if not isinstance(valid_until, basestring):
             if isinstance(valid_until, datetime):
                 valid_until_time = valid_until.timetuple()

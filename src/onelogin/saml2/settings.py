@@ -8,7 +8,7 @@ All rights reserved.
 Setting class of OneLogin's Python Toolkit.
 
 """
-from datetime import datetime
+from time import time
 import re
 from os.path import dirname, exists, join, sep
 
@@ -720,7 +720,7 @@ class OneLogin_Saml2_Settings(object):
                     if valid_until:
                         valid_until = OneLogin_Saml2_Utils.parse_SAML_to_time(valid_until)
                     expire_time = OneLogin_Saml2_Utils.get_expire_time(cache_duration, valid_until)
-                    if expire_time is not None and int(datetime.now().strftime('%s')) > int(expire_time):
+                    if expire_time is not None and int(time()) > int(expire_time):
                         errors.append('expired_xml')
 
         # TODO: Validate Sign

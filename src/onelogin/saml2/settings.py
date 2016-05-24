@@ -8,7 +8,6 @@ All rights reserved.
 Setting class of OneLogin's Python Toolkit.
 
 """
-from datetime import datetime
 from time import time
 import re
 from os.path import dirname, exists, join, sep

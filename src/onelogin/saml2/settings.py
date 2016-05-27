@@ -257,8 +257,9 @@ class OneLogin_Saml2_Settings(object):
         self.__sp.setdefault('attributeConsumingService', {})
 
         self.__sp.setdefault('singleLogoutService', {})
-
         self.__sp['singleLogoutService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+
+        self.__idp.setdefault('singleLogoutService', {})
 
         # Related to nameID
         self.__sp.setdefault('NameIDFormat', OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED)

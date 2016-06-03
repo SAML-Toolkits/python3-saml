@@ -512,6 +512,7 @@ class OneLogin_Saml2_Auth(object):
                                                    data.get('RelayState', None),
                                                    sign_alg,
                                                    saml_type,
+                                                   lowercase_urlencoding
                                                    )
 
             if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,

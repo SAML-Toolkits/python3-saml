@@ -404,12 +404,23 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         if 'security' not in settings_info:
             settings_info['security'] = {}
+
+        settings_info['security']['signMetadata'] = {}
+
+        try:
+            OneLogin_Saml2_Settings(settings_info)
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertIn('sp_signMetadata_invalid', str(e))
+
+        # Default cert/key
         settings_info['security']['signMetadata'] = True
         self.generateAndCheckMetadata(settings_info)
 
         # Now try again with SP keys set directly in settings and not from files:
         del settings_info['custom_base_path']
-        self.generateAndCheckMetadata(settings_info)
+        with self.assertRaises(OneLogin_Saml2_Error):
+            OneLogin_Saml2_Settings(settings_info).get_sp_metadata()
 
         # Now the keys should not be found, so metadata generation won't work:
         del settings_info['sp']['x509cert']

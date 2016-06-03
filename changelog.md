@@ -1,5 +1,13 @@
 # python3-saml changelog
 
+### 1.1.3 (Jun 02, 2016)
+* Fix Metadata XML (RequestedAttribute)
+* Fix Windows specific Unix date formatting bug.
+* Fix SHA384 Constant URI
+* Refactor of settings.py to make it a little more readable.
+* Bugfix for ADFS lowercase signatures
+* READMEs suggested wrong cert name
+
 ### 1.1.2 (May 14, 2016)
 
 * Allow AuthnRequest with no NameIDPolicy.

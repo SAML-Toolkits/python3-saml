@@ -386,7 +386,7 @@ class OneLogin_Saml2_Auth(object):
         return self.__build_signature(response_data, 'SAMLResponse', sign_algorithm)
 
     @staticmethod
-    def __build_sign_query(saml_data, relay_state, algorithm, saml_type):
+    def __build_sign_query(saml_data, relay_state, algorithm, saml_type, lowercase_urlencoding=False):
         """
         Build sign query
 
@@ -401,12 +401,14 @@ class OneLogin_Saml2_Auth(object):
 
         :param saml_type: The target URL the user should be redirected to
         :type saml_type: string  SAMLRequest | SAMLResponse
-        """
 
-        sign_data = ['%s=%s' % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data))]
+        :param lowercase_urlencoding: lowercase or no
+        :type lowercase_urlencoding: boolean
+        """
+        sign_data = ['%s=%s' % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data, lowercase_urlencoding))]
         if relay_state is not None:
-            sign_data.append('RelayState=%s' % OneLogin_Saml2_Utils.escape_url(relay_state))
-        sign_data.append('SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(algorithm))
+            sign_data.append('RelayState=%s' % OneLogin_Saml2_Utils.escape_url(relay_state, lowercase_urlencoding))
+        sign_data.append('SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(algorithm, lowercase_urlencoding))
         return '&'.join(sign_data)
 
     def __build_signature(self, data, saml_type, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
@@ -502,10 +504,15 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
 
+            lowercase_urlencoding = False
+            if 'lowercase_urlencoding' in self.__request_data.keys():
+                lowercase_urlencoding = self.__request_data['lowercase_urlencoding']
+
             signed_query = self.__build_sign_query(data[saml_type],
                                                    data.get('RelayState', None),
                                                    sign_alg,
-                                                   saml_type)
+                                                   saml_type,
+                                                   )
 
             if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
                                                              OneLogin_Saml2_Utils.b64decode(signature),

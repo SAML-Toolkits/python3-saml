@@ -41,15 +41,23 @@ class OneLogin_Saml2_Utils(object):
 
     """
     @staticmethod
-    def escape_url(url):
+    def escape_url(url, lowercase_urlencoding=False):
         """
         escape the non-safe symbols in url
+        The encoding used by ADFS 3.0 is not compatible with
+        python's quote_plus (ADFS produces lower case hex numbers and quote_plus produces
+        upper case hex numbers)
         :param url: the url to escape
         :type url: str
+
+        :param lowercase_urlencoding: lowercase or no
+        :type lowercase_urlencoding: boolean
+
         :return: the escaped url
         :rtype str
         """
-        return quote_plus(url)
+        encoded = quote_plus(url)
+        return re.sub(r"%[A-F0-9]{2}", lambda m: m.group(0).lower(), encoded) if lowercase_urlencoding else encoded
 
     @staticmethod
     def b64encode(data):

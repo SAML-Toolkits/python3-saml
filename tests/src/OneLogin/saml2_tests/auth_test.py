@@ -986,7 +986,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
         auth.process_slo()
-        self.assertIn('In order to validate the sign on the SAMLResponse, the x509cert of the IdP is required', auth.get_errors())
+        self.assertIn('Signature validation failed. Logout Response rejected', auth.get_errors())
 
     def testIsValidLogoutRequestSign(self):
         """
@@ -1074,4 +1074,4 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings_2 = OneLogin_Saml2_Settings(settings_info)
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
         auth.process_slo()
-        self.assertIn('In order to validate the sign on the SAMLRequest, the x509cert of the IdP is required', auth.get_errors())
+        self.assertIn('Signature validation failed. Logout Request rejected', auth.get_errors())

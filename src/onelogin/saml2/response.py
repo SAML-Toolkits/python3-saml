@@ -82,16 +82,19 @@ class OneLogin_Saml2_Response(object):
             sp_data = self.__settings.get_sp_data()
             sp_entity_id = sp_data['entityId']
 
-            sign_nodes = self.__query('//ds:Signature')
-
-            signed_elements = []
-            for sign_node in sign_nodes:
-                signed_elements.append(sign_node.getparent().tag)
+            signed_elements = self.process_signed_elements()
 
             if self.__settings.is_strict():
+                no_valid_xml_msg = 'Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd'
                 res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                 if isinstance(res, str):
-                    raise Exception('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd')
+                    raise Exception(no_valid_xml_msg)
+
+                # If encrypted, check also the decrypted document
+                if self.encrypted:
+                    res = OneLogin_Saml2_XML.validate_xml(self.decrypted_document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+                    if isinstance(res, str):
+                        raise Exception(no_valid_xml_msg)
 
                 security = self.__settings.get_security_data()
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
@@ -365,6 +368,53 @@ class OneLogin_Saml2_Response(object):
         assertion_nodes = OneLogin_Saml2_XML.query(self.document, '//saml:Assertion')
         return (len(encrypted_assertion_nodes) + len(assertion_nodes)) == 1
 
+    def process_signed_elements(self):
+        """
+        Verifies the signature nodes:
+         - Checks that are Response or Assertion
+         - Check that IDs and reference URI are unique and consistent.
+
+        :returns: The signed elements tag names
+        :rtype: list
+        """
+        sign_nodes = self.__query('//ds:Signature')
+
+        signed_elements = []
+        verified_seis = []
+        verified_ids = []
+        response_tag = '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP
+        assertion_tag = '{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML
+
+        for sign_node in sign_nodes:
+            signed_element = sign_node.getparent().tag
+            if signed_element != response_tag and signed_element != assertion_tag:
+                raise Exception('Invalid Signature Element %s SAML Response rejected' % signed_element)
+
+            if not sign_node.getparent().get('ID'):
+                raise Exception('Signed Element must contain an ID. SAML Response rejected')
+
+            id_value = sign_node.getparent().get('ID')
+            if id_value in verified_ids:
+                raise Exception('Duplicated ID. SAML Response rejected')
+            verified_ids.append(id_value)
+
+            # Check that reference URI matches the parent ID and no duplicate References or IDs
+            ref = OneLogin_Saml2_XML.query(sign_node, './/ds:Reference')
+            if ref:
+                ref = ref[0]
+                if ref.get('URI'):
+                    sei = ref.get('URI')[1:]
+
+                    if sei != id_value:
+                        raise Exception('Found an invalid Signed Element. SAML Response rejected')
+
+                    if sei in verified_seis:
+                        raise Exception('Duplicated Reference URI. SAML Response rejected')
+                    verified_seis.append(sei)
+
+            signed_elements.append(signed_element)
+        return signed_elements
+
     def validate_timestamps(self):
         """
         Verifies that the document is valid according to Conditions Element
@@ -393,10 +443,8 @@ class OneLogin_Saml2_Response(object):
         :returns: The queried nodes
         :rtype: list
         """
-        if self.encrypted:
-            assertion_expr = '/saml:EncryptedAssertion/saml:Assertion'
-        else:
-            assertion_expr = '/saml:Assertion'
+
+        assertion_expr = '/saml:Assertion'
         signature_expr = '/ds:Signature/ds:SignedInfo/ds:Reference'
         signed_assertion_query = '/samlp:Response' + assertion_expr + signature_expr
         assertion_reference_nodes = self.__query(signed_assertion_query)
@@ -473,7 +521,8 @@ class OneLogin_Saml2_Response(object):
                             keyinfo.append(encrypted_key[0])
 
                 encrypted_data = encrypted_data_nodes[0]
-                OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug)
+                decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug)
+                xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml
 
     def get_error(self):

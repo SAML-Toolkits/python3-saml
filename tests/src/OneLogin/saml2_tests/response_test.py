@@ -329,7 +329,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             nameid = response.get_nameid()
             self.assertNotEqual('root@example.com', nameid)
         except Exception:
-            self.assertEqual('Signature validation failed. SAML Response rejected', response.get_error())
+            self.assertEqual('Invalid Signature Element {urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor SAML Response rejected', response.get_error())
 
     def testDoesNotAllowSignatureWrappingAttack(self):
         """

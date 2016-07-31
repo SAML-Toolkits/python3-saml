@@ -21,13 +21,13 @@ from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 class OneLogin_Saml2_IdPMetadataParser(object):
     """
-    A class that contains methods to obtain and parse metadata from IdP
+    A class that contain methods related to obtaining and parsing metadata from IdP
     """
 
     @staticmethod
     def get_metadata(url):
         """
-        Get the metadata XML from the provided URL
+        Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
         :type url: string
         :returns: metadata XML
@@ -54,7 +54,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     @staticmethod
     def parse_remote(url, **kwargs):
         """
-        Get the metadata XML from the provided URL and parse it, returning a dict with extracted data
+        Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
         :type url: string
         :returns: settings dict with extracted data
@@ -69,14 +69,14 @@ class OneLogin_Saml2_IdPMetadataParser(object):
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT):
         """
-        Parse the Identity Provider metadata and return a dict with extracted data.
+        Parses the Identity Provider metadata and return a dict with extracted data.
 
         If there are multiple <IDPSSODescriptor> tags, parse only the first.
 
-        Parse only those SSO endpoints with the same binding as given by
+        Parses only those SSO endpoints with the same binding as given by
         the `required_sso_binding` parameter.
 
-        Parse only those SLO endpoints with the same binding as given by
+        Parses only those SLO endpoints with the same binding as given by
         the `required_slo_binding` parameter.
 
         If the metadata specifies multiple SSO endpoints with the required

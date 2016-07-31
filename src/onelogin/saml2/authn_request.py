@@ -29,13 +29,13 @@ class OneLogin_Saml2_Authn_Request(object):
         :param settings: OSetting data
         :type settings: OneLogin_Saml2_Settings
 
-        :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
+        :param force_authn: Optional argument. When true the AuthNRequest will set the ForceAuthn='true'.
         :type force_authn: bool
 
-        :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
+        :param is_passive: Optional argument. When true the AuthNRequest will set the Ispassive='true'.
         :type is_passive: bool
 
-        :param set_nameid_policy: Optional argument. When true the AuthNReuqest will set a nameIdPolicy element.
+        :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
         """
         self.__settings = settings

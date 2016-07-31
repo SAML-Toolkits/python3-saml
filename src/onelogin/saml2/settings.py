@@ -122,7 +122,7 @@ class OneLogin_Saml2_Settings(object):
 
     def __load_paths(self, base_path=None):
         """
-        Sets the paths of the different folders
+        Set the paths of the different folders
         """
         if base_path is None:
             base_path = dirname(dirname(dirname(__file__)))

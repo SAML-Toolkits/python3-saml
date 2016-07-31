@@ -99,7 +99,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     def get_request(self, deflate=True):
         """
-        Returns the Logout Request defated, base64encoded
+        Returns the Logout Request deflated, base64encoded
         :param deflate: It makes the deflate process optional
         :type: bool
         :return: Logout Request maybe deflated and base64 encoded
@@ -214,7 +214,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     def is_valid(self, request_data):
         """
-        Checks if the Logout Request recieved is valid
+        Checks if the Logout Request received is valid
         :param request_data: Request Data
         :type request_data: dict
 
@@ -278,6 +278,6 @@ class OneLogin_Saml2_Logout_Request(object):
 
     def get_error(self):
         """
-        After execute a validation process, if fails this method returns the cause
+        After executing a validation process, if it fails this method returns the cause
         """
         return self.__error

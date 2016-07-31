@@ -30,7 +30,7 @@ class OneLogin_Saml2_Auth(object):
     This class implements the SP SAML instance.
 
     Defines the methods that you can invoke in your application in
-    order to add SAML support (initiates sso, initiates slo, processes a
+    order to add SAML support (initiates SSO, initiates SLO, processes a
     SAML Response, a Logout Request or a Logout Response).
     """
 
@@ -82,7 +82,7 @@ class OneLogin_Saml2_Auth(object):
         """
         Process the SAML Response sent by the IdP.
 
-        :param request_id: Is an optional argumen. Is the ID of the AuthNRequest sent by this SP to the IdP.
+        :param request_id: Is an optional argument. Is the ID of the AuthNRequest sent by this SP to the IdP.
         :type request_id: string
 
         :raises: OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND, when a POST with a SAMLResponse is not found
@@ -174,14 +174,14 @@ class OneLogin_Saml2_Auth(object):
 
     def redirect_to(self, url=None, parameters={}):
         """
-        Redirects the user to the url past by parameter or to the url that we defined in our SSO Request.
+        Redirects the user to the URL passed by parameter or to the URL that we defined in our SSO Request.
 
         :param url: The target URL to redirect the user
         :type url: string
-        :param parameters: Extra parameters to be passed as part of the url
+        :param parameters: Extra parameters to be passed as part of the URL
         :type parameters: dict
 
-        :returns: Redirection url
+        :returns: Redirection URL
         """
         if url is None and 'RelayState' in self.__request_data['get_data']:
             url = self.__request_data['get_data']['RelayState']
@@ -268,16 +268,16 @@ class OneLogin_Saml2_Auth(object):
         :param return_to: Optional argument. The target URL the user should be redirected to after login.
         :type return_to: string
 
-        :param force_authn: Optional argument. When true the AuthNReuqest will set the ForceAuthn='true'.
+        :param force_authn: Optional argument. When true the AuthNRequest will set the ForceAuthn='true'.
         :type force_authn: bool
 
-        :param is_passive: Optional argument. When true the AuthNReuqest will set the Ispassive='true'.
+        :param is_passive: Optional argument. When true the AuthNRequest will set the Ispassive='true'.
         :type is_passive: bool
 
-        :param set_nameid_policy: Optional argument. When true the AuthNReuqest will set a nameIdPolicy element.
+        :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
 
-        :returns: Redirection url
+        :returns: Redirection URL
         :rtype: string
         """
         authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
@@ -311,7 +311,7 @@ class OneLogin_Saml2_Auth(object):
         :param nq: IDP Name Qualifier
         :type: string
 
-        :returns: Redirection url
+        :returns: Redirection URL
         """
         slo_url = self.get_slo_url()
         if slo_url is None:
@@ -343,7 +343,7 @@ class OneLogin_Saml2_Auth(object):
 
     def get_sso_url(self):
         """
-        Gets the SSO url.
+        Gets the SSO URL.
 
         :returns: An URL, the SSO endpoint of the IdP
         :rtype: string
@@ -353,7 +353,7 @@ class OneLogin_Saml2_Auth(object):
 
     def get_slo_url(self):
         """
-        Gets the SLO url.
+        Gets the SLO URL.
 
         :returns: An URL, the SLO endpoint of the IdP
         :rtype: string

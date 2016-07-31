@@ -527,6 +527,6 @@ class OneLogin_Saml2_Response(object):
 
     def get_error(self):
         """
-        After execute a validation process, if fails this method returns the cause
+        After executing a validation process, if it fails this method returns the cause
         """
         return self.__error

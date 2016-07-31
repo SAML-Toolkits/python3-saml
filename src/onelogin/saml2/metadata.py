@@ -217,7 +217,7 @@ class OneLogin_Saml2_Metadata(object):
     @staticmethod
     def add_x509_key_descriptors(metadata, cert=None):
         """
-        Adds the x509 descriptors (sign/encriptation) to the metadata
+        Adds the x509 descriptors (sign/encryption) to the metadata
         The same cert will be used for sign/encrypt
 
         :param metadata: SAML Metadata XML

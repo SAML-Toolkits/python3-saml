@@ -1,9 +1,9 @@
 # OneLogin's SAML Python Toolkit
 
-[![Build Status](https://api.travis-ci.org/onelogin/python3-saml.png?branch=master)](http://travis-ci.org/onelogin/python3-saml)
 [![Coverage Status](https://coveralls.io/repos/onelogin/python3-saml/badge.png)](https://coveralls.io/r/onelogin/python3-saml)
-[![PyPi Version](https://pypip.in/v/python3-saml/badge.png)](https://pypi.python.org/pypi/python3-saml)
-![PyPi Downloads](https://pypip.in/d/python3-saml/badge.png)
+[![PyPi Version](https://img.shields.io/pypi/v/python-saml.svg)](https://pypi.python.org/pypi/python3-saml)
+
+https://img.shields.io/pypi/v/python-saml.svg
 
 Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided

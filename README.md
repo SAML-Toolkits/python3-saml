@@ -1,7 +1,7 @@
 # OneLogin's SAML Python Toolkit
 
 [![Coverage Status](https://coveralls.io/repos/onelogin/python3-saml/badge.png)](https://coveralls.io/r/onelogin/python3-saml)
-[![PyPi Version](https://img.shields.io/pypi/v/python-saml.svg)](https://pypi.python.org/pypi/python3-saml)
+[![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
 
 https://img.shields.io/pypi/v/python-saml.svg
 

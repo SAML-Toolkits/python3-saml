@@ -2,6 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/onelogin/python3-saml/badge.png)](https://coveralls.io/r/onelogin/python3-saml)
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
+[![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)
 
 https://img.shields.io/pypi/v/python-saml.svg
 

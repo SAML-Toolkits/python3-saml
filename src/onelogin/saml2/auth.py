@@ -111,7 +111,7 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND
             )
 
-    def     process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None, method_data='get_data'):
+    def process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None, method_data='get_data'):
         """
         Process the SAML Logout Response / Logout Request sent by the IdP.
 

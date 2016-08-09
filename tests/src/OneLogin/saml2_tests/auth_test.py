@@ -1009,7 +1009,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
         settings.set_strict(False)
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
-        auth.process_slo()
+        auth.process_slo(method_data='get_data')
         self.assertEqual([], auth.get_errors())
 
         relay_state = request_data['get_data']['RelayState']

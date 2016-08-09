@@ -111,7 +111,7 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND
             )
 
-    def process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None):
+    def     process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None, method_data='get_data'):
         """
         Process the SAML Logout Response / Logout Request sent by the IdP.
 
@@ -125,13 +125,13 @@ class OneLogin_Saml2_Auth(object):
         """
         self.__errors = []
 
-        get_data = 'get_data' in self.__request_data and self.__request_data['get_data']
+        get_data = method_data in self.__request_data and self.__request_data[method_data]
         if get_data and 'SAMLResponse' in get_data:
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, get_data['SAMLResponse'])
             if not self.validate_response_signature(get_data):
                 self.__errors.append('invalid_logout_response_signature')
                 self.__errors.append('Signature validation failed. Logout Response rejected')
-            elif not logout_response.is_valid(self.__request_data, request_id):
+            elif not logout_response.is_valid(self.__request_data, request_id, method_data=method_data):
                 self.__errors.append('invalid_logout_response')
                 self.__error_reason = logout_response.get_error()
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
@@ -157,14 +157,14 @@ class OneLogin_Saml2_Auth(object):
                 logout_response = response_builder.get_response()
 
                 parameters = {'SAMLResponse': logout_response}
-                if 'RelayState' in self.__request_data['get_data']:
-                    parameters['RelayState'] = self.__request_data['get_data']['RelayState']
+                if 'RelayState' in self.__request_data[method_data]:
+                    parameters['RelayState'] = self.__request_data[method_data]['RelayState']
 
                 security = self.__settings.get_security_data()
                 if security['logoutResponseSigned']:
                     self.add_response_signature(parameters, security['signatureAlgorithm'])
 
-                return self.redirect_to(self.get_slo_url(), parameters)
+                return self.redirect_to(self.get_slo_url(), parameters, method_data=method_data)
         else:
             self.__errors.append('invalid_binding')
             raise OneLogin_Saml2_Error(
@@ -172,7 +172,7 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Error.SAML_LOGOUTMESSAGE_NOT_FOUND
             )
 
-    def redirect_to(self, url=None, parameters={}):
+    def redirect_to(self, url=None, parameters={}, method_data='get_data'):
         """
         Redirects the user to the url past by parameter or to the url that we defined in our SSO Request.
 
@@ -183,8 +183,8 @@ class OneLogin_Saml2_Auth(object):
 
         :returns: Redirection url
         """
-        if url is None and 'RelayState' in self.__request_data['get_data']:
-            url = self.__request_data['get_data']['RelayState']
+        if url is None and 'RelayState' in self.__request_data[method_data]:
+            url = self.__request_data[method_data]['RelayState']
         return OneLogin_Saml2_Utils.redirect(url, parameters, request_data=self.__request_data)
 
     def is_authenticated(self):

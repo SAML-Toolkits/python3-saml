@@ -161,6 +161,28 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
             <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" />
         </md:AttributeConsumingService>""", metadata)
 
+    def testBuilderAttributeConsumingServiceWithMultipleAttributeValue(self):
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings5.json'))
+        sp_data = settings.get_sp_data()
+        security = settings.get_security_data()
+        organization = settings.get_organization()
+        contacts = settings.get_contacts()
+
+        metadata = OneLogin_Saml2_Metadata.builder(
+            sp_data, security['authnRequestsSigned'],
+            security['wantAssertionsSigned'], None, None, contacts,
+            organization
+        )
+        self.assertIn("""        <md:AttributeConsumingService index="1">
+            <md:ServiceName xml:lang="en">Test Service</md:ServiceName>
+            <md:ServiceDescription xml:lang="en">Test Service</md:ServiceDescription>
+            <md:RequestedAttribute Name="userType" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>userType</saml:AttributeValue>
+                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>admin</saml:AttributeValue>
+            </md:RequestedAttribute>
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" />
+        </md:AttributeConsumingService>""", metadata)
+
     def testSignMetadata(self):
         """
         Tests the signMetadata method of the OneLogin_Saml2_Metadata

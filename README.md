@@ -228,7 +228,7 @@ This is the settings.json file:
                         "isRequired": false,
                         "nameFormat": "",
                         "friendlyName": "",
-                        "attributeValue": ""
+                        "attributeValue": []
                     }
                 ]
         },

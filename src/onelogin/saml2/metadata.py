@@ -120,11 +120,11 @@ class OneLogin_Saml2_Metadata(object):
             str_contacts = '\n'.join(contacts_info)
 
         str_attribute_consuming_service = ''
-
         if 'attributeConsumingService' in sp and len(sp['attributeConsumingService']):
             attr_cs_desc_str = ''
             if "serviceDescription" in sp['attributeConsumingService']:
-                attr_cs_desc_str = """            <md:ServiceDescription xml:lang="en">%s</md:ServiceDescription>\n""" % sp['attributeConsumingService']['serviceDescription']
+                attr_cs_desc_str = """            <md:ServiceDescription xml:lang="en">%s</md:ServiceDescription>
+""" % sp['attributeConsumingService']['serviceDescription']
 
             requested_attribute_data = []
             for req_attribs in sp['attributeConsumingService']['requestedAttributes']:
@@ -136,16 +136,22 @@ class OneLogin_Saml2_Metadata(object):
                 if 'friendlyName' in req_attribs.keys() and req_attribs['friendlyName']:
                     req_attr_nameformat_str = " FriendlyName=\"%s\"" % req_attribs['friendlyName']
                 if 'isRequired' in req_attribs.keys() and req_attribs['isRequired']:
-                    req_attr_isrequired_str = " isRequired=\"%s\"" % 'true' if req_attribs['isRequired'] else 'false'
-                if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
-                    req_attr_aux_str = """ >
-            <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>%(attributeValue)</saml:AttributeValue>
-</md:RequestedAttribute>""" % \
-                        {
-                            'attributeValue': req_attribs['attributeValue']
-                        }
+                    req_attr_isrequired_str = " isRequired=\"%s\"" % req_attribs['isRequired']
 
-                requested_attribute = OneLogin_Saml2_Templates.MD_REQUESTED_ATTRIBUTE % \
+                if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
+                    req_attr_aux_str = ""
+                    if isinstance(req_attribs['attributeValue'], basestring):
+                        req_attribs['attributeValue'] = [req_attribs['attributeValue']]
+                    for attrValue in req_attribs['attributeValue']:
+                        req_attr_aux_str += """
+                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>%(attributeValue)s</saml:AttributeValue>""" % \
+                            {
+                                'attributeValue': attrValue
+                            }
+                    req_attr_aux_str += """
+            </md:RequestedAttribute>"""
+
+                requested_attribute = """            <md:RequestedAttribute Name="%(req_attr_name)s"%(req_attr_nameformat_str)s%(req_attr_friendlyname_str)s%(req_attr_isrequired_str)s%(req_attr_aux_str)s""" % \
                     {
                         'req_attr_name': req_attribs['name'],
                         'req_attr_nameformat_str': req_attr_nameformat_str,
@@ -153,9 +159,14 @@ class OneLogin_Saml2_Metadata(object):
                         'req_attr_isrequired_str': req_attr_isrequired_str,
                         'req_attr_aux_str': req_attr_aux_str
                     }
+
                 requested_attribute_data.append(requested_attribute)
 
-            str_attribute_consuming_service = OneLogin_Saml2_Templates.MD_ATTR_CONSUMER_SERVICE % \
+            str_attribute_consuming_service = """        <md:AttributeConsumingService index="1">
+            <md:ServiceName xml:lang="en">%(service_name)s</md:ServiceName>
+%(attr_cs_desc)s%(requested_attribute_str)s
+        </md:AttributeConsumingService>
+""" % \
                 {
                     'service_name': sp['attributeConsumingService']['serviceName'],
                     'attr_cs_desc': attr_cs_desc_str,

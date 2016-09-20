@@ -1,0 +1,65 @@
+{
+    "strict": false,
+    "debug": false,
+    "custom_base_path": "../../../tests/data/customPath/",
+    "sp": {
+        "entityId": "http://pytoolkit.com:8000/metadata/",
+        "assertionConsumerService": {
+            "url": "http://pytoolkit.com:8000/?acs"
+        },
+        "attributeConsumingService": {
+            "isDefault": false,
+            "serviceName": "Test Service",
+            "serviceDescription": "Test Service",
+            "requestedAttributes": [ {
+                    "name": "userType",
+                    "nameFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+                    "isRequired": false,
+                    "attributeValue": ["userType","admin"]
+                },
+                {
+                    "name": "urn:oid:0.9.2342.19200300.100.1.1",
+                    "nameFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    "friendlyName": "uid",
+                    "isRequired": false
+                }
+            ]
+        },
+        "singleLogoutService": {
+            "url": "http://pytoolkit.com:8000/?sls"
+        },
+        "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+    },
+    "idp": {
+        "entityId": "https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php",
+        "singleSignOnService": {
+            "url": "http://pitbulk.no-ip.org/SSOService.php"
+        },
+        "singleLogoutService": {
+            "url": "http://pitbulk.no-ip.org/SingleLogoutService.php"
+        },
+        "x509cert": "MIICbDCCAdWgAwIBAgIBADANBgkqhkiG9w0BAQ0FADBTMQswCQYDVQQGEwJ1czETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UECgwMT25lbG9naW4gSW5jMRgwFgYDVQQDDA9pZHAuZXhhbXBsZS5jb20wHhcNMTQwOTIzMTIyNDA4WhcNNDIwMjA4MTIyNDA4WjBTMQswCQYDVQQGEwJ1czETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UECgwMT25lbG9naW4gSW5jMRgwFgYDVQQDDA9pZHAuZXhhbXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAOWA+YHU7cvPOrBOfxCscsYTJB+kH3MaA9BFrSHFS+KcR6cw7oPSktIJxUgvDpQbtfNcOkE/tuOPBDoech7AXfvH6d7Bw7xtW8PPJ2mB5Hn/HGW2roYhxmfh3tR5SdwN6i4ERVF8eLkvwCHsNQyK2Ref0DAJvpBNZMHCpS24916/AgMBAAGjUDBOMB0GA1UdDgQWBBQ77/qVeiigfhYDITplCNtJKZTM8DAfBgNVHSMEGDAWgBQ77/qVeiigfhYDITplCNtJKZTM8DAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBDQUAA4GBAJO2j/1uO80E5C2PM6Fk9mzerrbkxl7AZ/mvlbOn+sNZE+VZ1AntYuG8ekbJpJtG1YfRfc7EA9mEtqvv4dhv7zBy4nK49OR+KpIBjItWB5kYvrqMLKBa32sMbgqqUqeF1ENXKjpvLSuPdfGJZA3dNa/+Dyb8GGqWe707zLyc5F8m"
+    },
+    "security": {
+        "authnRequestsSigned": false,
+        "wantAssertionsSigned": false,
+        "signMetadata": false
+    },
+    "contactPerson": {
+        "technical": {
+            "givenName": "technical_name",
+            "emailAddress": "technical@example.com"
+        },
+        "support": {
+            "givenName": "support_name",
+            "emailAddress": "support@example.com"
+        }
+    },
+    "organization": {
+        "en-US": {
+            "name": "sp_test",
+            "displayname": "SP test",
+            "url": "http://sp.example.com"
+        }
+    }
+}

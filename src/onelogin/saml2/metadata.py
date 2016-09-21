@@ -139,12 +139,13 @@ class OneLogin_Saml2_Metadata(object):
                     req_attr_isrequired_str = " isRequired=\"%s\"" % req_attribs['isRequired']
 
                 if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
-                    req_attr_aux_str = ""
                     if isinstance(req_attribs['attributeValue'], basestring):
                         req_attribs['attributeValue'] = [req_attribs['attributeValue']]
+
+                    req_attr_aux_str = ">"
                     for attrValue in req_attribs['attributeValue']:
                         req_attr_aux_str += """
-                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion>%(attributeValue)s</saml:AttributeValue>""" % \
+                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">%(attributeValue)s</saml:AttributeValue>""" % \
                             {
                                 'attributeValue': attrValue
                             }

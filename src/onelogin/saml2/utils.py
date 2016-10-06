@@ -604,23 +604,22 @@ class OneLogin_Saml2_Utils(object):
         status = {}
 
         status_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status')
-        if len(status_entry) == 0:
-            raise Exception('Missing Status on response')
+        if len(status_entry) != 1:
+            raise Exception('Missing valid Status on response')
 
         code_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode', status_entry[0])
-        if len(code_entry) == 0:
-            raise Exception('Missing Status Code on response')
+        if len(code_entry) != 1:
+            raise Exception('Missing valid Status Code on response')
         code = code_entry[0].values()[0]
         status['code'] = code
 
+        status['msg'] = ''
         message_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', status_entry[0])
         if len(message_entry) == 0:
             subcode_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', status_entry[0])
-            if len(subcode_entry) > 0:
+            if len(subcode_entry) == 1:
                 status['msg'] = subcode_entry[0].values()[0]
-            else:
-                status['msg'] = ''
-        else:
+        elif len(message_entry) == 1:
             status['msg'] = message_entry[0].text
 
         return status

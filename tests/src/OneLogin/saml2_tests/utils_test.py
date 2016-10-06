@@ -394,7 +394,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             OneLogin_Saml2_Utils.get_status(dom_inv)
             exception = context.exception
-            self.assertIn("Missing Status on response", str(exception))
+            self.assertIn("Missing valid Status on response", str(exception))
 
         xml_inv2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_status_code.xml.base64'))
         xml_inv2 = b64decode(xml_inv2)
@@ -403,7 +403,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             OneLogin_Saml2_Utils.get_status(dom_inv2)
             exception = context.exception
-            self.assertIn("Missing Status Code on response", str(exception))
+            self.assertIn("Missing valid Status Code on response", str(exception))
 
     def testParseDuration(self):
         """

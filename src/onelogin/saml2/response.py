@@ -110,24 +110,32 @@ class OneLogin_Saml2_Response(object):
 
                 if security['wantNameIdEncrypted']:
                     encrypted_nameid_nodes = self.__query_assertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')
-                    if len(encrypted_nameid_nodes) == 0:
+                    if len(encrypted_nameid_nodes) != 1:
                         raise Exception('The NameID of the Response is not encrypted and the SP require it')
 
-                # Checks that there is at least one AttributeStatement if required
-                attribute_statement_nodes = self.__query_assertion('/saml:AttributeStatement')
-                if security['wantAttributeStatement'] and not attribute_statement_nodes:
-                    raise Exception('There is no AttributeStatement on the Response')
+                # Checks that a Conditions element exists
+                if not self.check_one_condition():
+                    raise Exception('The Assertion must include a Conditions element')
 
                 # Validates Assertion timestamps
                 if not self.validate_timestamps():
                     raise Exception('Timing issues (please check your clock settings)')
+
+                # Checks that an AuthnStatement element exists and is unique
+                if not self.check_one_authnstatement():
+                    raise Exception('The Assertion must include an AuthnStatement element')
+
+                # Checks that there is at least one AttributeStatement if required
+                attribute_statement_nodes = self.__query_assertion('/saml:AttributeStatement')
+                if security.get('wantAttributeStatement', True) and not attribute_statement_nodes:
+                    raise Exception('There is no AttributeStatement on the Response')
 
                 encrypted_attributes_nodes = self.__query_assertion('/saml:AttributeStatement/saml:EncryptedAttribute')
                 if encrypted_attributes_nodes:
                     raise Exception('There is an EncryptedAttribute in the Response and this SP not support them')
 
                 # Checks destination
-                destination = self.document.get('Destination', '')
+                destination = self.document.get('Destination', None)
                 if destination:
                     if not destination.startswith(current_url):
                         # TODO: Review if following lines are required, since we can control the
@@ -135,6 +143,8 @@ class OneLogin_Saml2_Response(object):
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
                         #  if not destination.startswith(current_url_routed):
                         raise Exception('The response was received at %s instead of %s' % (current_url, destination))
+                elif destination == '':
+                    raise Exception('The response has an empty Destination value')
 
                 # Checks audience
                 valid_audiences = self.get_audiences()
@@ -239,6 +249,26 @@ class OneLogin_Saml2_Response(object):
                 status_exception_msg += ' -> ' + status_msg
             raise Exception(status_exception_msg)
 
+    def check_one_condition(self):
+        """
+        Checks that the samlp:Response/saml:Assertion/saml:Conditions element exists and is unique.
+        """
+        condition_nodes = self.__query_assertion('/saml:Conditions')
+        if len(condition_nodes) == 1:
+            return True
+        else:
+            return False
+
+    def check_one_authnstatement(self):
+        """
+        Checks that the samlp:Response/saml:Assertion/saml:AuthnStatement element exists and is unique.
+        """
+        authnstatement_nodes = self.__query_assertion('/saml:AuthnStatement')
+        if len(authnstatement_nodes) == 1:
+            return True
+        else:
+            return False
+
     def get_audiences(self):
         """
         Gets the audiences
@@ -259,14 +289,18 @@ class OneLogin_Saml2_Response(object):
         issuers = set()
 
         message_issuer_nodes = self.__query('/samlp:Response/saml:Issuer')
-        if message_issuer_nodes:
+        if len(message_issuer_nodes) == 1:
             issuers.add(message_issuer_nodes[0].text)
+        else:
+            raise Exception('Issuer of the Response not found or multiple.')
 
         assertion_issuer_nodes = self.__query_assertion('/saml:Issuer')
-        if assertion_issuer_nodes:
+        if len(assertion_issuer_nodes) == 1:
             issuers.add(assertion_issuer_nodes[0].text)
+        else:
+            raise Exception('Issuer of the Assertion not found or multiple.')
 
-        return list(issuers)
+        return list(set(issuers))
 
     def get_nameid_data(self):
         """
@@ -292,10 +326,19 @@ class OneLogin_Saml2_Response(object):
             if security.get('wantNameId', True):
                 raise Exception('Not NameID found in the assertion of the Response')
         else:
+            if self.__settings.is_strict() and not nameid.text:
+                raise Exception('An empty NameID value found')
+
             nameid_data = {'Value': nameid.text}
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
                 value = nameid.get(attr, None)
                 if value:
+                    if self.__settings.is_strict() and attr == 'SPNameQualifier':
+                        sp_data = self.__settings.get_sp_data()
+                        sp_entity_id = sp_data.get('entityId', '')
+                        if sp_entity_id != value:
+                            raise Exception('The SPNameQualifier value mistmatch the SP entityID value.')
+
                     nameid_data[attr] = value
         return nameid_data
 
@@ -351,6 +394,9 @@ class OneLogin_Saml2_Response(object):
         attribute_nodes = self.__query_assertion('/saml:AttributeStatement/saml:Attribute')
         for attribute_node in attribute_nodes:
             attr_name = attribute_node.get('Name')
+            if attr_name in attributes.keys():
+                raise Exception('Found an Attribute element with duplicated Name')
+
             values = []
             for attr in attribute_node.iterchildren('{%s}AttributeValue' % OneLogin_Saml2_Constants.NSMAP['saml']):
                 values.append(attr.text)
@@ -366,7 +412,14 @@ class OneLogin_Saml2_Response(object):
         """
         encrypted_assertion_nodes = OneLogin_Saml2_XML.query(self.document, '//saml:EncryptedAssertion')
         assertion_nodes = OneLogin_Saml2_XML.query(self.document, '//saml:Assertion')
-        return (len(encrypted_assertion_nodes) + len(assertion_nodes)) == 1
+
+        valid = len(encrypted_assertion_nodes) + len(assertion_nodes) == 1
+
+        if (self.encrypted):
+            assertion_nodes = OneLogin_Saml2_XML.query(self.decrypted_document, '//saml:Assertion')
+            valid = valid and len(assertion_nodes) == 1
+
+        return valid
 
     def process_signed_elements(self):
         """

@@ -121,7 +121,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_8.get_nameid()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('The SPNameQualifier value mistmatch the SP entityID value.', e.message)
+            self.assertIn('The SPNameQualifier value mistmatch the SP entityID value.', str(e))
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_nameid.xml.base64'))
         response_9 = OneLogin_Saml2_Response(settings, xml_6)
@@ -129,7 +129,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_9.get_nameid()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('An empty NameID value found', e.message)
+            self.assertIn('An empty NameID value found', str(e))
 
     def testGetNameIdData(self):
         """
@@ -216,7 +216,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_7.get_nameid_data()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('Not NameID found in the assertion of the Response', e.message)
+            self.assertIn('Not NameID found in the assertion of the Response', str(e))
 
         json_settings['strict'] = True
         settings = OneLogin_Saml2_Settings(json_settings)
@@ -227,7 +227,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_8.get_nameid_data()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('The SPNameQualifier value mistmatch the SP entityID value.', e.message)
+            self.assertIn('The SPNameQualifier value mistmatch the SP entityID value.', str(e))
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_nameid.xml.base64'))
         response_9 = OneLogin_Saml2_Response(settings, xml_6)
@@ -235,7 +235,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response_9.get_nameid_data()
             self.assertTrue(False)
         except Exception as e:
-            self.assertIn('An empty NameID value found', e.message)
+            self.assertIn('An empty NameID value found', str(e))
 
     def testCheckStatus(self):
         """
@@ -377,14 +377,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         try:
             response_4.get_issuers()
         except Exception as e:
-            self.assertIn('Issuer of the Response not found or multiple.', e.message)
+            self.assertIn('Issuer of the Response not found or multiple.', str(e))
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_assertion.xml.base64'))
         response_5 = OneLogin_Saml2_Response(settings, xml_5)
         try:
             response_5.get_issuers()
         except Exception as e:
-            self.assertIn('Issuer of the Assertion not found or multiple.', e.message)
+            self.assertIn('Issuer of the Assertion not found or multiple.', str(e))
 
     def testGetSessionIndex(self):
         """
@@ -695,7 +695,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             response.get_attributes()
             self.assertFalse(True)
         except Exception as e:
-            self.assertEqual('Found an Attribute element with duplicated Name', e.message)
+            self.assertEqual('Found an Attribute element with duplicated Name', str(e))
 
     def testIsInValidDestination(self):
         """

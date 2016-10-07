@@ -131,7 +131,6 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn('An empty NameID value found', e.message)
 
-
     def testGetNameIdData(self):
         """
         Tests the get_nameid_data method of the OneLogin_Saml2_Response
@@ -376,14 +375,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_response.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
         try:
-            issuers = response_4.get_issuers()
+            response_4.get_issuers()
         except Exception as e:
             self.assertIn('Issuer of the Response not found or multiple.', e.message)
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_assertion.xml.base64'))
         response_5 = OneLogin_Saml2_Response(settings, xml_5)
         try:
-            issuers = response_5.get_issuers()
+            response_5.get_issuers()
         except Exception as e:
             self.assertIn('Issuer of the Assertion not found or multiple.', e.message)
 
@@ -693,7 +692,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'duplicated_attributes.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         try:
-            attributes = response.get_attributes()
+            response.get_attributes()
             self.assertFalse(True)
         except Exception as e:
             self.assertEqual('Found an Attribute element with duplicated Name', e.message)

@@ -84,6 +84,9 @@ class OneLogin_Saml2_Response(object):
 
             signed_elements = self.process_signed_elements()
 
+            has_signed_response = '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements
+            has_signed_assertion = '{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML in signed_elements
+
             if self.__settings.is_strict():
                 no_valid_xml_msg = 'Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd'
                 res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
@@ -196,33 +199,26 @@ class OneLogin_Saml2_Response(object):
                 if not any_subject_confirmation:
                     raise Exception('A valid SubjectConfirmation was not found on this Response')
 
-                if security['wantAssertionsSigned'] and ('{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML) not in signed_elements:
+                if security['wantAssertionsSigned'] and not not has_signed_assertion:
                     raise Exception('The Assertion of the Response is not signed and the SP require it')
 
-                if security['wantMessagesSigned'] and ('{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP) not in signed_elements:
+                if security['wantMessagesSigned'] and has_signed_response:
                     raise Exception('The Message of the Response is not signed and the SP require it')
 
-            if len(signed_elements) > 0:
-                if len(signed_elements) > 2:
-                    raise Exception('Too many Signatures found. SAML Response rejected')
-
-                cert = idp_data['x509cert']
-                fingerprint = idp_data['certFingerprint']
-                fingerprintalg = idp_data['certFingerprintAlgorithm']
+            if not signed_elements or (not has_signed_response and not has_signed_assertion):
+                raise Exception('No Signature found. SAML Response rejected')
+            else:
+                cert = idp_data.get('x509cert', None)
+                fingerprint = idp_data.get('certFingerprint', None)
+                fingerprintalg = idp_data.get('certFingerprintAlgorithm', None)
 
                 # If find a Signature on the Response, validates it checking the original response
-                if '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements:
-                    document_to_validate = self.document
-                # Otherwise validates the assertion (decrypted assertion if was encrypted)
-                else:
-                    if self.encrypted:
-                        document_to_validate = self.decrypted_document
-                    else:
-                        document_to_validate = self.document
-                if not OneLogin_Saml2_Utils.validate_sign(document_to_validate, cert, fingerprint, fingerprintalg):
+                if has_signed_response and not OneLogin_Saml2_Utils.validate_sign(self.document, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH):
                     raise Exception('Signature validation failed. SAML Response rejected')
-            else:
-                raise Exception('No Signature found. SAML Response rejected')
+
+                document_check_assertion = self.decrypted_document if self.encrypted else self.document
+                if has_signed_assertion and not OneLogin_Saml2_Utils.validate_sign(document_check_assertion, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH):
+                    raise Exception('Signature validation failed. SAML Response rejected')
 
             return True
         except Exception as err:
@@ -288,7 +284,7 @@ class OneLogin_Saml2_Response(object):
         """
         issuers = set()
 
-        message_issuer_nodes = self.__query('/samlp:Response/saml:Issuer')
+        message_issuer_nodes = OneLogin_Saml2_XML.query(self.document, '/samlp:Response/saml:Issuer')
         if len(message_issuer_nodes) == 1:
             issuers.add(message_issuer_nodes[0].text)
         else:
@@ -466,7 +462,40 @@ class OneLogin_Saml2_Response(object):
                     verified_seis.append(sei)
 
             signed_elements.append(signed_element)
+
+            if signed_elements:
+                if not self.validate_signed_elements(signed_elements):
+                    raise Exception('Found an unexpected Signature Element. SAML Response rejected')
         return signed_elements
+
+    def validate_signed_elements(self, signed_elements):
+        """
+        Verifies that the document has the expected signed nodes.
+        """
+        if len(signed_elements) > 2:
+            return False
+
+        response_tag = '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP
+        assertion_tag = '{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML
+
+        if (response_tag in signed_elements and signed_elements.count(response_tag) > 1) or \
+           (assertion_tag in signed_elements and signed_elements.count(assertion_tag) > 1) or \
+           (response_tag not in signed_elements and assertion_tag not in signed_elements):
+            return False
+
+        # Check that the signed elements found here, are the ones that will be verified
+        # by OneLogin_Saml2_Utils.validate_sign
+        if response_tag in signed_elements:
+            expected_signature_nodes = OneLogin_Saml2_XML.query(self.document, OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH)
+            if len(expected_signature_nodes) != 1:
+                raise Exception('Unexpected number of Response signatures found. SAML Response rejected.')
+
+        if assertion_tag in signed_elements:
+            expected_signature_nodes = self.__query(OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH)
+            if len(expected_signature_nodes) != 1:
+                raise Exception('Unexpected number of Assertion signatures found. SAML Response rejected.')
+
+        return True
 
     def validate_timestamps(self):
         """

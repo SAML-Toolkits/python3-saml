@@ -1,5 +1,20 @@
 # python3-saml changelog
 
+### 1.2.0 (October 14, 2016)
+* Several security improvements:
+  * Conditions element required and unique.
+  * AuthnStatement element required and unique.
+  * SPNameQualifier must math the SP EntityID
+  * Reject saml:Attribute element with same “Name” attribute
+  * Reject empty nameID
+  * Require Issuer element. (Must match IdP EntityID).
+  * Destination value can't be blank (if present must match ACS URL).
+  * Check that the EncryptedAssertion element only contains 1 Assertion element.
+* Improve Signature validation process
+* Document the wantAssertionsEncrypted parameter
+* Support multiple attributeValues on RequestedAttribute
+* Fix AttributeConsumingService
+
 ### 1.1.4 (Jun 27, 2016)
 * Change the decrypt assertion process.
 * Add 2 extra validations to prevent Signature wrapping attacks.

@@ -12,6 +12,16 @@ and supported by OneLogin Inc.
 
 This version supports Python3, There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml) 
 
+#### Warning ####
+
+Update python3-saml to 1.2.0, this version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
+
+python3-saml < v1.2.0 is vulnerable and allows signature wrapping!
+
+#### Security Guidelines ####
+
+If you believe you have discovered a security vulnerability in this toolkit, please report it at https://www.onelogin.com/security with a description. We follow responsible disclosure guidelines, and will work with you to quickly find a resolution.
+
 Why add SAML support to my software?
 ------------------------------------
 
@@ -99,11 +109,6 @@ Security warning
 
 In production, the **strict** parameter MUST be set as **"true"**. Otherwise
 your environment is not secure and will be exposed to attacks.
-
-Security Guidelines
--------------------
-
-If you believe you have discovered a security vulnerability in this toolkit, please report it at https://www.onelogin.com/security with a description. We follow responsible disclosure guidelines, and will work with you to quickly find a resolution.
 
 Getting started
 ---------------

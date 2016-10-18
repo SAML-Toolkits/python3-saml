@@ -1,5 +1,8 @@
 # python3-saml changelog
 
+### 1.2.1 (October 18, 2016)
+ * [#30](https://github.com/onelogin/python3-saml/pull/30) Bug on signature checks
+
 ### 1.2.0 (October 14, 2016)
 * Several security improvements:
   * Conditions element required and unique.

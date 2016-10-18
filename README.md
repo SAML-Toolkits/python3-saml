@@ -14,7 +14,9 @@ This version supports Python3, There is a separate version that only support Pyt
 
 #### Warning ####
 
-Update python3-saml to 1.2.0, this version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
+Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). 
+
+1.2.0 version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
 
 python3-saml < v1.2.0 is vulnerable and allows signature wrapping!
 

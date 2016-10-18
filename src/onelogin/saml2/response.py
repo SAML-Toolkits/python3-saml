@@ -83,8 +83,6 @@ class OneLogin_Saml2_Response(object):
             sp_entity_id = sp_data['entityId']
 
             signed_elements = self.process_signed_elements()
-            print('signed elements ... ')
-            print(signed_elements)
 
             has_signed_response = '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP in signed_elements
             has_signed_assertion = '{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML in signed_elements

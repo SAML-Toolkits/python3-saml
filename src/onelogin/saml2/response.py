@@ -199,10 +199,10 @@ class OneLogin_Saml2_Response(object):
                 if not any_subject_confirmation:
                     raise Exception('A valid SubjectConfirmation was not found on this Response')
 
-                if security['wantAssertionsSigned'] and not not has_signed_assertion:
+                if security['wantAssertionsSigned'] and not has_signed_assertion:
                     raise Exception('The Assertion of the Response is not signed and the SP require it')
 
-                if security['wantMessagesSigned'] and has_signed_response:
+                if security['wantMessagesSigned'] and not has_signed_response:
                     raise Exception('The Message of the Response is not signed and the SP require it')
 
             if not signed_elements or (not has_signed_response and not has_signed_assertion):

@@ -136,8 +136,7 @@ class OneLogin_Saml2_Metadata(object):
                 if 'friendlyName' in req_attribs.keys() and req_attribs['friendlyName']:
                     req_attr_nameformat_str = " FriendlyName=\"%s\"" % req_attribs['friendlyName']
                 if 'isRequired' in req_attribs.keys() and req_attribs['isRequired']:
-                    req_attr_isrequired_str = " isRequired=\"%s\"" % req_attribs['isRequired']
-
+                    req_attr_isrequired_str = " isRequired=\"%s\"" % 'true' if req_attribs['isRequired'] else 'false'
                 if 'attributeValue' in req_attribs.keys() and req_attribs['attributeValue']:
                     if isinstance(req_attribs['attributeValue'], basestring):
                         req_attribs['attributeValue'] = [req_attribs['attributeValue']]

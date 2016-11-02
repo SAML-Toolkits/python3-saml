@@ -134,9 +134,26 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     if len(slo_nodes) > 0:
                         idp_slo_url = slo_nodes[0].get('Location', None)
 
-                    cert_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, "./md:KeyDescriptor[@use='signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate")
+                    # Attempt to extract the cert/public key to be used for
+                    # verifying signatures (as opposed to extracing a key to be
+                    # used for encryption), by specifying `use=signing` in the
+                    # XPath expression. If that does not yield a cert, retry
+                    # using a more relaxed XPath expression (the `use` attribute
+                    # is optional according to the saml-metadata-2.0-os spec).
+                    cert_nodes = OneLogin_Saml2_XML.query(
+                        idp_descriptor_node,
+                        "./md:KeyDescriptor[@use='signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+                    )
+
+                    if not cert_nodes:
+                        cert_nodes = OneLogin_Saml2_XML.query(
+                            idp_descriptor_node,
+                            "./md:KeyDescriptor/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+                        )
+
                     if len(cert_nodes) > 0:
-                        idp_x509_cert = cert_nodes[0].text
+                        # Remove leading and trailing and intermediate whitespace.
+                        idp_x509_cert = ''.join(l for l in cert_nodes[0].text.split())
 
                     data['idp'] = {}
 

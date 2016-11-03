@@ -80,7 +80,7 @@ Installation
 
  * python 2.7 // python 3.3
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
- * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formater
+ * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formatter
 
 Review the setup.py file to know the version of the library that python3-saml is using
 
@@ -426,7 +426,7 @@ auth = OneLogin_Saml2_Auth(req, settings_data)
 settings = OneLogin_Saml2_Settings(settings_data)
 ```
 
-You can declare the settings_data in the file that constains the constructor execution or locate them in any file and load the file in order to get the dict available as we see in the following example:
+You can declare the settings_data in the file that contains the constructor execution or locate them in any file and load the file in order to get the dict available as we see in the following example:
 
 ```python
 filename = "/var/www/django-project/custom_settings.json" # The custom_settings.json contains a
@@ -526,7 +526,7 @@ The login method can recieve 3 more optional parameters:
 #### The SP Endpoints ####
 
 Related to the SP there are 3 important endpoints: The metadata view, the ACS view and the SLS view.
-The toolkit provides examples of those views in the demos, but lets see an example.
+The toolkit provides examples of those views in the demos, but let's see an example.
 
 ***SP Metadata***
 
@@ -583,7 +583,7 @@ The SAML response is processed and then checked that there are no errors. It als
 At that point there are 2 possible alternatives:
 
 * If no RelayState is provided, we could show the user data in this view or however we wanted.
-* If RelayState is provided, a rediretion take place.
+* If RelayState is provided, a redirection takes place.
 
 Notice that we saved the user data in the session before the redirection to have the user data available at the RelayState view.
 
@@ -878,7 +878,7 @@ A class that contains functionality related to the metadata of the SP
 
 * ***builder*** Generates the metadata of the SP based on the settings.
 * ***sign_metadata*** Signs the metadata with the key/cert provided.
-* ***add_x509_key_descriptors*** Adds the x509 descriptors (sign/encriptation) to the metadata
+* ***add_x509_key_descriptors*** Adds the x509 descriptors (sign/encryption) to the metadata
 
 ####OneLogin_Saml2_Utils - utils.py####
 
@@ -945,8 +945,8 @@ how it deployed. New demos using other python frameworks are welcome as a contri
 
 ### Getting Started ###
 
-We said that this toolkit includes a django application demo and a flask applicacion demo,
-lets see how fast is deploy them.
+We said that this toolkit includes a django application demo and a flask application demo,
+let's see how fast is it to deploy them.
 
 ***Virtualenv***
 
@@ -1037,7 +1037,7 @@ Once the SP is configured, the metadata of the SP is published at the /metadata 
 
     5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the IdP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
 
-Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET paramters are used to know the action that must be done.
+Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET parameters are used to know the action that must be done.
 
 ### Demo Django ###
 

@@ -10,11 +10,11 @@ Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided
 and supported by OneLogin Inc.
 
-This version supports Python3, There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml) 
+This version supports Python3, There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml)
 
 #### Warning ####
 
-Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). 
+Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned).
 
 1.2.0 version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
 
@@ -93,7 +93,7 @@ The toolkit is hosted on github. You can download it from:
  * Lastest release: https://github.com/onelogin/python3-saml/releases/latest
  * Master repo: https://github.com/onelogin/python3-saml/tree/master
 
-Copy the core of the library (src/onelogin/saml2 folder) and merge the setup.py inside the python application. (each application has its structure so take your time to locate the Python SAML toolkit in the best place). 
+Copy the core of the library (src/onelogin/saml2 folder) and merge the setup.py inside the python application. (each application has its structure so take your time to locate the Python SAML toolkit in the best place).
 
 #### Option 2. Download from pypi ####
 
@@ -916,7 +916,7 @@ Auxiliary class that contains several methods
 
 A class that contains methods to handle XMLs
 
-* ***to_string*** Serialize an element to an encoded string representation of its XML tree.        
+* ***to_string*** Serialize an element to an encoded string representation of its XML tree.
 * ***to_etree*** Parses an XML document or fragment from a string.
 * ***validate_xml*** Validates a xml against a schema
 * ***query*** Extracts nodes that match the query from the Element
@@ -930,7 +930,7 @@ A class that contains methods to obtain and parse metadata from IdP
 * ***parse_remote*** Get the metadata XML from the provided URL and parse it, returning a dict with extracted data
 * ***parse*** Parse the Identity Provider metadata and returns a dict with extracted data
 * ***merge_settings*** Will update the settings with the provided new settings data extracted from the IdP metadata
-        
+
 
 For more info, look at the source code; each method is documented and details about what does and how to use it are provided. Make sure to also check the doc folder where HTML documentation about the classes and methods is provided.
 
@@ -1011,7 +1011,7 @@ The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways:
 
 In the index.py file we define the app.config['SAML_PATH'], that will target to the 'saml' folder. We require it in order to load the settings files.
 
-First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+First we need to edit the saml/settings.json, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
 
 ####IdP setup####
 
@@ -1044,7 +1044,7 @@ Notice that all the SAML Requests and Responses are handled at a unique view (in
 You'll need a virtualenv with the toolkit installed on it.
 
 To run the demo you need to install the requirements first. Load your
-virtualenv  and execute:
+virtualenv and execute:
 ```
  pip install -r demo-django/requirements.txt
 ```
@@ -1084,7 +1084,7 @@ The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways:
 
 After set the SAML_FOLDER in the demo/settings.py, the settings of the python toolkit will be loaded on the django web.
 
-First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+First we need to edit the saml/settings.json, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
 
 ####IdP setup####
 
@@ -1096,7 +1096,7 @@ This demo works very similar to the flask-demo (We did it intentionally).
 
 ###Getting up and running on Heroku###
 
-Getting python3-saml up and running on Heroku will require some extra legwork: python3-saml depends on python-xmlsec which depends on headers from the xmlsec1-dev linux package to install correctly. 
+Getting python3-saml up and running on Heroku will require some extra legwork: python3-saml depends on python-xmlsec which depends on headers from the xmlsec1-dev linux package to install correctly.
 
 First you will need to add the ```apt``` buildpack to your build server:
 

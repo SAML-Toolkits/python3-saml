@@ -228,7 +228,7 @@ This is the settings.json file:
         // attributeConsumingService. nameFormat, attributeValue and
         // friendlyName can be ommited
         "attributeConsumingService": {
-                "ServiceName": "SP test",
+                "serviceName": "SP test",
                 "serviceDescription": "Test Service",
                 "requestedAttributes": [
                     {

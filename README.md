@@ -10,11 +10,11 @@ Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided
 and supported by OneLogin Inc.
 
-This version supports Python3, There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml) 
+This version supports Python3, There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml)
 
 #### Warning ####
 
-Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). 
+Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned).
 
 1.2.0 version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
 
@@ -80,7 +80,7 @@ Installation
 
  * python 2.7 // python 3.3
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
- * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formater
+ * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formatter
 
 Review the setup.py file to know the version of the library that python3-saml is using
 
@@ -93,7 +93,7 @@ The toolkit is hosted on github. You can download it from:
  * Lastest release: https://github.com/onelogin/python3-saml/releases/latest
  * Master repo: https://github.com/onelogin/python3-saml/tree/master
 
-Copy the core of the library (src/onelogin/saml2 folder) and merge the setup.py inside the python application. (each application has its structure so take your time to locate the Python SAML toolkit in the best place). 
+Copy the core of the library (src/onelogin/saml2 folder) and merge the setup.py inside the python application. (each application has its structure so take your time to locate the Python SAML toolkit in the best place).
 
 #### Option 2. Download from pypi ####
 
@@ -228,7 +228,7 @@ This is the settings.json file:
         // attributeConsumingService. nameFormat, attributeValue and
         // friendlyName can be ommited
         "attributeConsumingService": {
-                "ServiceName": "SP test",
+                "serviceName": "SP test",
                 "serviceDescription": "Test Service",
                 "requestedAttributes": [
                     {
@@ -289,8 +289,8 @@ This is the settings.json file:
          *  Notice that if you want to validate any SAML Message sent by the HTTP-Redirect binding, you
          *  will need to provide the whole x509cert.
          */
-        // 'certFingerprint' => '',
-        // 'certFingerprintAlgorithm' => 'sha1',
+        // "certFingerprint" => "",
+        // "certFingerprintAlgorithm" => "sha1",
     }
 }
 ```
@@ -340,7 +340,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
 
         // Indicates a requirement for the <saml:Assertion>
         // elements received by this SP to be encrypted.
-        'wantAssertionsEncrypted' => false,
+        "wantAssertionsEncrypted": false,
 
         // Indicates a requirement for the NameID element on the SAMLResponse
         // received by this SP to be present.
@@ -357,16 +357,16 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         // Set to false and no AuthContext will be sent in the AuthNRequest,
         // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
         // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
-        'requestedAuthnContext': true,
+        "requestedAuthnContext": true,
 	// Allows the authn comparison parameter to be set, defaults to 'exact' if the setting is not present.
-        'requestedAuthnContextComparison': 'exact',
+        "requestedAuthnContextComparison": "exact",
 
         // In some environment you will need to set how long the published metadata of the Service Provider gonna be valid.
         // is possible to not set the 2 following parameters (or set to null) and default values will be set (2 days, 1 week)
         // Provide the desire TimeStamp, for example 2015-06-26T20:00:00Z
-        'metadataValidUntil': null,
+        "metadataValidUntil": null,
         // Provide the desire Duration, for example PT518400S (6 days)
-        'metadataCacheDuration': null,
+        "metadataCacheDuration": null,
 
         // Algorithm that the toolkit will use on signing process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
@@ -374,7 +374,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
-        'signatureAlgorithm': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
     },
 
     // Contact information template, it is recommended to suply a
@@ -426,7 +426,7 @@ auth = OneLogin_Saml2_Auth(req, settings_data)
 settings = OneLogin_Saml2_Settings(settings_data)
 ```
 
-You can declare the settings_data in the file that constains the constructor execution or locate them in any file and load the file in order to get the dict available as we see in the following example:
+You can declare the settings_data in the file that contains the constructor execution or locate them in any file and load the file in order to get the dict available as we see in the following example:
 
 ```python
 filename = "/var/www/django-project/custom_settings.json" # The custom_settings.json contains a
@@ -526,7 +526,7 @@ The login method can recieve 3 more optional parameters:
 #### The SP Endpoints ####
 
 Related to the SP there are 3 important endpoints: The metadata view, the ACS view and the SLS view.
-The toolkit provides examples of those views in the demos, but lets see an example.
+The toolkit provides examples of those views in the demos, but let's see an example.
 
 ***SP Metadata***
 
@@ -583,7 +583,7 @@ The SAML response is processed and then checked that there are no errors. It als
 At that point there are 2 possible alternatives:
 
 * If no RelayState is provided, we could show the user data in this view or however we wanted.
-* If RelayState is provided, a rediretion take place.
+* If RelayState is provided, a redirection takes place.
 
 Notice that we saved the user data in the session before the redirection to have the user data available at the RelayState view.
 
@@ -878,7 +878,7 @@ A class that contains functionality related to the metadata of the SP
 
 * ***builder*** Generates the metadata of the SP based on the settings.
 * ***sign_metadata*** Signs the metadata with the key/cert provided.
-* ***add_x509_key_descriptors*** Adds the x509 descriptors (sign/encriptation) to the metadata
+* ***add_x509_key_descriptors*** Adds the x509 descriptors (sign/encryption) to the metadata
 
 ####OneLogin_Saml2_Utils - utils.py####
 
@@ -916,7 +916,7 @@ Auxiliary class that contains several methods
 
 A class that contains methods to handle XMLs
 
-* ***to_string*** Serialize an element to an encoded string representation of its XML tree.        
+* ***to_string*** Serialize an element to an encoded string representation of its XML tree.
 * ***to_etree*** Parses an XML document or fragment from a string.
 * ***validate_xml*** Validates a xml against a schema
 * ***query*** Extracts nodes that match the query from the Element
@@ -930,7 +930,7 @@ A class that contains methods to obtain and parse metadata from IdP
 * ***parse_remote*** Get the metadata XML from the provided URL and parse it, returning a dict with extracted data
 * ***parse*** Parse the Identity Provider metadata and returns a dict with extracted data
 * ***merge_settings*** Will update the settings with the provided new settings data extracted from the IdP metadata
-        
+
 
 For more info, look at the source code; each method is documented and details about what does and how to use it are provided. Make sure to also check the doc folder where HTML documentation about the classes and methods is provided.
 
@@ -945,8 +945,8 @@ how it deployed. New demos using other python frameworks are welcome as a contri
 
 ### Getting Started ###
 
-We said that this toolkit includes a django application demo and a flask applicacion demo,
-lets see how fast is deploy them.
+We said that this toolkit includes a django application demo and a flask application demo,
+let's see how fast is it to deploy them.
 
 ***Virtualenv***
 
@@ -1011,7 +1011,7 @@ The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways:
 
 In the index.py file we define the app.config['SAML_PATH'], that will target to the 'saml' folder. We require it in order to load the settings files.
 
-First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+First we need to edit the saml/settings.json, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
 
 ####IdP setup####
 
@@ -1037,14 +1037,14 @@ Once the SP is configured, the metadata of the SP is published at the /metadata 
 
     5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the IdP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
 
-Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET paramters are used to know the action that must be done.
+Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET parameters are used to know the action that must be done.
 
 ### Demo Django ###
 
 You'll need a virtualenv with the toolkit installed on it.
 
 To run the demo you need to install the requirements first. Load your
-virtualenv  and execute:
+virtualenv and execute:
 ```
  pip install -r demo-django/requirements.txt
 ```
@@ -1084,7 +1084,7 @@ The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways:
 
 After set the SAML_FOLDER in the demo/settings.py, the settings of the python toolkit will be loaded on the django web.
 
-First we need to edit the saml/settings.json, configure the SP part and  review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+First we need to edit the saml/settings.json, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
 
 ####IdP setup####
 
@@ -1096,7 +1096,7 @@ This demo works very similar to the flask-demo (We did it intentionally).
 
 ###Getting up and running on Heroku###
 
-Getting python3-saml up and running on Heroku will require some extra legwork: python3-saml depends on python-xmlsec which depends on headers from the xmlsec1-dev linux package to install correctly. 
+Getting python3-saml up and running on Heroku will require some extra legwork: python3-saml depends on python-xmlsec which depends on headers from the xmlsec1-dev linux package to install correctly.
 
 First you will need to add the ```apt``` buildpack to your build server:
 

@@ -9,6 +9,9 @@ python:
   - '3.4.3'
   - '3.5.0'
 
+env:
+  - CFLAGS="-Wall -O0 -g"
+
 install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev

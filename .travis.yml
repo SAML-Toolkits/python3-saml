@@ -8,8 +8,6 @@ python:
 # - '3.3.6'
   - '3.4.3'
   - '3.5.0'
-env:
-  - CFLAGS='-Wall -O0 -g'
 
 install:
   - sudo apt-get update -qq
@@ -18,7 +16,8 @@ install:
   - 'travis_retry pip install .'
   - 'travis_retry pip install -e ".[test]"'
 
-script: 
+script:
+  - 'export CFLAGS="-Wall -O0 -g"'
   - './seg_wrapper.sh coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'

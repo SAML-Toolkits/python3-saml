@@ -36,7 +36,7 @@ setup(
         'isodate>=0.5.0',
         'xmlsec>=0.6.0'
     ],
-    dependency_links=['http://github.com/mehcode/python-xmlsec/tarball/master'],
+    dependency_links=['git+ssh://git@github.com/mehcode/python-xmlsec.git@0f046381ec6bac7b3dd8b2ad6da0d022e7b30274'],
     extras_require={
         'test': (
             'coverage==3.7.1',

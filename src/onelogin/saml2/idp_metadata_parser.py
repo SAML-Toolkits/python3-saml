@@ -68,8 +68,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
             idp_metadata,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
-            index=0
-            ):
+            index=0):
         """
         Parses the Identity Provider metadata and return a dict with extracted data.
 

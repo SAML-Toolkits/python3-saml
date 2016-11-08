@@ -9,7 +9,6 @@ Metadata class of OneLogin's Python Toolkit.
 
 from copy import deepcopy
 
-
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -17,6 +16,7 @@ except ImportError:
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_IdPMetadataParser(object):
@@ -67,7 +67,9 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     def parse(
             idp_metadata,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
-            required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT):
+            required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
+            index=0
+            ):
         """
         Parses the Identity Provider metadata and return a dict with extracted data.
 
@@ -93,6 +95,9 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :param required_slo_binding: Parse only POST or REDIRECT SLO endpoints.
         :type required_slo_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
             or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+
+        :param index: If the metadata contains more than 1 certificate, use index to get the right certificate.
+        :type index: number
 
         :returns: settings dict with extracted data
         :rtype: dict
@@ -152,8 +157,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                         )
 
                     if len(cert_nodes) > 0:
-                        # Remove leading and trailing and intermediate whitespace.
-                        idp_x509_cert = ''.join(l for l in cert_nodes[0].text.split())
+                        idp_x509_cert = OneLogin_Saml2_Utils.format_cert(cert_nodes[index].text, False)
 
                     data['idp'] = {}
 

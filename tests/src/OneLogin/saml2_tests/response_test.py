@@ -1349,3 +1349,18 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
                 'http_host': 'pitbulk.no-ip.org',
                 'script_name': 'newonelogin/demo1/index.php?acs'
             }))
+
+    def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
+        """
+        Tests that the internal exception gets raised if the raise parameter
+        is True.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+        xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_conditions.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+
+        self.assertFalse(response.is_valid(self.get_request_data()))
+
+        with self.assertRaises(Exception):
+            response.is_valid(self.get_request_data(), raises=True)

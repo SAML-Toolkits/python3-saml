@@ -47,7 +47,7 @@ class OneLogin_Saml2_Response(object):
             self.encrypted = True
             self.decrypted_document = self.__decrypt_assertion(decrypted_document)
 
-    def is_valid(self, request_data, request_id=None):
+    def is_valid(self, request_data, request_id=None, raises=False):
         """
         Validates the response object.
 
@@ -56,6 +56,9 @@ class OneLogin_Saml2_Response(object):
 
         :param request_id: Optional argument. The ID of the AuthNRequest sent by this SP to the IdP
         :type request_id: string
+
+        :param raises: Optional argument. If true, the function will raise an exception as soon as first validation test fails
+        :type raises: bool
 
         :returns: True if the SAML Response is valid, False if not
         :rtype: bool
@@ -226,6 +229,8 @@ class OneLogin_Saml2_Response(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
+            if raises:
+                raise
             return False
 
     def check_status(self):

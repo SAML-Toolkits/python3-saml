@@ -279,7 +279,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, xml)
         self.assertFalse(response.is_valid(self.get_request_data()))
-        self.assertEquals('The Assertion must include a Conditions element', response.get_error())
+        self.assertEqual('The Assertion must include a Conditions element', response.get_error())
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         response_2 = OneLogin_Saml2_Response(settings, xml_2)
@@ -298,7 +298,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, xml)
         self.assertFalse(response.is_valid(self.get_request_data()))
-        self.assertEquals('The Assertion must include an AuthnStatement element', response.get_error())
+        self.assertEqual('The Assertion must include an AuthnStatement element', response.get_error())
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         response_2 = OneLogin_Saml2_Response(settings, xml_2)
@@ -724,7 +724,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         message_3 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_destination.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, message_3)
         self.assertFalse(response_4.is_valid(self.get_request_data()))
-        self.assertEquals('The response has an empty Destination value', response_4.get_error())
+        self.assertEqual('The response has an empty Destination value', response_4.get_error())
 
         # No Destination
         dom.firstChild.removeAttribute('Destination')

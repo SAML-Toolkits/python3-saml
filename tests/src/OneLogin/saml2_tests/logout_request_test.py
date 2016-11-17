@@ -336,3 +336,19 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         logout_request5 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request5.is_valid(request_data))
+
+    def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
+        request = OneLogin_Saml2_Utils.b64encode('<xml>invalid</xml>')
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+
+        logout_request = OneLogin_Saml2_Logout_Request(settings, request)
+
+        self.assertFalse(logout_request.is_valid(request_data))
+
+        with self.assertRaises(Exception):
+            logout_request.is_valid(request_data, raises=True)

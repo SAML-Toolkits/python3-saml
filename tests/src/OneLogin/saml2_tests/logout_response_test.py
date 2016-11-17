@@ -277,3 +277,20 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         response_3 = OneLogin_Saml2_Logout_Response(settings, message_3)
         self.assertTrue(response_3.is_valid(request_data))
+
+    def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
+        message = OneLogin_Saml2_Utils.deflate_and_base64_encode('<xml>invalid</xml>')
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {}
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+
+        response = OneLogin_Saml2_Logout_Response(settings, message)
+
+        self.assertFalse(response.is_valid(request_data))
+
+        with self.assertRaises(Exception):
+            response.is_valid(request_data, raises=True)

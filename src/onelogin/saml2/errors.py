@@ -50,3 +50,27 @@ class OneLogin_Saml2_Error(Exception):
 
         Exception.__init__(self, message)
         self.code = code
+
+
+class OneLogin_Saml2_ValidationError(Exception):
+
+    NAMEID_NOT_FOUND_IN_ASSERTION = 0
+    EMPTY_NAMEID_VALUE_FOUND = 1
+    SP_NAME_QUALIFIER_NAME_MISMATCH = 2
+
+    def __init__(self, message, code=0, errors=None):
+        """
+        Initializes the Exception instance.
+
+        Arguments are:
+            * (str)   message.   Describes the error.
+            * (int)   code.      The code error (defined in the error class).
+        """
+
+        assert isinstance(code, int)
+
+        if errors is not None:
+            message = message % errors
+
+        Exception.__init__(self, message)
+        self.code = code

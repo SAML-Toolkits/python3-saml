@@ -13,6 +13,7 @@ from copy import deepcopy
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from onelogin.saml2.errors import OneLogin_Saml2_ValidationError
 
 
 class OneLogin_Saml2_Response(object):
@@ -320,10 +321,16 @@ class OneLogin_Saml2_Response(object):
         if nameid is None:
             security = self.__settings.get_security_data()
             if security.get('wantNameId', True):
-                raise Exception('Not NameID found in the assertion of the Response')
+                raise OneLogin_Saml2_ValidationError(
+                    'Not NameID found in the assertion of the Response',
+                    OneLogin_Saml2_ValidationError.NAMEID_NOT_FOUND_IN_ASSERTION
+                )
         else:
             if self.__settings.is_strict() and not nameid.text:
-                raise Exception('An empty NameID value found')
+                raise OneLogin_Saml2_ValidationError(
+                    'An empty NameID value found',
+                    OneLogin_Saml2_ValidationError.EMPTY_NAMEID_VALUE_FOUND
+                )
 
             nameid_data = {'Value': nameid.text}
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
@@ -333,7 +340,10 @@ class OneLogin_Saml2_Response(object):
                         sp_data = self.__settings.get_sp_data()
                         sp_entity_id = sp_data.get('entityId', '')
                         if sp_entity_id != value:
-                            raise Exception('The SPNameQualifier value mistmatch the SP entityID value.')
+                            raise OneLogin_Saml2_ValidationError(
+                                'The SPNameQualifier value mistmatch the SP entityID value.',
+                                OneLogin_Saml2_ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH
+                            )
 
                     nameid_data[attr] = value
         return nameid_data

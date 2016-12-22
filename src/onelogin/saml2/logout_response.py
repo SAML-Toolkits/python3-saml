@@ -63,7 +63,7 @@ class OneLogin_Saml2_Logout_Response(object):
         status = entries[0].attrib['Value']
         return status
 
-    def is_valid(self, request_data, request_id=None):
+    def is_valid(self, request_data, request_id=None, method_data='get_data'):
         """
         Determines if the SAML LogoutResponse is valid
         :param request_id: The ID of the LogoutRequest sent by this SP to the IdP
@@ -75,7 +75,7 @@ class OneLogin_Saml2_Logout_Response(object):
         try:
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
-            get_data = request_data['get_data']
+            get_data = request_data[method_data]
 
             if self.__settings.is_strict():
                 res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())

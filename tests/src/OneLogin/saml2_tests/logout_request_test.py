@@ -236,7 +236,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Logout Request'):
-            logout_request2.is_valid(request_data, raises=True)
+            logout_request2.is_valid(request_data, raise_exceptions=True)
 
     def testIsInvalidDestination(self):
         """
@@ -255,7 +255,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         with self.assertRaisesRegexp(Exception, 'The LogoutRequest was received at'):
-            logout_request2.is_valid(request_data, raises=True)
+            logout_request2.is_valid(request_data, raise_exceptions=True)
 
         dom = parseString(request)
         dom.documentElement.setAttribute('Destination', None)
@@ -286,7 +286,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         with self.assertRaisesRegexp(Exception, 'Timing issues \(please check your clock settings\)'):
-            logout_request2.is_valid(request_data, raises=True)
+            logout_request2.is_valid(request_data, raise_exceptions=True)
 
     def testIsValid(self):
         """
@@ -334,4 +334,4 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertFalse(logout_request.is_valid(request_data))
 
         with self.assertRaises(Exception):
-            logout_request.is_valid(request_data, raises=True)
+            logout_request.is_valid(request_data, raise_exceptions=True)

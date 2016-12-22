@@ -493,7 +493,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_saml2.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'Unsupported SAML version'):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testValidateID(self):
         """
@@ -504,7 +504,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_id.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'Missing ID attribute on SAML Response'):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidReference(self):
         """
@@ -534,7 +534,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'Timing issues \(please check your clock settings\)'):
-            response_2.is_valid(self.get_request_data(), raises=True)
+            response_2.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidNoStatement(self):
         """
@@ -592,7 +592,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_key.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'Signature validation failed. SAML Response rejected'):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidMultipleAssertions(self):
         """
@@ -604,7 +604,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'multiple_assertions.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'SAML Response must contain 1 assertion'):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidEncAttrs(self):
         """
@@ -620,7 +620,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegexp(Exception, 'There is an EncryptedAttribute in the Response and this SP not support them'):
-            response_2.is_valid(self.get_request_data(), raises=True)
+            response_2.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidDuplicatedAttrs(self):
         """
@@ -723,11 +723,11 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response_3 = OneLogin_Saml2_Response(settings, message)
         with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Assertion/Response'):
-            response_3.is_valid(request_data, raises=True)
+            response_3.is_valid(request_data, raise_exceptions=True)
 
         response_4 = OneLogin_Saml2_Response(settings, message_2)
         with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Assertion/Response'):
-            response_4.is_valid(request_data, raises=True)
+            response_4.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidSessionIndex(self):
         """
@@ -752,7 +752,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
         with self.assertRaisesRegexp(Exception, 'The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response'):
-            response_2.is_valid(request_data, raises=True)
+            response_2.is_valid(request_data, raise_exceptions=True)
 
     def testDatetimeWithMiliseconds(self):
         """
@@ -843,27 +843,27 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response.is_valid(request_data, raises=True)
+            response.is_valid(request_data, raise_exceptions=True)
 
         response_2 = OneLogin_Saml2_Response(settings, message_2)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response_2.is_valid(request_data, raises=True)
+            response_2.is_valid(request_data, raise_exceptions=True)
 
         response_3 = OneLogin_Saml2_Response(settings, message_3)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response_3.is_valid(request_data, raises=True)
+            response_3.is_valid(request_data, raise_exceptions=True)
 
         response_4 = OneLogin_Saml2_Response(settings, message_4)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response_4.is_valid(request_data, raises=True)
+            response_4.is_valid(request_data, raise_exceptions=True)
 
         response_5 = OneLogin_Saml2_Response(settings, message_5)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response_5.is_valid(request_data, raises=True)
+            response_5.is_valid(request_data, raise_exceptions=True)
 
         response_6 = OneLogin_Saml2_Response(settings, message_6)
         with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
-            response_6.is_valid(request_data, raises=True)
+            response_6.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidRequestId(self):
         """
@@ -889,7 +889,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
         with self.assertRaisesRegexp(Exception, 'The InResponseTo of the Response'):
-            response.is_valid(request_data, request_id, raises=True)
+            response.is_valid(request_data, request_id, raise_exceptions=True)
 
         valid_request_id = '_57bcbf70-7b1f-012e-c821-782bcb13bb38'
         response.is_valid(request_data, valid_request_id)
@@ -934,7 +934,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_4 = OneLogin_Saml2_Settings(settings_info)
         response_4 = OneLogin_Saml2_Response(settings_4, message)
         with self.assertRaisesRegexp(Exception, 'The Assertion of the Response is not signed and the SP require it'):
-            response_4.is_valid(request_data, raises=True)
+            response_4.is_valid(request_data, raise_exceptions=True)
 
         settings_info['security']['wantAssertionsSigned'] = False
         settings_info['strict'] = False
@@ -962,7 +962,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_8 = OneLogin_Saml2_Settings(settings_info)
         response_8 = OneLogin_Saml2_Response(settings_8, message)
         with self.assertRaisesRegexp(Exception, 'The Message of the Response is not signed and the SP require it'):
-            response_8.is_valid(request_data, raises=True)
+            response_8.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidEncIssues(self):
         """
@@ -1044,7 +1044,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response = OneLogin_Saml2_Response(settings, xml)
 
         with self.assertRaisesRegexp(Exception, 'failed to load key'):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidCert2(self):
         """
@@ -1270,4 +1270,4 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response.is_valid(self.get_request_data()))
 
         with self.assertRaises(Exception):
-            response.is_valid(self.get_request_data(), raises=True)
+            response.is_valid(self.get_request_data(), raise_exceptions=True)

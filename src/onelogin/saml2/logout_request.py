@@ -212,14 +212,14 @@ class OneLogin_Saml2_Logout_Request(object):
             session_indexes.append(session_index_node.text)
         return session_indexes
 
-    def is_valid(self, request_data, raises=False):
+    def is_valid(self, request_data, raise_exceptions=False):
         """
         Checks if the Logout Request received is valid
         :param request_data: Request Data
         :type request_data: dict
 
-        :param raises: Optional argument. If true, the function will raise an exception as soon as first validation test fails
-        :type raises: bool
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
 
         :return: If the Logout Request is or not valid
         :rtype: boolean
@@ -277,7 +277,7 @@ class OneLogin_Saml2_Logout_Request(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
-            if raises:
+            if raise_exceptions:
                 raise
             return False
 

@@ -533,7 +533,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Timing issues \(please check your clock settings\)'):
+        with self.assertRaisesRegexp(Exception, 'Could not validate timestamp: expired. Check system clock.'):
             response_2.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidNoStatement(self):
@@ -1043,7 +1043,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
 
-        with self.assertRaisesRegexp(Exception, 'failed to load key'):
+        with self.assertRaisesRegexp(Exception, 'Signature validation failed. SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidCert2(self):

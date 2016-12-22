@@ -10,7 +10,7 @@ Logout Request class of OneLogin's Python Toolkit.
 """
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, return_false_on_exception
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
@@ -246,7 +246,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 if root.get('NotOnOrAfter', None):
                     na = OneLogin_Saml2_Utils.parse_SAML_to_time(root.get('NotOnOrAfter'))
                     if na <= OneLogin_Saml2_Utils.now():
-                        raise Exception('Timing issues (please check your clock settings)')
+                        raise Exception('Could not validate timestamp: expired. Check system clock.)')
 
                 # Check destination
                 if root.get('Destination', None):

@@ -285,7 +285,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-        with self.assertRaisesRegexp(Exception, 'Timing issues \(please check your clock settings\)'):
+        with self.assertRaisesRegexp(Exception, 'Could not validate timestamp: expired. Check system clock.'):
             logout_request2.is_valid(request_data, raise_exceptions=True)
 
     def testIsValid(self):

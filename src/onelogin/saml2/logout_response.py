@@ -63,11 +63,15 @@ class OneLogin_Saml2_Logout_Response(object):
         status = entries[0].attrib['Value']
         return status
 
-    def is_valid(self, request_data, request_id=None):
+    def is_valid(self, request_data, request_id=None, raises=False):
         """
         Determines if the SAML LogoutResponse is valid
         :param request_id: The ID of the LogoutRequest sent by this SP to the IdP
         :type request_id: string
+
+        :param raises: Optional argument. If true, the function will raise an exception as soon as first validation test fails
+        :type raises: bool
+
         :return: Returns if the SAML LogoutResponse is or not valid
         :rtype: boolean
         """
@@ -111,6 +115,8 @@ class OneLogin_Saml2_Logout_Response(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
+            if raises:
+                raise
             return False
 
     def __query(self, query):

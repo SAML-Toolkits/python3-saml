@@ -121,10 +121,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID'):
             OneLogin_Saml2_Logout_Request.get_nameid(request_2)
-            exception = context.exception
-            self.assertIn("Key is required in order to decrypt the NameID", str(exception))
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
@@ -140,16 +138,12 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         encrypted_id_nodes = dom_2.getElementsByTagName('saml:EncryptedID')
         encrypted_data = encrypted_id_nodes[0].firstChild.nextSibling
         encrypted_id_nodes[0].removeChild(encrypted_data)
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request'):
             OneLogin_Saml2_Logout_Request.get_nameid(dom_2.toxml(), key)
-            exception = context.exception
-            self.assertIn("Not NameID found in the Logout Request", str(exception))
 
         inv_request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'no_nameId.xml'))
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(Exception, 'Not NameID found in the Logout Request'):
             OneLogin_Saml2_Logout_Request.get_nameid(inv_request)
-            exception = context.exception
-            self.assertIn("Not NameID found in the Logout Request", str(exception))
 
     def testGetNameId(self):
         """
@@ -160,10 +154,8 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(name_id, 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c')
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID'):
             OneLogin_Saml2_Logout_Request.get_nameid(request_2)
-            exception = context.exception
-            self.assertIn("Key is required in order to decrypt the NameID", str(exception))
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
@@ -242,12 +234,9 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
-        try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-            valid = logout_request2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('Invalid issuer in the Logout Request', str(e))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
+        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Logout Request'):
+            logout_request2.is_valid(request_data, raises=True)
 
     def testIsInvalidDestination(self):
         """
@@ -264,12 +253,9 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
-        try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-            valid = logout_request2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('The LogoutRequest was received at', str(e))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
+        with self.assertRaisesRegexp(Exception, 'The LogoutRequest was received at'):
+            logout_request2.is_valid(request_data, raises=True)
 
         dom = parseString(request)
         dom.documentElement.setAttribute('Destination', None)
@@ -298,12 +284,9 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertTrue(logout_request.is_valid(request_data))
 
         settings.set_strict(True)
-        try:
-            logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-            valid = logout_request2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('Timing issues (please check your clock settings)', str(e))
+        logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
+        with self.assertRaisesRegexp(Exception, 'Timing issues \(please check your clock settings\)'):
+            logout_request2.is_valid(request_data, raises=True)
 
     def testIsValid(self):
         """
@@ -336,3 +319,19 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         request = request.replace('http://stuff.com/endpoints/endpoints/sls.php', current_url)
         logout_request5 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request5.is_valid(request_data))
+
+    def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
+        request = OneLogin_Saml2_Utils.b64encode('<xml>invalid</xml>')
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+
+        logout_request = OneLogin_Saml2_Logout_Request(settings, request)
+
+        self.assertFalse(logout_request.is_valid(request_data))
+
+        with self.assertRaises(Exception):
+            logout_request.is_valid(request_data, raises=True)

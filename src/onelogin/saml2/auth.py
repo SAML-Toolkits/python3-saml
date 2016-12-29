@@ -58,6 +58,7 @@ class OneLogin_Saml2_Auth(object):
         self.__authenticated = False
         self.__errors = []
         self.__error_reason = None
+        self.__last_request_id = None
 
     def get_settings(self):
         """
@@ -260,6 +261,13 @@ class OneLogin_Saml2_Auth(object):
         assert isinstance(name, compat.str_type)
         return self.__attributes.get(name)
 
+    def get_last_request_id(self):
+        """
+        :returns: The ID of the last Request SAML message generated.
+        :rtype: string
+        """
+        return self.__last_request_id
+
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
         """
         Initiates the SSO process.
@@ -280,6 +288,7 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
+        self.__last_request_id = authn_request.get_id()
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}
@@ -328,6 +337,7 @@ class OneLogin_Saml2_Auth(object):
             session_index=session_index,
             nq=nq
         )
+        self.__last_request_id = logout_request.id
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         if return_to is not None:

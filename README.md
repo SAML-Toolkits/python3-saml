@@ -523,6 +523,10 @@ The login method can recieve 3 more optional parameters:
 * is_passive        When true the AuthNReuqest will set the Ispassive='true'
 * set_nameid_policy When true the AuthNReuqest will set a nameIdPolicy element.
 
+If a match on the future SAMLResponse ID and the AuthNRequest ID to be sent is required, that AuthNRequest ID must to be extracted and stored for future validation, we can get that ID by
+
+auth.get_last_request_id()
+
 #### The SP Endpoints ####
 
 Related to the SP there are 3 important endpoints: The metadata view, the ACS view and the SLS view.
@@ -706,6 +710,10 @@ Also there are 2 optional parameters that can be set:
 SAML Response with a NameId, then this NameId will be used.
 * session_index. SessionIndex that identifies the session of the user.
 
+If a match on the LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored for future validation, we can get that ID by
+
+auth.get_last_request_id()
+
 ####Example of a view that initiates the SSO request and handles the response (is the acs target)####
 
 We can code a unique file that initiates the SSO process, handle the response, get the attributes, initiate the slo and processes the logout response.
@@ -781,6 +789,7 @@ Main class of OneLogin Python Toolkit
 * ***get_last_error_reason*** Returns the reason of the last error
 * ***get_sso_url*** Gets the SSO url.
 * ***get_slo_url*** Gets the SLO url.
+* ***get_last_request_id*** The ID of the last Request SAML message generated (AuthNRequest, LogoutRequest).
 * ***build_request_signature*** Builds the Signature of the SAML Request.
 * ***build_response_signature*** Builds the Signature of the SAML Response.
 * ***get_settings*** Returns the settings info.

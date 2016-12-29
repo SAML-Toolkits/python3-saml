@@ -16,10 +16,9 @@ import xmlsec
 from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 
@@ -429,7 +428,7 @@ class OneLogin_Saml2_Auth(object):
         if not key:
             raise OneLogin_Saml2_Error(
                 "Trying to sign the %s but can't load the SP private key." % saml_type,
-                OneLogin_Saml2_Error.SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND
             )
 
         msg = self.__build_sign_query(data[saml_type],
@@ -472,7 +471,7 @@ class OneLogin_Saml2_Auth(object):
 
         return self.__validate_signature(request_data, 'SAMLResponse')
 
-    def __validate_signature(self, data, saml_type):
+    def __validate_signature(self, data, saml_type, raise_exceptions=False):
         """
         Validate Signature
 
@@ -484,22 +483,30 @@ class OneLogin_Saml2_Auth(object):
 
         :param saml_type: The target URL the user should be redirected to
         :type saml_type: string  SAMLRequest | SAMLResponse
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
-
-        signature = data.get('Signature', None)
-        if signature is None:
-            if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
-                self.__error_reason = 'The %s is not signed. Rejected.' % saml_type
-                return False
-            return True
-
-        x509cert = self.get_settings().get_idp_cert()
-
-        if x509cert is None:
-            self.__errors.append("In order to validate the sign on the %s, the x509cert of the IdP is required" % saml_type)
-            return False
-
         try:
+            signature = data.get('Signature', None)
+            if signature is None:
+                if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
+                    raise OneLogin_Saml2_ValidationError(
+                        'The %s is not signed. Rejected.' % saml_type,
+                        OneLogin_Saml2_ValidationError.NO_SIGNED_RESPONSE
+                    )
+                return True
+
+            x509cert = self.get_settings().get_idp_cert()
+
+            if not x509cert:
+                error_msg = "In order to validate the sign on the %s, the x509cert of the IdP is required" % saml_type
+                self.__errors.append(error_msg)
+                raise OneLogin_Saml2_Error(
+                    error_msg,
+                    OneLogin_Saml2_Error.CERT_NOT_FOUND
+                )
+
             sign_alg = data.get('SigAlg', OneLogin_Saml2_Constants.RSA_SHA1)
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
@@ -520,8 +527,13 @@ class OneLogin_Saml2_Auth(object):
                                                              x509cert,
                                                              sign_alg,
                                                              self.__settings.is_debug_active()):
-                raise Exception('Signature validation failed. %s rejected.' % saml_type)
+                raise OneLogin_Saml2_ValidationError(
+                    'Signature validation failed. %s rejected.' % saml_type,
+                    OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
+                )
             return True
         except Exception as e:
             self.__error_reason = str(e)
+            if raise_exceptions:
+                raise e
             return False

@@ -24,7 +24,7 @@ import xmlsec
 
 from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.errors import OneLogin_Saml2_Error
+from onelogin.saml2.errors import OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -628,11 +628,17 @@ class OneLogin_Saml2_Utils(object):
 
         status_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status')
         if len(status_entry) != 1:
-            raise Exception('Missing valid Status on response')
+            raise OneLogin_Saml2_ValidationError(
+                'Missing Status on response',
+                OneLogin_Saml2_ValidationError.MISSING_STATUS
+            )
 
         code_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode', status_entry[0])
         if len(code_entry) != 1:
-            raise Exception('Missing valid Status Code on response')
+            raise OneLogin_Saml2_ValidationError(
+                'Missing Status Code on response',
+                OneLogin_Saml2_ValidationError.MISSING_STATUS_CODE
+            )
         code = code_entry[0].values()[0]
         status['code'] = code
 
@@ -787,7 +793,10 @@ class OneLogin_Saml2_Utils(object):
             # Raises expection if invalid
             return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
         else:
-            raise Exception('Expected exactly one signature node; got {}.'.format(len(signature_nodes)))
+            raise OneLogin_Saml2_ValidationError(
+                'Expected exactly one signature node; got {}.'.format(len(signature_nodes)),
+                OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES
+            )
 
     @staticmethod
     @return_false_on_exception
@@ -880,7 +889,10 @@ class OneLogin_Saml2_Utils(object):
                     cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
 
         if cert is None or cert == '':
-            raise Exception('Could not validate node signature: No certificate provided.')
+            raise OneLogin_Saml2_Error(
+                'Could not validate node signature: No certificate provided.',
+                OneLogin_Saml2_Error.CERT_NOT_FOUND
+            )
 
         # Check if Reference URI is empty
         reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
@@ -897,10 +909,8 @@ class OneLogin_Saml2_Utils(object):
             dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
 
         dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
-        try:
-            dsig_ctx.verify(signature_node)
-        except Exception:
-            raise Exception('Signature validation failed. SAML Response rejected')
+        dsig_ctx.verify(signature_node)
+
         return True
 
     @staticmethod

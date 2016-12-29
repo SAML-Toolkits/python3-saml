@@ -114,7 +114,10 @@ class OneLogin_Saml2_Settings(object):
                     ','.join(self.__errors)
                 )
         else:
-            raise Exception('Unsupported settings object')
+            raise OneLogin_Saml2_Error(
+                'Unsupported settings object',
+                OneLogin_Saml2_Error.UNSUPPORTED_SETTINGS_OBJECT
+            )
 
         self.format_idp_cert()
         self.format_sp_cert()

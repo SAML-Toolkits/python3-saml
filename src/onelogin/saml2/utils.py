@@ -914,7 +914,7 @@ class OneLogin_Saml2_Utils(object):
             dsig_ctx.verify(signature_node)
         except Exception as err:
             raise OneLogin_Saml2_ValidationError(
-                'Signature validation failed. SAML Response rejected',
+                'Signature validation failed. SAML Response rejected. %s',
                 OneLogin_Saml2_ValidationError.INVALID_SIGNATURE,
                 str(err)
             )

@@ -166,7 +166,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
         if name_id is None:
             raise OneLogin_Saml2_ValidationError(
-                'Not NameID found in the Logout Request',
+                'NameID not found in the Logout Request',
                 OneLogin_Saml2_ValidationError.NO_NAMEID
             )
 

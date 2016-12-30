@@ -909,7 +909,15 @@ class OneLogin_Saml2_Utils(object):
             dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
 
         dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
-        dsig_ctx.verify(signature_node)
+
+        try:
+            dsig_ctx.verify(signature_node)
+        except Exception as err:
+            raise OneLogin_Saml2_ValidationError(
+                'Signature validation failed. SAML Response rejected',
+                OneLogin_Saml2_ValidationError.INVALID_SIGNATURE,
+                str(err)
+            )
 
         return True
 

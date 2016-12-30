@@ -335,3 +335,23 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         with self.assertRaises(Exception):
             logout_request.is_valid(request_data, raise_exceptions=True)
+
+    def testGetXML(self):
+        """
+        Tests that we can get the logout request XML directly without
+        going through intermediate steps
+        """
+        request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        logout_request_generated = OneLogin_Saml2_Logout_Request(settings)
+        expectedFragment = (
+            'Destination="http://idp.example.com/SingleLogoutService.php">\n'
+            '    <saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>\n'
+            '    <saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://idp.example.com/</saml:NameID>\n'
+            '    \n</samlp:LogoutRequest>'
+        )
+        self.assertIn(expectedFragment, logout_request_generated.get_xml())
+
+        logout_request_processed = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
+        self.assertEqual(request, logout_request_processed.get_xml())

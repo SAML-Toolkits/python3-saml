@@ -187,3 +187,12 @@ class OneLogin_Saml2_Logout_Response(object):
         After executing a validation process, if it fails this method returns the cause
         """
         return self.__error
+
+    def get_xml(self):
+        """
+        Returns the XML that will be sent as part of the response
+        or that was received at the SP
+        :return: XML response body
+        :rtype: string
+        """
+        return self.__logout_response

@@ -794,6 +794,8 @@ Main class of OneLogin Python Toolkit
 * ***build_response_signature*** Builds the Signature of the SAML Response.
 * ***get_settings*** Returns the settings info.
 * ***set_strict*** Set the strict mode active/disable.
+* ***get_last_request_xml*** Returns the most recently-constructed/processed XML SAML request (AuthNRequest, LogoutRequest)
+* ***get_last_response_xml*** Returns the most recently-constructed/processed XML SAML response (SAMLResponse, LogoutResponse). If the SAMLResponse was encrypted, by default tries to return the decrypted XML.
 
 ####OneLogin_Saml2_Auth - authn_request.py####
 
@@ -802,7 +804,7 @@ SAML 2 Authentication Request class
 * `__init__` This class handles an AuthNRequest. It builds an AuthNRequest object.
 * ***get_request*** Returns unsigned AuthnRequest.
 * ***get_id*** Returns the AuthNRequest ID.
-
+* ***get_xml*** Returns the XML that will be sent as part of the request.
 
 ####OneLogin_Saml2_Response - response.py####
 
@@ -821,6 +823,7 @@ SAML 2 Authentication Response class
 * ***validate_num_assertions*** Verifies that the document only contains a single Assertion (encrypted or not)
 * ***validate_timestamps*** Verifies that the document is valid according to Conditions Element
 * ***get_error*** After execute a validation process, if fails this method returns the cause
+* ***get_xml_document*** If necessary, decrypt the XML response document, and return it.
 
 ####OneLogin_Saml2_LogoutRequest - logout_request.py####
 
@@ -835,6 +838,7 @@ SAML 2 Logout Request class
 * ***get_session_indexes*** Gets the SessionIndexes from the Logout Request.
 * ***is_valid*** Checks if the Logout Request recieved is valid.
 * ***get_error*** After execute a validation process, if fails this method returns the cause.
+* ***get_xml*** Returns the XML that will be sent as part of the request or that was received at the SP
 
 ####OneLogin_Saml2_LogoutResponse - logout_response.py####
 
@@ -847,7 +851,7 @@ SAML 2 Logout Response class
 * ***build*** Creates a Logout Response object.
 * ***get_response*** Returns a Logout Response object.
 * ***get_error*** After execute a validation process, if fails this method returns the cause.
-
+* ***get_xml*** Returns the XML that will be sent as part of the response or that was received at the SP
 
 ####OneLogin_Saml2_Settings - settings.py####
 

@@ -21,26 +21,26 @@ class OneLogin_Saml2_Templates(object):
 
     AUTHN_REQUEST = """\
 <samlp:AuthnRequest
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="%(id)s"
-    Version="2.0"%(provider_name)s%(force_authn_str)s%(is_passive_str)s
-    IssueInstant="%(issue_instant)s"
-    Destination="%(destination)s"
-    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    AssertionConsumerServiceURL="%(assertion_url)s"%(attr_consuming_service_str)s>
+  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+  ID="%(id)s"
+  Version="2.0"%(provider_name)s%(force_authn_str)s%(is_passive_str)s
+  IssueInstant="%(issue_instant)s"
+  Destination="%(destination)s"
+  ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+  AssertionConsumerServiceURL="%(assertion_url)s"%(attr_consuming_service_str)s>
     <saml:Issuer>%(entity_id)s</saml:Issuer>%(nameid_policy_str)s
 %(requested_authn_context_str)s
 </samlp:AuthnRequest>"""
 
     LOGOUT_REQUEST = """\
 <samlp:LogoutRequest
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="%(id)s"
-    Version="2.0"
-    IssueInstant="%(issue_instant)s"
-    Destination="%(single_logout_url)s">
+  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+  ID="%(id)s"
+  Version="2.0"
+  IssueInstant="%(issue_instant)s"
+  Destination="%(single_logout_url)s">
     <saml:Issuer>%(entity_id)s</saml:Issuer>
     %(name_id)s
     %(session_index)s
@@ -48,13 +48,13 @@ class OneLogin_Saml2_Templates(object):
 
     LOGOUT_RESPONSE = """\
 <samlp:LogoutResponse
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="%(id)s"
-    Version="2.0"
-    IssueInstant="%(issue_instant)s"
-    Destination="%(destination)s"
-    InResponseTo="%(in_response_to)s">
+  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+  ID="%(id)s"
+  Version="2.0"
+  IssueInstant="%(issue_instant)s"
+  Destination="%(destination)s"
+  InResponseTo="%(in_response_to)s">
     <saml:Issuer>%(entity_id)s</saml:Issuer>
     <samlp:Status>
         <samlp:StatusCode Value="%(status)s" />
@@ -105,18 +105,18 @@ class OneLogin_Saml2_Templates(object):
 
     RESPONSE = """\
 <samlp:Response
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="%(id)s"
-    InResponseTo="%(in_response_to)s"
-    Version="2.0"
-    IssueInstant="%(issue_instant)s"
-    Destination="%(destination)s">
+  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+  ID="%(id)s"
+  InResponseTo="%(in_response_to)s"
+  Version="2.0"
+  IssueInstant="%(issue_instant)s"
+  Destination="%(destination)s">
     <saml:Issuer>%(entity_id)s</saml:Issuer>
     <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
         <samlp:StatusCode
-            xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-            Value="%(status)s">
+          xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+          Value="%(status)s">
         </samlp:StatusCode>
     </samlp:Status>
     <saml:Assertion
@@ -128,14 +128,14 @@ class OneLogin_Saml2_Templates(object):
         <saml:Issuer>%(entity_id)s</saml:Issuer>
         <saml:Subject>
             <saml:NameID
-                NameQualifier="%(entity_id)s"
-                SPNameQualifier="%(requester)s"
-                Format="%(name_id_policy)s">%(name_id)s</saml:NameID>
+              NameQualifier="%(entity_id)s"
+              SPNameQualifier="%(requester)s"
+              Format="%(name_id_policy)s">%(name_id)s</saml:NameID>
             <saml:SubjectConfirmation Method="%(cm)s">
                 <saml:SubjectConfirmationData
-                    NotOnOrAfter="%(not_after)s"
-                    InResponseTo="%(in_response_to)s"
-                    Recipient="%(destination)s">
+                  NotOnOrAfter="%(not_after)s"
+                  InResponseTo="%(in_response_to)s"
+                  Recipient="%(destination)s">
                 </saml:SubjectConfirmationData>
             </saml:SubjectConfirmation>
         </saml:Subject>
@@ -145,9 +145,9 @@ class OneLogin_Saml2_Templates(object):
             </saml:AudienceRestriction>
         </saml:Conditions>
         <saml:AuthnStatement
-            AuthnInstant="%(issue_instant)s"
-            SessionIndex="%(session_index)s"
-            SessionNotOnOrAfter="%(not_after)s">
+          AuthnInstant="%(issue_instant)s"
+          SessionIndex="%(session_index)s"
+          SessionNotOnOrAfter="%(not_after)s">
 %(authn_context)s
         </saml:AuthnStatement>
         <saml:AttributeStatement>

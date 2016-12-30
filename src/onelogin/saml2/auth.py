@@ -12,6 +12,7 @@ Initializes the SP SAML instance
 """
 
 import xmlsec
+from lxml import etree
 
 from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
@@ -59,6 +60,8 @@ class OneLogin_Saml2_Auth(object):
         self.__errors = []
         self.__error_reason = None
         self.__last_request_id = None
+        self.__last_request = None
+        self.__last_response = None
 
     def get_settings(self):
         """
@@ -92,6 +95,7 @@ class OneLogin_Saml2_Auth(object):
         if 'post_data' in self.__request_data and 'SAMLResponse' in self.__request_data['post_data']:
             # AuthnResponse -- HTTP_POST Binding
             response = OneLogin_Saml2_Response(self.__settings, self.__request_data['post_data']['SAMLResponse'])
+            self.__last_response = response.get_xml_document()
 
             if response.is_valid(self.__request_data, request_id):
                 self.__attributes = response.get_attributes()
@@ -128,6 +132,7 @@ class OneLogin_Saml2_Auth(object):
         get_data = 'get_data' in self.__request_data and self.__request_data['get_data']
         if get_data and 'SAMLResponse' in get_data:
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, get_data['SAMLResponse'])
+            self.__last_response = logout_response.get_xml()
             if not self.validate_response_signature(get_data):
                 self.__errors.append('invalid_logout_response_signature')
                 self.__errors.append('Signature validation failed. Logout Response rejected')
@@ -141,6 +146,7 @@ class OneLogin_Saml2_Auth(object):
 
         elif get_data and 'SAMLRequest' in get_data:
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
+            self.__last_request = logout_request.get_xml()
             if not self.validate_request_signature(get_data):
                 self.__errors.append("invalid_logout_request_signature")
                 self.__errors.append('Signature validation failed. Logout Request rejected')
@@ -154,6 +160,7 @@ class OneLogin_Saml2_Auth(object):
                 in_response_to = logout_request.id
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
                 response_builder.build(in_response_to)
+                self.__last_response = response_builder.get_xml()
                 logout_response = response_builder.get_response()
 
                 parameters = {'SAMLResponse': logout_response}
@@ -288,6 +295,7 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
+        self.__last_request = authn_request.get_xml()
         self.__last_request_id = authn_request.get_id()
 
         saml_request = authn_request.get_request()
@@ -337,6 +345,7 @@ class OneLogin_Saml2_Auth(object):
             session_index=session_index,
             nq=nq
         )
+        self.__last_request = logout_request.get_xml()
         self.__last_request_id = logout_request.id
 
         parameters = {'SAMLRequest': logout_request.get_request()}
@@ -547,3 +556,26 @@ class OneLogin_Saml2_Auth(object):
             if raise_exceptions:
                 raise e
             return False
+
+    def get_last_response_xml(self, pretty_print_if_possible=False):
+        """
+        Retrieves the raw XML (decrypted) of the last SAML response,
+        or the last Logout Response generated or processed
+        :returns: SAML response XML
+        :rtype: string|None
+        """
+        response = None
+        if self.__last_response is not None:
+            if isinstance(self.__last_response, basestring):
+                response = self.__last_response
+            else:
+                response = etree.tostring(self.__last_response, pretty_print=pretty_print_if_possible)
+        return response
+
+    def get_last_request_xml(self):
+        """
+        Retrieves the raw XML sent in the last SAML request
+        :returns: SAML request XML
+        :rtype: string|None
+        """
+        return self.__last_request or None

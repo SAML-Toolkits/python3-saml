@@ -111,6 +111,15 @@ class OneLogin_Saml2_Logout_Request(object):
             request = OneLogin_Saml2_Utils.b64encode(self.__logout_request)
         return request
 
+    def get_xml(self):
+        """
+        Returns the XML that will be sent as part of the request
+        or that was received at the SP
+        :return: XML request body
+        :rtype: string
+        """
+        return self.__logout_request
+
     @staticmethod
     def get_id(request):
         """

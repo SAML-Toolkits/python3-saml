@@ -754,3 +754,14 @@ class OneLogin_Saml2_Response(object):
         After executing a validation process, if it fails this method returns the cause
         """
         return self.__error
+
+    def get_xml_document(self):
+        """
+        If necessary, decrypt the XML response document, and return it.
+        :return: Decrypted XML response document
+        :rtype: string
+        """
+        if self.encrypted:
+            return self.decrypted_document
+        else:
+            return self.document

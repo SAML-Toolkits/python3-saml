@@ -727,7 +727,7 @@ class OneLogin_Saml2_Response(object):
                 if not children:
                     raise OneLogin_Saml2_ValidationError(
                         'KeyInfo has no children nodes, invalid Assertion',
-                        OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOIND_IN_KEYINFO
+                        OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO
                     )
                 for child in children:
                     if 'RetrievalMethod' in child.tag:

@@ -757,9 +757,10 @@ class OneLogin_Saml2_Response(object):
 
     def get_xml_document(self):
         """
-        If necessary, decrypt the XML response document, and return it.
+        Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
+
         :return: Decrypted XML response document
-        :rtype: string
+        :rtype: DOMDocument
         """
         if self.encrypted:
             return self.decrypted_document

@@ -512,7 +512,7 @@ class OneLogin_Saml2_Auth(object):
                 if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
                     raise OneLogin_Saml2_ValidationError(
                         'The %s is not signed. Rejected.' % saml_type,
-                        OneLogin_Saml2_ValidationError.NO_SIGNED_RESPONSE
+                        OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
                     )
                 return True
 

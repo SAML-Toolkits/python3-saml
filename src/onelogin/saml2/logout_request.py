@@ -296,7 +296,7 @@ class OneLogin_Saml2_Logout_Request(object):
                     if 'Signature' not in get_data:
                         raise OneLogin_Saml2_ValidationError(
                             'The Message of the Logout Request is not signed and the SP require it',
-                            OneLogin_Saml2_ValidationError.NO_SIGNED_RESPONSE
+                            OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
                         )
 
             return True

@@ -11,7 +11,7 @@ SAML Response class of OneLogin's Python Toolkit.
 
 from copy import deepcopy
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -47,7 +47,7 @@ class OneLogin_Saml2_Response(object):
             self.encrypted = True
             self.decrypted_document = self.__decrypt_assertion(decrypted_document)
 
-    def is_valid(self, request_data, request_id=None):
+    def is_valid(self, request_data, request_id=None, raise_exceptions=False):
         """
         Validates the response object.
 
@@ -57,6 +57,9 @@ class OneLogin_Saml2_Response(object):
         :param request_id: Optional argument. The ID of the AuthNRequest sent by this SP to the IdP
         :type request_id: string
 
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
+
         :returns: True if the SAML Response is valid, False if not
         :rtype: bool
         """
@@ -64,15 +67,24 @@ class OneLogin_Saml2_Response(object):
         try:
             # Checks SAML version
             if self.document.get('Version', None) != '2.0':
-                raise Exception('Unsupported SAML version')
+                raise OneLogin_Saml2_ValidationError(
+                    'Unsupported SAML version',
+                    OneLogin_Saml2_ValidationError.UNSUPPORTED_SAML_VERSION
+                )
 
             # Checks that ID exists
             if self.document.get('ID', None) is None:
-                raise Exception('Missing ID attribute on SAML Response')
+                raise OneLogin_Saml2_ValidationError(
+                    'Missing ID attribute on SAML Response',
+                    OneLogin_Saml2_ValidationError.MISSING_ID
+                )
 
             # Checks that the response only has one assertion
             if not self.validate_num_assertions():
-                raise Exception('SAML Response must contain 1 assertion')
+                raise OneLogin_Saml2_ValidationError(
+                    'SAML Response must contain 1 assertion',
+                    OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS
+                )
 
             # Checks that the response has the SUCCESS status
             self.check_status()
@@ -91,13 +103,19 @@ class OneLogin_Saml2_Response(object):
                 no_valid_xml_msg = 'Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd'
                 res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                 if isinstance(res, str):
-                    raise Exception(no_valid_xml_msg)
+                    raise OneLogin_Saml2_ValidationError(
+                        no_valid_xml_msg,
+                        OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT
+                    )
 
                 # If encrypted, check also the decrypted document
                 if self.encrypted:
                     res = OneLogin_Saml2_XML.validate_xml(self.decrypted_document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                     if isinstance(res, str):
-                        raise Exception(no_valid_xml_msg)
+                        raise OneLogin_Saml2_ValidationError(
+                            no_valid_xml_msg,
+                            OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT
+                        )
 
                 security = self.__settings.get_security_data()
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
@@ -106,36 +124,56 @@ class OneLogin_Saml2_Response(object):
                 in_response_to = self.document.get('InResponseTo', None)
                 if in_response_to is not None and request_id is not None:
                     if in_response_to != request_id:
-                        raise Exception('The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id))
+                        raise OneLogin_Saml2_ValidationError(
+                            'The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id),
+                            OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
+                        )
 
                 if not self.encrypted and security['wantAssertionsEncrypted']:
-                    raise Exception('The assertion of the Response is not encrypted and the SP require it')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The assertion of the Response is not encrypted and the SP require it',
+                        OneLogin_Saml2_ValidationError.NO_ENCRYPTED_ASSERTION
+                    )
 
                 if security['wantNameIdEncrypted']:
                     encrypted_nameid_nodes = self.__query_assertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')
                     if len(encrypted_nameid_nodes) != 1:
-                        raise Exception('The NameID of the Response is not encrypted and the SP require it')
+                        raise OneLogin_Saml2_ValidationError(
+                            'The NameID of the Response is not encrypted and the SP require it',
+                            OneLogin_Saml2_ValidationError.NO_ENCRYPTED_NAMEID
+                        )
 
                 # Checks that a Conditions element exists
                 if not self.check_one_condition():
-                    raise Exception('The Assertion must include a Conditions element')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The Assertion must include a Conditions element',
+                        OneLogin_Saml2_ValidationError.MISSING_CONDITIONS
+                    )
 
                 # Validates Assertion timestamps
-                if not self.validate_timestamps():
-                    raise Exception('Timing issues (please check your clock settings)')
+                self.validate_timestamps(raise_exceptions=True)
 
                 # Checks that an AuthnStatement element exists and is unique
                 if not self.check_one_authnstatement():
-                    raise Exception('The Assertion must include an AuthnStatement element')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The Assertion must include an AuthnStatement element',
+                        OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_AUTHSTATEMENTS
+                    )
 
                 # Checks that there is at least one AttributeStatement if required
                 attribute_statement_nodes = self.__query_assertion('/saml:AttributeStatement')
                 if security.get('wantAttributeStatement', True) and not attribute_statement_nodes:
-                    raise Exception('There is no AttributeStatement on the Response')
+                    raise OneLogin_Saml2_ValidationError(
+                        'There is no AttributeStatement on the Response',
+                        OneLogin_Saml2_ValidationError.NO_ATTRIBUTESTATEMENT
+                    )
 
                 encrypted_attributes_nodes = self.__query_assertion('/saml:AttributeStatement/saml:EncryptedAttribute')
                 if encrypted_attributes_nodes:
-                    raise Exception('There is an EncryptedAttribute in the Response and this SP not support them')
+                    raise OneLogin_Saml2_ValidationError(
+                        'There is an EncryptedAttribute in the Response and this SP not support them',
+                        OneLogin_Saml2_ValidationError.ENCRYPTED_ATTRIBUTES
+                    )
 
                 # Checks destination
                 destination = self.document.get('Destination', None)
@@ -145,25 +183,39 @@ class OneLogin_Saml2_Response(object):
                         # request_data
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
                         #  if not destination.startswith(current_url_routed):
-                        raise Exception('The response was received at %s instead of %s' % (current_url, destination))
+                        raise OneLogin_Saml2_ValidationError(
+                            'The response was received at %s instead of %s' % (current_url, destination),
+                            OneLogin_Saml2_ValidationError.WRONG_DESTINATION
+                        )
                 elif destination == '':
-                    raise Exception('The response has an empty Destination value')
-
+                    raise OneLogin_Saml2_ValidationError(
+                        'The response has an empty Destination value',
+                        OneLogin_Saml2_ValidationError.EMPTY_DESTINATION
+                    )
                 # Checks audience
                 valid_audiences = self.get_audiences()
                 if valid_audiences and sp_entity_id not in valid_audiences:
-                    raise Exception('%s is not a valid audience for this Response' % sp_entity_id)
+                    raise OneLogin_Saml2_ValidationError(
+                        '%s is not a valid audience for this Response' % sp_entity_id,
+                        OneLogin_Saml2_ValidationError.WRONG_AUDIENCE
+                    )
 
                 # Checks the issuers
                 issuers = self.get_issuers()
                 for issuer in issuers:
                     if issuer is None or issuer != idp_entity_id:
-                        raise Exception('Invalid issuer in the Assertion/Response')
+                        raise OneLogin_Saml2_ValidationError(
+                            'Invalid issuer in the Assertion/Response',
+                            OneLogin_Saml2_ValidationError.WRONG_ISSUER
+                        )
 
                 # Checks the session Expiration
                 session_expiration = self.get_session_not_on_or_after()
                 if session_expiration and session_expiration <= OneLogin_Saml2_Utils.now():
-                    raise Exception('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response',
+                        OneLogin_Saml2_ValidationError.SESSION_EXPIRED
+                    )
 
                 # Checks the SubjectConfirmation, at least one SubjectConfirmation must be valid
                 any_subject_confirmation = False
@@ -197,28 +249,46 @@ class OneLogin_Saml2_Response(object):
                         break
 
                 if not any_subject_confirmation:
-                    raise Exception('A valid SubjectConfirmation was not found on this Response')
+                    raise OneLogin_Saml2_ValidationError(
+                        'A valid SubjectConfirmation was not found on this Response',
+                        OneLogin_Saml2_ValidationError.WRONG_SUBJECTCONFIRMATION
+                    )
 
                 if security['wantAssertionsSigned'] and not has_signed_assertion:
-                    raise Exception('The Assertion of the Response is not signed and the SP require it')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The Assertion of the Response is not signed and the SP require it',
+                        OneLogin_Saml2_ValidationError.NO_SIGNED_ASSERTION
+                    )
 
                 if security['wantMessagesSigned'] and not has_signed_response:
-                    raise Exception('The Message of the Response is not signed and the SP require it')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The Message of the Response is not signed and the SP require it',
+                        OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
+                    )
 
             if not signed_elements or (not has_signed_response and not has_signed_assertion):
-                raise Exception('No Signature found. SAML Response rejected')
+                raise OneLogin_Saml2_ValidationError(
+                    'No Signature found. SAML Response rejected',
+                    OneLogin_Saml2_ValidationError.NO_SIGNATURE_FOUND
+                )
             else:
                 cert = idp_data.get('x509cert', None)
                 fingerprint = idp_data.get('certFingerprint', None)
                 fingerprintalg = idp_data.get('certFingerprintAlgorithm', None)
 
                 # If find a Signature on the Response, validates it checking the original response
-                if has_signed_response and not OneLogin_Saml2_Utils.validate_sign(self.document, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH):
-                    raise Exception('Signature validation failed. SAML Response rejected')
+                if has_signed_response and not OneLogin_Saml2_Utils.validate_sign(self.document, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH, raise_exceptions=False):
+                    raise OneLogin_Saml2_ValidationError(
+                        'Signature validation failed. SAML Response rejected',
+                        OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
+                    )
 
                 document_check_assertion = self.decrypted_document if self.encrypted else self.document
-                if has_signed_assertion and not OneLogin_Saml2_Utils.validate_sign(document_check_assertion, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH):
-                    raise Exception('Signature validation failed. SAML Response rejected')
+                if has_signed_assertion and not OneLogin_Saml2_Utils.validate_sign(document_check_assertion, cert, fingerprint, fingerprintalg, xpath=OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH, raise_exceptions=False):
+                    raise OneLogin_Saml2_ValidationError(
+                        'Signature validation failed. SAML Response rejected',
+                        OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
+                    )
 
             return True
         except Exception as err:
@@ -226,6 +296,8 @@ class OneLogin_Saml2_Response(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
+            if raise_exceptions:
+                raise
             return False
 
     def check_status(self):
@@ -243,7 +315,10 @@ class OneLogin_Saml2_Response(object):
             status_msg = status.get('msg', None)
             if status_msg:
                 status_exception_msg += ' -> ' + status_msg
-            raise Exception(status_exception_msg)
+            raise OneLogin_Saml2_ValidationError(
+                status_exception_msg,
+                OneLogin_Saml2_ValidationError.STATUS_CODE_IS_NOT_SUCCESS
+            )
 
     def check_one_condition(self):
         """
@@ -288,13 +363,19 @@ class OneLogin_Saml2_Response(object):
         if len(message_issuer_nodes) == 1:
             issuers.add(message_issuer_nodes[0].text)
         else:
-            raise Exception('Issuer of the Response not found or multiple.')
+            raise OneLogin_Saml2_ValidationError(
+                'Issuer of the Response not found or multiple.',
+                OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_RESPONSE
+            )
 
         assertion_issuer_nodes = self.__query_assertion('/saml:Issuer')
         if len(assertion_issuer_nodes) == 1:
             issuers.add(assertion_issuer_nodes[0].text)
         else:
-            raise Exception('Issuer of the Assertion not found or multiple.')
+            raise OneLogin_Saml2_ValidationError(
+                'Issuer of the Assertion not found or multiple.',
+                OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_ASSERTION
+            )
 
         return list(set(issuers))
 
@@ -320,10 +401,16 @@ class OneLogin_Saml2_Response(object):
         if nameid is None:
             security = self.__settings.get_security_data()
             if security.get('wantNameId', True):
-                raise Exception('Not NameID found in the assertion of the Response')
+                raise OneLogin_Saml2_ValidationError(
+                    'NameID not found in the assertion of the Response',
+                    OneLogin_Saml2_ValidationError.NO_NAMEID
+                )
         else:
             if self.__settings.is_strict() and not nameid.text:
-                raise Exception('An empty NameID value found')
+                raise OneLogin_Saml2_ValidationError(
+                    'An empty NameID value found',
+                    OneLogin_Saml2_ValidationError.EMPTY_NAMEID
+                )
 
             nameid_data = {'Value': nameid.text}
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
@@ -333,7 +420,10 @@ class OneLogin_Saml2_Response(object):
                         sp_data = self.__settings.get_sp_data()
                         sp_entity_id = sp_data.get('entityId', '')
                         if sp_entity_id != value:
-                            raise Exception('The SPNameQualifier value mistmatch the SP entityID value.')
+                            raise OneLogin_Saml2_ValidationError(
+                                'The SPNameQualifier value mistmatch the SP entityID value.',
+                                OneLogin_Saml2_ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH
+                            )
 
                     nameid_data[attr] = value
         return nameid_data
@@ -391,7 +481,10 @@ class OneLogin_Saml2_Response(object):
         for attribute_node in attribute_nodes:
             attr_name = attribute_node.get('Name')
             if attr_name in attributes.keys():
-                raise Exception('Found an Attribute element with duplicated Name')
+                raise OneLogin_Saml2_ValidationError(
+                    'Found an Attribute element with duplicated Name',
+                    OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
+                )
 
             values = []
             for attr in attribute_node.iterchildren('{%s}AttributeValue' % OneLogin_Saml2_Constants.NSMAP['saml']):
@@ -437,14 +530,23 @@ class OneLogin_Saml2_Response(object):
         for sign_node in sign_nodes:
             signed_element = sign_node.getparent().tag
             if signed_element != response_tag and signed_element != assertion_tag:
-                raise Exception('Invalid Signature Element %s SAML Response rejected' % signed_element)
+                raise OneLogin_Saml2_ValidationError(
+                    'Invalid Signature Element %s SAML Response rejected' % signed_element,
+                    OneLogin_Saml2_ValidationError.WRONG_SIGNED_ELEMENT
+                )
 
             if not sign_node.getparent().get('ID'):
-                raise Exception('Signed Element must contain an ID. SAML Response rejected')
+                raise OneLogin_Saml2_ValidationError(
+                    'Signed Element must contain an ID. SAML Response rejected',
+                    OneLogin_Saml2_ValidationError.ID_NOT_FOUND_IN_SIGNED_ELEMENT
+                )
 
             id_value = sign_node.getparent().get('ID')
             if id_value in verified_ids:
-                raise Exception('Duplicated ID. SAML Response rejected')
+                raise OneLogin_Saml2_ValidationError(
+                    'Duplicated ID. SAML Response rejected',
+                    OneLogin_Saml2_ValidationError.DUPLICATED_ID_IN_SIGNED_ELEMENTS
+                )
             verified_ids.append(id_value)
 
             # Check that reference URI matches the parent ID and no duplicate References or IDs
@@ -455,22 +557,37 @@ class OneLogin_Saml2_Response(object):
                     sei = ref.get('URI')[1:]
 
                     if sei != id_value:
-                        raise Exception('Found an invalid Signed Element. SAML Response rejected')
+                        raise OneLogin_Saml2_ValidationError(
+                            'Found an invalid Signed Element. SAML Response rejected',
+                            OneLogin_Saml2_ValidationError.INVALID_SIGNED_ELEMENT
+                        )
 
                     if sei in verified_seis:
-                        raise Exception('Duplicated Reference URI. SAML Response rejected')
+                        raise OneLogin_Saml2_ValidationError(
+                            'Duplicated Reference URI. SAML Response rejected',
+                            OneLogin_Saml2_ValidationError.DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS
+                        )
                     verified_seis.append(sei)
 
             signed_elements.append(signed_element)
 
             if signed_elements:
-                if not self.validate_signed_elements(signed_elements):
-                    raise Exception('Found an unexpected Signature Element. SAML Response rejected')
+                if not self.validate_signed_elements(signed_elements, raise_exceptions=True):
+                    raise OneLogin_Saml2_ValidationError(
+                        'Found an unexpected Signature Element. SAML Response rejected',
+                        OneLogin_Saml2_ValidationError.UNEXPECTED_SIGNED_ELEMENT
+                    )
         return signed_elements
 
+    @return_false_on_exception
     def validate_signed_elements(self, signed_elements):
         """
         Verifies that the document has the expected signed nodes.
+
+        :param signed_elements: The signed elements to be checked
+        :type signed_elements: list
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
         if len(signed_elements) > 2:
             return False
@@ -488,15 +605,22 @@ class OneLogin_Saml2_Response(object):
         if response_tag in signed_elements:
             expected_signature_nodes = OneLogin_Saml2_XML.query(self.document, OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH)
             if len(expected_signature_nodes) != 1:
-                raise Exception('Unexpected number of Response signatures found. SAML Response rejected.')
+                raise OneLogin_Saml2_ValidationError(
+                    'Unexpected number of Response signatures found. SAML Response rejected.',
+                    OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE
+                )
 
         if assertion_tag in signed_elements:
             expected_signature_nodes = self.__query(OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH)
             if len(expected_signature_nodes) != 1:
-                raise Exception('Unexpected number of Assertion signatures found. SAML Response rejected.')
+                raise OneLogin_Saml2_ValidationError(
+                    'Unexpected number of Assertion signatures found. SAML Response rejected.',
+                    OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION
+                )
 
         return True
 
+    @return_false_on_exception
     def validate_timestamps(self):
         """
         Verifies that the document is valid according to Conditions Element
@@ -510,9 +634,15 @@ class OneLogin_Saml2_Response(object):
             nb_attr = conditions_node.get('NotBefore')
             nooa_attr = conditions_node.get('NotOnOrAfter')
             if nb_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nb_attr) > OneLogin_Saml2_Utils.now() + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT:
-                return False
+                raise OneLogin_Saml2_ValidationError(
+                    'Could not validate timestamp: not yet valid. Check system clock.',
+                    OneLogin_Saml2_ValidationError.ASSERTION_TOO_EARLY
+                )
             if nooa_attr and OneLogin_Saml2_Utils.parse_SAML_to_time(nooa_attr) + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT <= OneLogin_Saml2_Utils.now():
-                return False
+                raise OneLogin_Saml2_ValidationError(
+                    'Could not validate timestamp: expired. Check system clock.',
+                    OneLogin_Saml2_ValidationError.ASSERTION_EXPIRED
+                )
         return True
 
     def __query_assertion(self, xpath_expr):
@@ -577,7 +707,10 @@ class OneLogin_Saml2_Response(object):
         debug = self.__settings.is_debug_active()
 
         if not key:
-            raise Exception('No private key available, check settings')
+            raise OneLogin_Saml2_Error(
+                'No private key available to decrypt the assertion, check settings',
+                OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND
+            )
 
         encrypted_assertion_nodes = OneLogin_Saml2_XML.query(xml, '/samlp:Response/saml:EncryptedAssertion')
         if encrypted_assertion_nodes:
@@ -585,15 +718,24 @@ class OneLogin_Saml2_Response(object):
             if encrypted_data_nodes:
                 keyinfo = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData/ds:KeyInfo')
                 if not keyinfo:
-                    raise Exception('No KeyInfo present, invalid Assertion')
+                    raise OneLogin_Saml2_ValidationError(
+                        'No KeyInfo present, invalid Assertion',
+                        OneLogin_Saml2_ValidationError.KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA
+                    )
                 keyinfo = keyinfo[0]
                 children = keyinfo.getchildren()
                 if not children:
-                    raise Exception('No child to KeyInfo, invalid Assertion')
+                    raise OneLogin_Saml2_ValidationError(
+                        'KeyInfo has no children nodes, invalid Assertion',
+                        OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO
+                    )
                 for child in children:
                     if 'RetrievalMethod' in child.tag:
                         if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
-                            raise Exception('Unsupported Retrieval Method found')
+                            raise OneLogin_Saml2_ValidationError(
+                                'Unsupported Retrieval Method found',
+                                OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD
+                            )
                         uri = child.attrib['URI']
                         if not uri.startswith('#'):
                             break
@@ -612,3 +754,15 @@ class OneLogin_Saml2_Response(object):
         After executing a validation process, if it fails this method returns the cause
         """
         return self.__error
+
+    def get_xml_document(self):
+        """
+        Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
+
+        :return: Decrypted XML response document
+        :rtype: DOMDocument
+        """
+        if self.encrypted:
+            return self.decrypted_document
+        else:
+            return self.document

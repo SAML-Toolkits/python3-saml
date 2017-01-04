@@ -10,7 +10,7 @@ Logout Request class of OneLogin's Python Toolkit.
 """
 
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
@@ -111,6 +111,15 @@ class OneLogin_Saml2_Logout_Request(object):
             request = OneLogin_Saml2_Utils.b64encode(self.__logout_request)
         return request
 
+    def get_xml(self):
+        """
+        Returns the XML that will be sent as part of the request
+        or that was received at the SP
+        :return: XML request body
+        :rtype: string
+        """
+        return self.__logout_request
+
     @staticmethod
     def get_id(request):
         """
@@ -141,7 +150,10 @@ class OneLogin_Saml2_Logout_Request(object):
 
         if len(encrypted_entries) == 1:
             if key is None:
-                raise Exception('Key is required in order to decrypt the NameID')
+                raise OneLogin_Saml2_Error(
+                    'Private Key is required in order to decrypt the NameID, check settings',
+                    OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND
+                )
 
             encrypted_data_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:EncryptedID/xenc:EncryptedData')
             if len(encrypted_data_nodes) == 1:
@@ -153,7 +165,10 @@ class OneLogin_Saml2_Logout_Request(object):
                 name_id = entries[0]
 
         if name_id is None:
-            raise Exception('Not NameID found in the Logout Request')
+            raise OneLogin_Saml2_ValidationError(
+                'NameID not found in the Logout Request',
+                OneLogin_Saml2_ValidationError.NO_NAMEID
+            )
 
         name_id_data = {
             'Value': name_id.text
@@ -212,11 +227,14 @@ class OneLogin_Saml2_Logout_Request(object):
             session_indexes.append(session_index_node.text)
         return session_indexes
 
-    def is_valid(self, request_data):
+    def is_valid(self, request_data, raise_exceptions=False):
         """
         Checks if the Logout Request received is valid
         :param request_data: Request Data
         :type request_data: dict
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
 
         :return: If the Logout Request is or not valid
         :rtype: boolean
@@ -233,7 +251,10 @@ class OneLogin_Saml2_Logout_Request(object):
             if self.__settings.is_strict():
                 res = OneLogin_Saml2_XML.validate_xml(root, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                 if isinstance(res, str):
-                    raise Exception('Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd')
+                    raise OneLogin_Saml2_ValidationError(
+                        'Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd',
+                        OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT
+                    )
 
                 security = self.__settings.get_security_data()
 
@@ -243,30 +264,41 @@ class OneLogin_Saml2_Logout_Request(object):
                 if root.get('NotOnOrAfter', None):
                     na = OneLogin_Saml2_Utils.parse_SAML_to_time(root.get('NotOnOrAfter'))
                     if na <= OneLogin_Saml2_Utils.now():
-                        raise Exception('Timing issues (please check your clock settings)')
+                        raise OneLogin_Saml2_ValidationError(
+                            'Could not validate timestamp: expired. Check system clock.)',
+                            OneLogin_Saml2_ValidationError.RESPONSE_EXPIRED
+                        )
 
                 # Check destination
                 if root.get('Destination', None):
                     destination = root.get('Destination')
                     if destination != '':
                         if current_url not in destination:
-                            raise Exception(
+                            raise OneLogin_Saml2_ValidationError(
                                 'The LogoutRequest was received at '
                                 '%(currentURL)s instead of %(destination)s' %
                                 {
                                     'currentURL': current_url,
                                     'destination': destination,
-                                }
+                                },
+                                OneLogin_Saml2_ValidationError.WRONG_DESTINATION
                             )
 
                 # Check issuer
                 issuer = OneLogin_Saml2_Logout_Request.get_issuer(root)
                 if issuer is not None and issuer != idp_entity_id:
-                    raise Exception('Invalid issuer in the Logout Request')
+                    raise OneLogin_Saml2_ValidationError(
+                        'Invalid issuer in the Logout Request',
+                        OneLogin_Saml2_ValidationError.WRONG_ISSUER
+                    )
 
                 if security['wantMessagesSigned']:
                     if 'Signature' not in get_data:
-                        raise Exception('The Message of the Logout Request is not signed and the SP require it')
+                        raise OneLogin_Saml2_ValidationError(
+                            'The Message of the Logout Request is not signed and the SP require it',
+                            OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
+                        )
+
             return True
         except Exception as err:
             # pylint: disable=R0801
@@ -274,6 +306,8 @@ class OneLogin_Saml2_Logout_Request(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
+            if raise_exceptions:
+                raise
             return False
 
     def get_error(self):

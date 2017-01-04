@@ -12,14 +12,14 @@ Initializes the SP SAML instance
 """
 
 import xmlsec
+from lxml import etree
 
 from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 
@@ -59,6 +59,9 @@ class OneLogin_Saml2_Auth(object):
         self.__authenticated = False
         self.__errors = []
         self.__error_reason = None
+        self.__last_request_id = None
+        self.__last_request = None
+        self.__last_response = None
 
     def get_settings(self):
         """
@@ -92,6 +95,7 @@ class OneLogin_Saml2_Auth(object):
         if 'post_data' in self.__request_data and 'SAMLResponse' in self.__request_data['post_data']:
             # AuthnResponse -- HTTP_POST Binding
             response = OneLogin_Saml2_Response(self.__settings, self.__request_data['post_data']['SAMLResponse'])
+            self.__last_response = response.get_xml_document()
 
             if response.is_valid(self.__request_data, request_id):
                 self.__attributes = response.get_attributes()
@@ -128,6 +132,7 @@ class OneLogin_Saml2_Auth(object):
         get_data = 'get_data' in self.__request_data and self.__request_data['get_data']
         if get_data and 'SAMLResponse' in get_data:
             logout_response = OneLogin_Saml2_Logout_Response(self.__settings, get_data['SAMLResponse'])
+            self.__last_response = logout_response.get_xml()
             if not self.validate_response_signature(get_data):
                 self.__errors.append('invalid_logout_response_signature')
                 self.__errors.append('Signature validation failed. Logout Response rejected')
@@ -141,6 +146,7 @@ class OneLogin_Saml2_Auth(object):
 
         elif get_data and 'SAMLRequest' in get_data:
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
+            self.__last_request = logout_request.get_xml()
             if not self.validate_request_signature(get_data):
                 self.__errors.append("invalid_logout_request_signature")
                 self.__errors.append('Signature validation failed. Logout Request rejected')
@@ -154,6 +160,7 @@ class OneLogin_Saml2_Auth(object):
                 in_response_to = logout_request.id
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
                 response_builder.build(in_response_to)
+                self.__last_response = response_builder.get_xml()
                 logout_response = response_builder.get_response()
 
                 parameters = {'SAMLResponse': logout_response}
@@ -261,6 +268,13 @@ class OneLogin_Saml2_Auth(object):
         assert isinstance(name, compat.str_type)
         return self.__attributes.get(name)
 
+    def get_last_request_id(self):
+        """
+        :returns: The ID of the last Request SAML message generated.
+        :rtype: string
+        """
+        return self.__last_request_id
+
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
         """
         Initiates the SSO process.
@@ -281,6 +295,8 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
+        self.__last_request = authn_request.get_xml()
+        self.__last_request_id = authn_request.get_id()
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}
@@ -329,6 +345,8 @@ class OneLogin_Saml2_Auth(object):
             session_index=session_index,
             nq=nq
         )
+        self.__last_request = logout_request.get_xml()
+        self.__last_request_id = logout_request.id
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         if return_to is not None:
@@ -429,7 +447,7 @@ class OneLogin_Saml2_Auth(object):
         if not key:
             raise OneLogin_Saml2_Error(
                 "Trying to sign the %s but can't load the SP private key." % saml_type,
-                OneLogin_Saml2_Error.SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND
             )
 
         msg = self.__build_sign_query(data[saml_type],
@@ -472,7 +490,7 @@ class OneLogin_Saml2_Auth(object):
 
         return self.__validate_signature(request_data, 'SAMLResponse')
 
-    def __validate_signature(self, data, saml_type):
+    def __validate_signature(self, data, saml_type, raise_exceptions=False):
         """
         Validate Signature
 
@@ -484,22 +502,30 @@ class OneLogin_Saml2_Auth(object):
 
         :param saml_type: The target URL the user should be redirected to
         :type saml_type: string  SAMLRequest | SAMLResponse
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
-
-        signature = data.get('Signature', None)
-        if signature is None:
-            if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
-                self.__error_reason = 'The %s is not signed. Rejected.' % saml_type
-                return False
-            return True
-
-        x509cert = self.get_settings().get_idp_cert()
-
-        if x509cert is None:
-            self.__errors.append("In order to validate the sign on the %s, the x509cert of the IdP is required" % saml_type)
-            return False
-
         try:
+            signature = data.get('Signature', None)
+            if signature is None:
+                if self.__settings.is_strict() and self.__settings.get_security_data().get('wantMessagesSigned', False):
+                    raise OneLogin_Saml2_ValidationError(
+                        'The %s is not signed. Rejected.' % saml_type,
+                        OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
+                    )
+                return True
+
+            x509cert = self.get_settings().get_idp_cert()
+
+            if not x509cert:
+                error_msg = "In order to validate the sign on the %s, the x509cert of the IdP is required" % saml_type
+                self.__errors.append(error_msg)
+                raise OneLogin_Saml2_Error(
+                    error_msg,
+                    OneLogin_Saml2_Error.CERT_NOT_FOUND
+                )
+
             sign_alg = data.get('SigAlg', OneLogin_Saml2_Constants.RSA_SHA1)
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
@@ -520,8 +546,36 @@ class OneLogin_Saml2_Auth(object):
                                                              x509cert,
                                                              sign_alg,
                                                              self.__settings.is_debug_active()):
-                raise Exception('Signature validation failed. %s rejected.' % saml_type)
+                raise OneLogin_Saml2_ValidationError(
+                    'Signature validation failed. %s rejected.' % saml_type,
+                    OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
+                )
             return True
         except Exception as e:
             self.__error_reason = str(e)
+            if raise_exceptions:
+                raise e
             return False
+
+    def get_last_response_xml(self, pretty_print_if_possible=False):
+        """
+        Retrieves the raw XML (decrypted) of the last SAML response,
+        or the last Logout Response generated or processed
+        :returns: SAML response XML
+        :rtype: string|None
+        """
+        response = None
+        if self.__last_response is not None:
+            if isinstance(self.__last_response, basestring):
+                response = self.__last_response
+            else:
+                response = etree.tostring(self.__last_response, pretty_print=pretty_print_if_possible)
+        return response
+
+    def get_last_request_xml(self):
+        """
+        Retrieves the raw XML sent in the last SAML request
+        :returns: SAML request XML
+        :rtype: string|None
+        """
+        return self.__last_request or None

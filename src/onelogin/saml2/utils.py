@@ -16,6 +16,7 @@ from hashlib import sha1, sha256, sha384, sha512
 from isodate import parse_duration as duration_parser
 import re
 from textwrap import wrap
+from functools import wraps
 from uuid import uuid4
 
 import zlib
@@ -23,7 +24,7 @@ import xmlsec
 
 from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.errors import OneLogin_Saml2_Error
+from onelogin.saml2.errors import OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
@@ -31,6 +32,24 @@ try:
     from urllib.parse import quote_plus  # py3
 except ImportError:
     from urllib import quote_plus  # py2
+
+
+def return_false_on_exception(func):
+    """
+    Decorator. When applied to a function, it will, by default, suppress any exceptions
+    raised by that function and return False. It may be overridden by passing a
+    "raise_exceptions" keyword argument when calling the wrapped function.
+    """
+    @wraps(func)
+    def exceptfalse(*args, **kwargs):
+        if not kwargs.pop('raise_exceptions', False):
+            try:
+                return func(*args, **kwargs)
+            except Exception:
+                return False
+        else:
+            return func(*args, **kwargs)
+    return exceptfalse
 
 
 class OneLogin_Saml2_Utils(object):
@@ -609,11 +628,17 @@ class OneLogin_Saml2_Utils(object):
 
         status_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status')
         if len(status_entry) != 1:
-            raise Exception('Missing valid Status on response')
+            raise OneLogin_Saml2_ValidationError(
+                'Missing Status on response',
+                OneLogin_Saml2_ValidationError.MISSING_STATUS
+            )
 
         code_entry = OneLogin_Saml2_XML.query(dom, '/samlp:Response/samlp:Status/samlp:StatusCode', status_entry[0])
         if len(code_entry) != 1:
-            raise Exception('Missing valid Status Code on response')
+            raise OneLogin_Saml2_ValidationError(
+                'Missing Status Code on response',
+                OneLogin_Saml2_ValidationError.MISSING_STATUS_CODE
+            )
         code = code_entry[0].values()[0]
         status['code'] = code
 
@@ -719,6 +744,7 @@ class OneLogin_Saml2_Utils(object):
         return OneLogin_Saml2_XML.to_string(elem)
 
     @staticmethod
+    @return_false_on_exception
     def validate_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False, xpath=None):
         """
         Validates a signature (Message or Assertion).
@@ -743,36 +769,37 @@ class OneLogin_Saml2_Utils(object):
 
         :param xpath: The xpath of the signed element
         :type: string
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
-        try:
-            if xml is None or xml == '':
-                raise Exception('Empty string supplied as input')
+        if xml is None or xml == '':
+            raise Exception('Empty string supplied as input')
 
-            elem = OneLogin_Saml2_XML.to_etree(xml)
-            xmlsec.enable_debug_trace(debug)
-            xmlsec.tree.add_ids(elem, ["ID"])
+        elem = OneLogin_Saml2_XML.to_etree(xml)
+        xmlsec.enable_debug_trace(debug)
+        xmlsec.tree.add_ids(elem, ["ID"])
 
-            if xpath:
-                signature_nodes = OneLogin_Saml2_XML.query(elem, xpath)
-            else:
-                signature_nodes = OneLogin_Saml2_XML.query(elem, OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH)
+        if xpath:
+            signature_nodes = OneLogin_Saml2_XML.query(elem, xpath)
+        else:
+            signature_nodes = OneLogin_Saml2_XML.query(elem, OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH)
 
-                if len(signature_nodes) == 0:
-                    signature_nodes = OneLogin_Saml2_XML.query(elem, OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH)
+            if len(signature_nodes) == 0:
+                signature_nodes = OneLogin_Saml2_XML.query(elem, OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH)
 
-            if len(signature_nodes) == 1:
-                signature_node = signature_nodes[0]
-
-                return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug)
-            else:
-                return False
-        except xmlsec.Error as e:
-            if debug:
-                print(e)
-
-            return False
+        if len(signature_nodes) == 1:
+            signature_node = signature_nodes[0]
+            # Raises expection if invalid
+            return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
+        else:
+            raise OneLogin_Saml2_ValidationError(
+                'Expected exactly one signature node; got {}.'.format(len(signature_nodes)),
+                OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES
+            )
 
     @staticmethod
+    @return_false_on_exception
     def validate_metadata_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False):
         """
         Validates a signature of a EntityDescriptor.
@@ -794,35 +821,36 @@ class OneLogin_Saml2_Utils(object):
 
         :param debug: Activate the xmlsec debug
         :type: bool
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
-        try:
-            if xml is None or xml == '':
-                raise Exception('Empty string supplied as input')
+        if xml is None or xml == '':
+            raise Exception('Empty string supplied as input')
 
-            elem = OneLogin_Saml2_XML.to_etree(xml)
-            xmlsec.enable_debug_trace(debug)
-            xmlsec.tree.add_ids(elem, ["ID"])
+        elem = OneLogin_Saml2_XML.to_etree(xml)
+        xmlsec.enable_debug_trace(debug)
+        xmlsec.tree.add_ids(elem, ["ID"])
 
-            signature_nodes = OneLogin_Saml2_XML.query(elem, '/md:EntitiesDescriptor/ds:Signature')
+        signature_nodes = OneLogin_Saml2_XML.query(elem, '/md:EntitiesDescriptor/ds:Signature')
+
+        if len(signature_nodes) == 0:
+            signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/ds:Signature')
 
             if len(signature_nodes) == 0:
-                signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/ds:Signature')
+                signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:SPSSODescriptor/ds:Signature')
+                signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:IDPSSODescriptor/ds:Signature')
 
-                if len(signature_nodes) == 0:
-                    signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:SPSSODescriptor/ds:Signature')
-                    signature_nodes += OneLogin_Saml2_XML.query(elem, '/md:EntityDescriptor/md:IDPSSODescriptor/ds:Signature')
-
-            if len(signature_nodes) > 0:
-                for signature_node in signature_nodes:
-                    if not OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug):
-                        return False
-                return True
-            else:
-                return False
-        except Exception:
-            return False
+        if len(signature_nodes) > 0:
+            for signature_node in signature_nodes:
+                # Raises expection if invalid
+                OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
+            return True
+        else:
+            raise Exception('Could not validate metadata signature: No signature nodes found.')
 
     @staticmethod
+    @return_false_on_exception
     def validate_node_sign(signature_node, elem, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False):
         """
         Validates a signature node.
@@ -847,40 +875,51 @@ class OneLogin_Saml2_Utils(object):
 
         :param debug: Activate the xmlsec debug
         :type: bool
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
         """
+        if (cert is None or cert == '') and fingerprint:
+            x509_certificate_nodes = OneLogin_Saml2_XML.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
+            if len(x509_certificate_nodes) > 0:
+                x509_certificate_node = x509_certificate_nodes[0]
+                x509_cert_value = x509_certificate_node.text
+                x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value, fingerprintalg)
+                if fingerprint == x509_fingerprint_value:
+                    cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
+
+        if cert is None or cert == '':
+            raise OneLogin_Saml2_Error(
+                'Could not validate node signature: No certificate provided.',
+                OneLogin_Saml2_Error.CERT_NOT_FOUND
+            )
+
+        # Check if Reference URI is empty
+        reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
+        if len(reference_elem) > 0:
+            if reference_elem[0].get('URI') == '':
+                reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
+
+        if validatecert:
+            manager = xmlsec.KeysManager()
+            manager.load_cert_from_memory(cert, xmlsec.KeyFormat.CERT_PEM, xmlsec.KeyDataType.TRUSTED)
+            dsig_ctx = xmlsec.SignatureContext(manager)
+        else:
+            dsig_ctx = xmlsec.SignatureContext()
+            dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
+
+        dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
+
         try:
-            if (cert is None or cert == '') and fingerprint:
-                x509_certificate_nodes = OneLogin_Saml2_XML.query(signature_node, '//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate')
-                if len(x509_certificate_nodes) > 0:
-                    x509_certificate_node = x509_certificate_nodes[0]
-                    x509_cert_value = x509_certificate_node.text
-                    x509_fingerprint_value = OneLogin_Saml2_Utils.calculate_x509_fingerprint(x509_cert_value, fingerprintalg)
-                    if fingerprint == x509_fingerprint_value:
-                        cert = OneLogin_Saml2_Utils.format_cert(x509_cert_value)
-
-            if cert is None or cert == '':
-                return False
-
-            # Check if Reference URI is empty
-            reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
-            if len(reference_elem) > 0:
-                if reference_elem[0].get('URI') == '':
-                    reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
-
-            if validatecert:
-                manager = xmlsec.KeysManager()
-                manager.load_cert_from_memory(cert, xmlsec.KeyFormat.CERT_PEM, xmlsec.KeyDataType.TRUSTED)
-                dsig_ctx = xmlsec.SignatureContext(manager)
-            else:
-                dsig_ctx = xmlsec.SignatureContext()
-                dsig_ctx.key = xmlsec.Key.from_memory(cert, xmlsec.KeyFormat.CERT_PEM, None)
-
-            dsig_ctx.set_enabled_key_data([xmlsec.KeyData.X509])
             dsig_ctx.verify(signature_node)
-            return True
-        except xmlsec.Error as e:
-            if debug:
-                print(e)
+        except Exception as err:
+            raise OneLogin_Saml2_ValidationError(
+                'Signature validation failed. SAML Response rejected. %s',
+                OneLogin_Saml2_ValidationError.INVALID_SIGNATURE,
+                str(err)
+            )
+
+        return True
 
     @staticmethod
     def sign_binary(msg, key, algorithm=xmlsec.Transform.RSA_SHA1, debug=False):

@@ -170,11 +170,10 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        try:
-            valid = response_2.is_valid(request_data, request_id)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('The InResponseTo of the Logout Response:', str(e))
+        self.assertFalse(response_2.is_valid(request_data, request_id))
+        self.assertIn('The InResponseTo of the Logout Response:', response_2.get_error())
+        with self.assertRaisesRegexp(Exception, 'The InResponseTo of the Logout Response:'):
+            response_2.is_valid(request_data, request_id, raise_exceptions=True)
 
     def testIsInValidIssuer(self):
         """
@@ -201,11 +200,8 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        try:
-            valid = response_2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('Invalid issuer in the Logout Request', str(e))
+        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Logout Request'):
+            response_2.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidDestination(self):
         """
@@ -226,11 +222,8 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        try:
-            valid = response_2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('The LogoutRequest was received at', str(e))
+        with self.assertRaisesRegexp(Exception, 'The LogoutResponse was received at'):
+            response_2.is_valid(request_data, raise_exceptions=True)
 
         # Empty destination
         dom = parseString(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
@@ -264,11 +257,8 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        try:
-            valid = response_2.is_valid(request_data)
-            self.assertFalse(valid)
-        except Exception as e:
-            self.assertIn('The LogoutRequest was received at', str(e))
+        with self.assertRaisesRegexp(Exception, 'The LogoutResponse was received at'):
+            response_2.is_valid(request_data, raise_exceptions=True)
 
         plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))
         current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
@@ -277,3 +267,44 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         response_3 = OneLogin_Saml2_Logout_Response(settings, message_3)
         self.assertTrue(response_3.is_valid(request_data))
+
+    def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
+        message = OneLogin_Saml2_Utils.deflate_and_base64_encode('<xml>invalid</xml>')
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {}
+        }
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+
+        response = OneLogin_Saml2_Logout_Response(settings, message)
+
+        self.assertFalse(response.is_valid(request_data))
+
+        with self.assertRaises(Exception):
+            response.is_valid(request_data, raise_exceptions=True)
+
+    def testGetXML(self):
+        """
+        Tests that we can get the logout response XML directly without
+        going through intermediate steps
+        """
+        response = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response.xml'))
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        logout_response_generated = OneLogin_Saml2_Logout_Response(settings)
+        logout_response_generated.build("InResponseValue")
+        expectedFragment = (
+            'Destination="http://idp.example.com/SingleLogoutService.php"\n'
+            '  InResponseTo="InResponseValue">\n'
+            '    <saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>\n'
+            '    <samlp:Status>\n'
+            '        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />\n'
+            '    </samlp:Status>\n'
+            '</samlp:LogoutResponse>'
+        )
+        self.assertIn(expectedFragment, logout_response_generated.get_xml())
+
+        logout_response_processed = OneLogin_Saml2_Logout_Response(settings, OneLogin_Saml2_Utils.deflate_and_base64_encode(response))
+        self.assertEqual(response, logout_response_processed.get_xml())

@@ -73,6 +73,34 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ProviderName="SP test"', inflated)
 
+    def testGetXML(self):
+        """
+        Tests that we can get the request XML directly without
+        going through intermediate steps
+        """
+        saml_settings = self.loadSettingsJSON()
+        saml_settings['organization'] = {
+            u'en-US': {
+                u'url': u'http://sp.example.com',
+                u'name': u'sp_test',
+                u'displayname': u'SP test',
+            }
+        }
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        inflated = authn_request.get_xml()
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertIn('ProviderName="SP test"', inflated)
+
+        saml_settings['organization'] = {}
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        inflated = authn_request.get_xml()
+        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn('ProviderName="SP test"', inflated)
+
     def testCreateRequestAuthContext(self):
         """
         Tests the OneLogin_Saml2_Authn_Request Constructor.

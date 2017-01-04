@@ -9,7 +9,7 @@ Logout Response class of OneLogin's Python Toolkit.
 
 """
 
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
@@ -63,11 +63,15 @@ class OneLogin_Saml2_Logout_Response(object):
         status = entries[0].attrib['Value']
         return status
 
-    def is_valid(self, request_data, request_id=None):
+    def is_valid(self, request_data, request_id=None, raise_exceptions=False):
         """
         Determines if the SAML LogoutResponse is valid
         :param request_id: The ID of the LogoutRequest sent by this SP to the IdP
         :type request_id: string
+
+        :param raise_exceptions: Whether to return false on failure or raise an exception
+        :type raise_exceptions: Boolean
+
         :return: Returns if the SAML LogoutResponse is or not valid
         :rtype: boolean
         """
@@ -80,30 +84,45 @@ class OneLogin_Saml2_Logout_Response(object):
             if self.__settings.is_strict():
                 res = OneLogin_Saml2_XML.validate_xml(self.document, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
                 if isinstance(res, str):
-                    raise Exception('Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd')
+                    raise OneLogin_Saml2_ValidationError(
+                        'Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd',
+                        OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT
+                    )
 
                 security = self.__settings.get_security_data()
 
                 # Check if the InResponseTo of the Logout Response matches the ID of the Logout Request (requestId) if provided
                 in_response_to = self.document.get('InResponseTo', None)
                 if request_id is not None and in_response_to and in_response_to != request_id:
-                    raise Exception('The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id))
+                    raise OneLogin_Saml2_ValidationError(
+                        'The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id),
+                        OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
+                    )
 
                 # Check issuer
                 issuer = self.get_issuer()
                 if issuer is not None and issuer != idp_entity_id:
-                    raise Exception('Invalid issuer in the Logout Request')
+                    raise OneLogin_Saml2_ValidationError(
+                        'Invalid issuer in the Logout Request',
+                        OneLogin_Saml2_ValidationError.WRONG_ISSUER
+                    )
 
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
                 # Check destination
                 destination = self.document.get('Destination', None)
                 if destination and current_url not in destination:
-                    raise Exception('The LogoutRequest was received at $currentURL instead of $destination')
+                    raise OneLogin_Saml2_ValidationError(
+                        'The LogoutResponse was received at %s instead of %s' % (current_url, destination),
+                        OneLogin_Saml2_ValidationError.WRONG_DESTINATION
+                    )
 
                 if security['wantMessagesSigned']:
                     if 'Signature' not in get_data:
-                        raise Exception('The Message of the Logout Response is not signed and the SP require it')
+                        raise OneLogin_Saml2_ValidationError(
+                            'The Message of the Logout Response is not signed and the SP require it',
+                            OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
+                        )
             return True
         # pylint: disable=R0801
         except Exception as err:
@@ -111,6 +130,8 @@ class OneLogin_Saml2_Logout_Response(object):
             debug = self.__settings.is_debug_active()
             if debug:
                 print(err)
+            if raise_exceptions:
+                raise
             return False
 
     def __query(self, query):
@@ -166,3 +187,12 @@ class OneLogin_Saml2_Logout_Response(object):
         After executing a validation process, if it fails this method returns the cause
         """
         return self.__error
+
+    def get_xml(self):
+        """
+        Returns the XML that will be sent as part of the response
+        or that was received at the SP
+        :return: XML response body
+        :rtype: string
+        """
+        return self.__logout_response

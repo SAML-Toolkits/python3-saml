@@ -14,7 +14,7 @@ This version supports Python3, There is a separate version that only support Pyt
 
 #### Warning ####
 
-Update python3-saml to 1.2.1 that patch 1.2.0 (that had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). [CVE-2016-1000251](https://github.com/distributedweaknessfiling/DWF-Database-Artifacts/blob/master/DWF/2016/1000251/CVE-2016-1000251.json)
+Update python3-saml to >= 1.2.1, 1.2.0 had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). [CVE-2016-1000251](https://github.com/distributedweaknessfiling/DWF-Database-Artifacts/blob/master/DWF/2016/1000251/CVE-2016-1000251.json)
 
 1.2.0 version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
 

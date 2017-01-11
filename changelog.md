@@ -1,5 +1,13 @@
 # python3-saml changelog
 
+### 1.2.2 (January 11, 2017)
+ * [#37](https://github.com/onelogin/python3-saml/pull/37) Add option to raise response validation exceptions
+ * [#42](https://github.com/onelogin/python3-saml/pull/42) Optionally raise detailed exceptions vs. returning False. Implement a more specific exception class for handling some validation errors. Improve/Fix tests. Add support for retrieving the last ID of the generated AuthNRequest / LogoutRequest. Add hooks to retrieve last-sent and last-received requests and responses
+ * Improved inResponse validation on Responses
+ * Add the ability to extract the specific certificate from IdP metadata when several defined
+ * Fix Invalid True attribute value in Metadata XML
+ * [#35](https://github.com/onelogin/python3-saml/pull/35) Fix typos and json sample code in documentation
+
 ### 1.2.1 (October 18, 2016)
  * [#30](https://github.com/onelogin/python3-saml/pull/30) Bug on signature checks
 

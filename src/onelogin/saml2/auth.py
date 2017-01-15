@@ -24,6 +24,12 @@ from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
+
 class OneLogin_Saml2_Auth(object):
     """
 
@@ -569,7 +575,7 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(self.__last_response, basestring):
                 response = self.__last_response
             else:
-                response = etree.tostring(self.__last_response, pretty_print=pretty_print_if_possible)
+                response = etree.tostring(self.__last_response, encoding='unicode', pretty_print=pretty_print_if_possible)
         return response
 
     def get_last_request_xml(self):

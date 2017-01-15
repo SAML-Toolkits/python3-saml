@@ -1,5 +1,8 @@
 # python3-saml changelog
 
+### 1.2.3 (January 15, 2017)
+ * Fix p3 compatibility
+
 ### 1.2.2 (January 11, 2017)
  * [#37](https://github.com/onelogin/python3-saml/pull/37) Add option to raise response validation exceptions
  * [#42](https://github.com/onelogin/python3-saml/pull/42) Optionally raise detailed exceptions vs. returning False. Implement a more specific exception class for handling some validation errors. Improve/Fix tests. Add support for retrieving the last ID of the generated AuthNRequest / LogoutRequest. Add hooks to retrieve last-sent and last-received requests and responses

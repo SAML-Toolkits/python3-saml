@@ -1,0 +1,48 @@
+{
+    "strict": false,
+    "debug": false,
+    "custom_base_path": "../../../tests/data/customPath/",
+    "sp": {
+        "entityId": "http://stuff.com/endpoints/metadata.php",
+        "assertionConsumerService": {
+            "url": "http://stuff.com/endpoints/endpoints/acs.php"
+        },
+        "singleLogoutService": {
+            "url": "http://stuff.com/endpoints/endpoints/sls.php"
+        },
+        "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+    },
+    "idp": {
+        "entityId": "http://idp.example.com/",
+        "singleSignOnService": {
+            "url": "http://idp.example.com/SSOService.php"
+        },
+        "singleLogoutService": {
+            "url": "http://idp.example.com/SingleLogoutService.php"
+        },
+        "certFingerprint": "AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9",
+        "certFingerprintAlgorithm": "sha1"
+    },
+    "security": {
+        "authnRequestsSigned": true,
+        "wantAssertionsSigned": false,
+        "signMetadata": false
+    },
+    "contactPerson": {
+        "technical": {
+            "givenName": "technical_name",
+            "emailAddress": "technical@example.com"
+        },
+        "support": {
+            "givenName": "support_name",
+            "emailAddress": "support@example.com"
+        }
+    },
+    "organization": {
+        "en-US": {
+            "name": "sp_test",
+            "displayname": "SP test",
+            "url": "http://sp.example.com"
+        }
+    }
+}

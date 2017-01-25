@@ -274,6 +274,8 @@ class OneLogin_Saml2_Response(object):
             else:
                 cert = idp_data.get('x509cert', None)
                 fingerprint = idp_data.get('certFingerprint', None)
+                if fingerprint:
+                    fingerprint = OneLogin_Saml2_Utils.format_finger_print(fingerprint)
                 fingerprintalg = idp_data.get('certFingerprintAlgorithm', None)
 
                 # If find a Signature on the Response, validates it checking the original response

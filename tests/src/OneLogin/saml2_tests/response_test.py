@@ -1241,7 +1241,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
     def testIsValidSignFingerprint(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response
-        Case valid sign response / sign assertion / both signed
+        Case valid sign response / sign assertion / both signed with fingerprint
 
         Strict mode will always fail due destination problem, if we manipulate
         it the sign will fail.

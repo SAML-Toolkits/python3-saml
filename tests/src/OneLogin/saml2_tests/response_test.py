@@ -1238,6 +1238,63 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         # Modified message
         self.assertFalse(response_9.is_valid(self.get_request_data()))
 
+    def testIsValidSignFingerprint(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response
+        Case valid sign response / sign assertion / both signed
+
+        Strict mode will always fail due destination problem, if we manipulate
+        it the sign will fail.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON("settings6.json"))
+
+        # expired cert
+        xml = self.file_contents(join(self.data_path, 'responses', 'signed_message_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertTrue(response.is_valid(self.get_request_data()))
+
+        xml_2 = self.file_contents(join(self.data_path, 'responses', 'signed_assertion_response.xml.base64'))
+        response_2 = OneLogin_Saml2_Response(settings, xml_2)
+        self.assertTrue(response_2.is_valid(self.get_request_data()))
+
+        xml_3 = self.file_contents(join(self.data_path, 'responses', 'double_signed_response.xml.base64'))
+        response_3 = OneLogin_Saml2_Response(settings, xml_3)
+        self.assertTrue(response_3.is_valid(self.get_request_data()))
+
+        settings_2 = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings2.json'))
+        xml_4 = self.file_contents(join(self.data_path, 'responses', 'signed_message_response2.xml.base64'))
+        response_4 = OneLogin_Saml2_Response(settings_2, xml_4)
+        self.assertTrue(response_4.is_valid(self.get_request_data()))
+
+        xml_5 = self.file_contents(join(self.data_path, 'responses', 'signed_assertion_response2.xml.base64'))
+        response_5 = OneLogin_Saml2_Response(settings_2, xml_5)
+        self.assertTrue(response_5.is_valid(self.get_request_data()))
+
+        xml_6 = self.file_contents(join(self.data_path, 'responses', 'double_signed_response2.xml.base64'))
+        response_6 = OneLogin_Saml2_Response(settings_2, xml_6)
+        self.assertTrue(response_6.is_valid(self.get_request_data()))
+
+        dom = parseString(b64decode(xml_4))
+        dom.firstChild.firstChild.firstChild.nodeValue = 'https://example.com/other-idp'
+        xml_7 = OneLogin_Saml2_Utils.b64encode(dom.toxml())
+        response_7 = OneLogin_Saml2_Response(settings, xml_7)
+        # Modified message
+        self.assertFalse(response_7.is_valid(self.get_request_data()))
+
+        dom_2 = parseString(OneLogin_Saml2_Utils.b64decode(xml_5))
+        dom_2.firstChild.firstChild.firstChild.nodeValue = 'https://example.com/other-idp'
+        xml_8 = OneLogin_Saml2_Utils.b64encode(dom_2.toxml())
+        response_8 = OneLogin_Saml2_Response(settings, xml_8)
+        # Modified message
+        self.assertFalse(response_8.is_valid(self.get_request_data()))
+
+        dom_3 = parseString(OneLogin_Saml2_Utils.b64decode(xml_6))
+        dom_3.firstChild.firstChild.firstChild.nodeValue = 'https://example.com/other-idp'
+        xml_9 = OneLogin_Saml2_Utils.b64encode(dom_3.toxml())
+        response_9 = OneLogin_Saml2_Response(settings, xml_9)
+        # Modified message
+        self.assertFalse(response_9.is_valid(self.get_request_data()))
+
     def testIsValidSignWithEmptyReferenceURI(self):
         settings_info = self.loadSettingsJSON()
         del settings_info['idp']['x509cert']

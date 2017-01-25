@@ -289,8 +289,8 @@ This is the settings.json file:
          *  Notice that if you want to validate any SAML Message sent by the HTTP-Redirect binding, you
          *  will need to provide the whole x509cert.
          */
-        // "certFingerprint" => "",
-        // "certFingerprintAlgorithm" => "sha1",
+        // "certFingerprint": "",
+        // "certFingerprintAlgorithm": "sha1",
     }
 }
 ```

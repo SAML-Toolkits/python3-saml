@@ -102,6 +102,13 @@ class OneLogin_Saml2_Authn_Request(object):
         if 'attributeConsumingService' in sp_data and sp_data['attributeConsumingService']:
             attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"1\""
 
+        attr_issuer_str = ""
+        if 'issuerFormat' in sp_data and sp_data['issuerFormat']:
+            attr_issuer_str += " Format=\"%s\"" % sp_data['issuerFormat']
+
+        if 'issuerNameQualifier' in sp_data and sp_data['issuerNameQualifier']:
+            attr_issuer_str += " NameQualifier=\"%s\"" % sp_data['issuerNameQualifier']
+
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {
                 'id': uid,
@@ -111,7 +118,8 @@ class OneLogin_Saml2_Authn_Request(object):
                 'issue_instant': issue_instant,
                 'destination': destination,
                 'assertion_url': sp_data['assertionConsumerService']['url'],
-                'entity_id': sp_data['entityId'],
+                'entity_id': sp_data['entityId'],                
+                'attr_issuer_str': attr_issuer_str,
                 'nameid_policy_str': nameid_policy_str,
                 'requested_authn_context_str': requested_authn_context_str,
                 'attr_consuming_service_str': attr_consuming_service_str,

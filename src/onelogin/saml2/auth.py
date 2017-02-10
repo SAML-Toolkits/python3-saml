@@ -275,7 +275,7 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__last_request_id
 
-    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
+    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, issuer_attrs=None):
         """
         Initiates the SSO process.
 
@@ -291,10 +291,13 @@ class OneLogin_Saml2_Auth(object):
         :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
 
+        :param issuer_attrs: Optional argument. Dictionary of attributes for Issuer element.
+        :type issuer_attrs: dict
+
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy,issuer_attrs)
         self.__last_request = authn_request.get_xml()
         self.__last_request_id = authn_request.get_id()
 

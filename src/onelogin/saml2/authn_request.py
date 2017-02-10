@@ -22,7 +22,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True):
+    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True, issuer_attrs=None):
         """
         Constructs the AuthnRequest object.
 
@@ -37,6 +37,9 @@ class OneLogin_Saml2_Authn_Request(object):
 
         :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
+
+        :param issuer_attrs: Optional argument. Dictionary of attributes for Issuer element.
+        :type issuer_attrs: dict
         """
         self.__settings = settings
 
@@ -103,11 +106,11 @@ class OneLogin_Saml2_Authn_Request(object):
             attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"1\""
 
         attr_issuer_str = ""
-        if 'issuerFormat' in sp_data and sp_data['issuerFormat']:
-            attr_issuer_str += " Format=\"%s\"" % sp_data['issuerFormat']
+        if 'Format' in issuer_attrs and issuer_attrs['Format']:
+            attr_issuer_str += " Format=\"%s\"" % issuer_attrs['Format']
 
-        if 'issuerNameQualifier' in sp_data and sp_data['issuerNameQualifier']:
-            attr_issuer_str += " NameQualifier=\"%s\"" % sp_data['issuerNameQualifier']
+        if 'NameQualifier' in issuer_attrs and issuer_attrs['NameQualifier']:
+            attr_issuer_str += " NameQualifier=\"%s\"" % issuer_attrs['NameQualifier']
 
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {

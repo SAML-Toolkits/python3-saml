@@ -573,12 +573,12 @@ class OneLogin_Saml2_Response(object):
 
             signed_elements.append(signed_element)
 
-            if signed_elements:
-                if not self.validate_signed_elements(signed_elements, raise_exceptions=True):
-                    raise OneLogin_Saml2_ValidationError(
-                        'Found an unexpected Signature Element. SAML Response rejected',
-                        OneLogin_Saml2_ValidationError.UNEXPECTED_SIGNED_ELEMENT
-                    )
+        if signed_elements:
+            if not self.validate_signed_elements(signed_elements, raise_exceptions=True):
+                raise OneLogin_Saml2_ValidationError(
+                    'Found an unexpected Signature Element. SAML Response rejected',
+                    OneLogin_Saml2_ValidationError.UNEXPECTED_SIGNED_ELEMENT
+                )
         return signed_elements
 
     @return_false_on_exception

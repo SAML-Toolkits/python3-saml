@@ -354,8 +354,8 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_response.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'Issuer of the Response not found or multiple.'):
-            response_4.get_issuers()
+        response_4.get_issuers()
+        self.assertEqual(['https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php'], response_4.get_issuers())
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_assertion.xml.base64'))
         response_5 = OneLogin_Saml2_Response(settings, xml_5)

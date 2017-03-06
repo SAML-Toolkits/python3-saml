@@ -362,13 +362,14 @@ class OneLogin_Saml2_Response(object):
         issuers = set()
 
         message_issuer_nodes = OneLogin_Saml2_XML.query(self.document, '/samlp:Response/saml:Issuer')
-        if len(message_issuer_nodes) == 1:
-            issuers.add(message_issuer_nodes[0].text)
-        else:
-            raise OneLogin_Saml2_ValidationError(
-                'Issuer of the Response not found or multiple.',
-                OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_RESPONSE
-            )
+        if len(message_issuer_nodes) > 0:
+            if len(message_issuer_nodes) == 1:
+                issuers.add(message_issuer_nodes[0].text)
+            else:
+                raise OneLogin_Saml2_ValidationError(
+                    'Issuer of the Response is multiple.',
+                    OneLogin_Saml2_ValidationError.ISSUER_MULTIPLE_IN_RESPONSE
+                )
 
         assertion_issuer_nodes = self.__query_assertion('/saml:Issuer')
         if len(assertion_issuer_nodes) == 1:

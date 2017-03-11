@@ -713,6 +713,31 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         ds_signature_8 = res_8.firstChild.firstChild.nextSibling.firstChild.nextSibling
         self.assertIn('ds:Signature', ds_signature_8.tagName)
 
+    def testAddSignCheckAlg(self):
+        """
+        Tests the add_sign method of the OneLogin_Saml2_Utils
+        Case: Review signature & digest algorithm
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        key = settings.get_sp_key()
+        cert = settings.get_sp_cert()
+
+        xml_authn = b64decode(self.file_contents(join(self.data_path, 'requests', 'authn_request.xml.base64')))
+        xml_authn_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert))
+        self.assertIn('<ds:SignatureValue>', xml_authn_signed)
+        self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', xml_authn_signed)
+        self.assertIn('<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>', xml_authn_signed)
+
+        xml_authn_signed_2 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert, False, OneLogin_Saml2_Constants.RSA_SHA256, OneLogin_Saml2_Constants.SHA384))
+        self.assertIn('<ds:SignatureValue>', xml_authn_signed_2)
+        self.assertIn('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>', xml_authn_signed_2)
+        self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', xml_authn_signed_2)
+
+        xml_authn_signed_3 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn, key, cert, False, OneLogin_Saml2_Constants.RSA_SHA384, OneLogin_Saml2_Constants.SHA512))
+        self.assertIn('<ds:SignatureValue>', xml_authn_signed_3)
+        self.assertIn('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', xml_authn_signed_3)
+        self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>', xml_authn_signed_3)
+
     def testValidateSign(self):
         """
         Tests the validate_sign method of the OneLogin_Saml2_Utils

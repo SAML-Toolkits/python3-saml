@@ -679,7 +679,7 @@ class OneLogin_Saml2_Utils(object):
         return enc_ctx.decrypt(encrypted_data)
 
     @staticmethod
-    def add_sign(xml, key, cert, debug=False, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
+    def add_sign(xml, key, cert, debug=False, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1, digest_algorithm=OneLogin_Saml2_Constants.SHA1):
         """
         Adds signature key and senders certificate to an element (Message or
         Assertion).
@@ -698,6 +698,12 @@ class OneLogin_Saml2_Utils(object):
 
         :param sign_algorithm: Signature algorithm method
         :type sign_algorithm: string
+
+        :param digest_algorithm: Digest algorithm method
+        :type digest_algorithm: string
+
+        :returns: Signed XML
+        :rtype: string
         """
         if xml is None or xml == '':
             raise Exception('Empty string supplied as input')
@@ -728,7 +734,15 @@ class OneLogin_Saml2_Utils(object):
         if elem_id:
             elem_id = '#' + elem_id
 
-        ref = xmlsec.template.add_reference(signature, xmlsec.Transform.SHA1, uri=elem_id)
+        digest_algorithm_transform_map = {
+            OneLogin_Saml2_Constants.SHA1: xmlsec.Transform.SHA1,
+            OneLogin_Saml2_Constants.SHA256: xmlsec.Transform.SHA256,
+            OneLogin_Saml2_Constants.SHA384: xmlsec.Transform.SHA384,
+            OneLogin_Saml2_Constants.SHA512: xmlsec.Transform.SHA512
+        }
+        digest_algorithm_transform = digest_algorithm_transform_map.get(digest_algorithm, xmlsec.Transform.SHA1)
+
+        ref = xmlsec.template.add_reference(signature, digest_algorithm_transform, uri=elem_id)
         xmlsec.template.add_transform(ref, xmlsec.Transform.ENVELOPED)
         xmlsec.template.add_transform(ref, xmlsec.Transform.EXCL_C14N)
         key_info = xmlsec.template.ensure_key_info(signature)

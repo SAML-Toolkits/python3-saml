@@ -374,7 +374,14 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
-        "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+        "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+
+        // Algorithm that the toolkit will use on digest process. Options:
+        //    'http://www.w3.org/2000/09/xmldsig#sha1'
+        //    'http://www.w3.org/2001/04/xmlenc#sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
+        //    'http://www.w3.org/2001/04/xmlenc#sha512'
+        'digestAlgorithm': "http://www.w3.org/2000/09/xmldsig#sha1"
     },
 
     // Contact information template, it is recommended to suply a

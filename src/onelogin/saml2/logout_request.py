@@ -25,7 +25,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     """
 
-    def __init__(self, settings, request=None, name_id=None, session_index=None, nq=None):
+    def __init__(self, settings, request=None, name_id=None, session_index=None, nq=None, name_id_format=None):
         """
         Constructs the Logout Request object.
 
@@ -42,6 +42,9 @@ class OneLogin_Saml2_Logout_Request(object):
         :type session_index: string
 
         :param nq: IDP Name Qualifier
+        :type: string
+
+        :param name_id_format: The NameID Format that will be set in the LogoutRequest.
         :type: string
         """
         self.__settings = settings
@@ -63,7 +66,8 @@ class OneLogin_Saml2_Logout_Request(object):
                 cert = idp_data['x509cert']
 
             if name_id is not None:
-                name_id_format = sp_data['NameIDFormat']
+                if name_id_format is None:
+                    name_id_format = sp_data['NameIDFormat']
                 sp_name_qualifier = None
             else:
                 name_id = idp_data['entityId']
@@ -75,7 +79,8 @@ class OneLogin_Saml2_Logout_Request(object):
                 sp_name_qualifier,
                 name_id_format,
                 cert,
-                nq=nq,
+                False,
+                nq
             )
 
             if session_index:
@@ -193,6 +198,23 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         name_id = OneLogin_Saml2_Logout_Request.get_nameid_data(request, key)
         return name_id['Value']
+
+    @staticmethod
+    def get_nameid_format(request, key=None):
+        """
+        Gets the NameID Format of the Logout Request Message
+        :param request: Logout Request Message
+        :type request: string|DOMDocument
+        :param key: The SP key
+        :type key: string
+        :return: Name ID Format
+        :rtype: string
+        """
+        name_id_format = None
+        name_id_data = OneLogin_Saml2_Logout_Request.get_nameid_data(request, key)
+        if name_id_data and 'Format' in name_id_data.keys():
+            name_id_format = name_id_data['Format']
+        return name_id_format
 
     @staticmethod
     def get_issuer(request):

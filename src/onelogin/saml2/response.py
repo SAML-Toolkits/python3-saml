@@ -444,6 +444,19 @@ class OneLogin_Saml2_Response(object):
             nameid_value = nameid_data['Value']
         return nameid_value
 
+    def get_nameid_format(self):
+        """
+        Gets the NameID Format provided by the SAML Response from the IdP
+
+        :returns: NameID Format
+        :rtype: string|None
+        """
+        nameid_format = None
+        nameid_data = self.get_nameid_data()
+        if nameid_data and 'Format' in nameid_data.keys():
+            nameid_format = nameid_data['Format']
+        return nameid_format
+
     def get_session_not_on_or_after(self):
         """
         Gets the SessionNotOnOrAfter from the AuthnStatement

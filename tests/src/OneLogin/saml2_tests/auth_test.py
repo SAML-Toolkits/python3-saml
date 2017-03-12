@@ -24,15 +24,16 @@ except ImportError:
 class OneLogin_Saml2_Auth_Test(unittest.TestCase):
     data_path = join(dirname(__file__), '..', '..', '..', 'data')
 
-    def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+    def loadSettingsJSON(self, filename=None):
+        if filename:
+            filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
+        else:
+            filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
             stream.close()
             return settings
-        else:
-            raise Exception('Settings json file does not exist')
 
     def file_contents(self, filename):
         f = open(filename, 'r')
@@ -810,6 +811,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth.process_response()
 
         name_id_from_response = auth.get_nameid()
+        name_id_format_from_response = auth.get_nameid_format()
 
         target_url = auth.logout()
         parsed_query = parse_qs(urlparse(target_url)[4])
@@ -817,7 +819,21 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
 
         name_id_from_request = OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        name_id_format_from_request = OneLogin_Saml2_Logout_Request.get_nameid_format(logout_request)
         self.assertEqual(name_id_from_response, name_id_from_request)
+        self.assertEqual(name_id_format_from_response, name_id_format_from_request)
+
+        new_name_id = "new_name_id"
+        new_name_id_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+        target_url_2 = auth.logout(name_id=new_name_id, name_id_format=new_name_id_format)
+        parsed_query = parse_qs(urlparse(target_url_2)[4])
+        self.assertIn('SAMLRequest', parsed_query)
+        logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0])
+
+        name_id_from_request = OneLogin_Saml2_Logout_Request.get_nameid(logout_request)
+        name_id_format_from_request = OneLogin_Saml2_Logout_Request.get_nameid_format(logout_request)
+        self.assertEqual(new_name_id, name_id_from_request)
+        self.assertEqual(new_name_id_format, name_id_format_from_request)
 
     def testSetStrict(self):
         """
@@ -839,6 +855,98 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertFalse(settings.is_strict())
 
         self.assertRaises(AssertionError, auth.set_strict, '42')
+
+    def testIsAuthenticated(self):
+        """
+        Tests the is_authenticated method of the OneLogin_Saml2_Auth
+        """
+        request_data = self.get_request()
+        del request_data['get_data']
+        message = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        auth.process_response()
+        self.assertFalse(auth.is_authenticated())
+
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+
+    def testGetNameId(self):
+        """
+        Tests the get_nameid method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        request_data = self.get_request()
+        del request_data['get_data']
+        message = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertFalse(auth.is_authenticated())
+        self.assertEqual(auth.get_nameid(), None)
+
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("492882615acf31c8096b627245d76ae53036c090", auth.get_nameid())
+
+        settings_2 = self.loadSettingsJSON('settings2.json')
+        message = self.file_contents(join(self.data_path, 'responses', 'signed_message_encrypted_assertion2.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("25ddd7d34a7d79db69167625cda56a320adf2876", auth.get_nameid())
+
+    def testGetNameIdFormat(self):
+        """
+        Tests the get_nameid_format method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        request_data = self.get_request()
+        del request_data['get_data']
+        message = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertFalse(auth.is_authenticated())
+        self.assertEqual(auth.get_nameid_format(), None)
+
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", auth.get_nameid_format())
+
+        settings_2 = self.loadSettingsJSON('settings2.json')
+        message = self.file_contents(join(self.data_path, 'responses', 'signed_message_encrypted_assertion2.xml.base64'))
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified", auth.get_nameid_format())
 
     def testBuildRequestSignature(self):
         """

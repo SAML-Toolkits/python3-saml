@@ -47,5 +47,5 @@ setup(
             'coveralls==0.4.4',
         ),
     },
-    keywords='saml saml2 xmlsec django flask python3',
+    keywords='saml saml2 xmlsec django flask pyramid python3',
 )

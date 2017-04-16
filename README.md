@@ -153,6 +153,11 @@ openssl req -new -x509 -days 3652 -nodes -out sp.crt -keyout saml.key
 
 This folder contains a Flask project that will be used as demo to show how to add SAML support to the Flask Framework. 'index.py' is the main flask file that has all the code, this file uses the templates stored at the 'templates' folder. In the 'saml' folder we found the 'certs' folder to store the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
 
+#### demo_pyramid ####
+
+This folder contains a Pyramid project that will be used as demo to show how to add SAML support to the [Pyramid Web Framework](http://docs.pylonsproject.org/projects/pyramid/en/latest/).  '\_\_init__.py' is the main file that configures the app and its routes, 'views.py' is where all the logic and SAML handling takes place, and the templates are stored in the 'templates' folder. The 'saml' folder is the same as in the other two demos.
+
+
 #### setup.py ####
 
 Setup script is the centre of all activity in building, distributing, and installing modules.
@@ -1134,3 +1139,80 @@ libxmlsec1-dev
 ```
 
 Finally, add python3-saml to your requrements.txt and ```git push``` to trigger a build.
+
+### Demo Pyramid ###
+
+Unlike the other two projects, you don't need a pre-existing virtualenv to get
+up and running here, since Pyramid comes from the
+[buildout](http://www.buildout.org/en/latest/) school of thought.
+
+To run the demo you need to install Pyramid, the requirements, etc.:
+```
+ cd demo_pyramid
+ python3 -m venv env
+ env/bin/pip install --upgrade pip setuptools
+ env/bin/pip install -e ".[testing]"
+```
+
+If you want to make sure the tests pass, run:
+```
+ env/bin/pytest
+```
+
+Next, edit the settings in `demo_pyramid/saml/settings.json`. (Pyramid runs on
+port 6543 by default.)
+
+Now you can run the demo like this:
+```
+ env/bin/pserve development.ini
+```
+
+If that worked, the demo is now running at http://localhost:6543.
+
+####Content####
+
+The Pyramid project contains:
+
+
+* ***\_\_init__.py*** is the main Pyramid file that configures the app and its routes.
+
+* ***views.py*** is where all the SAML handling takes place.
+
+* ***templates*** is the folder where Pyramid stores the templates of the project. It was implemented a layout.jinja2 template that is extended by index.jinja2 and attrs.jinja2, the templates of our simple demo that shows messages, user attributes when available and login and logout links.
+
+* ***saml*** is a folder that contains the 'certs' folder that could be used to store the x509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
+
+
+####SP setup####
+
+The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways: settings files or define a setting dict. In demo_pyramid the first method is used.
+
+In the views.py file we define the SAML_PATH, which will target the 'saml' folder. We require it in order to load the settings files.
+
+First we need to edit the saml/settings.json, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the saml/advanced_settings.json files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+
+####IdP setup####
+
+Once the SP is configured, the metadata of the SP is published at the /metadata/ url. Based on that info, configure the IdP.
+
+####How it works####
+
+1. First time you access to the main view 'http://localhost:6543', you can select to login and return to the same view or login and be redirected to /?attrs (attrs view).
+
+ 2. When you click:
+
+    2.1 in the first link, we access to /?sso (index view). An AuthNRequest is sent to the IdP, we authenticate at the IdP and then a Response is sent through the user's client to the SP, specifically the Assertion Consumer Service view: /?acs. Notice that a RelayState parameter is set to the url that initiated the process, the index view.
+
+    2.2 in the second link we access to /?attrs (attrs view), we will expetience have the same process described at 2.1 with the diference that as RelayState is set the attrs url.
+
+ 3. The SAML Response is processed in the ACS /?acs, if the Response is not valid, the process stops here and a message is shown. Otherwise we are redirected to the RelayState view. a) / or b) /?attrs
+
+ 4. We are logged in the app and the user attributes are showed. At this point, we can test the single log out functionality.
+
+ The single log out funcionality could be tested by 2 ways.
+
+    5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies through the client to the SP with a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
+
+    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the IdP, sends a Logout Request to the SP (SLS endpoint, /?sls). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
+
+Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET parameters are used to know the action that must be done.

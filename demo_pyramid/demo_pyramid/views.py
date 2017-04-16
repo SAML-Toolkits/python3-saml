@@ -33,6 +33,7 @@ def index(request):
     req = prepare_pyramid_request(request)
     auth = init_saml_auth(req)
     errors = []
+    error_reason = ""
     not_auth_warn = False
     success_slo = False
     attributes = False
@@ -65,6 +66,8 @@ def index(request):
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.POST and self_url != request.POST['RelayState']:
                 return HTTPFound(auth.redirect_to(request.POST['RelayState']))
+        else:
+            error_reason = auth.get_last_error_reason()
     elif 'sls' in request.GET:
         dscb = lambda: session.clear()
         url = auth.process_slo(delete_session_cb=dscb)
@@ -82,6 +85,7 @@ def index(request):
 
     return {
         'errors': errors,
+        'error_reason': error_reason,
         'not_auth_warn': not_auth_warn,
         'success_slo': success_slo,
         'attributes': attributes,

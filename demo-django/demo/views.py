@@ -78,13 +78,13 @@ def index(request):
         if len(request.session['samlUserdata']) > 0:
             attributes = request.session['samlUserdata'].items()
 
+    context = RequestContext(request, {'errors': errors,
+                                       'not_auth_warn': not_auth_warn,
+                                       'success_slo': success_slo,
+                                       'attributes': attributes,
+                                       'paint_logout': paint_logout}).flatten()
     return render_to_response('index.html',
-                              {'errors': errors,
-                               'not_auth_warn': not_auth_warn,
-                               'success_slo': success_slo,
-                               'attributes': attributes,
-                               'paint_logout': paint_logout},
-                              context_instance=RequestContext(request))
+                              context=context)
 
 
 def attrs(request):
@@ -97,9 +97,8 @@ def attrs(request):
             attributes = request.session['samlUserdata'].items()
 
     return render_to_response('attrs.html',
-                              {'paint_logout': paint_logout,
-                               'attributes': attributes},
-                              context_instance=RequestContext(request))
+                              context=RequestContext(request, {'paint_logout': paint_logout,
+                                                               'attributes': attributes}).flatten())
 
 
 def metadata(request):

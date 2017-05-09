@@ -14,6 +14,8 @@ try:
 except ImportError:
     import urllib2
 
+import ssl
+
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -25,7 +27,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     """
 
     @staticmethod
-    def get_metadata(url):
+    def get_metadata(url, validate_cert=True):
         """
         Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -34,7 +36,14 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :rtype: string
         """
         valid = False
-        response = urllib2.urlopen(url)
+
+        if validate_cert:
+            response = urllib2.urlopen(url)
+        else:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            response = urllib2.urlopen(url, context=ctx)
         xml = response.read()
 
         if xml:
@@ -52,7 +61,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         return xml
 
     @staticmethod
-    def parse_remote(url, **kwargs):
+    def parse_remote(url, validate_cert=True, **kwargs):
         """
         Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -60,7 +69,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :returns: settings dict with extracted data
         :rtype: dict
         """
-        idp_metadata = OneLogin_Saml2_IdPMetadataParser.get_metadata(url)
+        idp_metadata = OneLogin_Saml2_IdPMetadataParser.get_metadata(url, validate_cert)
         return OneLogin_Saml2_IdPMetadataParser.parse(idp_metadata, **kwargs)
 
     @staticmethod

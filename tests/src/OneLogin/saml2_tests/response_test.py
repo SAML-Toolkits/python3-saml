@@ -1402,3 +1402,13 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         with self.assertRaises(Exception):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
+
+    def testStatusCheckBeforeAssertionCheck(self):
+        """
+        Tests the status of a response is checked before the assertion count. As failed statuses will have no assertions
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'status_code_responder.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        with self.assertRaisesRegexp(Exception, 'The status code of the Response was not Success, was Responder'):
+            response.is_valid(self.get_request_data(), raise_exceptions=True)

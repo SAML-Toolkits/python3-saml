@@ -79,15 +79,15 @@ class OneLogin_Saml2_Response(object):
                     OneLogin_Saml2_ValidationError.MISSING_ID
                 )
 
+            # Checks that the response has the SUCCESS status
+            self.check_status()
+
             # Checks that the response only has one assertion
             if not self.validate_num_assertions():
                 raise OneLogin_Saml2_ValidationError(
                     'SAML Response must contain 1 assertion',
                     OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS
                 )
-
-            # Checks that the response has the SUCCESS status
-            self.check_status()
 
             idp_data = self.__settings.get_idp_data()
             idp_entity_id = idp_data['entityId']

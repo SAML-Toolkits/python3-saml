@@ -121,6 +121,8 @@ class OneLogin_Saml2_Settings(object):
 
         self.format_idp_cert()
         self.format_sp_cert()
+        if 'x509certNew' in self.__sp:
+            self.format_sp_cert_new()
         self.format_sp_key()
 
     def __load_paths(self, base_path=None):
@@ -523,6 +525,22 @@ class OneLogin_Saml2_Settings(object):
 
         return cert or None
 
+    def get_sp_cert_new(self):
+        """
+        Returns the x509 public of the SP planned
+        to be used soon instead the other public cert
+        :returns: SP public cert new
+        :rtype: string or None
+        """
+        cert = self.__sp.get('x509certNew')
+        cert_file_name = self.__paths['cert'] + 'sp_new.crt'
+
+        if not cert and exists(cert_file_name):
+            with open(cert_file_name) as f:
+                cert = f.read()
+
+        return cert or None
+
     def get_idp_cert(self):
         """
         Returns the x509 public cert of the IdP.
@@ -589,6 +607,10 @@ class OneLogin_Saml2_Settings(object):
             self.__security['metadataCacheDuration'],
             self.get_contacts(), self.get_organization()
         )
+
+        cert_new = self.get_sp_cert_new()
+        metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert_new)
+
         cert = self.get_sp_cert()
         metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert)
 
@@ -698,6 +720,12 @@ class OneLogin_Saml2_Settings(object):
         Formats the SP cert.
         """
         self.__sp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509cert'])
+
+    def format_sp_cert_new(self):
+        """
+        Formats the SP cert.
+        """
+        self.__sp['x509certNew'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509certNew'])
 
     def format_sp_key(self):
         """

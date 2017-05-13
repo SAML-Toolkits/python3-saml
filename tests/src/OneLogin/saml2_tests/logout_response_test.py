@@ -22,7 +22,8 @@ except ImportError:
 
 
 class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -31,8 +32,8 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         else:
             return self.assertRegexpMatches(text, regexp, msg)
 
-    def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)

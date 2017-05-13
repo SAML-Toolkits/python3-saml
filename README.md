@@ -143,6 +143,9 @@ Or also we can provide those data in the setting file at the 'x509cert' and the 
 
 Sometimes we could need a signature on the metadata published by the SP, in this case we could use the x.509 cert previously mentioned or use a new x.509 cert: metadata.crt and metadata.key.
 
+Use `sp_new.crt` if you are in a key rollover process and you want to
+publish that x509certificate on Service Provider metadata.
+
 If you want to create self-signed certs, you can do it at the https://www.samltool.com/self_signed_certs.php service, or using the command:
 
 ```bash
@@ -253,6 +256,15 @@ This is the settings.json file:
         // the certs folder. But we can also provide them with the following parameters
         "x509cert": "",
         "privateKey": ""
+
+        /*
+         * Key rollover
+         * If you plan to update the SP x509cert and privateKey
+         * you can define here the new x509cert and it will be 
+         * published on the SP metadata so Identity Providers can
+         * read them and get ready for rollover.
+         */
+        // 'x509certNew': '',
     },
 
     // Identity Provider Data that we want connected with our SP.
@@ -776,6 +788,11 @@ else:
   print ', '.join(errors)
 ```
 
+### SP Key rollover ###
+
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
 
 ### Main classes and methods ###
 
@@ -884,6 +901,7 @@ Configuration of the OneLogin Python Toolkit
 * ***check_sp_certs*** Checks if the x509 certs of the SP exists and are valid.
 * ***get_sp_key*** Returns the x509 private key of the SP.
 * ***get_sp_cert*** Returns the x509 public cert of the SP.
+* ***get_sp_cert_new*** Returns the future x509 public cert of the SP.
 * ***get_idp_cert*** Returns the x509 public cert of the IdP.
 * ***get_sp_data*** Gets the SP data.
 * ***get_idp_data*** Gets the IdP data.
@@ -892,6 +910,7 @@ Configuration of the OneLogin Python Toolkit
 * ***get_organization*** Gets organization data.
 * ***format_idp_cert*** Formats the IdP cert.
 * ***format_sp_cert*** Formats the SP cert.
+* ***format_sp_cert_new*** Formats the SP cert new.
 * ***format_sp_key*** Formats the private key.
 * ***set_strict*** Activates or deactivates the strict mode.
 * ***is_strict*** Returns if the 'strict' mode is active.

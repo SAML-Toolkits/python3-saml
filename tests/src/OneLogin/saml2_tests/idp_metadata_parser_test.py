@@ -281,6 +281,44 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         self.assertEqual(expected_settings6_7, settings6)
         self.assertEqual(expected_settings6_7, settings7)
 
+    def test_parse_with_entity_id(self):
+        """
+        Tests the parse method of the OneLogin_Saml2_IdPMetadataParser
+        Case: Provide entity_id to identify the desired IdPDescriptor from
+              EntitiesDescriptor
+        """
+        xml_idp_metadata = self.file_contents(join(self.data_path, 'metadata', 'idp_multiple_descriptors.xml'))
+
+        # should find first descriptor
+        data = OneLogin_Saml2_IdPMetadataParser.parse(xml_idp_metadata)
+        self.assertEqual("https://foo.example.com/access/saml/idp.xml", data["idp"]["entityId"])
+
+        # should find desired descriptor
+        data2 = OneLogin_Saml2_IdPMetadataParser.parse(xml_idp_metadata, entity_id="https://bar.example.com/access/saml/idp.xml")
+        self.assertEqual("https://bar.example.com/access/saml/idp.xml", data2["idp"]["entityId"])
+
+        expected_settings_json = """
+        {
+            "sp": {
+                "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+            },
+            "idp": {
+                "singleLogoutService": {
+                    "url": "https://hello.example.com/access/saml/logout",
+                    "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                },
+                "entityId": "https://bar.example.com/access/saml/idp.xml",
+                "x509cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxekNDQXhTZ0F3SUJBZ0lCQVRBTkJna3Foa2lHOXcwQkFRc0ZBRENCaGpFTE1Ba0dBMVVFQmhNQ1FWVXgKRERBS0JnTlZCQWdUQTA1VFZ6RVBNQTBHQTFVRUJ4TUdVM2xrYm1WNU1Rd3dDZ1lEVlFRS0RBTlFTVlF4Q1RBSApCZ05WQkFzTUFERVlNQllHQTFVRUF3d1BiR0YzY21WdVkyVndhWFF1WTI5dE1TVXdJd1lKS29aSWh2Y05BUWtCCkRCWnNZWGR5Wlc1alpTNXdhWFJBWjIxaGFXd3VZMjl0TUI0WERURXlNRFF4T1RJeU5UUXhPRm9YRFRNeU1EUXgKTkRJeU5UUXhPRm93Z1lZeEN6QUpCZ05WQkFZVEFrRlZNUXd3Q2dZRFZRUUlFd05PVTFjeER6QU5CZ05WQkFjVApCbE41Wkc1bGVURU1NQW9HQTFVRUNnd0RVRWxVTVFrd0J3WURWUVFMREFBeEdEQVdCZ05WQkFNTUQyeGhkM0psCmJtTmxjR2wwTG1OdmJURWxNQ01HQ1NxR1NJYjNEUUVKQVF3V2JHRjNjbVZ1WTJVdWNHbDBRR2R0WVdsc0xtTnYKYlRDQm56QU5CZ2txaGtpRzl3MEJBUUVGQUFPQmpRQXdnWWtDZ1lFQXFqaWUzUjJvaStwRGFldndJeXMvbWJVVApubkdsa3h0ZGlrcnExMXZleHd4SmlQTmhtaHFSVzNtVXVKRXpsbElkVkw2RW14R1lUcXBxZjkzSGxoa3NhZUowCjhVZ2pQOVVtTVlyaFZKdTFqY0ZXVjdmei9yKzIxL2F3VG5EVjlzTVlRcXVJUllZeTdiRzByMU9iaXdkb3ZudGsKN2dGSTA2WjB2WmFjREU1Ym9xVUNBd0VBQWFPQ0FTVXdnZ0VoTUFrR0ExVWRFd1FDTUFBd0N3WURWUjBQQkFRRApBZ1VnTUIwR0ExVWREZ1FXQkJTUk9OOEdKOG8rOGpnRnRqa3R3WmRxeDZCUnlUQVRCZ05WSFNVRUREQUtCZ2dyCkJnRUZCUWNEQVRBZEJnbGdoa2dCaHZoQ0FRMEVFQllPVkdWemRDQllOVEE1SUdObGNuUXdnYk1HQTFVZEl3U0IKcXpDQnFJQVVrVGpmQmlmS1B2STRCYlk1TGNHWGFzZWdVY21oZ1l5a2dZa3dnWVl4Q3pBSkJnTlZCQVlUQWtGVgpNUXd3Q2dZRFZRUUlFd05PVTFjeER6QU5CZ05WQkFjVEJsTjVaRzVsZVRFTU1Bb0dBMVVFQ2d3RFVFbFVNUWt3CkJ3WURWUVFMREFBeEdEQVdCZ05WQkFNTUQyeGhkM0psYm1ObGNHbDBMbU52YlRFbE1DTUdDU3FHU0liM0RRRUoKQVF3V2JHRjNjbVZ1WTJVdWNHbDBRR2R0WVdsc0xtTnZiWUlCQVRBTkJna3Foa2lHOXcwQkFRc0ZBQU9CZ1FDRQpUQWVKVERTQVc2ejFVRlRWN1FyZWg0VUxGT1JhajkrZUN1RjNLV0RIYyswSVFDajlyZG5ERzRRL3dmNy9yYVEwCkpuUFFDU0NkclBMSmV5b1BIN1FhVHdvYUY3ZHpWdzRMQ3N5TkpURld4NGNNNTBWdzZSNWZET2dpQzhic2ZmUzgKQkptb3VscnJaRE5OVmpHOG1XNmNMeHJZdlZRT3JSVmVjQ0ZJZ3NzQ2JBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=",
+                "singleSignOnService": {
+                    "url": "https://hello.example.com/access/saml/login",
+                    "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                }
+            }
+        }
+        """
+        expected_settings = json.loads(expected_settings_json)
+        self.assertEqual(expected_settings, data2)
+
     def testMergeSettings(self):
         """
         Tests the merge_settings method of the OneLogin_Saml2_IdPMetadataParser

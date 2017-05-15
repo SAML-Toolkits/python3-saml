@@ -477,6 +477,23 @@ json_data_file.close()
 auth = OneLogin_Saml2_Auth(req, settings_data)
 ```
 
+#### Metadata Based Configuration
+
+The method above requires a little extra work to manually specify attributes about the IdP. (And your SP application)
+
+There's an easier method -- use a metadata exchange.  Metadata is just an XML file that defines the capabilities of both the IdP and the SP application.  It also contains the X.509 public key certificates which add to the trusted relationship.  The IdP administrator can also configure custom settings for an SP based on the metadata.
+
+Using ````parse_remote```` IdP metadata can be obtained and added to the settings withouth further ado.
+
+``
+idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata')
+``
+
+If the Metadata contains several entities, the relevant EntityDescriptor can be specified when retrieving the settings from the IdpMetadataParser by its Entity Id value:
+
+idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote(https://example.com/metadatas, entity_id='idp_entity_id')
+
+
 #### How load the library ####
 
 In order to use the toolkit library you need to import the file that contains the class that you will need

@@ -127,7 +127,6 @@ class OneLogin_Saml2_Settings(object):
             self.format_sp_cert_new()
         self.format_sp_key()
 
-
     def __load_paths(self, base_path=None):
         """
         Set the paths of the different folders

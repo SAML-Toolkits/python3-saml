@@ -579,10 +579,10 @@ class OneLogin_Saml2_Auth(object):
                 cert = idp_data['x509cert']
 
                 if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
-                                                                OneLogin_Saml2_Utils.b64decode(signature),
-                                                                cert,
-                                                                sign_alg,
-                                                                self.__settings.is_debug_active()):
+                                                                 OneLogin_Saml2_Utils.b64decode(signature),
+                                                                 cert,
+                                                                 sign_alg,
+                                                                 self.__settings.is_debug_active()):
                     raise OneLogin_Saml2_ValidationError(
                         'Signature validation failed. %s rejected' % saml_type,
                         OneLogin_Saml2_ValidationError.INVALID_SIGNATURE

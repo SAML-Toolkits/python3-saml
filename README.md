@@ -308,6 +308,22 @@ This is the settings.json file:
          */
         // "certFingerprint": "",
         // "certFingerprintAlgorithm": "sha1",
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and
+         * more than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti': {
+        //      'signing': [
+        //          '<cert1-string>'
+        //      ],
+        //      'encryption': [
+        //          '<cert2-string>'
+        //      ]
+        // }
     }
 }
 ```
@@ -788,10 +804,25 @@ else:
   print ', '.join(errors)
 ```
 
+
 ### SP Key rollover ###
 
 If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
 published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
+
+### IdP with multiple certificates ###
+
+In some scenarios the IdP uses different certificates for
+signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
+
+In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+
+When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+
+The 'x509certMulti' is an array with 2 keys:
+- 'signing'. An array of certs that will be used to validate IdP signature 
+- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP.
 
 
 ### Main classes and methods ###
@@ -909,6 +940,7 @@ Configuration of the OneLogin Python Toolkit
 * ***get_contacts*** Gets contacts data.
 * ***get_organization*** Gets organization data.
 * ***format_idp_cert*** Formats the IdP cert.
+* ***format_idp_cert_multi*** Formats all registered IdP certs.
 * ***format_sp_cert*** Formats the SP cert.
 * ***format_sp_cert_new*** Formats the SP cert new.
 * ***format_sp_key*** Formats the private key.

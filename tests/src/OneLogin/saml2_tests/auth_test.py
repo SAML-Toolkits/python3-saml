@@ -22,13 +22,18 @@ except ImportError:
 
 
 class OneLogin_Saml2_Auth_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
-    def loadSettingsJSON(self, filename=None):
-        if filename:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
+    # assertRaisesRegexp deprecated on python3
+    def assertRaisesRegex(self, exception, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRaisesRegex'):
+            return super(OneLogin_Saml2_Auth_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
         else:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+            return self.assertRaisesRegexp(exception, regexp)
+
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -144,7 +149,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         Case No Response, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
-        with self.assertRaisesRegexp(OneLogin_Saml2_Error, 'SAML Response not found'):
+        with self.assertRaisesRegex(OneLogin_Saml2_Error, 'SAML Response not found'):
             auth.process_response()
         self.assertEqual(auth.get_errors(), ['invalid_binding'])
 
@@ -258,7 +263,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         Case No Message, An exception is throw
         """
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=self.loadSettingsJSON())
-        with self.assertRaisesRegexp(OneLogin_Saml2_Error, 'SAML LogoutRequest/LogoutResponse not found'):
+        with self.assertRaisesRegex(OneLogin_Saml2_Error, 'SAML LogoutRequest/LogoutResponse not found'):
             auth.process_slo(True)
         self.assertEqual(auth.get_errors(), ['invalid_binding'])
 
@@ -770,7 +775,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         del settings_info['idp']['singleLogoutService']
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
         # The Header of the redirect produces an Exception
-        with self.assertRaisesRegexp(OneLogin_Saml2_Error, 'The IdP does not support Single Log Out'):
+        with self.assertRaisesRegex(OneLogin_Saml2_Error, 'The IdP does not support Single Log Out'):
             auth.logout('http://example.com/returnto')
 
     def testLogoutNameIDandSessionIndex(self):
@@ -965,7 +970,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
-        with self.assertRaisesRegexp(OneLogin_Saml2_Error, "Trying to sign the SAMLRequest but can't load the SP private key"):
+        with self.assertRaisesRegex(OneLogin_Saml2_Error, "Trying to sign the SAMLRequest but can't load the SP private key"):
             auth2.add_request_signature(parameters)
 
     def testBuildResponseSignature(self):
@@ -986,7 +991,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         settings['sp']['privateKey'] = ''
         settings['custom_base_path'] = u'invalid/path/'
         auth2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
-        with self.assertRaisesRegexp(OneLogin_Saml2_Error, "Trying to sign the SAMLResponse but can't load the SP private key"):
+        with self.assertRaisesRegex(OneLogin_Saml2_Error, "Trying to sign the SAMLResponse but can't load the SP private key"):
             auth2.add_response_signature(parameters)
 
     def testIsInValidLogoutResponseSign(self):

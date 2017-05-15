@@ -32,6 +32,13 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         else:
             return self.assertRegexpMatches(text, regexp, msg)
 
+    # assertRaisesRegexp deprecated on python3
+    def assertRaisesRegex(self, exception, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRaisesRegex'):
+            return super(OneLogin_Saml2_Logout_Response_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
+        else:
+            return self.assertRaisesRegexp(exception, regexp)
+
     def loadSettingsJSON(self, name='settings1.json'):
         filename = join(self.settings_path, name)
         if exists(filename):
@@ -173,7 +180,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
         self.assertFalse(response_2.is_valid(request_data, request_id))
         self.assertIn('The InResponseTo of the Logout Response:', response_2.get_error())
-        with self.assertRaisesRegexp(Exception, 'The InResponseTo of the Logout Response:'):
+        with self.assertRaisesRegex(Exception, 'The InResponseTo of the Logout Response:'):
             response_2.is_valid(request_data, request_id, raise_exceptions=True)
 
     def testIsInValidIssuer(self):
@@ -201,7 +208,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Logout Request'):
+        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Logout Request'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidDestination(self):
@@ -223,7 +230,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'The LogoutResponse was received at'):
+        with self.assertRaisesRegex(Exception, 'The LogoutResponse was received at'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
         # Empty destination
@@ -258,7 +265,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'The LogoutResponse was received at'):
+        with self.assertRaisesRegex(Exception, 'The LogoutResponse was received at'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
         plain_message = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(message))

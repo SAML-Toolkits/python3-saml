@@ -63,7 +63,13 @@ class OneLogin_Saml2_Logout_Request(object):
 
             cert = None
             if security['nameIdEncrypted']:
-                cert = idp_data['x509cert']
+                exists_multix509enc = 'x509certMulti' in idp_data and \
+                    'encryption' in idp_data['x509certMulti'] and \
+                    idp_data['x509certMulti']['encryption']
+                if exists_multix509enc:
+                    cert = idp_data['x509certMulti']['encryption'][0]
+                else:
+                    cert = idp_data['x509cert']
 
             if name_id is not None:
                 if name_id_format is None:

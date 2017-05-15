@@ -410,9 +410,9 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', metadata)
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', metadata)
         self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', metadata)
-        self.assertEquals(2, metadata.count('<md:KeyDescriptor'))
-        self.assertEquals(1, metadata.count('<md:KeyDescriptor use="signing"'))
-        self.assertEquals(1, metadata.count('<md:KeyDescriptor use="encryption"'))
+        self.assertEqual(2, metadata.count('<md:KeyDescriptor'))
+        self.assertEqual(1, metadata.count('<md:KeyDescriptor use="signing"'))
+        self.assertEqual(1, metadata.count('<md:KeyDescriptor use="encryption"'))
 
     def testGetSPMetadataWithx509certNew(self):
         """
@@ -420,13 +420,13 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         Case with x509certNew
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings7.json'))
-        metadata = settings.get_sp_metadata()
+        metadata = compat.to_string(settings.get_sp_metadata())
 
         self.assertNotEqual(len(metadata), 0)
         self.assertIn('<md:SPSSODescriptor', metadata)
-        self.assertEquals(4, metadata.count('<md:KeyDescriptor'))
-        self.assertEquals(2, metadata.count('<md:KeyDescriptor use="signing"'))
-        self.assertEquals(2, metadata.count('<md:KeyDescriptor use="encryption"'))
+        self.assertEqual(4, metadata.count('<md:KeyDescriptor'))
+        self.assertEqual(2, metadata.count('<md:KeyDescriptor use="signing"'))
+        self.assertEqual(2, metadata.count('<md:KeyDescriptor use="encryption"'))
 
     def testGetSPMetadataSigned(self):
         """

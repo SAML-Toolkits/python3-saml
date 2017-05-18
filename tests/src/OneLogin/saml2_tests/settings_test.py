@@ -399,7 +399,10 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         Tests the getSPMetadata method of the OneLogin_Saml2_Settings
         Case unsigned metadata
         """
-        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings_info = self.loadSettingsJSON()
+        settings_info['security']['wantNameIdEncrypted'] = False
+        settings_info['security']['wantAssertionsEncrypted'] = False
+        settings = OneLogin_Saml2_Settings(settings_info)
         metadata = compat.to_string(settings.get_sp_metadata())
 
         self.assertNotEqual(len(metadata), 0)
@@ -410,6 +413,14 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         self.assertIn('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', metadata)
         self.assertIn('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', metadata)
         self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', metadata)
+        self.assertEqual(1, metadata.count('<md:KeyDescriptor'))
+        self.assertEqual(1, metadata.count('<md:KeyDescriptor use="signing"'))
+        self.assertEqual(0, metadata.count('<md:KeyDescriptor use="encryption"'))
+
+        settings_info['security']['wantNameIdEncrypted'] = False
+        settings_info['security']['wantAssertionsEncrypted'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+        metadata = compat.to_string(settings.get_sp_metadata())
         self.assertEqual(2, metadata.count('<md:KeyDescriptor'))
         self.assertEqual(1, metadata.count('<md:KeyDescriptor use="signing"'))
         self.assertEqual(1, metadata.count('<md:KeyDescriptor use="encryption"'))
@@ -419,11 +430,21 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         Tests the getSPMetadata method of the OneLogin_Saml2_Settings
         Case with x509certNew
         """
-        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings7.json'))
+        settings_info = self.loadSettingsJSON('settings7.json')
+        settings_info['security']['wantNameIdEncrypted'] = False
+        settings_info['security']['wantAssertionsEncrypted'] = False
+        settings = OneLogin_Saml2_Settings(settings_info)
         metadata = compat.to_string(settings.get_sp_metadata())
-
         self.assertNotEqual(len(metadata), 0)
         self.assertIn('<md:SPSSODescriptor', metadata)
+        self.assertEquals(2, metadata.count('<md:KeyDescriptor'))
+        self.assertEquals(2, metadata.count('<md:KeyDescriptor use="signing"'))
+        self.assertEquals(0, metadata.count('<md:KeyDescriptor use="encryption"'))
+
+        settings_info['security']['wantNameIdEncrypted'] = True
+        settings_info['security']['wantAssertionsEncrypted'] = False
+        settings = OneLogin_Saml2_Settings(settings_info)
+        metadata = settings.get_sp_metadata()
         self.assertEqual(4, metadata.count('<md:KeyDescriptor'))
         self.assertEqual(2, metadata.count('<md:KeyDescriptor use="signing"'))
         self.assertEqual(2, metadata.count('<md:KeyDescriptor use="encryption"'))

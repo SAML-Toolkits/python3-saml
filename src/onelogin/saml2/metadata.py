@@ -229,7 +229,7 @@ class OneLogin_Saml2_Metadata(object):
         key_descriptor.set('use', ('encryption', 'signing')[signing])
 
     @staticmethod
-    def add_x509_key_descriptors(metadata, cert=None):
+    def add_x509_key_descriptors(metadata, cert=None, add_encryption=True):
         """
         Adds the x509 descriptors (sign/encryption) to the metadata
         The same cert will be used for sign/encrypt
@@ -239,6 +239,9 @@ class OneLogin_Saml2_Metadata(object):
 
         :param cert: x509 cert
         :type cert: string
+
+        :param add_encryption: Determines if the KeyDescriptor[use="encryption"] should be added.
+        :type add_encryption: boolean
 
         :returns: Metadata with KeyDescriptors
         :rtype: string
@@ -256,6 +259,7 @@ class OneLogin_Saml2_Metadata(object):
         except StopIteration:
             raise Exception('Malformed metadata.')
 
-        OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
+        if add_encryption:
+            OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
         OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, True)
         return OneLogin_Saml2_XML.to_string(root)

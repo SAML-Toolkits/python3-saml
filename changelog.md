@@ -1,4 +1,20 @@
 # python3-saml changelog
+### 1.2.4 (May 18, 2017)
+* Publish KeyDescriptor[use=encryption] only when required
+* [#57](https://github.com/onelogin/python3-saml/pull/57) Be able to register future SP x509cert on the settings and publish it on SP metadata
+* [#57](https://github.com/onelogin/python3-saml/pull/57) Be able to register more than 1 Identity Provider x509cert, linked with an specific use (signing or encryption
+* [#57](https://github.com/onelogin/python3-saml/pull/57) Allow metadata to be retrieved from source containing data of multiple entities
+* [#57](https://github.com/onelogin/python3-saml/pull/57) Adapt IdP XML metadata parser to take care of multiple IdP certtificates and be able to inject the data obtained on the settings.
+* Be able to relax SSL Certificate verification when retrieving idp metadata
+* Checking the status of response before assertion count
+* Allows underscores in URL hosts
+* Add a Pyramid demo
+* Be able to provide a NameIDFormat to LogoutRequest
+* Add DigestMethod support. Add sign_algorithm and digest_algorithm par
+ameters to sign_metadata and add_sign.
+* Validate serial number as string to work around libxml2 limitation
+* Make the Issuer on the Response Optional
+* Fixed bug with formated cert fingerprints
 
 ### 1.2.3 (January 15, 2017)
  * Fix p3 compatibility

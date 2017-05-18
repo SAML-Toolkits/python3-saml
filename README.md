@@ -143,6 +143,9 @@ Or also we can provide those data in the setting file at the 'x509cert' and the 
 
 Sometimes we could need a signature on the metadata published by the SP, in this case we could use the x.509 cert previously mentioned or use a new x.509 cert: metadata.crt and metadata.key.
 
+Use `sp_new.crt` if you are in a key rollover process and you want to
+publish that x509certificate on Service Provider metadata.
+
 If you want to create self-signed certs, you can do it at the https://www.samltool.com/self_signed_certs.php service, or using the command:
 
 ```bash
@@ -253,6 +256,15 @@ This is the settings.json file:
         // the certs folder. But we can also provide them with the following parameters
         "x509cert": "",
         "privateKey": ""
+
+        /*
+         * Key rollover
+         * If you plan to update the SP x509cert and privateKey
+         * you can define here the new x509cert and it will be 
+         * published on the SP metadata so Identity Providers can
+         * read them and get ready for rollover.
+         */
+        // 'x509certNew': '',
     },
 
     // Identity Provider Data that we want connected with our SP.
@@ -296,6 +308,22 @@ This is the settings.json file:
          */
         // "certFingerprint": "",
         // "certFingerprintAlgorithm": "sha1",
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and
+         * more than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti': {
+        //      'signing': [
+        //          '<cert1-string>'
+        //      ],
+        //      'encryption': [
+        //          '<cert2-string>'
+        //      ]
+        // }
     }
 }
 ```
@@ -448,6 +476,23 @@ json_data_file.close()
 
 auth = OneLogin_Saml2_Auth(req, settings_data)
 ```
+
+#### Metadata Based Configuration
+
+The method above requires a little extra work to manually specify attributes about the IdP. (And your SP application)
+
+There's an easier method -- use a metadata exchange.  Metadata is just an XML file that defines the capabilities of both the IdP and the SP application.  It also contains the X.509 public key certificates which add to the trusted relationship.  The IdP administrator can also configure custom settings for an SP based on the metadata.
+
+Using ````parse_remote```` IdP metadata can be obtained and added to the settings withouth further ado.
+
+``
+idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata')
+``
+
+If the Metadata contains several entities, the relevant EntityDescriptor can be specified when retrieving the settings from the IdpMetadataParser by its Entity Id value:
+
+idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote(https://example.com/metadatas, entity_id='idp_entity_id')
+
 
 #### How load the library ####
 
@@ -777,6 +822,26 @@ else:
 ```
 
 
+### SP Key rollover ###
+
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
+
+### IdP with multiple certificates ###
+
+In some scenarios the IdP uses different certificates for
+signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
+
+In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+
+When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+
+The 'x509certMulti' is an array with 2 keys:
+- 'signing'. An array of certs that will be used to validate IdP signature 
+- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP.
+
+
 ### Main classes and methods ###
 
 Described below are the main classes and methods that can be invoked from the SAML2 library.
@@ -884,6 +949,7 @@ Configuration of the OneLogin Python Toolkit
 * ***check_sp_certs*** Checks if the x509 certs of the SP exists and are valid.
 * ***get_sp_key*** Returns the x509 private key of the SP.
 * ***get_sp_cert*** Returns the x509 public cert of the SP.
+* ***get_sp_cert_new*** Returns the future x509 public cert of the SP.
 * ***get_idp_cert*** Returns the x509 public cert of the IdP.
 * ***get_sp_data*** Gets the SP data.
 * ***get_idp_data*** Gets the IdP data.
@@ -891,7 +957,9 @@ Configuration of the OneLogin Python Toolkit
 * ***get_contacts*** Gets contacts data.
 * ***get_organization*** Gets organization data.
 * ***format_idp_cert*** Formats the IdP cert.
+* ***format_idp_cert_multi*** Formats all registered IdP certs.
 * ***format_sp_cert*** Formats the SP cert.
+* ***format_sp_cert_new*** Formats the SP cert new.
 * ***format_sp_key*** Formats the private key.
 * ***set_strict*** Activates or deactivates the strict mode.
 * ***is_strict*** Returns if the 'strict' mode is active.

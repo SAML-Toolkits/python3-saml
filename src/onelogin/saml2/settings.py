@@ -120,7 +120,11 @@ class OneLogin_Saml2_Settings(object):
             )
 
         self.format_idp_cert()
+        if 'x509certMulti' in self.__idp:
+            self.format_idp_cert_multi()
         self.format_sp_cert()
+        if 'x509certNew' in self.__sp:
+            self.format_sp_cert_new()
         self.format_sp_key()
 
     def __load_paths(self, base_path=None):
@@ -366,14 +370,21 @@ class OneLogin_Saml2_Settings(object):
                     exists_x509 = bool(idp.get('x509cert'))
                     exists_fingerprint = bool(idp.get('certFingerprint'))
 
+                    exists_multix509sign = 'x509certMulti' in idp and \
+                        'signing' in idp['x509certMulti'] and \
+                        idp['x509certMulti']['signing']
+                    exists_multix509enc = 'x509certMulti' in idp and \
+                        'encryption' in idp['x509certMulti'] and \
+                        idp['x509certMulti']['encryption']
+
                     want_assert_sign = bool(security.get('wantAssertionsSigned'))
                     want_mes_signed = bool(security.get('wantMessagesSigned'))
                     nameid_enc = bool(security.get('nameIdEncrypted'))
 
                     if (want_assert_sign or want_mes_signed) and \
-                            not(exists_x509 or exists_fingerprint):
+                            not(exists_x509 or exists_fingerprint or exists_multix509sign):
                         errors.append('idp_cert_or_fingerprint_not_found_and_required')
-                    if nameid_enc and not exists_x509:
+                    if nameid_enc and not (exists_x509 or exists_multix509enc):
                         errors.append('idp_cert_not_found_and_required')
         return errors
 
@@ -523,6 +534,22 @@ class OneLogin_Saml2_Settings(object):
 
         return cert or None
 
+    def get_sp_cert_new(self):
+        """
+        Returns the x509 public of the SP planned
+        to be used soon instead the other public cert
+        :returns: SP public cert new
+        :rtype: string or None
+        """
+        cert = self.__sp.get('x509certNew')
+        cert_file_name = self.__paths['cert'] + 'sp_new.crt'
+
+        if not cert and exists(cert_file_name):
+            with open(cert_file_name) as f:
+                cert = f.read()
+
+        return cert or None
+
     def get_idp_cert(self):
         """
         Returns the x509 public cert of the IdP.
@@ -589,6 +616,10 @@ class OneLogin_Saml2_Settings(object):
             self.__security['metadataCacheDuration'],
             self.get_contacts(), self.get_organization()
         )
+
+        cert_new = self.get_sp_cert_new()
+        metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert_new)
+
         cert = self.get_sp_cert()
         metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert)
 
@@ -693,11 +724,30 @@ class OneLogin_Saml2_Settings(object):
         """
         self.__idp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509cert'])
 
+    def format_idp_cert_multi(self):
+        """
+        Formats the Multple IdP certs.
+        """
+        if 'x509certMulti' in self.__idp:
+            if 'signing' in self.__idp['x509certMulti']:
+                for idx in range(len(self.__idp['x509certMulti']['signing'])):
+                    self.__idp['x509certMulti']['signing'][idx] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509certMulti']['signing'][idx])
+
+            if 'encryption' in self.__idp['x509certMulti']:
+                for idx in range(len(self.__idp['x509certMulti']['encryption'])):
+                    self.__idp['x509certMulti']['encryption'][idx] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509certMulti']['encryption'][idx])
+
     def format_sp_cert(self):
         """
         Formats the SP cert.
         """
         self.__sp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509cert'])
+
+    def format_sp_cert_new(self):
+        """
+        Formats the SP cert.
+        """
+        self.__sp['x509certNew'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509certNew'])
 
     def format_sp_key(self):
         """

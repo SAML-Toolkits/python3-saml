@@ -20,7 +20,8 @@ except ImportError:
 
 
 class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -29,8 +30,15 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         else:
             return self.assertRegexpMatches(text, regexp, msg)
 
-    def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+    # assertRaisesRegexp deprecated on python3
+    def assertRaisesRegex(self, exception, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRaisesRegex'):
+            return super(OneLogin_Saml2_Logout_Request_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
+        else:
+            return self.assertRaisesRegexp(exception, regexp)
+
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -121,7 +129,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        with self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID'):
+        with self.assertRaisesRegex(Exception, 'Key is required in order to decrypt the NameID'):
             OneLogin_Saml2_Logout_Request.get_nameid(request_2)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
@@ -138,11 +146,11 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         encrypted_id_nodes = dom_2.getElementsByTagName('saml:EncryptedID')
         encrypted_data = encrypted_id_nodes[0].firstChild.nextSibling
         encrypted_id_nodes[0].removeChild(encrypted_data)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the Logout Request'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the Logout Request'):
             OneLogin_Saml2_Logout_Request.get_nameid(dom_2.toxml(), key)
 
         inv_request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'no_nameId.xml'))
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the Logout Request'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the Logout Request'):
             OneLogin_Saml2_Logout_Request.get_nameid(inv_request)
 
         idp_data = settings.get_idp_data()
@@ -165,7 +173,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(name_id, 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c')
 
         request_2 = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_encrypted_nameid.xml'))
-        with self.assertRaisesRegexp(Exception, 'Key is required in order to decrypt the NameID'):
+        with self.assertRaisesRegex(Exception, 'Key is required in order to decrypt the NameID'):
             OneLogin_Saml2_Logout_Request.get_nameid(request_2)
 
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
@@ -246,7 +254,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Logout Request'):
+        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Logout Request'):
             logout_request2.is_valid(request_data, raise_exceptions=True)
 
     def testIsInvalidDestination(self):
@@ -265,7 +273,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-        with self.assertRaisesRegexp(Exception, 'The LogoutRequest was received at'):
+        with self.assertRaisesRegex(Exception, 'The LogoutRequest was received at'):
             logout_request2.is_valid(request_data, raise_exceptions=True)
 
         dom = parseString(request)
@@ -296,7 +304,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         settings.set_strict(True)
         logout_request2 = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
-        with self.assertRaisesRegexp(Exception, 'Could not validate timestamp: expired. Check system clock.'):
+        with self.assertRaisesRegex(Exception, 'Could not validate timestamp: expired. Check system clock.'):
             logout_request2.is_valid(request_data, raise_exceptions=True)
 
     def testIsValid(self):

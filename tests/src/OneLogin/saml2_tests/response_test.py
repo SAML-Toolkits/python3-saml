@@ -20,13 +20,18 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_Response_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
-    def loadSettingsJSON(self, filename=None):
-        if filename:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
+    # assertRaisesRegexp deprecated on python3
+    def assertRaisesRegex(self, exception, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRaisesRegex'):
+            return super(OneLogin_Saml2_Response_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
         else:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+            return self.assertRaisesRegexp(exception, regexp)
+
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -98,14 +103,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_nameid.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_4.get_nameid()
 
         json_settings['security']['wantNameId'] = True
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_5 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_5.get_nameid()
 
         json_settings['security']['wantNameId'] = False
@@ -119,7 +124,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_7 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_7.get_nameid()
 
         json_settings['strict'] = True
@@ -127,12 +132,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_8 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegexp(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
             response_8.get_nameid()
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_nameid.xml.base64'))
         response_9 = OneLogin_Saml2_Response(settings, xml_6)
-        with self.assertRaisesRegexp(Exception, 'An empty NameID value found'):
+        with self.assertRaisesRegex(Exception, 'An empty NameID value found'):
             response_9.get_nameid()
 
     def testReturnNameIdFormat(self):
@@ -155,14 +160,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_nameid.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_4.get_nameid()
 
         json_settings['security']['wantNameId'] = True
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_5 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_5.get_nameid()
 
         json_settings['security']['wantNameId'] = False
@@ -176,7 +181,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_7 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_7.get_nameid()
 
         json_settings['strict'] = True
@@ -184,12 +189,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_8 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegexp(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
             response_8.get_nameid()
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_nameid.xml.base64'))
         response_9 = OneLogin_Saml2_Response(settings, xml_6)
-        with self.assertRaisesRegexp(Exception, 'An empty NameID value found'):
+        with self.assertRaisesRegex(Exception, 'An empty NameID value found'):
             response_9.get_nameid()
 
     def testGetNameIdData(self):
@@ -229,14 +234,14 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_nameid.xml.base64'))
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_4.get_nameid_data()
 
         json_settings['security']['wantNameId'] = True
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_5 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_5.get_nameid_data()
 
         json_settings['security']['wantNameId'] = False
@@ -250,7 +255,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_7 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_7.get_nameid_data()
 
         json_settings['security']['wantNameId'] = False
@@ -264,7 +269,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
 
         response_7 = OneLogin_Saml2_Response(settings, xml_4)
-        with self.assertRaisesRegexp(Exception, 'NameID not found in the assertion of the Response'):
+        with self.assertRaisesRegex(Exception, 'NameID not found in the assertion of the Response'):
             response_7.get_nameid_data()
 
         json_settings['strict'] = True
@@ -272,12 +277,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_8 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegexp(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
             response_8.get_nameid_data()
 
         xml_6 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'empty_nameid.xml.base64'))
         response_9 = OneLogin_Saml2_Response(settings, xml_6)
-        with self.assertRaisesRegexp(Exception, 'An empty NameID value found'):
+        with self.assertRaisesRegex(Exception, 'An empty NameID value found'):
             response_9.get_nameid_data()
 
     def testCheckStatus(self):
@@ -295,12 +300,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'status_code_responder.xml.base64'))
         response_2 = OneLogin_Saml2_Response(settings, xml_2)
-        with self.assertRaisesRegexp(Exception, 'The status code of the Response was not Success, was Responder'):
+        with self.assertRaisesRegex(Exception, 'The status code of the Response was not Success, was Responder'):
             response_2.check_status()
 
         xml_3 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'status_code_responer_and_msg.xml.base64'))
         response_3 = OneLogin_Saml2_Response(settings, xml_3)
-        with self.assertRaisesRegexp(Exception, 'The status code of the Response was not Success, was Responder -> something_is_wrong'):
+        with self.assertRaisesRegex(Exception, 'The status code of the Response was not Success, was Responder -> something_is_wrong'):
             response_3.check_status()
 
     def testCheckOneCondition(self):
@@ -416,7 +421,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_assertion.xml.base64'))
         response_5 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegexp(Exception, 'Issuer of the Assertion not found or multiple.'):
+        with self.assertRaisesRegex(Exception, 'Issuer of the Assertion not found or multiple.'):
             response_5.get_issuers()
 
     def testGetSessionIndex(self):
@@ -464,7 +469,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'wrapped_response_2.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Invalid Signature Element {urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor SAML Response rejected'):
+        with self.assertRaisesRegex(Exception, 'Invalid Signature Element {urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
         nameid = response.get_nameid()
         self.assertEqual('root@example.com', nameid)
@@ -566,7 +571,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_saml2.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Unsupported SAML version'):
+        with self.assertRaisesRegex(Exception, 'Unsupported SAML version'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testValidateID(self):
@@ -577,7 +582,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_id.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Missing ID attribute on SAML Response'):
+        with self.assertRaisesRegex(Exception, 'Missing ID attribute on SAML Response'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidReference(self):
@@ -591,7 +596,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response.is_valid(self.get_request_data()))
         self.assertEqual('Signature validation failed. SAML Response rejected', response.get_error())
 
-        with self.assertRaisesRegexp(Exception, 'Signature validation failed. SAML Response rejected'):
+        with self.assertRaisesRegex(Exception, 'Signature validation failed. SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidExpired(self):
@@ -607,7 +612,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Could not validate timestamp: expired. Check system clock.'):
+        with self.assertRaisesRegex(Exception, 'Could not validate timestamp: expired. Check system clock.'):
             response_2.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidNoStatement(self):
@@ -665,7 +670,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_key.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Signature validation failed. SAML Response rejected'):
+        with self.assertRaisesRegex(Exception, 'Signature validation failed. SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidMultipleAssertions(self):
@@ -677,7 +682,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'multiple_assertions.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'SAML Response must contain 1 assertion'):
+        with self.assertRaisesRegex(Exception, 'SAML Response must contain 1 assertion'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidEncAttrs(self):
@@ -693,7 +698,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'There is an EncryptedAttribute in the Response and this SP not support them'):
+        with self.assertRaisesRegex(Exception, 'There is an EncryptedAttribute in the Response and this SP not support them'):
             response_2.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidDuplicatedAttrs(self):
@@ -704,7 +709,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'duplicated_attributes.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'Found an Attribute element with duplicated Name'):
+        with self.assertRaisesRegex(Exception, 'Found an Attribute element with duplicated Name'):
             response.get_attributes()
 
     def testIsInValidDestination(self):
@@ -796,11 +801,11 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_3 = OneLogin_Saml2_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Assertion/Response'):
+        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Assertion/Response'):
             response_3.is_valid(request_data, raise_exceptions=True)
 
         response_4 = OneLogin_Saml2_Response(settings, message_2)
-        with self.assertRaisesRegexp(Exception, 'Invalid issuer in the Assertion/Response'):
+        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Assertion/Response'):
             response_4.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidSessionIndex(self):
@@ -825,7 +830,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response'):
+        with self.assertRaisesRegex(Exception, 'The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
     def testDatetimeWithMiliseconds(self):
@@ -916,27 +921,27 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response.is_valid(request_data, raise_exceptions=True)
 
         response_2 = OneLogin_Saml2_Response(settings, message_2)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
         response_3 = OneLogin_Saml2_Response(settings, message_3)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response_3.is_valid(request_data, raise_exceptions=True)
 
         response_4 = OneLogin_Saml2_Response(settings, message_4)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response_4.is_valid(request_data, raise_exceptions=True)
 
         response_5 = OneLogin_Saml2_Response(settings, message_5)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response_5.is_valid(request_data, raise_exceptions=True)
 
         response_6 = OneLogin_Saml2_Response(settings, message_6)
-        with self.assertRaisesRegexp(Exception, 'A valid SubjectConfirmation was not found on this Response'):
+        with self.assertRaisesRegex(Exception, 'A valid SubjectConfirmation was not found on this Response'):
             response_6.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidRequestId(self):
@@ -962,7 +967,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
-        with self.assertRaisesRegexp(Exception, 'The InResponseTo of the Response'):
+        with self.assertRaisesRegex(Exception, 'The InResponseTo of the Response'):
             response.is_valid(request_data, request_id, raise_exceptions=True)
 
         valid_request_id = '_57bcbf70-7b1f-012e-c821-782bcb13bb38'
@@ -1007,7 +1012,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['security']['wantAssertionsSigned'] = True
         settings_4 = OneLogin_Saml2_Settings(settings_info)
         response_4 = OneLogin_Saml2_Response(settings_4, message)
-        with self.assertRaisesRegexp(Exception, 'The Assertion of the Response is not signed and the SP require it'):
+        with self.assertRaisesRegex(Exception, 'The Assertion of the Response is not signed and the SP require it'):
             response_4.is_valid(request_data, raise_exceptions=True)
 
         settings_info['security']['wantAssertionsSigned'] = False
@@ -1035,7 +1040,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings_info['security']['wantMessagesSigned'] = True
         settings_8 = OneLogin_Saml2_Settings(settings_info)
         response_8 = OneLogin_Saml2_Response(settings_8, message)
-        with self.assertRaisesRegexp(Exception, 'The Message of the Response is not signed and the SP require it'):
+        with self.assertRaisesRegex(Exception, 'The Message of the Response is not signed and the SP require it'):
             response_8.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidEncIssues(self):
@@ -1117,7 +1122,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
 
-        with self.assertRaisesRegexp(Exception, 'Signature validation failed. SAML Response rejected'):
+        with self.assertRaisesRegex(Exception, 'Signature validation failed. SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
     def testIsInValidCert2(self):
@@ -1410,5 +1415,5 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'status_code_responder.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegexp(Exception, 'The status code of the Response was not Success, was Responder'):
+        with self.assertRaisesRegex(Exception, 'The status code of the Response was not Success, was Responder'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)

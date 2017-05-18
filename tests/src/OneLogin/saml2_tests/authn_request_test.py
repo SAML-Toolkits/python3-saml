@@ -22,6 +22,7 @@ except ImportError:
 
 
 class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -30,8 +31,8 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         else:
             return self.assertRegexpMatches(text, regexp, msg)
 
-    def loadSettingsJSON(self, filename='settings1.json'):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -90,7 +91,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
 
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         inflated = authn_request.get_xml()
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertIn('ProviderName="SP test"', inflated)
 
         saml_settings['organization'] = {}
@@ -98,7 +99,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
 
         authn_request = OneLogin_Saml2_Authn_Request(settings)
         inflated = authn_request.get_xml()
-        self.assertRegexpMatches(inflated, '^<samlp:AuthnRequest')
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
         self.assertNotIn('ProviderName="SP test"', inflated)
 
     def testCreateRequestAuthContext(self):

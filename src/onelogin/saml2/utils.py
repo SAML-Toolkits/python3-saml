@@ -760,7 +760,7 @@ class OneLogin_Saml2_Utils(object):
 
     @staticmethod
     @return_false_on_exception
-    def validate_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False, xpath=None):
+    def validate_sign(xml, cert=None, fingerprint=None, fingerprintalg='sha1', validatecert=False, debug=False, xpath=None, multicerts=None):
         """
         Validates a signature (Message or Assertion).
 
@@ -785,6 +785,9 @@ class OneLogin_Saml2_Utils(object):
         :param xpath: The xpath of the signed element
         :type: string
 
+        :param multicerts: Multiple public certs
+        :type: list
+
         :param raise_exceptions: Whether to return false on failure or raise an exception
         :type raise_exceptions: Boolean
         """
@@ -805,8 +808,21 @@ class OneLogin_Saml2_Utils(object):
 
         if len(signature_nodes) == 1:
             signature_node = signature_nodes[0]
-            # Raises expection if invalid
-            return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
+
+            if not multicerts:
+                return OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
+            else:
+                # If multiple certs are provided, I may ignore cert and
+                # fingerprint provided by the method and just check the
+                # certs multicerts
+                fingerprint = fingerprintalg = None
+                for cert in multicerts:
+                    if OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, False, raise_exceptions=False):
+                        return True
+                raise OneLogin_Saml2_ValidationError(
+                    'Signature validation failed. SAML Response rejected.',
+                    OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
+                )
         else:
             raise OneLogin_Saml2_ValidationError(
                 'Expected exactly one signature node; got {}.'.format(len(signature_nodes)),

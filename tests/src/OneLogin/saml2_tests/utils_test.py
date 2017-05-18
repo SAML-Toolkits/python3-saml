@@ -17,13 +17,18 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_Utils_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
+    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
 
-    def loadSettingsJSON(self, filename=None):
-        if filename:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', filename)
+    # assertRegexpMatches deprecated on python3
+    def assertRaisesRegex(self, exception, regexp, msg=None):
+        if hasattr(unittest.TestCase, 'assertRaisesRegex'):
+            return super(OneLogin_Saml2_Utils_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
         else:
-            filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+            return self.assertRaisesRegexp(exception, regexp)
+
+    def loadSettingsJSON(self, name='settings1.json'):
+        filename = join(self.settings_path, name)
         if exists(filename):
             stream = open(filename, 'r')
             settings = json.load(stream)
@@ -391,14 +396,14 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_inv = b64decode(xml_inv)
         dom_inv = etree.fromstring(xml_inv)
 
-        with self.assertRaisesRegexp(Exception, 'Missing Status on response'):
+        with self.assertRaisesRegex(Exception, 'Missing Status on response'):
             OneLogin_Saml2_Utils.get_status(dom_inv)
 
         xml_inv2 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_status_code.xml.base64'))
         xml_inv2 = b64decode(xml_inv2)
         dom_inv2 = etree.fromstring(xml_inv2)
 
-        with self.assertRaisesRegexp(Exception, 'Missing Status Code on response'):
+        with self.assertRaisesRegex(Exception, 'Missing Status Code on response'):
             OneLogin_Saml2_Utils.get_status(dom_inv2)
 
     def testParseDuration(self):

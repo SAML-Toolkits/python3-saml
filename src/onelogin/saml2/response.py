@@ -471,6 +471,33 @@ class OneLogin_Saml2_Response(object):
             not_on_or_after = OneLogin_Saml2_Utils.parse_SAML_to_time(authn_statement_nodes[0].get('SessionNotOnOrAfter'))
         return not_on_or_after
 
+    # Created new function logic from is_valid() to return the NotOnOrAfter date.
+    def get_nooa(self):
+        """
+        Gets the SessionNotOnOrAfter from the AuthnStatement
+        Could be used to set the local session expiration
+
+        :returns: The SessionNotOnOrAfter value
+        :rtype: time|None
+        """
+
+        nooa_value = None
+
+        subject_confirmation_nodes = self.__query_assertion('/saml:Subject/saml:SubjectConfirmation')
+        for scn in subject_confirmation_nodes:
+            method = scn.get('Method', None)
+            if method and method != OneLogin_Saml2_Constants.CM_BEARER:
+                continue
+        
+            sc_data = scn.find('saml:SubjectConfirmationData', namespaces=OneLogin_Saml2_Constants.NSMAP)
+            if sc_data is None:
+                continue
+            else:
+                nooa_value = sc_data.get('NotOnOrAfter', None)
+        return nooa_value
+
+
+
     def get_session_index(self):
         """
         Gets the SessionIndex from the AuthnStatement

@@ -103,7 +103,8 @@ class OneLogin_Saml2_Auth(object):
                 self.__nameid = response.get_nameid()
                 self.__nameid_format = response.get_nameid_format()
                 self.__session_index = response.get_session_index()
-                self.__session_expiration = response.get_session_not_on_or_after()
+                #self.__session_expiration = response.get_session_not_on_or_after()
+                self.__session_expiration = response.get_nooa()
                 self.__authenticated = True
 
             else:

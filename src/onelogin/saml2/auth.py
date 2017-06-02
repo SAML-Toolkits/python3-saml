@@ -146,6 +146,10 @@ class OneLogin_Saml2_Auth(object):
             elif not keep_local_session:
                 OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
+            if 'RelayState' in get_data:
+                return get_data['RelayState']
+
+
         elif get_data and 'SAMLRequest' in get_data:
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
             self.__last_request = logout_request.get_xml()

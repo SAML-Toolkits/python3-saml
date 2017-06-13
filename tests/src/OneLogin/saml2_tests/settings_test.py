@@ -437,14 +437,14 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         metadata = compat.to_string(settings.get_sp_metadata())
         self.assertNotEqual(len(metadata), 0)
         self.assertIn('<md:SPSSODescriptor', metadata)
-        self.assertEquals(2, metadata.count('<md:KeyDescriptor'))
-        self.assertEquals(2, metadata.count('<md:KeyDescriptor use="signing"'))
-        self.assertEquals(0, metadata.count('<md:KeyDescriptor use="encryption"'))
+        self.assertEqual(2, metadata.count('<md:KeyDescriptor'))
+        self.assertEqual(2, metadata.count('<md:KeyDescriptor use="signing"'))
+        self.assertEqual(0, metadata.count('<md:KeyDescriptor use="encryption"'))
 
         settings_info['security']['wantNameIdEncrypted'] = True
         settings_info['security']['wantAssertionsEncrypted'] = False
         settings = OneLogin_Saml2_Settings(settings_info)
-        metadata = settings.get_sp_metadata()
+        metadata = compat.to_string(settings.get_sp_metadata())
         self.assertEqual(4, metadata.count('<md:KeyDescriptor'))
         self.assertEqual(2, metadata.count('<md:KeyDescriptor use="signing"'))
         self.assertEqual(2, metadata.count('<md:KeyDescriptor use="encryption"'))

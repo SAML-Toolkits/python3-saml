@@ -1,6 +1,6 @@
 # python3-saml changelog
 ### 1.2.5 (Jun 2, 2017)
-* Fix issue related with multicers (multicerts were not used on response view)
+* Fix issue related with multicers (multicerts were not used on response validation)
 ### 1.2.4 (May 18, 2017)
 * Publish KeyDescriptor[use=encryption] only when required
 * [#57](https://github.com/onelogin/python3-saml/pull/57) Be able to register future SP x509cert on the settings and publish it on SP metadata

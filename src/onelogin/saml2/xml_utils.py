@@ -11,6 +11,7 @@ Auxiliary class of OneLogin's Python Toolkit.
 
 from os.path import join, dirname
 from lxml import etree
+from defusedxml.lxml import tostring, fromstring
 from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
@@ -21,10 +22,10 @@ for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
 
 class OneLogin_Saml2_XML(object):
     _element_class = type(etree.Element('root'))
-    _parse_etree = staticmethod(etree.fromstring)
+    _parse_etree = staticmethod(fromstring)
     _schema_class = etree.XMLSchema
     _text_class = compat.text_types
-    _unparse_etree = staticmethod(etree.tostring)
+    _unparse_etree = staticmethod(tostring)
 
     dump = staticmethod(etree.dump)
     make_root = staticmethod(etree.Element)

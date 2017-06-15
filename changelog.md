@@ -1,4 +1,7 @@
 # python3-saml changelog
+### 1.2.6 (Jun 15, 2017)
+* Use defusedxml that will prevent XEE and other attacks based on the abuse on XMLs. (CVE-2017-9672)
+
 ### 1.2.5 (Jun 2, 2017)
 * Fix issue related with multicers (multicerts were not used on response validation)
 ### 1.2.4 (May 18, 2017)

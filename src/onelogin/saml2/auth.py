@@ -13,6 +13,7 @@ Initializes the SP SAML instance
 
 import xmlsec
 from lxml import etree
+from defusedxml.lxml import tostring
 
 from onelogin.saml2 import compat
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
@@ -606,7 +607,7 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(self.__last_response, compat.str_type):
                 response = self.__last_response
             else:
-                response = etree.tostring(self.__last_response, encoding='unicode', pretty_print=pretty_print_if_possible)
+                response = tostring(self.__last_response, encoding='unicode', pretty_print=pretty_print_if_possible)
         return response
 
     def get_last_request_xml(self):

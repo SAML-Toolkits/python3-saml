@@ -14,6 +14,8 @@ This version supports Python3, There is a separate version that only support Pyt
 
 #### Warning ####
 
+Release 1.2.6 adds the use defusedxml that will prevent XEE and other attacks based on the abuse of XML. (CVE-2017-9672)
+
 Update python3-saml to >= 1.2.1, 1.2.0 had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). [CVE-2016-1000251](https://github.com/distributedweaknessfiling/DWF-Database-Artifacts/blob/master/DWF/2016/1000251/CVE-2016-1000251.json)
 
 1.2.0 version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
@@ -80,7 +82,9 @@ Installation
 
  * python 2.7 // python 3.3
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
- * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/duration parser and formatter
+ * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
+ duration parser and formatter
+ * [defusedxml](https://pypi.python.org/pypi/defusedxml) XML bomb protection for Python stdlib modules
 
 Review the setup.py file to know the version of the library that python3-saml is using
 

@@ -12,7 +12,6 @@ Initializes the SP SAML instance
 """
 
 import xmlsec
-from lxml import etree
 from defusedxml.lxml import tostring
 
 from onelogin.saml2 import compat

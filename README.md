@@ -828,7 +828,7 @@ else:
 
 ### SP Key rollover ###
 
-If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as settings['sp']['x509certNew'] and it will be 
 published on the SP metadata so Identity Providers can read them and get ready for rollover.
 
 
@@ -837,7 +837,7 @@ published on the SP metadata so Identity Providers can read them and get ready f
 In some scenarios the IdP uses different certificates for
 signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
 
-In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+In order to handle that the toolkit offers the settings['idp']['x509certMulti'] parameter.
 
 When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
 

@@ -1259,3 +1259,46 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_slo()
         self.assertEqual(response, auth.get_last_response_xml())
+
+    def testGetLastMessageAndAssertionId(self):
+        """
+        Tests the get_last_message_id and get_last_assertion_id of the OneLogin_Saml2_Auth class
+        Case Valid Response
+        """
+        request_data = self.get_request()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+
+        auth.process_response()
+        self.assertEqual(auth.get_last_message_id(), 'pfxcc31568b-c46d-ff75-ba2e-5303484980da')
+        self.assertEqual(auth.get_last_assertion_id(), 'pfx08c2a6bb-7ee4-8dc2-8fe2-f055eed93de4')
+
+    def testGetIdFromLogoutRequest(self):
+        """
+        Tests the get_last_message_id of the OneLogin_Saml2_Auth class
+        Case Valid Logout request
+        """
+        settings = self.loadSettingsJSON()
+        request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
+        message = OneLogin_Saml2_Utils.deflate_and_base64_encode(request)
+        message_wrapper = {'get_data': {'SAMLRequest': message}}
+        auth = OneLogin_Saml2_Auth(message_wrapper, old_settings=settings)
+        auth.process_slo()
+        self.assertIn(auth.get_last_message_id(), 'ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e')
+
+    def testGetIdFromLogoutResponse(self):
+        """
+        Tests the get_last_message_id of the OneLogin_Saml2_Auth class
+        Case Valid Logout response
+        """
+        settings = self.loadSettingsJSON()
+        response = self.file_contents(join(self.data_path, 'logout_responses', 'logout_response.xml'))
+        message = OneLogin_Saml2_Utils.deflate_and_base64_encode(response)
+        message_wrapper = {'get_data': {'SAMLResponse': message}}
+        auth = OneLogin_Saml2_Auth(message_wrapper, old_settings=settings)
+        auth.process_slo()
+        self.assertIn(auth.get_last_message_id(), '_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859')

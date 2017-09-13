@@ -61,6 +61,8 @@ class OneLogin_Saml2_Auth(object):
         self.__errors = []
         self.__error_reason = None
         self.__last_request_id = None
+        self.__last_message_id = None
+        self.__last_assertion_id = None
         self.__last_request = None
         self.__last_response = None
 
@@ -104,6 +106,8 @@ class OneLogin_Saml2_Auth(object):
                 self.__nameid_format = response.get_nameid_format()
                 self.__session_index = response.get_session_index()
                 self.__session_expiration = response.get_session_not_on_or_after()
+                self.__last_message_id = response.get_id()
+                self.__last_assertion_id = response.get_assertion_id()
                 self.__authenticated = True
 
             else:
@@ -143,8 +147,10 @@ class OneLogin_Saml2_Auth(object):
                 self.__error_reason = logout_response.get_error()
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
                 self.__errors.append('logout_not_success')
-            elif not keep_local_session:
-                OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
+            else:
+                self.__last_message_id = logout_response.id
+                if not keep_local_session:
+                    OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
         elif get_data and 'SAMLRequest' in get_data:
             logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
@@ -160,6 +166,7 @@ class OneLogin_Saml2_Auth(object):
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
                 in_response_to = logout_request.id
+                self.__last_message_id = logout_request.id
                 response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
                 response_builder.build(in_response_to)
                 self.__last_response = response_builder.get_xml()
@@ -285,6 +292,20 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         return self.__last_request_id
+
+    def get_last_message_id(self):
+        """
+        :returns: The ID of the last Response SAML message processed.
+        :rtype: string
+        """
+        return self.__last_message_id
+
+    def get_last_assertion_id(self):
+        """
+        :returns: The ID of the last assertion processed.
+        :rtype: string
+        """
+        return self.__last_assertion_id
 
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
         """

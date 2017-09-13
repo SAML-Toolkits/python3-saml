@@ -786,3 +786,22 @@ class OneLogin_Saml2_Response(object):
             return self.decrypted_document
         else:
             return self.document
+
+    def get_id(self):
+        """
+        :returns: the ID of the response
+        :rtype: string
+        """
+        return self.document.get('ID', None)
+
+    def get_assertion_id(self):
+        """
+        :returns: the ID of the assertion in the response
+        :rtype: string
+        """
+        if not self.validate_num_assertions():
+            raise OneLogin_Saml2_ValidationError(
+                'SAML Response must contain 1 assertion',
+                OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS
+            )
+        return self.__query_assertion('')[0].get('ID', None)

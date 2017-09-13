@@ -1223,7 +1223,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         expectedFragment = (
             '  Destination="http://idp.example.com/SingleLogoutService.php">\n'
             '    <saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>\n'
-            '    <saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://idp.example.com/</saml:NameID>\n'
+            '    <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://idp.example.com/</saml:NameID>\n'
             '    \n</samlp:LogoutRequest>'
         )
         self.assertIn(expectedFragment, auth.get_last_request_xml())

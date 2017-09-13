@@ -72,12 +72,17 @@ class OneLogin_Saml2_Logout_Request(object):
                     cert = idp_data['x509cert']
 
             if name_id is not None:
-                if name_id_format is None:
+                if not name_id_format:
                     name_id_format = sp_data['NameIDFormat']
-                sp_name_qualifier = None
             else:
-                name_id = idp_data['entityId']
                 name_id_format = OneLogin_Saml2_Constants.NAMEID_ENTITY
+
+            sp_name_qualifier = None
+            if name_id_format == OneLogin_Saml2_Constants.NAMEID_ENTITY:
+                name_id = idp_data['entityId']
+                nq = None
+            elif nq is not None:
+                # We only gonna include SPNameQualifier if NameQualifier is provided
                 sp_name_qualifier = sp_data['entityId']
 
             name_id_obj = OneLogin_Saml2_Utils.generate_name_id(

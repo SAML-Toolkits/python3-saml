@@ -765,15 +765,23 @@ target_url = 'https://example.com'
 auth.logout(return_to=target_url)
 ```
 
-Also there are 2 optional parameters that can be set:
+Also there are 4 optional parameters that can be set:
 
 * name_id. That will be used to build the LogoutRequest. If not name_id parameter is set and the auth object processed a
 SAML Response with a NameId, then this NameId will be used.
 * session_index. SessionIndex that identifies the session of the user.
+* nq. IDP Name Qualifier
+* name_id_format. The NameID Format that will be set in the LogoutRequest
+
+If no name_id is provided, the LogoutRequest will contain a NameID with the entity Format.
+If name_id is provided and no name_id_format is provided, the NameIDFormat of the settings will be used.
+If nq is provided, the SPNameQualifier will be also attached to the NameId.
 
 If a match on the LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored for future validation, we can get that ID by
 
+```python
 auth.get_last_request_id()
+```
 
 ####Example of a view that initiates the SSO request and handles the response (is the acs target)####
 

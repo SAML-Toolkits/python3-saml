@@ -125,7 +125,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIsNone(auth2.get_session_expiration())
 
         auth2.process_response()
-        self.assertEqual(1392802621, auth2.get_session_expiration())
+        self.assertEqual(2655106621, auth2.get_session_expiration())
 
     def testGetLastErrorReason(self):
         """
@@ -1179,6 +1179,21 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth.process_slo()
         self.assertIn('Signature validation failed. Logout Request rejected', auth.get_errors())
 
+    def testGetLastRequestID(self):
+        settings_info = self.loadSettingsJSON()
+        request_data = self.get_request()
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
+
+        auth.login()
+        id1 = auth.get_last_request_id()
+        self.assertNotEqual(id1, None)
+
+        auth.logout()
+        id2 = auth.get_last_request_id()
+        self.assertNotEqual(id2, None)
+
+        self.assertNotEqual(id1, id2)
+
     def testGetLastSAMLResponse(self):
         settings = self.loadSettingsJSON()
         message = self.file_contents(join(self.data_path, 'responses', 'signed_message_response.xml.base64'))
@@ -1260,22 +1275,45 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth.process_slo()
         self.assertEqual(response, auth.get_last_response_xml())
 
-    def testGetLastMessageAndAssertionId(self):
+    def testGetInfoFromLastResponseReceived(self):
         """
-        Tests the get_last_message_id and get_last_assertion_id of the OneLogin_Saml2_Auth class
-        Case Valid Response
+        Tests the get_last_message_id, get_last_assertion_id and get_last_assertion_not_on_or_after
+        of the OneLogin_Saml2_Auth class
         """
+        settings = self.loadSettingsJSON()
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
         del request_data['get_data']
         request_data['post_data'] = {
             'SAMLResponse': message
         }
-        auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
 
         auth.process_response()
-        self.assertEqual(auth.get_last_message_id(), 'pfxcc31568b-c46d-ff75-ba2e-5303484980da')
-        self.assertEqual(auth.get_last_assertion_id(), 'pfx08c2a6bb-7ee4-8dc2-8fe2-f055eed93de4')
+        self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
+        self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
+        self.assertIsNone(auth.get_last_assertion_not_on_or_after())
+
+        # NotOnOrAfter is only calculated with strict = true
+        # If invalid, response id and assertion id are not obtained
+
+        settings['strict'] = True
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertNotEqual(len(auth.get_errors()), 0)
+        self.assertIsNone(auth.get_last_message_id())
+        self.assertIsNone(auth.get_last_assertion_id())
+        self.assertIsNone(auth.get_last_assertion_not_on_or_after())
+
+        request_data['https'] = 'on'
+        request_data['http_host'] = 'pitbulk.no-ip.org'
+        request_data['script_name'] = '/newonelogin/demo1/index.php?acs'
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_response()
+        self.assertEqual(len(auth.get_errors()), 0)
+        self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
+        self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
+        self.assertEqual(auth.get_last_assertion_not_on_or_after(), 2671081021)
 
     def testGetIdFromLogoutRequest(self):
         """

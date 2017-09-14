@@ -854,6 +854,13 @@ The 'x509certMulti' is an array with 2 keys:
 - 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP.
 
 
+### Replay attacks ###
+
+In order to avoid replay attacks, you can store the ID of the SAML messages already processed, to avoid processing them twice. Since the Messages expires and will be invalidated due that fact, you don't need to store those IDs longer than the time frame that you currently accepting.
+
+Get the ID of the last processed message/assertion with the get_last_message_id/get_last_assertion_id method of the Auth object.
+
+
 ### Main classes and methods ###
 
 Described below are the main classes and methods that can be invoked from the SAML2 library.
@@ -885,6 +892,9 @@ Main class of OneLogin Python Toolkit
 * ***set_strict*** Set the strict mode active/disable.
 * ***get_last_request_xml*** Returns the most recently-constructed/processed XML SAML request (AuthNRequest, LogoutRequest)
 * ***get_last_response_xml*** Returns the most recently-constructed/processed XML SAML response (SAMLResponse, LogoutResponse). If the SAMLResponse had an encrypted assertion, decrypts it.
+* ***get_last_message_id*** The ID of the last Response SAML message processed.
+* ***get_last_assertion_id*** The ID of the last assertion processed.
+* ***get_last_assertion_not_on_or_after*** The NotOnOrAfter value of the valid SubjectConfirmationData node (if any) of the last assertion processed (is only calculated with strict = true)
 
 ####OneLogin_Saml2_Auth - authn_request.py####
 
@@ -913,6 +923,9 @@ SAML 2 Authentication Response class
 * ***validate_timestamps*** Verifies that the document is valid according to Conditions Element
 * ***get_error*** After execute a validation process, if fails this method returns the cause
 * ***get_xml_document*** Returns the SAML Response document (If contains an encrypted assertion, decrypts it).
+* ***get_id*** the ID of the response
+* ***get_assertion_id*** the ID of the assertion in the response
+* ***get_assertion_not_on_or_after*** the NotOnOrAfter value of the valid SubjectConfirmationData if any
 
 ####OneLogin_Saml2_LogoutRequest - logout_request.py####
 

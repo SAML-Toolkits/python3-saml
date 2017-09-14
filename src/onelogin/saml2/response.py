@@ -39,6 +39,7 @@ class OneLogin_Saml2_Response(object):
         self.document = OneLogin_Saml2_XML.to_etree(self.response)
         self.decrypted_document = None
         self.encrypted = None
+        self.valid_scd_not_on_or_after = None
 
         # Quick check for the presence of EncryptedAssertion
         encrypted_assertion_nodes = self.__query('/samlp:Response/saml:EncryptedAssertion')
@@ -245,6 +246,10 @@ class OneLogin_Saml2_Response(object):
                             parsed_nb = OneLogin_Saml2_Utils.parse_SAML_to_time(nb)
                             if parsed_nb > OneLogin_Saml2_Utils.now():
                                 continue
+
+                        if nooa:
+                            self.valid_scd_not_on_or_after = OneLogin_Saml2_Utils.parse_SAML_to_time(nooa)
+
                         any_subject_confirmation = True
                         break
 
@@ -474,6 +479,12 @@ class OneLogin_Saml2_Response(object):
         if authn_statement_nodes:
             not_on_or_after = OneLogin_Saml2_Utils.parse_SAML_to_time(authn_statement_nodes[0].get('SessionNotOnOrAfter'))
         return not_on_or_after
+
+    def get_assertion_not_on_or_after(self):
+        """
+        Returns the NotOnOrAfter value of the valid SubjectConfirmationData node if any
+        """
+        return self.valid_scd_not_on_or_after
 
     def get_session_index(self):
         """

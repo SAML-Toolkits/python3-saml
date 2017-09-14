@@ -1417,3 +1417,52 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, 'The status code of the Response was not Success, was Responder'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
+
+    def testGetId(self):
+        """
+        Tests that we can retrieve the ID of the Response
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        xml = self.file_contents(join(self.data_path, 'responses', 'signed_message_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertEqual(response.get_id(), 'pfxc3d2b542-0f7e-8767-8e87-5b0dc6913375')
+
+    def testGetAssertionId(self):
+        """
+        Tests that we can retrieve the ID of the Assertion
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        xml = self.file_contents(join(self.data_path, 'responses', 'signed_message_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertEqual(response.get_assertion_id(), '_cccd6024116641fe48e0ae2c51220d02755f96c98d')
+
+    def testGetAssertionNotOnOrAfter(self):
+        """
+        Tests that we can retrieve the NotOnOrAfter value of
+        the valid SubjectConfirmationData
+        """
+        settings_data = self.loadSettingsJSON()
+        request_data = self.get_request_data()
+        settings = OneLogin_Saml2_Settings(settings_data)
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, message)
+        self.assertIsNone(response.get_assertion_not_on_or_after())
+
+        response.is_valid(request_data)
+        self.assertIsNone(response.get_error())
+        self.assertIsNone(response.get_assertion_not_on_or_after())
+
+        settings_data['strict'] = True
+        settings = OneLogin_Saml2_Settings(settings_data)
+        response = OneLogin_Saml2_Response(settings, message)
+
+        response.is_valid(request_data)
+        self.assertNotEqual(response.get_error(), None)
+        self.assertIsNone(response.get_assertion_not_on_or_after())
+
+        request_data['https'] = 'on'
+        request_data['http_host'] = 'pitbulk.no-ip.org'
+        request_data['script_name'] = '/newonelogin/demo1/index.php?acs'
+        response.is_valid(request_data)
+        self.assertIsNone(response.get_error())
+        self.assertEqual(response.get_assertion_not_on_or_after(), 2671081021)

@@ -65,6 +65,7 @@ class OneLogin_Saml2_Auth(object):
         self.__last_assertion_id = None
         self.__last_request = None
         self.__last_response = None
+        self.__last_assertion_not_on_or_after = None
 
     def get_settings(self):
         """
@@ -109,6 +110,7 @@ class OneLogin_Saml2_Auth(object):
                 self.__last_message_id = response.get_id()
                 self.__last_assertion_id = response.get_assertion_id()
                 self.__authenticated = True
+                self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
 
             else:
                 self.__errors.append('invalid_response')
@@ -254,6 +256,13 @@ class OneLogin_Saml2_Auth(object):
         :rtype: DateTime|None
         """
         return self.__session_expiration
+
+    def get_last_assertion_not_on_or_after(self):
+        """
+        The NotOnOrAfter value of the valid SubjectConfirmationData node
+        (if any) of the last assertion processed
+        """
+        return self.__last_assertion_not_on_or_after
 
     def get_errors(self):
         """

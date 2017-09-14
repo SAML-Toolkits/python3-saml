@@ -95,6 +95,7 @@ class OneLogin_Saml2_Auth(object):
         :raises: OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND, when a POST with a SAMLResponse is not found
         """
         self.__errors = []
+        self.__error_reason = None
 
         if 'post_data' in self.__request_data and 'SAMLResponse' in self.__request_data['post_data']:
             # AuthnResponse -- HTTP_POST Binding
@@ -136,6 +137,7 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection url
         """
         self.__errors = []
+        self.__error_reason = None
 
         get_data = 'get_data' in self.__request_data and self.__request_data['get_data']
         if get_data and 'SAMLResponse' in get_data:

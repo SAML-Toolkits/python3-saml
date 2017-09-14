@@ -200,7 +200,9 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     data['sp']['NameIDFormat'] = idp_name_id_format
 
                 if certs is not None:
-                    if len(certs) == 1 or \
+                    if (len(certs) == 1 and
+                        (('signing' in certs and len(certs['signing']) == 1) or
+                         ('encryption' in certs and len(certs['encryption']) == 1))) or \
                         (('signing' in certs and len(certs['signing']) == 1) and
                          ('encryption' in certs and len(certs['encryption']) == 1 and
                          certs['signing'][0] == certs['encryption'][0])):

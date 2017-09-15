@@ -410,15 +410,17 @@ class OneLogin_Saml2_Response(object):
             nameid_nodes = self.__query_assertion('/saml:Subject/saml:NameID')
             if nameid_nodes:
                 nameid = nameid_nodes[0]
+
+        is_strict = self.__settings.is_strict()
+        want_nameid = self.__settings.get_security_data().get('wantNameId', True)
         if nameid is None:
-            security = self.__settings.get_security_data()
-            if security.get('wantNameId', True):
+            if is_strict and want_nameid:
                 raise OneLogin_Saml2_ValidationError(
                     'NameID not found in the assertion of the Response',
                     OneLogin_Saml2_ValidationError.NO_NAMEID
                 )
         else:
-            if self.__settings.is_strict() and not nameid.text:
+            if is_strict and want_nameid and not nameid.text:
                 raise OneLogin_Saml2_ValidationError(
                     'An empty NameID value found',
                     OneLogin_Saml2_ValidationError.EMPTY_NAMEID
@@ -428,7 +430,7 @@ class OneLogin_Saml2_Response(object):
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
                 value = nameid.get(attr, None)
                 if value:
-                    if self.__settings.is_strict() and attr == 'SPNameQualifier':
+                    if is_strict and attr == 'SPNameQualifier':
                         sp_data = self.__settings.get_sp_data()
                         sp_entity_id = sp_data.get('entityId', '')
                         if sp_entity_id != value:

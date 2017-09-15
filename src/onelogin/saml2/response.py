@@ -778,7 +778,7 @@ class OneLogin_Saml2_Response(object):
                             keyinfo.append(encrypted_key[0])
 
                 encrypted_data = encrypted_data_nodes[0]
-                decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug)
+                decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug=debug, inplace=True)
                 xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml
 

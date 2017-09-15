@@ -8,6 +8,7 @@ import json
 from lxml import etree
 from os.path import dirname, join, exists
 import unittest
+from defusedxml.lxml import fromstring
 from xml.dom.minidom import parseString
 
 from onelogin.saml2 import compat
@@ -613,7 +614,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         encrypted_nameid_nodes = dom_nameid_enc.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
         encrypted_data = encrypted_nameid_nodes[0]
         decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
-        self.assertEqual('{%s}NameID' % OneLogin_Saml2_Constants.NS_SAML, decrypted_nameid.tag)
+        self.assertEqual('saml:NameID', decrypted_nameid.tag)
         self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
 
         xml_assertion_enc = b64decode(self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64')))
@@ -636,24 +637,71 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         key2 = f.read()
         f.close()
 
-        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data, key2)
+        # sp.key and sp2.key are equivalent we should be able to decrypt the nameID again
+        decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key2)
+        self.assertIn('{%s}NameID' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_nameid.tag)
+        self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
 
-        key_3_file_name = join(self.data_path, 'misc', 'sp2.key')
+        key_3_file_name = join(self.data_path, 'misc', 'sp3.key')
         f = open(key_3_file_name, 'r')
         key3 = f.read()
         f.close()
-        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data, key3)
+
+        # sp.key and sp3.key are equivalent we should be able to decrypt the nameID again
+        decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key3)
+        self.assertIn('{%s}NameID' % (OneLogin_Saml2_Constants.NS_SAML), decrypted_nameid.tag)
+        self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
+
+        key_4_file_name = join(self.data_path, 'misc', 'sp4.key')
+        f = open(key_4_file_name, 'r')
+        key4 = f.read()
+        f.close()
+
+        with self.assertRaisesRegex(Exception, "(1, 'failed to decrypt')"):
+            OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key4)
+
         xml_nameid_enc_2 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_EncMethod.xml.base64')))
-        dom_nameid_enc_2 = etree.fromstring(xml_nameid_enc_2)
-        encrypted_nameid_nodes_2 = dom_nameid_enc_2.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
-        encrypted_data_2 = encrypted_nameid_nodes_2[0]
-        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_2, key)
+        dom_nameid_enc_2 = parseString(xml_nameid_enc_2)
+        encrypted_nameid_nodes_2 = dom_nameid_enc_2.getElementsByTagName('saml:EncryptedID')
+        encrypted_data_2 = encrypted_nameid_nodes_2[0].firstChild
+
+        with self.assertRaisesRegex(Exception, "(1, 'failed to decrypt')"):
+            OneLogin_Saml2_Utils.decrypt_element(encrypted_data_2, key)
 
         xml_nameid_enc_3 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_nameID_without_keyinfo.xml.base64')))
-        dom_nameid_enc_3 = etree.fromstring(xml_nameid_enc_3)
-        encrypted_nameid_nodes_3 = dom_nameid_enc_3.find('.//saml:EncryptedID', namespaces=OneLogin_Saml2_Constants.NSMAP)
-        encrypted_data_3 = encrypted_nameid_nodes_3[0]
-        self.assertRaises(Exception, OneLogin_Saml2_Utils.decrypt_element, encrypted_data_3, key)
+        dom_nameid_enc_3 = parseString(xml_nameid_enc_3)
+        encrypted_nameid_nodes_3 = dom_nameid_enc_3.getElementsByTagName('saml:EncryptedID')
+        encrypted_data_3 = encrypted_nameid_nodes_3[0].firstChild
+
+        with self.assertRaisesRegex(Exception, "(1, 'failed to decrypt')"):
+            OneLogin_Saml2_Utils.decrypt_element(encrypted_data_3, key)
+
+    def testDecryptElementInplace(self):
+        """
+        Tests the decrypt_element method of the OneLogin_Saml2_Utils with inplace=True
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        key = settings.get_sp_key()
+
+        xml_nameid_enc = b64decode(self.file_contents(join(self.data_path, 'responses', 'response_encrypted_nameid.xml.base64')))
+        dom = fromstring(xml_nameid_enc)
+        encrypted_node = dom.xpath('//saml:EncryptedID/xenc:EncryptedData', namespaces=OneLogin_Saml2_Constants.NSMAP)[0]
+
+        # can be decrypted twice when copy the node first
+        for _ in range(2):
+            decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_node, key, inplace=False)
+            self.assertIn('NameID', decrypted_nameid.tag)
+            self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
+
+        # can only be decrypted once in place
+        decrypted_nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_node, key, inplace=True)
+        self.assertIn('NameID', decrypted_nameid.tag)
+        self.assertEqual('2de11defd199f8d5bb63f9b7deb265ba5c675c10', decrypted_nameid.text)
+
+        # can't be decrypted twice since it has been decrypted inplace
+        with self.assertRaisesRegex(Exception, "(1, 'failed to decrypt')"):
+            OneLogin_Saml2_Utils.decrypt_element(encrypted_node, key, inplace=True)
 
     def testAddSign(self):
         """

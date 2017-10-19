@@ -557,7 +557,7 @@ class OneLogin_Saml2_Utils(object):
         return formatted_fingerprint.lower()
 
     @staticmethod
-    def generate_name_id(value, sp_nq, sp_format, cert=None, debug=False, nq=None):
+    def generate_name_id(value, sp_nq, sp_format=None, cert=None, debug=False, nq=None):
         """
         Generates a nameID.
 

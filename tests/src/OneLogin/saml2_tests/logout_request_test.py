@@ -89,6 +89,64 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegex(inflated, '^<samlp:LogoutRequest')
 
+    def testConstructorWithNameIdFormatOnSettings(self):
+        """
+        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Case: Defines NameIDFormat from settings
+        """
+        settings_info = self.loadSettingsJSON()
+        name_id = 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c'
+        name_id_format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        settings_info['sp']['NameIDFormat'] = name_id_format
+        settings = OneLogin_Saml2_Settings(settings_info)
+        logout_request = OneLogin_Saml2_Logout_Request(settings, name_id=name_id)
+        logout_request_xml = OneLogin_Saml2_Utils.decode_base64_and_inflate(logout_request.get_request())
+        name_id_data = OneLogin_Saml2_Logout_Request.get_nameid_data(logout_request_xml)
+        expected_name_id_data = {
+            'Value': name_id,
+            'Format': name_id_format
+        }
+        self.assertEqual(expected_name_id_data, name_id_data)
+
+    def testConstructorWithoutNameIdFormat(self):
+        """
+        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Case: Checks that NameIDFormat is not added
+        """
+        settings_info = self.loadSettingsJSON()
+        name_id = 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c'
+        name_id_format = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        settings_info['sp']['NameIDFormat'] = name_id_format
+        settings = OneLogin_Saml2_Settings(settings_info)
+        logout_request = OneLogin_Saml2_Logout_Request(settings, name_id=name_id)
+        logout_request_xml = OneLogin_Saml2_Utils.decode_base64_and_inflate(logout_request.get_request())
+        name_id_data = OneLogin_Saml2_Logout_Request.get_nameid_data(logout_request_xml)
+        expected_name_id_data = {
+            'Value': name_id
+        }
+        self.assertEqual(expected_name_id_data, name_id_data)
+
+    def testConstructorEncryptIdUsingX509certMulti(self):
+        """
+        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Case: Able to generate encryptedID with MultiCert
+        """
+        settings_info = self.loadSettingsJSON('settings8.json')
+        settings_info['security']['nameIdEncrypted'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+
+        logout_request = OneLogin_Saml2_Logout_Request(settings)
+
+        parameters = {'SAMLRequest': logout_request.get_request()}
+        logout_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SingleLogoutService.php', parameters, True)
+        self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
+        url_parts = urlparse(logout_url)
+        exploded = parse_qs(url_parts.query)
+        payload = exploded['SAMLRequest'][0]
+        inflated = OneLogin_Saml2_Utils.decode_base64_and_inflate(payload)
+        self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
+        self.assertRegexpMatches(inflated, '<saml:EncryptedID>')
+
     def testGetIDFromSAMLLogoutRequest(self):
         """
         Tests the get_id method of the OneLogin_Saml2_LogoutRequest

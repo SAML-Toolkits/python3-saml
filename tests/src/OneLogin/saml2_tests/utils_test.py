@@ -511,6 +511,17 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         self.assertNotIn(not_expected_attribute, name_id.attrib.keys())
 
+    def testGenerateNameIdWithoutFormat(self):
+        """
+        Tests the generateNameId method of the OneLogin_Saml2_Utils
+        """
+        name_id_value = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde'
+        name_id_format = None
+
+        name_id = OneLogin_Saml2_Utils.generate_name_id(name_id_value, None, name_id_format)
+        expected_name_id = '<saml:NameID>ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>'
+        self.assertEqual(name_id, expected_name_id)
+
     def testGenerateNameIdWithSPNameQualifier(self):
         """
         Tests the generateNameId method of the OneLogin_Saml2_Utils

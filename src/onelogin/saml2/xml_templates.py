@@ -155,3 +155,8 @@ class OneLogin_Saml2_Templates(object):
         </saml:AttributeStatement>
     </saml:Assertion>
 </samlp:Response>"""
+
+    AUTHN_CONTEXT = """\
+                  <saml:AuthnContext>
+                      <saml:AuthnContextClassRef>%(context_class)s</saml:AuthnContextClassRef>
+                  </saml:AuthnContext>"""

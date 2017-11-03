@@ -16,6 +16,7 @@ except ImportError:
 
 import ssl
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
@@ -51,7 +52,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
         if xml:
             try:
-                dom = OneLogin_Saml2_XML.to_etree(xml)
+                dom = OneLogin_Saml2_XML.to_etree(compat.to_bytes(xml))
                 idp_descriptor_nodes = OneLogin_Saml2_XML.query(dom, '//md:IDPSSODescriptor')
                 if idp_descriptor_nodes:
                     valid = True
@@ -124,7 +125,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         """
         data = {}
 
-        dom = OneLogin_Saml2_XML.to_etree(idp_metadata)
+        dom = OneLogin_Saml2_XML.to_etree(compat.to_bytes(idp_metadata))
         idp_entity_id = want_authn_requests_signed = idp_name_id_format = idp_sso_url = idp_slo_url = certs = None
 
         entity_desc_path = '//md:EntityDescriptor'

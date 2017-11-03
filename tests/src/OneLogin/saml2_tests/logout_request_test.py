@@ -139,13 +139,13 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         parameters = {'SAMLRequest': logout_request.get_request()}
         logout_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SingleLogoutService.php', parameters, True)
-        self.assertRegexpMatches(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
+        self.assertRegex(logout_url, '^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=')
         url_parts = urlparse(logout_url)
         exploded = parse_qs(url_parts.query)
         payload = exploded['SAMLRequest'][0]
-        inflated = OneLogin_Saml2_Utils.decode_base64_and_inflate(payload)
-        self.assertRegexpMatches(inflated, '^<samlp:LogoutRequest')
-        self.assertRegexpMatches(inflated, '<saml:EncryptedID>')
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
+        self.assertRegex(inflated, '^<samlp:LogoutRequest')
+        self.assertRegex(inflated, '<saml:EncryptedID>')
 
     def testGetIDFromSAMLLogoutRequest(self):
         """

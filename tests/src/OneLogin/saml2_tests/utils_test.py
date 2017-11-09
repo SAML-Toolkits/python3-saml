@@ -774,7 +774,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         xml_metadata_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_metadata, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_metadata_signed)
         res_8 = parseString(xml_metadata_signed)
-        ds_signature_8 = res_8.firstChild.firstChild.nextSibling.firstChild.nextSibling
+        ds_signature_8 = res_8.firstChild.firstChild.nextSibling
         self.assertIn('ds:Signature', ds_signature_8.tagName)
 
     def testAddSignCheckAlg(self):

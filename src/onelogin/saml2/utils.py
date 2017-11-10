@@ -742,7 +742,11 @@ class OneLogin_Saml2_Utils(object):
             issuer = issuer[0]
             issuer.addnext(signature)
         else:
-            elem.insert(0, signature)
+            entity_descriptor = OneLogin_Saml2_XML.query(elem, '//md:EntityDescriptor')
+            if len(entity_descriptor) > 0:
+                elem.insert(0, signature)
+            else:
+                elem[0].insert(0, signature)
 
         elem_id = elem.get('ID', None)
         if elem_id:

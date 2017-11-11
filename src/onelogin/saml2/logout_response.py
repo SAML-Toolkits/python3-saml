@@ -23,7 +23,12 @@ class OneLogin_Saml2_Logout_Response(object):
 
     """
 
-    def __init__(self, settings, response=None):
+    METHOD_RESOLVERS = {
+        'redirect': 'decode_base64_and_inflate',
+        'post': 'b64decode'
+    }
+
+    def __init__(self, settings, response=None, method='redirect'):
         """
         Constructs a Logout Response object (Initialize params from settings
         and if provided load the Logout Response.
@@ -38,7 +43,11 @@ class OneLogin_Saml2_Logout_Response(object):
         self.id = None
 
         if response is not None:
-            self.__logout_response = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(response))
+            resolver = self.METHOD_RESOLVERS.get(method, None)
+            if resolver is None:
+                raise ValueError("Wrong value %r for argument 'method'." % method)
+            decoded_response = getattr(OneLogin_Saml2_Utils, resolver)(response)
+            self.__logout_response = compat.to_string(decoded_response)
             self.document = OneLogin_Saml2_XML.to_etree(self.__logout_response)
             self.id = self.document.get('ID', None)
 

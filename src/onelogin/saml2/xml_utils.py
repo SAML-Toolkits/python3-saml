@@ -31,7 +31,6 @@ class OneLogin_Saml2_XML(object):
     make_root = staticmethod(etree.Element)
     make_child = staticmethod(etree.SubElement)
 
-
     @staticmethod
     def to_string(xml, **kwargs):
         """

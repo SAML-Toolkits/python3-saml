@@ -47,6 +47,24 @@ class OneLogin_Saml2_Constants(object):
     NS_XENC = 'http://www.w3.org/2001/04/xmlenc#'
     NS_DS = 'http://www.w3.org/2000/09/xmldsig#'
 
+    # Namespace Prefixes
+    NS_PREFIX_SAML = 'saml'
+    NS_PREFIX_SAMLP = 'samlp'
+    NS_PREFIX_MD = 'md'
+    NS_PREFIX_XS = 'xs'
+    NS_PREFIX_XSI = 'xsi'
+    NS_PREFIX_XENC = 'xenc'
+    NS_PREFIX_DS = 'ds'
+
+    # Prefix:Namespace Mappings
+    NSMAP = {
+        NS_PREFIX_SAMLP: NS_SAMLP,
+        NS_PREFIX_SAML: NS_SAML,
+        NS_PREFIX_DS: NS_DS,
+        NS_PREFIX_XENC: NS_XENC,
+        NS_PREFIX_MD: NS_MD
+    }
+
     # Bindings
     BINDING_HTTP_POST = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
     BINDING_HTTP_REDIRECT = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
@@ -75,15 +93,6 @@ class OneLogin_Saml2_Constants(object):
     STATUS_NO_PASSIVE = 'urn:oasis:names:tc:SAML:2.0:status:NoPassive'
     STATUS_PARTIAL_LOGOUT = 'urn:oasis:names:tc:SAML:2.0:status:PartialLogout'
     STATUS_PROXY_COUNT_EXCEEDED = 'urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded'
-
-    # Namespaces
-    NSMAP = {
-        'samlp': NS_SAMLP,
-        'saml': NS_SAML,
-        'ds': NS_DS,
-        'xenc': NS_XENC,
-        'md': NS_MD
-    }
 
     # Sign & Crypto
     SHA1 = 'http://www.w3.org/2000/09/xmldsig#sha1'

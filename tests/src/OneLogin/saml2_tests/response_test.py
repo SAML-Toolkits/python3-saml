@@ -3,7 +3,7 @@
 # Copyright (c) 2014, OneLogin, Inc.
 # All rights reserved.
 
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from lxml import etree
 from datetime import datetime
 from datetime import timedelta
@@ -918,6 +918,29 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         self.assertFalse(response_2.is_valid(request_data))
         self.assertIn('is not a valid audience for this Response', response_2.get_error())
+
+    def testAudienceFormatting(self):
+        """
+        Tests that get_audiences strips superfluous whitespace from Audience text.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        xml = b"""<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+          <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+            <saml:Conditions NotBefore="2018-01-10T22:04:42Z" NotOnOrAfter="2018-01-10T22:24:42Z">
+              <saml:AudienceRestriction>
+                <saml:Audience>
+                    https://foo.com/sso/</saml:Audience>
+              </saml:AudienceRestriction>
+            </saml:Conditions>
+          </saml:Assertion>
+        </samlp:Response>
+        """
+        response = b64encode(xml)
+
+        response = OneLogin_Saml2_Response(settings=settings, response=response)
+        audiences = response.get_audiences()
+        self.assertIn('https://foo.com/sso/', audiences)
 
     def testIsInValidIssuer(self):
         """

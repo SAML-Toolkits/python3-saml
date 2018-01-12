@@ -359,7 +359,7 @@ class OneLogin_Saml2_Response(object):
         :rtype: list
         """
         audience_nodes = self.__query_assertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience')
-        return [node.text for node in audience_nodes if node.text is not None]
+        return [node.text.strip() for node in audience_nodes if node.text is not None]
 
     def get_issuers(self):
         """
@@ -430,6 +430,7 @@ class OneLogin_Saml2_Response(object):
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
                 value = nameid.get(attr, None)
                 if value:
+                    value = value.strip()
                     if is_strict and attr == 'SPNameQualifier':
                         sp_data = self.__settings.get_sp_data()
                         sp_entity_id = sp_data.get('entityId', '')

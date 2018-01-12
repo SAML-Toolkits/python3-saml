@@ -942,6 +942,27 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         audiences = response.get_audiences()
         self.assertIn('https://foo.com/sso/', audiences)
 
+    def testNameQualifierFormatting(self):
+        """
+        Tests that get_audiences strips superfluous whitespace from Audience text.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        xml = b"""<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+          <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+            <saml:Subject>
+            <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+                         SPNameQualifier=" https://foo.com/sso/">sess</saml:NameID>
+            </saml:Subject>
+          </saml:Assertion>
+        </samlp:Response>
+        """
+        response = b64encode(xml)
+
+        response = OneLogin_Saml2_Response(settings=settings, response=response)
+        nameid_data = response.get_nameid_data()
+        self.assertEqual(nameid_data['SPNameQualifier'], 'https://foo.com/sso/')
+
     def testIsInValidIssuer(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class

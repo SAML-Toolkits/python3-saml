@@ -1332,7 +1332,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
         settings_info_3 = self.loadSettingsJSON('settings2.json')
-        idp_cert = settings_info_3['idp']['x509cert']
+        idp_cert = OneLogin_Saml2_Utils.format_cert(settings_info_3['idp']['x509cert'])
         settings_info_3['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(idp_cert)
         settings_info_3['idp']['x509cert'] = ''
         settings_3 = OneLogin_Saml2_Settings(settings_info_3)

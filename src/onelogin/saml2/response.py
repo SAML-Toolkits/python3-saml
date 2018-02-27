@@ -359,7 +359,7 @@ class OneLogin_Saml2_Response(object):
         :rtype: list
         """
         audience_nodes = self.__query_assertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience')
-        return [node.text for node in audience_nodes if node.text is not None]
+        return [OneLogin_Saml2_XML.element_text(node) for node in audience_nodes if OneLogin_Saml2_XML.element_text(node) is not None]
 
     def get_issuers(self):
         """
@@ -373,7 +373,9 @@ class OneLogin_Saml2_Response(object):
         message_issuer_nodes = OneLogin_Saml2_XML.query(self.document, '/samlp:Response/saml:Issuer')
         if len(message_issuer_nodes) > 0:
             if len(message_issuer_nodes) == 1:
-                issuers.add(message_issuer_nodes[0].text)
+                issuer_value = OneLogin_Saml2_XML.element_text(message_issuer_nodes[0])
+                if issuer_value:
+                    issuers.add(issuer_value)
             else:
                 raise OneLogin_Saml2_ValidationError(
                     'Issuer of the Response is multiple.',
@@ -382,7 +384,9 @@ class OneLogin_Saml2_Response(object):
 
         assertion_issuer_nodes = self.__query_assertion('/saml:Issuer')
         if len(assertion_issuer_nodes) == 1:
-            issuers.add(assertion_issuer_nodes[0].text)
+            issuer_value = OneLogin_Saml2_XML.element_text(assertion_issuer_nodes[0])
+            if issuer_value:
+                issuers.add(issuer_value)
         else:
             raise OneLogin_Saml2_ValidationError(
                 'Issuer of the Assertion not found or multiple.',
@@ -420,13 +424,13 @@ class OneLogin_Saml2_Response(object):
                     OneLogin_Saml2_ValidationError.NO_NAMEID
                 )
         else:
-            if is_strict and want_nameid and not nameid.text:
+            if is_strict and want_nameid and not OneLogin_Saml2_XML.element_text(nameid):
                 raise OneLogin_Saml2_ValidationError(
                     'An empty NameID value found',
                     OneLogin_Saml2_ValidationError.EMPTY_NAMEID
                 )
 
-            nameid_data = {'Value': nameid.text}
+            nameid_data = {'Value': OneLogin_Saml2_XML.element_text(nameid)}
             for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
                 value = nameid.get(attr, None)
                 if value:
@@ -521,7 +525,12 @@ class OneLogin_Saml2_Response(object):
 
             values = []
             for attr in attribute_node.iterchildren('{%s}AttributeValue' % OneLogin_Saml2_Constants.NSMAP['saml']):
-                values.append(attr.text)
+                attr_text = OneLogin_Saml2_XML.element_text(attr)
+                if attr_text:
+                    attr_text = attr_text.strip()
+                    if attr_text:
+                        values.append(attr_text)
+
             attributes[attr_name] = values
         return attributes
 

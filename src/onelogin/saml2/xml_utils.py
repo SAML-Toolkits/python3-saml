@@ -156,3 +156,8 @@ class OneLogin_Saml2_XML(object):
         end = xml.find(close_tag, start) + len(close_tag)
         assert end != -1
         return compat.to_string(xml[start:end])
+
+    @staticmethod
+    def element_text(node):
+        etree.strip_tags(node, etree.Comment)
+        return node.text

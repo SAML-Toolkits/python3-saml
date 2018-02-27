@@ -634,6 +634,19 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertEqual('test@onelogin.com', response.get_nameid())
         self.assertFalse(response.is_valid(self.get_request_data()))
 
+    def testNodeTextAttack(self):
+        """
+        Tests the get_nameid and get_attributes methods of the OneLogin_Saml2_Response
+        Test that the node text with comment attack (VU#475445) is not allowed
+        """
+        xml = self.file_contents(join(self.data_path, 'responses', 'response_node_text_attack.xml.base64'))
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        response = OneLogin_Saml2_Response(settings, xml)
+        attributes = response.get_attributes()
+        nameid = response.get_nameid()
+        self.assertEqual("smith", attributes.get('surname')[0])
+        self.assertEqual('support@onelogin.com', nameid)
+
     def testGetSessionNotOnOrAfter(self):
         """
         Tests the get_session_not_on_or_after method of the OneLogin_Saml2_Response

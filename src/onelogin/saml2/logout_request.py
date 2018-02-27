@@ -188,7 +188,7 @@ class OneLogin_Saml2_Logout_Request(object):
             )
 
         name_id_data = {
-            'Value': name_id.text
+            'Value': OneLogin_Saml2_XML.element_text(name_id)
         }
         for attr in ['Format', 'SPNameQualifier', 'NameQualifier']:
             if attr in name_id.attrib:
@@ -241,7 +241,7 @@ class OneLogin_Saml2_Logout_Request(object):
         issuer = None
         issuer_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/saml:Issuer')
         if len(issuer_nodes) == 1:
-            issuer = issuer_nodes[0].text
+            issuer = OneLogin_Saml2_XML.element_text(issuer_nodes[0])
         return issuer
 
     @staticmethod
@@ -258,7 +258,7 @@ class OneLogin_Saml2_Logout_Request(object):
         session_indexes = []
         session_index_nodes = OneLogin_Saml2_XML.query(elem, '/samlp:LogoutRequest/samlp:SessionIndex')
         for session_index_node in session_index_nodes:
-            session_indexes.append(session_index_node.text)
+            session_indexes.append(OneLogin_Saml2_XML.element_text(session_index_node))
         return session_indexes
 
     def is_valid(self, request_data, raise_exceptions=False):

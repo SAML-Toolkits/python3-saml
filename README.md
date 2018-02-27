@@ -14,7 +14,11 @@ This version supports Python3, There is a separate version that only support Pyt
 
 #### Warning ####
 
-Release 1.2.6 adds the use defusedxml that will prevent XEE and other attacks based on the abuse of XML. (CVE-2017-9672)
+Update python-saml to 1.4.0, this version includes a fix for the [CVE-2017-11427](https://www.cvedetails.com/cve/CVE-2017-11427/) vulnerability.
+
+That version also change how calculate fingerprint method works, and will expect as input a formatted x509 certificate
+
+Update python-saml3 to 1.2.6 that adds the use defusedxml that will prevent XEE and other attacks based on the abuse of XML. (CVE-2017-9672)
 
 Update python3-saml to >= 1.2.1, 1.2.0 had a bug on signature validation process (when using wantAssertionsSigned and wantMessagesSigned). [CVE-2016-1000251](https://github.com/distributedweaknessfiling/DWF-Database-Artifacts/blob/master/DWF/2016/1000251/CVE-2016-1000251.json)
 

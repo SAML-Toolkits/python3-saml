@@ -1,4 +1,14 @@
 # python3-saml changelog
+
+### 1.4.0 (Feb 27, 2018)
+* Fix vulnerability [CVE-2017-11427](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-11427). Process text of nodes properly, ignoring comments
+* Improve how fingerprint is calcultated
+* Fix issue with LogoutRequest rejected by ADFS due NameID with unspecified format instead no format attribute
+* Fix signature position in the SP metadata
+* [#80](https://github.com/onelogin/python3-saml/pull/80) Preserve xmlns:xs namespace when signing and serializing responses
+* Redefine NSMAP constant
+* Updated Django demo (Django 1.11).
+
 ### 1.3.0 (Sep 15, 2017)
 * Improve decrypt method, Add an option to decrypt an element in place or copy it before decryption.
 * [#63](https://github.com/onelogin/python3-saml/pull/63) Be able to get at the auth object the last processed ID (response/assertion) and the last generated ID, as well as the NotOnOrAfter value of the valid SubjectConfirmationData in the processed SAMLResponse

@@ -624,9 +624,9 @@ saml_settings = auth.get_settings()
 metadata = saml_settings.get_sp_metadata()
 errors = saml_settings.validate_metadata(metadata)
 if len(errors) == 0:
-    print metadata
+    print(metadata)
 else:
-    print "Error found on Metadata: %s" % (', '.join(errors))
+    print("Error found on Metadata: %s" % (', '.join(errors)))
 ```
 
 The get_sp_metadata will return the metadata signed or not based on the security info of the advanced_settings.json ('signMetadata').
@@ -656,11 +656,11 @@ if not errors:
             auth.redirect_to(req['post_data']['RelayState'])
         else:
             for attr_name in request.session['samlUserdata'].keys():
-                print '%s ==> %s' % (attr_name, '|| '.join(request.session['samlUserdata'][attr_name]))
+                print('%s ==> %s' % (attr_name, '|| '.join(request.session['samlUserdata'][attr_name])))
     else:
-      print 'Not authenticated'
+      print('Not authenticated')
 else:
-    print "Error when processing SAML Response: %s" % (', '.join(errors))
+    print("Error when processing SAML Response: %s" % (', '.join(errors)))
 ```
 
 The SAML response is processed and then checked that there are no errors. It also verifies that the user is authenticated and stored the userdata in session.
@@ -697,9 +697,9 @@ The following code is equivalent:
 
 ```python
 attributes = auth.get_attributes();
-print attributes['cn']
+print(attributes['cn'])
 
-print auth.get_attribute('cn')
+print(auth.get_attribute('cn'))
 ```
 
 Before trying to get an attribute, check that the user is authenticated. If the user isn't authenticated, an empty dict will be returned. For example, if we call to get_attributes before a auth.process_response, the get_attributes() will return an empty dict.
@@ -717,9 +717,9 @@ if len(errors) == 0:
     if url is not None:
         return redirect(url)
     else:
-        print "Sucessfully Logged out"
+        print("Sucessfully Logged out")
 else:
-    print "Error when processing SLO: %s" % (', '.join(errors))
+    print("Error when processing SLO: %s" % (', '.join(errors)))
 ```
 
 If the SLS endpoints receives a Logout Response, the response is validated and the session could be closed, using the callback.
@@ -848,9 +848,9 @@ elif 'sls' in request.args:                                             # Single
             msg = "Sucessfully logged out"
 
 if len(errors) == 0:
-  print msg
+  print(msg)
 else:
-  print ', '.join(errors)
+  print(', '.join(errors))
 ```
 
 

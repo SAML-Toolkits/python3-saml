@@ -20,6 +20,7 @@ __pycache_
 .coverage
 .pypirc
 /.idea
+.mypy_cache/
 
 *.key
 *.crt

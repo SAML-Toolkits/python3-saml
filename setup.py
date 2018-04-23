@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014, OneLogin, Inc.
-# All rights reserved.
+# Copyright (c) 2010-2018 OneLogin, Inc.
+# MIT License
 
 from setuptools import setup
 

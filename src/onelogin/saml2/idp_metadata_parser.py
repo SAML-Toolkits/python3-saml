@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """ OneLogin_Saml2_IdPMetadataParser class
-Copyright (c) 2014, OneLogin, Inc.
-All rights reserved.
+Copyright (c) 2010-2018 OneLogin, Inc.
+MIT License
 Metadata class of OneLogin's Python Toolkit.
 """
 

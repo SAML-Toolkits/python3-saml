@@ -2,8 +2,8 @@
 
 """ OneLoginSaml2Metadata class
 
-Copyright (c) 2014, OneLogin, Inc.
-All rights reserved.
+Copyright (c) 2010-2018 OneLogin, Inc.
+MIT License
 
 Metadata class of OneLogin's Python Toolkit.
 

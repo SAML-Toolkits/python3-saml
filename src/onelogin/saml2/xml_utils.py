@@ -2,8 +2,8 @@
 
 """ OneLogin_Saml2_XML class
 
-Copyright (c) 2015, OneLogin, Inc.
-All rights reserved.
+Copyright (c) 2010-2018 OneLogin, Inc.
+MIT License
 
 Auxiliary class of OneLogin's Python Toolkit.
 

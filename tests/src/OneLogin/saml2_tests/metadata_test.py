@@ -208,6 +208,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
 
         self.assertIn('<md:SPSSODescriptor', signed_metadata)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', signed_metadata)
+        self.assertIn('ID="ONELOGIN_', signed_metadata)
         self.assertIn('AuthnRequestsSigned="false"', signed_metadata)
         self.assertIn('WantAssertionsSigned="false"', signed_metadata)
 
@@ -233,6 +234,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
 
         self.assertIn('<md:SPSSODescriptor', signed_metadata_2)
         self.assertIn('entityID="http://stuff.com/endpoints/metadata.php"', signed_metadata_2)
+        self.assertIn('ID="ONELOGIN_', signed_metadata_2)
         self.assertIn('AuthnRequestsSigned="false"', signed_metadata_2)
         self.assertIn('WantAssertionsSigned="false"', signed_metadata_2)
 

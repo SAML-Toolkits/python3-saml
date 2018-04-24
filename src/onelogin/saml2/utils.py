@@ -728,9 +728,7 @@ class OneLogin_Saml2_Utils(object):
             raise Exception('Empty string supplied as input')
 
         elem = OneLogin_Saml2_XML.to_etree(xml)
-        xmlsec.enable_debug_trace(debug)
-        xmlsec.tree.add_ids(elem, ["ID"])
-        # Sign the metadata with our private key.
+
         sign_algorithm_transform_map = {
             OneLogin_Saml2_Constants.DSA_SHA1: xmlsec.Transform.DSA_SHA1,
             OneLogin_Saml2_Constants.RSA_SHA1: xmlsec.Transform.RSA_SHA1,
@@ -746,16 +744,26 @@ class OneLogin_Saml2_Utils(object):
         if len(issuer) > 0:
             issuer = issuer[0]
             issuer.addnext(signature)
+            elem_to_sign = issuer.getparent()
         else:
             entity_descriptor = OneLogin_Saml2_XML.query(elem, '//md:EntityDescriptor')
             if len(entity_descriptor) > 0:
                 elem.insert(0, signature)
             else:
                 elem[0].insert(0, signature)
+            elem_to_sign = elem
 
-        elem_id = elem.get('ID', None)
-        if elem_id:
-            elem_id = '#' + elem_id
+        elem_id = elem_to_sign.get('ID', None)
+        if elem_id is not None:
+            if elem_id:
+                elem_id = '#' + elem_id
+        else:
+            generated_id = generated_id = OneLogin_Saml2_Utils.generate_unique_id()
+            elem_id = '#' + generated_id
+            elem_to_sign.attrib['ID'] = generated_id
+
+        xmlsec.enable_debug_trace(debug)
+        xmlsec.tree.add_ids(elem_to_sign, ["ID"])
 
         digest_algorithm_transform_map = {
             OneLogin_Saml2_Constants.SHA1: xmlsec.Transform.SHA1,

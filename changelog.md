@@ -1,4 +1,8 @@
 # python3-saml changelog
+### 1.4.1 (Apr 25, 2018)
+* Add ID to EntityDescriptor before sign it on add_sign method.
+* Update defusedxml, coveralls and coverage dependencies
+* Update copyright and license reference
 
 ### 1.4.0 (Feb 27, 2018)
 * Fix vulnerability [CVE-2017-11427](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-11427). Process text of nodes properly, ignoring comments

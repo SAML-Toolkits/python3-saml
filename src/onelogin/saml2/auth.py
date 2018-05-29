@@ -63,6 +63,7 @@ class OneLogin_Saml2_Auth(object):
         self.__last_request_id = None
         self.__last_message_id = None
         self.__last_assertion_id = None
+        self.__last_authn_contexts = []
         self.__last_request = None
         self.__last_response = None
         self.__last_assertion_not_on_or_after = None
@@ -110,6 +111,7 @@ class OneLogin_Saml2_Auth(object):
                 self.__session_expiration = response.get_session_not_on_or_after()
                 self.__last_message_id = response.get_id()
                 self.__last_assertion_id = response.get_assertion_id()
+                self.__last_authn_contexts = response.get_authn_contexts()
                 self.__authenticated = True
                 self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
 
@@ -317,6 +319,13 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         return self.__last_assertion_id
+
+    def get_last_authn_contexts(self):
+        """
+        :returns: The list of authentication contexts sent in the last SAML resposne.
+        :rtype: list
+        """
+        return self.__last_authn_contexts
 
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
         """

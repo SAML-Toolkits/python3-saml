@@ -1231,6 +1231,20 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         )
         self.assertIn(expectedFragment, auth.get_last_request_xml())
 
+    def testGetLastAuthnContexts(self):
+        settings = self.loadSettingsJSON()
+        request_data = self.get_request()
+        message = self.file_contents(
+            join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+
+        auth.process_response()
+        self.assertEqual(auth.get_last_authn_contexts(), ['urn:oasis:names:tc:SAML:2.0:ac:classes:Password'])
+
     def testGetLastLogoutRequest(self):
         settings = self.loadSettingsJSON()
         auth = OneLogin_Saml2_Auth({'http_host': 'localhost', 'script_name': 'thing'}, old_settings=settings)

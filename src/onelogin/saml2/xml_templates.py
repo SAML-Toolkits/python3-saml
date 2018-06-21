@@ -80,6 +80,11 @@ class OneLogin_Saml2_Templates(object):
 %(attr_cs_desc)s%(requested_attribute_str)s
         </md:AttributeConsumingService>\n"""
 
+    MD_ASSERTION_CONSUMER_SERVICE = """\
+        <md:AssertionConsumerService Binding="%(binding)s"
+                                     Location="%(location)s"
+                                     index="%(index)s" />\n"""
+
     MD_ENTITY_DESCRIPTOR = """\
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -88,9 +93,7 @@ class OneLogin_Saml2_Templates(object):
                      entityID="%(entity_id)s">
     <md:SPSSODescriptor AuthnRequestsSigned="%(authnsign)s" WantAssertionsSigned="%(wsign)s" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
 %(sls)s        <md:NameIDFormat>%(name_id_format)s</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="%(binding)s"
-                                     Location="%(location)s"
-                                     index="1" />
+        %(assertion_consumers)s
 %(attribute_consuming_service)s    </md:SPSSODescriptor>
 %(organization)s
 %(contacts)s

@@ -9,6 +9,7 @@ AuthNRequest class of OneLogin's Python Toolkit.
 
 """
 
+from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
@@ -22,7 +23,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True):
+    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True, acs_index=None):
         """
         Constructs the AuthnRequest object.
 
@@ -37,6 +38,9 @@ class OneLogin_Saml2_Authn_Request(object):
 
         :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
+
+        :param acs_index: Optional argument. The index of the assertionConsumerService to use, if multiple were specified.
+        :type acs_index: int
         """
         self.__settings = settings
 
@@ -102,6 +106,19 @@ class OneLogin_Saml2_Authn_Request(object):
         if 'attributeConsumingService' in sp_data and sp_data['attributeConsumingService']:
             attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"1\""
 
+        assertion_url = ''
+        if isinstance(sp_data['assertionConsumerService'], dict):
+            assertion_url = sp_data['assertionConsumerService']['url']
+        else:
+            for idx, acs in enumerate(sp_data['assertionConsumerService']):
+                if idx == 0:
+                    # By default, use the first assertion consumer service if an index is not specified.
+                    assertion_url = acs['url']
+                index = compat.to_string(acs.get('index', idx))
+                if index == compat.to_string(acs_index):
+                    assertion_url = acs['url']
+                    break
+
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {
                 'id': uid,
@@ -110,7 +127,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 'is_passive_str': is_passive_str,
                 'issue_instant': issue_instant,
                 'destination': destination,
-                'assertion_url': sp_data['assertionConsumerService']['url'],
+                'assertion_url': assertion_url,
                 'entity_id': sp_data['entityId'],
                 'nameid_policy_str': nameid_policy_str,
                 'requested_authn_context_str': requested_authn_context_str,

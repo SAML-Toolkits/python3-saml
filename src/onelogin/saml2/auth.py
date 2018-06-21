@@ -318,7 +318,7 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__last_assertion_id
 
-    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True):
+    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, acs_index=None):
         """
         Initiates the SSO process.
 
@@ -334,10 +334,13 @@ class OneLogin_Saml2_Auth(object):
         :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.
         :type set_nameid_policy: bool
 
+        :param acs_index: Optional argument. The index of the assertionConsumerService to use, if multiple were specified.
+        :type acs_index: int
+
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy, acs_index)
         self.__last_request = authn_request.get_xml()
         self.__last_request_id = authn_request.get_id()
 

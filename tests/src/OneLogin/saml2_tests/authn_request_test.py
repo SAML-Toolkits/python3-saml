@@ -339,3 +339,14 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
 
         self.assertRegex(inflated, 'AttributeConsumingServiceIndex="1"')
+
+    def testMultipleAssertionConsumerServices(self):
+        settings_data = self.loadSettingsJSON('settings9.json')
+        settings = OneLogin_Saml2_Settings(settings_data)
+        self.assertEqual(len(settings.get_errors()), 0)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings, acs_index=456)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+
+        self.assertRegex(inflated, 'AssertionConsumerServiceURL="http://stuff.com/endpoints/endpoints/acs2.php">')

@@ -120,6 +120,8 @@ Security warning
 In production, the **strict** parameter MUST be set as **"true"**. Otherwise
 your environment is not secure and will be exposed to attacks.
 
+In production also we highly recommend to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
+
 Getting started
 ---------------
 
@@ -301,8 +303,11 @@ This is the settings.json file:
         // Public x509 certificate of the IdP
         "x509cert": "<onelogin_connector_cert>"
         /*
-         *  Instead of using the whole x509cert you can use a fingerprint in
-         *  order to validate a SAMLResponse.
+         *  Instead of using the whole x509cert you can use a fingerprint in order to
+         *  validate a SAMLResponse (but you still need the x509cert to validate LogoutRequest and LogoutResponse using the HTTP-Redirect binding).
+         *  But take in mind that the fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass,
+         *  that why we don't recommend it use for production environments.
+         *
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *  or add for example the -sha256 , -sha384 or -sha512 parameter)
          *

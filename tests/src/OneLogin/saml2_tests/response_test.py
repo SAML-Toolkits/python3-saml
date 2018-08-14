@@ -610,6 +610,26 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_3 = OneLogin_Saml2_Response(settings, xml_3)
         self.assertEqual({}, response_3.get_attributes())
 
+    def testGetNestedNameIDAttributes(self):
+        """
+        Tests the getAttributes method of the OneLogin_Saml2_Response with nested
+        nameID data
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        xml = self.file_contents(join(self.data_path, 'responses', 'response_with_nested_nameid_values.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        expected_attributes = {
+            'uid': ['demo'],
+            'another_value': [{
+                'NameID': {
+                    'Format': 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+                    'NameQualifier': 'https://idpID',
+                    'value': 'value'
+                }
+            }]
+        }
+        self.assertEqual(expected_attributes, response.get_attributes())
+
     def testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference(self):
         """
         Tests the get_nameid method of the OneLogin_Saml2_Response

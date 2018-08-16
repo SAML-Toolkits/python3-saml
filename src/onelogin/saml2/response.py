@@ -531,6 +531,15 @@ class OneLogin_Saml2_Response(object):
                     if attr_text:
                         values.append(attr_text)
 
+                # Parse any nested NameID children
+                for nameid in attr.iterchildren('{%s}NameID' % OneLogin_Saml2_Constants.NSMAP['saml']):
+                    values.append({
+                        'NameID': {
+                            'Format': nameid.get('Format'),
+                            'NameQualifier': nameid.get('NameQualifier'),
+                            'value': nameid.text
+                        }
+                    })
             attributes[attr_name] = values
         return attributes
 

@@ -258,8 +258,12 @@ class OneLogin_Saml2_Settings(object):
         """
         Add default values if the settings info is not complete
         """
-        self.__sp.setdefault('assertionConsumerService', {})
-        self.__sp['assertionConsumerService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
+        acs = self.__sp.setdefault('assertionConsumerService', {})
+        if isinstance(acs, dict):
+            acs.setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
+        else:
+            for entry in acs:
+                entry.setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
 
         self.__sp.setdefault('attributeConsumingService', {})
 
@@ -415,10 +419,22 @@ class OneLogin_Saml2_Settings(object):
                 if not sp.get('entityId'):
                     errors.append('sp_entityId_not_found')
 
-                if not sp.get('assertionConsumerService', {}).get('url'):
-                    errors.append('sp_acs_not_found')
-                elif not validate_url(sp['assertionConsumerService']['url']):
-                    errors.append('sp_acs_url_invalid')
+                acs_list = sp.get('assertionConsumerService', {})
+                acs_indexes = set()
+                if isinstance(acs_list, dict):
+                    acs_list = [acs_list]
+                if not isinstance(acs_list, list):
+                    errors.append('sp_acs_invalid_type')
+                else:
+                    for idx, acs in enumerate(acs_list):
+                        index = compat.to_string(acs.get('index', idx))
+                        if index in acs_indexes:
+                            errors.append('sp_acs_duplicate_index')
+                        acs_indexes.add(index)
+                        if not acs.get('url'):
+                            errors.append('sp_acs_not_found')
+                        elif not validate_url(acs['url']):
+                            errors.append('sp_acs_url_invalid')
 
                 if sp.get('attributeConsumingService'):
                     attributeConsumingService = sp['attributeConsumingService']

@@ -173,6 +173,21 @@ class OneLogin_Saml2_Metadata(object):
                     'requested_attribute_str': '\n'.join(requested_attribute_data)
                 }
 
+        str_assertion_consumers = ''
+        if isinstance(sp['assertionConsumerService'], dict):
+            str_assertion_consumers += OneLogin_Saml2_Templates.MD_ASSERTION_CONSUMER_SERVICE % {
+                'binding': sp['assertionConsumerService']['binding'],
+                'location': sp['assertionConsumerService']['url'],
+                'index': sp['assertionConsumerService'].get('index', '1')
+            }
+        else:
+            for idx, acs in enumerate(sp['assertionConsumerService']):
+                str_assertion_consumers += OneLogin_Saml2_Templates.MD_ASSERTION_CONSUMER_SERVICE % {
+                    'binding': acs['binding'],
+                    'location': acs['url'],
+                    'index': acs.get('index', compat.to_string(idx))
+                }
+
         metadata = OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR % \
             {
                 'valid': ('validUntil="%s"' % valid_until_str) if valid_until_str else '',
@@ -181,8 +196,7 @@ class OneLogin_Saml2_Metadata(object):
                 'authnsign': str_authnsign,
                 'wsign': str_wsign,
                 'name_id_format': sp['NameIDFormat'],
-                'binding': sp['assertionConsumerService']['binding'],
-                'location': sp['assertionConsumerService']['url'],
+                'assertion_consumers': str_assertion_consumers,
                 'sls': sls,
                 'organization': str_organization,
                 'contacts': str_contacts,

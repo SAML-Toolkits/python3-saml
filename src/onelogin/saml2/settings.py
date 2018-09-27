@@ -310,6 +310,7 @@ class OneLogin_Saml2_Settings(object):
         self.__sp.setdefault('privateKey', '')
 
         self.__security.setdefault('requestedAuthnContext', True)
+        self.__security.setdefault('failOnAuthnContextMismatch', False)
 
     def check_settings(self, settings):
         """

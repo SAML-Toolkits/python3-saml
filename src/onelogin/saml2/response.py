@@ -161,6 +161,18 @@ class OneLogin_Saml2_Response(object):
                         OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_AUTHSTATEMENTS
                     )
 
+                # Checks that the response has all of the AuthnContexts that we provided in the request.
+                # Only check if failOnAuthnContextMismatch is true and requestedAuthnContext is set to a list.
+                requested_authn_contexts = security['requestedAuthnContext']
+                if security['failOnAuthnContextMismatch'] and requested_authn_contexts and requested_authn_contexts is not True:
+                    authn_contexts = self.get_authn_contexts()
+                    unmatched_contexts = set(requested_authn_contexts).difference(authn_contexts)
+                    if unmatched_contexts:
+                        raise OneLogin_Saml2_ValidationError(
+                            'The AuthnContext "%s" didn\'t include requested context "%s"' % (', '.join(authn_contexts), ', '.join(unmatched_contexts)),
+                            OneLogin_Saml2_ValidationError.AUTHN_CONTEXT_MISMATCH
+                        )
+
                 # Checks that there is at least one AttributeStatement if required
                 attribute_statement_nodes = self.__query_assertion('/saml:AttributeStatement')
                 if security.get('wantAttributeStatement', True) and not attribute_statement_nodes:
@@ -360,6 +372,16 @@ class OneLogin_Saml2_Response(object):
         """
         audience_nodes = self.__query_assertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience')
         return [OneLogin_Saml2_XML.element_text(node) for node in audience_nodes if OneLogin_Saml2_XML.element_text(node) is not None]
+
+    def get_authn_contexts(self):
+        """
+        Gets the authentication contexts
+
+        :returns: The authentication classes for the SAML Response
+        :rtype: list
+        """
+        authn_context_nodes = self.__query_assertion('/saml:AuthnStatement/saml:AuthnContext/saml:AuthnContextClassRef')
+        return [OneLogin_Saml2_XML.element_text(node) for node in authn_context_nodes]
 
     def get_issuers(self):
         """

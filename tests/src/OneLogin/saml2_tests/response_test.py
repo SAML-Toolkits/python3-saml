@@ -952,6 +952,44 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response_2.is_valid(request_data))
         self.assertIn('is not a valid audience for this Response', response_2.get_error())
 
+    def testIsInValidAuthenticationContext(self):
+        """
+        Tests that requestedAuthnContext, when set, is compared against the
+        response AuthnContext, which is what you use for two-factor
+        authentication. Without this check you can get back a valid response
+        that didn't complete the two-factor step.
+        """
+        request_data = self.get_request_data()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        two_factor_context = 'urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken'
+        password_context = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
+        settings_dict = self.loadSettingsJSON()
+        settings_dict['security']['requestedAuthnContext'] = [two_factor_context]
+        settings_dict['security']['failOnAuthnContextMismatch'] = True
+        settings_dict['strict'] = True
+        settings = OneLogin_Saml2_Settings(settings_dict)
+
+        # check that we catch when the contexts don't match
+        response = OneLogin_Saml2_Response(settings, message)
+        self.assertFalse(response.is_valid(request_data))
+        self.assertIn('The AuthnContext "%s" didn\'t include requested context "%s"' % (password_context, two_factor_context), response.get_error())
+
+        # now drop in the expected AuthnContextClassRef and see that it passes
+        original_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(message))
+        two_factor_message = original_message.replace(password_context, two_factor_context)
+        two_factor_message = OneLogin_Saml2_Utils.b64encode(two_factor_message)
+        response = OneLogin_Saml2_Response(settings, two_factor_message)
+        response.is_valid(request_data)
+        # check that we got as far as destination validation, which comes later
+        self.assertIn('The response was received at', response.get_error())
+
+        # with the default setting, check that we succeed with our original context
+        settings_dict['security']['requestedAuthnContext'] = True
+        settings = OneLogin_Saml2_Settings(settings_dict)
+        response = OneLogin_Saml2_Response(settings, message)
+        response.is_valid(request_data)
+        self.assertIn('The response was received at', response.get_error())
+
     def testIsInValidIssuer(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class

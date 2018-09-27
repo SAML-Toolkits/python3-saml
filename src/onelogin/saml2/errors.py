@@ -109,6 +109,7 @@ class OneLogin_Saml2_ValidationError(Exception):
     INVALID_SIGNATURE = 42
     WRONG_NUMBER_OF_SIGNATURES = 43
     RESPONSE_EXPIRED = 44
+    AUTHN_CONTEXT_MISMATCH = 45
 
     def __init__(self, message, code=0, errors=None):
         """

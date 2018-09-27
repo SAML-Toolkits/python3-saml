@@ -100,7 +100,7 @@ class OneLogin_Saml2_Constants(object):
     SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#sha384'
     SHA512 = 'http://www.w3.org/2001/04/xmlenc#sha512'
 
-    DSA_SHA1 = 'http://www.w3.org/2000/09/xmld/sig#dsa-sha1'
+    DSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
     RSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
     RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
     RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'

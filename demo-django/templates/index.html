@@ -10,6 +10,9 @@
           <li>{{err}}</li>
         {% endfor %}
     </ul>
+    {% if error_reason %}
+      <p><b>Reason:</b> {{error_reason}}</p>
+    {% endif %}
   </div>
 {% endif %}
 

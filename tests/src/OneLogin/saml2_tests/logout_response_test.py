@@ -208,7 +208,7 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Logout_Response(settings, message)
-        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Logout Request'):
+        with self.assertRaisesRegex(Exception, 'Invalid issuer in the Logout Response'):
             response_2.is_valid(request_data, raise_exceptions=True)
 
     def testIsInValidDestination(self):

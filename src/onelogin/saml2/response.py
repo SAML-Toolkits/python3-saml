@@ -218,7 +218,11 @@ class OneLogin_Saml2_Response(object):
                 for issuer in issuers:
                     if issuer is None or issuer != idp_entity_id:
                         raise OneLogin_Saml2_ValidationError(
-                            'Invalid issuer in the Assertion/Response',
+                            'Invalid issuer in the Assertion/Response (expected %(idpEntityId)s, got %(issuer)s)' %
+                            {
+                                'idpEntityId': idp_entity_id,
+                                'issuer': issuer
+                            },
                             OneLogin_Saml2_ValidationError.WRONG_ISSUER
                         )
 

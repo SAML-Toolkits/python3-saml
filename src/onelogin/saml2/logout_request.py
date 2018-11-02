@@ -322,7 +322,11 @@ class OneLogin_Saml2_Logout_Request(object):
                 issuer = OneLogin_Saml2_Logout_Request.get_issuer(root)
                 if issuer is not None and issuer != idp_entity_id:
                     raise OneLogin_Saml2_ValidationError(
-                        'Invalid issuer in the Logout Request',
+                        'Invalid issuer in the Logout Request (expected %(idpEntityId)s, got %(issuer)s)' %
+                        {
+                            'idpEntityId': idp_entity_id,
+                            'issuer': issuer
+                        },
                         OneLogin_Saml2_ValidationError.WRONG_ISSUER
                     )
 

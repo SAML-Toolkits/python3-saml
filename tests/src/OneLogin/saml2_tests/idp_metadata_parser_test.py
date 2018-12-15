@@ -51,7 +51,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             data = OneLogin_Saml2_IdPMetadataParser.get_metadata('http://google.es')
 
         try:
-            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://www.testshib.org/metadata/testshib-providers.xml')
+            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://idp.testshib.org/idp/shibboleth')
             self.assertTrue(data is not None and data is not {})
         except URLError:
             pass
@@ -64,7 +64,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             data = OneLogin_Saml2_IdPMetadataParser.parse_remote('http://google.es')
 
         try:
-            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://www.testshib.org/metadata/testshib-providers.xml')
+            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://idp.testshib.org/idp/shibboleth')
         except URLError:
             xml = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
             data = OneLogin_Saml2_IdPMetadataParser.parse(xml)
@@ -148,7 +148,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         """
         try:
             xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
-                'https://www.testshib.org/metadata/testshib-providers.xml')
+                'https://idp.testshib.org/idp/shibboleth')
         except URLError:
             xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
 
@@ -186,7 +186,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         """
         try:
             xmldoc = OneLogin_Saml2_IdPMetadataParser.get_metadata(
-                'https://www.testshib.org/metadata/testshib-providers.xml')
+                'https://idp.testshib.org/idp/shibboleth')
         except URLError:
             xmldoc = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
 

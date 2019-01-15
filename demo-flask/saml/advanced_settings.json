@@ -9,7 +9,7 @@
         "wantAssertionsSigned": false,
         "wantNameId" : true,
         "wantNameIdEncrypted": false,
-        "wantAssertionsEncrypted": false,
+        "wantAssertionsEncrypted": true,
         "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
         "digestAlgorithm": "http://www.w3.org/2000/09/xmldsig#sha1"
     },

@@ -83,7 +83,7 @@ def index(request):
             attributes = request.session['samlUserdata'].items()
 
     return render(request, 'index.html', {'errors': errors, 'error_reason': error_reason, 'not_auth_warn': not_auth_warn, 'success_slo': success_slo,
-                                          'attributes': attributes, 'paint_logout': paint_logout})        
+                                          'attributes': attributes, 'paint_logout': paint_logout})
 
 
 def attrs(request):

@@ -5,6 +5,11 @@ python:
   - '3.5'
   - '3.6'
 
+matrix:
+  include:
+    - python: '3.7'
+      dist: xenial  # required for Python >= 3.7 (travis-ci/travis-ci#9069)
+
 install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
@@ -15,7 +20,6 @@ script:
   - 'coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
-  - 'pep8 tests/src/OneLogin/saml2_tests/*.py demo-flask/*.py demo-django/*.py src/onelogin/saml2/*.py --config=tests/pep8.rc'
-  - 'pyflakes src/onelogin/saml2 demo-django demo-flask tests/src/OneLogin/saml2_tests'
+  - 'flake8 .'
 
 after_success: 'coveralls'

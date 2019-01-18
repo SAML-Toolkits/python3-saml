@@ -55,7 +55,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 idp_descriptor_nodes = OneLogin_Saml2_XML.query(dom, '//md:IDPSSODescriptor')
                 if idp_descriptor_nodes:
                     valid = True
-            except:
+            except Exception:
                 pass
 
         if not valid:

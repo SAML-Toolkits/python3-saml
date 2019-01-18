@@ -267,7 +267,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
             'SAMLRequest': authn_request.get_request()
         }
         auth_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SSOService.php', parameters, True)
-        self.assertRegex(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
+        self.assertRegex(auth_url, r'^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
         exploded = urlparse(auth_url)
         exploded = parse_qs(exploded[4])
         payload = exploded['SAMLRequest'][0]
@@ -295,7 +295,7 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
             'SAMLRequest': authn_request.get_request()
         }
         auth_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SSOService.php', parameters, True)
-        self.assertRegex(auth_url, '^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
+        self.assertRegex(auth_url, r'^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
         exploded = urlparse(auth_url)
         exploded = parse_qs(exploded[4])
         payload = exploded['SAMLRequest'][0]

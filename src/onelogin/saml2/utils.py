@@ -391,7 +391,7 @@ class OneLogin_Saml2_Utils(object):
 
     @staticmethod
     def parse_time_to_SAML(time):
-        """
+        r"""
         Converts a UNIX timestamp to SAML2 timestamp on the form
         yyyy-mm-ddThh:mm:ss(\.s+)?Z.
 
@@ -406,7 +406,7 @@ class OneLogin_Saml2_Utils(object):
 
     @staticmethod
     def parse_SAML_to_time(timestr):
-        """
+        r"""
         Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z
         to a UNIX timestamp. The sub-second part is ignored.
 

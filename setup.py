@@ -42,12 +42,11 @@ setup(
     dependency_links=['http://github.com/mehcode/python-xmlsec/tarball/master'],
     extras_require={
         'test': (
-            'coverage>=3.6',
-            'freezegun==0.3.5',
-            'pylint==1.9.1',
-            'pep8==1.5.7',
-            'pyflakes==0.8.1',
-            'coveralls==1.1',
+            'coverage>=4.5.2',
+            'freezegun==0.3.11',
+            'pylint==1.9.4',
+            'flake8==3.6.0',
+            'coveralls==1.5.1',
         ),
     },
     keywords='saml saml2 xmlsec django flask pyramid python3',

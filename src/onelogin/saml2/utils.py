@@ -13,7 +13,6 @@ import base64
 from copy import deepcopy
 import calendar
 from datetime import datetime
-from defusedxml.lxml import fromstring
 from hashlib import sha1, sha256, sha384, sha512
 from isodate import parse_duration as duration_parser
 import re
@@ -684,7 +683,7 @@ class OneLogin_Saml2_Utils(object):
         """
 
         if isinstance(encrypted_data, Element):
-            encrypted_data = fromstring(str(encrypted_data.toxml()))
+            encrypted_data = OneLogin_Saml2_XML.to_etree(str(encrypted_data.toxml()))
         if not inplace and isinstance(encrypted_data, OneLogin_Saml2_XML._element_class):
             encrypted_data = deepcopy(encrypted_data)
         elif isinstance(encrypted_data, OneLogin_Saml2_XML._text_class):

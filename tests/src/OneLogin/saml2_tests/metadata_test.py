@@ -157,11 +157,11 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn("""        <md:AttributeConsumingService index="1">
             <md:ServiceName xml:lang="en">Test Service</md:ServiceName>
             <md:ServiceDescription xml:lang="en">Test Service</md:ServiceDescription>
-            <md:RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" />
-            <md:RequestedAttribute Name="urn:oid:2.5.4.4" FriendlyName="sn" />
-            <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" FriendlyName="displayName" />
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail" />
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" />
+            <md:RequestedAttribute Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="givenName" />
+            <md:RequestedAttribute Name="urn:oid:2.5.4.4" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="sn" />
+            <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="displayName" />
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="mail" />
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="uid" />
         </md:AttributeConsumingService>""", metadata)
 
     def testBuilderAttributeConsumingServiceWithMultipleAttributeValue(self):
@@ -183,7 +183,7 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
                 <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">userType</saml:AttributeValue>
                 <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">admin</saml:AttributeValue>
             </md:RequestedAttribute>
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" FriendlyName="uid" />
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="uid" />
         </md:AttributeConsumingService>""", metadata)
 
     def testSignMetadata(self):

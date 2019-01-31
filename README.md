@@ -915,6 +915,7 @@ Main class of OneLogin Python Toolkit
 * ***get_sso_url*** Gets the SSO url.
 * ***get_slo_url*** Gets the SLO url.
 * ***get_last_request_id*** The ID of the last Request SAML message generated (AuthNRequest, LogoutRequest).
+* ***get_last_authn_contexts*** Returns the list of authentication contexts sent in the last SAML Response.
 * ***build_request_signature*** Builds the Signature of the SAML Request.
 * ***build_response_signature*** Builds the Signature of the SAML Response.
 * ***get_settings*** Returns the settings info.

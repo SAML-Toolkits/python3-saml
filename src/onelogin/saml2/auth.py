@@ -322,7 +322,7 @@ class OneLogin_Saml2_Auth(object):
 
     def get_last_authn_contexts(self):
         """
-        :returns: The list of authentication contexts sent in the last SAML resposne.
+        :returns: The list of authentication contexts sent in the last SAML Response.
         :rtype: list
         """
         return self.__last_authn_contexts

@@ -1249,8 +1249,8 @@ Getting ``python3-saml`` up and running on Heroku will require some extra legwor
 First you will need to add the ```apt``` buildpack to your build server:
 
 ```
-heroku buildpacks:set --index=1 -a your-app https://github.com/ABASystems/heroku-buildpack-apt
-heroku buildpacks:set --index=2 -a your-app https://github.com/ABASystems/heroku-buildpack-python
+heroku buildpacks:add --index=1 -a your-app heroku-community/apt
+heroku buildpacks:add --index=2 -a your-app heroku/python
 ```
 
 You can confirm the buildpacks have been added in the correct order with ```heroku buildpacks -a your-app```, you should see the apt buildpack first followed by the Python buildpack.

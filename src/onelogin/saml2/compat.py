@@ -22,6 +22,7 @@ except NameError:
 
 if isinstance(b'', type('')):  # py 2.x
     text_types = (basestring,)  # noqa
+    bytes_type = bytes
     str_type = basestring  # noqa
 
     def utf8(data):
@@ -42,6 +43,7 @@ if isinstance(b'', type('')):  # py 2.x
 
 else:  # py 3.x
     text_types = (bytes, str)
+    bytes_type = bytes
     str_type = str
 
     def utf8(data):

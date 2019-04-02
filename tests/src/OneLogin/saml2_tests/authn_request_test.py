@@ -257,6 +257,37 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         self.assertRegex(inflated_3, '^<samlp:AuthnRequest')
         self.assertNotIn('<samlp:NameIDPolicy', inflated_3)
 
+    def testCreateRequestSubject(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        The creation of a deflated SAML Request with and without Subject
+        """
+        saml_settings = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_encoded = authn_request.get_request()
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
+        self.assertNotIn('<saml:Subject>', inflated)
+
+        authn_request_2 = OneLogin_Saml2_Authn_Request(settings, name_id_value_req='testuser@example.com')
+        authn_request_encoded_2 = authn_request_2.get_request()
+        inflated_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_2))
+        self.assertRegex(inflated_2, '^<samlp:AuthnRequest')
+        self.assertIn('<saml:Subject>', inflated_2)
+        self.assertIn('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', inflated_2)
+        self.assertIn('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', inflated_2)
+
+        saml_settings['sp']['NameIDFormat'] = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        settings = OneLogin_Saml2_Settings(saml_settings)
+        authn_request_3 = OneLogin_Saml2_Authn_Request(settings, name_id_value_req='testuser@example.com')
+        authn_request_encoded_3 = authn_request_3.get_request()
+        inflated_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded_3))
+        self.assertRegex(inflated_3, '^<samlp:AuthnRequest')
+        self.assertIn('<saml:Subject>', inflated_3)
+        self.assertIn('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', inflated_3)
+        self.assertIn('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', inflated_3)
+
     def testCreateDeflatedSAMLRequestURLParameter(self):
         """
         Tests the OneLogin_Saml2_Authn_Request Constructor.

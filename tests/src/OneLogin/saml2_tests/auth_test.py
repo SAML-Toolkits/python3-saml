@@ -609,7 +609,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
     def testLoginForceAuthN(self):
         """
         Tests the login method of the OneLogin_Saml2_Auth class
-        Case Logout with no parameters. A AuthN Request is built with ForceAuthn and redirect executed
+        Case AuthN Request is built with ForceAuthn and redirect executed
         """
         settings_info = self.loadSettingsJSON()
         return_to = u'http://example.com/returnto'
@@ -642,7 +642,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
     def testLoginIsPassive(self):
         """
         Tests the login method of the OneLogin_Saml2_Auth class
-        Case Logout with no parameters. A AuthN Request is built with IsPassive and redirect executed
+        Case AuthN Request is built with IsPassive and redirect executed
         """
         settings_info = self.loadSettingsJSON()
         return_to = u'http://example.com/returnto'
@@ -676,7 +676,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
     def testLoginSetNameIDPolicy(self):
         """
         Tests the login method of the OneLogin_Saml2_Auth class
-        Case Logout with no parameters. A AuthN Request is built with and without NameIDPolicy
+        Case AuthN Request is built with and without NameIDPolicy
         """
         settings_info = self.loadSettingsJSON()
         return_to = u'http://example.com/returnto'
@@ -706,6 +706,46 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SAMLRequest', parsed_query_3)
         request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
         self.assertNotIn('<samlp:NameIDPolicy', request_3)
+
+    def testLoginWithSubject(self):
+        """
+        Tests the login method of the OneLogin_Saml2_Auth class
+        Case AuthN Request is built with and without Subject
+        """
+        settings_info = self.loadSettingsJSON()
+        return_to = u'http://example.com/returnto'
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url = auth.login(return_to)
+        parsed_query = parse_qs(urlparse(target_url)[4])
+        self.assertIn(sso_url, target_url)
+        self.assertIn('SAMLRequest', parsed_query)
+        request = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query['SAMLRequest'][0]))
+        self.assertNotIn('<saml:Subject>', request)
+        self.assertNotIn('<saml:NameID', request)
+        self.assertNotIn('<saml:saml:SubjectConfirmation', request)
+
+        auth_2 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_2 = auth_2.login(return_to, name_id_value_req='testuser@example.com')
+        parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
+        self.assertIn(sso_url, target_url_2)
+        self.assertIn('SAMLRequest', parsed_query_2)
+        request_2 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_2['SAMLRequest'][0]))
+        self.assertIn('<saml:Subject>', request_2)
+        self.assertIn('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', request_2)
+        self.assertIn('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', request_2)
+
+        settings_info['sp']['NameIDFormat'] = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        auth_3 = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        target_url_3 = auth_3.login(return_to, name_id_value_req='testuser@example.com')
+        parsed_query_3 = parse_qs(urlparse(target_url_3)[4])
+        self.assertIn(sso_url, target_url_3)
+        self.assertIn('SAMLRequest', parsed_query_3)
+        request_3 = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(parsed_query_3['SAMLRequest'][0]))
+        self.assertIn('<saml:Subject>', request_3)
+        self.assertIn('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', request_3)
+        self.assertIn('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', request_3)
 
     def testLogout(self):
         """

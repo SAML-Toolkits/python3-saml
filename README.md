@@ -151,7 +151,7 @@ If our environment requires sign or encrypt support, the certs folder may contai
 * sp.crt The public cert of the SP
 * sp.key The private key of the SP
 
-Or also we can provide those data in the setting file at the ``X.509cert`` and the ``privateKey`` JSON parameters of the ``sp`` element.
+Or also we can provide those data in the setting file at the ``x509cert`` and the ``privateKey`` JSON parameters of the ``sp`` element.
 
 Sometimes we could need a signature on the metadata published by the SP, in this case we could use the X.509 cert previously mentioned or use a new X.509 cert: ``metadata.crt`` and ``metadata.key``.
 
@@ -161,7 +161,7 @@ publish that X.509 certificate on Service Provider metadata.
 If you want to create self-signed certs, you can do it at the https://www.samltool.com/self_signed_certs.php service, or using the command:
 
 ```bash
-openssl req -new -X.509 -days 3652 -nodes -out sp.crt -keyout saml.key
+openssl req -new -x509 -days 3652 -nodes -out sp.crt -keyout saml.key
 ```
 
 #### demo-flask ####
@@ -264,7 +264,7 @@ This is the ``settings.json`` file:
         // represent the requested subject.
         // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
         "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-        // Usually X.509cert and privateKey of the SP are provided by files placed at
+        // Usually X.509 cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
         "x509cert": "",
         "privateKey": ""
@@ -310,7 +310,7 @@ This is the ``settings.json`` file:
          *  But take in mind that the fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass,
          *  that why we don't recommend it use for production environments.
          *
-         *  (openssl X.509 -noout -fingerprint -in "idp.crt" to generate it,
+         *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *  or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
          *  If a fingerprint is provided, then the certFingerprintAlgorithm is required in order to
@@ -343,7 +343,7 @@ This is the ``settings.json`` file:
 }
 ```
 
-In addition to the required settings data (IdP, SP), extra settings can be defined in `advanced_settings.json`:
+In addition to the required settings data (idp, sp), extra settings can be defined in `advanced_settings.json`:
 
 ```javascript
 {
@@ -865,7 +865,7 @@ else:
 
 ### SP Key rollover ###
 
-If you plan to update the SP ``X.509cert`` and ``privateKey`` you can define the new ``X.509cert`` as ``settings['sp']['X.509certNew']`` and it will be
+If you plan to update the SP ``x509cert`` and ``privateKey`` you can define the new ``x509cert`` as ``settings['sp']['x509certNew']`` and it will be
 published on the SP metadata so Identity Providers can read them and get ready for rollover.
 
 
@@ -874,11 +874,11 @@ published on the SP metadata so Identity Providers can read them and get ready f
 In some scenarios the IdP uses different certificates for
 signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
 
-In order to handle that the toolkit offers the ``settings['idp']['X.509certMulti']`` parameter.
+In order to handle that the toolkit offers the ``settings['idp']['x509certMulti']`` parameter.
 
-When that parameter is used, ``X.509cert`` and ``certFingerprint`` values will be ignored by the toolkit.
+When that parameter is used, ``x509cert`` and ``certFingerprint`` values will be ignored by the toolkit.
 
-The ``X.509certMulti`` is an array with 2 keys:
+The ``x509certMulti`` is an array with 2 keys:
 - ``signing``: An array of certs that will be used to validate IdP signature
 - ``encryption``: An array with one unique cert that will be used to encrypt data to be sent to the IdP.
 
@@ -1026,7 +1026,7 @@ A class that contains functionality related to the metadata of the SP
 
 * ***builder*** Generates the metadata of the SP based on the settings.
 * ***sign_metadata*** Signs the metadata with the key/cert provided.
-* ***add_X.509_key_descriptors*** Adds the X.509 descriptors (sign/encryption) to the metadata
+* ***add_x509_key_descriptors*** Adds the X.509 descriptors (sign/encryption) to the metadata
 
 #### OneLogin_Saml2_Utils - utils.py ####
 

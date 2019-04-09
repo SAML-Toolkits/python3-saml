@@ -1,4 +1,9 @@
 # python3-saml changelog
+### 1.6.0 (Apr 10, 2019)
+* Add support for Subjects on AuthNRequests by the new name_id_value_req parameter
+* [#127](https://github.com/onelogin/python3-saml/pull/127) Fix for SLO when XML specifies encoding
+* [#126](https://github.com/onelogin/python3-saml/pull/126) Fixed setting NameFormat attribute for AttributeValue tags
+
 ### 1.5.0 (Jan 29, 2019)
 * Security improvements. Use of tagid to prevent XPath injection. Disable DTD on fromstring defusedxml method
 * [#97](https://github.com/onelogin/python3-saml/pull/97) Check that the response has all of the AuthnContexts that we provided

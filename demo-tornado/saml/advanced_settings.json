@@ -1,0 +1,36 @@
+{
+    "security": {
+        "nameIdEncrypted": false,
+        "authnRequestsSigned": true,
+        "logoutRequestSigned": true,
+        "logoutResponseSigned": true,
+        "signMetadata": {
+                                            "keyFileName": "metadata.key",
+                                            "certFileName": "metadata.crt"
+                                         },
+        "wantMessagesSigned": false,
+        "wantAssertionsSigned": true,
+        "wantNameId" : true,
+        "wantNameIdEncrypted": false,
+        "wantAssertionsEncrypted": false,
+        "signatureAlgorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+        "digestAlgorithm": "http://www.w3.org/2000/09/xmldsig#sha1"
+    },
+    "contactPerson": {
+        "technical": {
+            "givenName": "technical_name",
+            "emailAddress": "technical@example.com"
+        },
+        "support": {
+            "givenName": "support_name",
+            "emailAddress": "support@example.com"
+        }
+    },
+    "organization": {
+        "en-US": {
+            "name": "sp_test",
+            "displayname": "SP test",
+            "url": "http://sp.example.com"
+        }
+    }
+}

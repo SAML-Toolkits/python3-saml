@@ -1241,7 +1241,7 @@ First we need to edit the ``saml/settings.json`` file, configure the SP part and
 
 Once the SP is configured, the metadata of the SP is published at the ``/metadata`` url. Based on that info, configure the IdP.
 
-#####Test with keycloack#####
+##### Test with keycloack #####
 
 You can test your SP with every compatible IdP, for example Keycloack by Red Hat (Check if you need also authorization and not only authentication )
 

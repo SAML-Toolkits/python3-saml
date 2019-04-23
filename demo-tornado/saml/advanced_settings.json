@@ -1,15 +1,12 @@
 {
     "security": {
         "nameIdEncrypted": false,
-        "authnRequestsSigned": true,
-        "logoutRequestSigned": true,
-        "logoutResponseSigned": true,
-        "signMetadata": {
-                                            "keyFileName": "metadata.key",
-                                            "certFileName": "metadata.crt"
-                                         },
+        "authnRequestsSigned": false,
+        "logoutRequestSigned": false,
+        "logoutResponseSigned": false,
+        "signMetadata": false,
         "wantMessagesSigned": false,
-        "wantAssertionsSigned": true,
+        "wantAssertionsSigned": false,
         "wantNameId" : true,
         "wantNameIdEncrypted": false,
         "wantAssertionsEncrypted": false,

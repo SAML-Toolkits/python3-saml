@@ -1,9 +1,9 @@
-#Tornado Demo#
+# Tornado Demo #
 Fully-working tornado-demo.
 
-###ABOUT ISSUE###
+### About issues ###
 This is only a demo, some issues about session still remain. 
 Actually the session is global.
 
-###PRODUCTION###
+### Production ###
 Remember to disable debugging in production.

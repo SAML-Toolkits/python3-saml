@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     validUntil="2020-03-05T18:19:11Z"
+                     validUntil="2037-03-05T18:19:11Z"
                      cacheDuration="PT1594475551S"
                      entityID="http://stuff.com/endpoints/metadata.php">
     <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">

@@ -10,7 +10,7 @@ Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided
 and supported by OneLogin Inc.
 
-This version supports Python3. There is a separate version that only support Python2: [python-saml](https://pypi.python.org/pypi/python-saml)
+This version supports Python3. There is a separate version that only support Python2: [python-saml](https://github.com/onelogin/python-saml)
 
 #### Warning ####
 
@@ -100,7 +100,7 @@ Review the ``setup.py`` file to know the version of the library that ``python3-s
 
 The toolkit is hosted on GitHub. You can download it from:
 
- * Lastest release: https://github.com/onelogin/python3-saml/releases/latest
+ * Latest release: https://github.com/onelogin/python3-saml/releases/latest
  * Master repo: https://github.com/onelogin/python3-saml/tree/master
 
 Copy the core of the library ``(src/onelogin/saml2 folder)`` and merge the ``setup.py`` inside the Python application. (Each application has its structure so take your time to locate the Python SAML toolkit in the best place).

@@ -407,7 +407,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
         response_13 = OneLogin_Saml2_Response(settings, xml_6)
         nameid_data_13 = response_13.get_nameid_data()
-        nameid_data_13 = self.assertEqual(expected_nameid_data_5, nameid_data_13)
+        self.assertEqual(expected_nameid_data_5, nameid_data_13)
 
         json_settings['strict'] = False
         json_settings['security']['wantNameId'] = False
@@ -684,6 +684,22 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml_3 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion.xml.base64'))
         response_3 = OneLogin_Saml2_Response(settings, xml_3)
         self.assertEqual(2696012228, response_3.get_session_not_on_or_after())
+
+    def testGetInResponseTo(self):
+        """
+        Tests the retrieval of the InResponseTo attribute
+        """
+
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        # Response without an InResponseTo element should return None
+        xml = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertIsNone(response.get_in_response_to())
+
+        xml_3 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion.xml.base64'))
+        response_3 = OneLogin_Saml2_Response(settings, xml_3)
+        self.assertEqual('ONELOGIN_be60b8caf8e9d19b7a3551b244f116c947ff247d', response_3.get_in_response_to())
 
     def testIsInvalidXML(self):
         """

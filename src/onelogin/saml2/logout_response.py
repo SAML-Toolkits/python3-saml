@@ -95,7 +95,7 @@ class OneLogin_Saml2_Logout_Response(object):
                 security = self.__settings.get_security_data()
 
                 # Check if the InResponseTo of the Logout Response matches the ID of the Logout Request (requestId) if provided
-                in_response_to = self.document.get('InResponseTo', None)
+                in_response_to = self.get_in_response_to()
                 if request_id is not None and in_response_to and in_response_to != request_id:
                     raise OneLogin_Saml2_ValidationError(
                         'The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id),
@@ -174,6 +174,14 @@ class OneLogin_Saml2_Logout_Response(object):
             }
 
         self.__logout_response = logout_response
+
+    def get_in_response_to(self):
+        """
+        Gets the ID of the LogoutRequest which this response is in response to
+        :returns: ID of LogoutRequest this LogoutResponse is in response to or None if it is not present
+        :rtype: str
+        """
+        return self.document.get('InResponseTo')
 
     def get_response(self, deflate=True):
         """

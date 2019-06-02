@@ -122,7 +122,7 @@ class OneLogin_Saml2_Response(object):
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
                 # Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                in_response_to = self.document.get('InResponseTo', None)
+                in_response_to = self.get_in_response_to()
                 if in_response_to is not None and request_id is not None:
                     if in_response_to != request_id:
                         raise OneLogin_Saml2_ValidationError(
@@ -386,6 +386,14 @@ class OneLogin_Saml2_Response(object):
         """
         authn_context_nodes = self.__query_assertion('/saml:AuthnStatement/saml:AuthnContext/saml:AuthnContextClassRef')
         return [OneLogin_Saml2_XML.element_text(node) for node in authn_context_nodes]
+
+    def get_in_response_to(self):
+        """
+        Gets the ID of the request which this response is in response to
+        :returns: ID of AuthNRequest this Response is in response to or None if it is not present
+        :rtype: str
+        """
+        return self.document.get('InResponseTo')
 
     def get_issuers(self):
         """

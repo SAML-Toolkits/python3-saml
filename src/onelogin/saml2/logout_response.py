@@ -176,6 +176,11 @@ class OneLogin_Saml2_Logout_Response(object):
         self.__logout_response = logout_response
 
     def get_in_response_to(self):
+        """
+        Gets the ID of the LogoutRequest which this response is in response to
+        :returns: ID of LogoutRequest this LogoutResponse is in response to or None if it is not present
+        :rtype: str
+        """
         return self.document.get('InResponseTo')
 
     def get_response(self, deflate=True):

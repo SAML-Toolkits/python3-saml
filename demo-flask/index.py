@@ -11,7 +11,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'onelogindemopytoolkit'
-app.config['SAML_PATH'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'saml')
+app.config['SAML_PATH'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'saml')
 
 
 def init_saml_auth(req):

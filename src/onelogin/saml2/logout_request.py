@@ -25,7 +25,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
     """
 
-    def __init__(self, settings, request=None, name_id=None, session_index=None, nq=None, name_id_format=None):
+    def __init__(self, settings, request=None, name_id=None, session_index=None, nq=None, name_id_format=None, spnq=None):
         """
         Constructs the Logout Request object.
 
@@ -45,6 +45,9 @@ class OneLogin_Saml2_Logout_Request(object):
         :type: string
 
         :param name_id_format: The NameID Format that will be set in the LogoutRequest.
+        :type: string
+
+        :param spnq: SP Name Qualifier
         :type: string
         """
         self.__settings = settings
@@ -75,19 +78,23 @@ class OneLogin_Saml2_Logout_Request(object):
                 if not name_id_format and sp_data['NameIDFormat'] != OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED:
                     name_id_format = sp_data['NameIDFormat']
             else:
+                name_id = idp_data['entityId']
                 name_id_format = OneLogin_Saml2_Constants.NAMEID_ENTITY
 
-            sp_name_qualifier = None
-            if name_id_format == OneLogin_Saml2_Constants.NAMEID_ENTITY:
-                name_id = idp_data['entityId']
+            # From saml-core-2.0-os 8.3.6, when the entity Format is used:
+            # "The NameQualifier, SPNameQualifier, and SPProvidedID attributes
+            # MUST be omitted.
+            if name_id_format and name_id_format == OneLogin_Saml2_Constants.NAMEID_ENTITY:
                 nq = None
-            elif nq is not None:
-                # We only gonna include SPNameQualifier if NameQualifier is provided
-                sp_name_qualifier = sp_data['entityId']
+                spnq = None
+
+            # NameID Format UNSPECIFIED omitted
+            if name_id_format and name_id_format == OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED:
+                name_id_format = None
 
             name_id_obj = OneLogin_Saml2_Utils.generate_name_id(
                 name_id,
-                sp_name_qualifier,
+                spnq,
                 name_id_format,
                 cert,
                 False,

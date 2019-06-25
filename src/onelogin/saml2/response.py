@@ -506,6 +506,32 @@ class OneLogin_Saml2_Response(object):
             nameid_format = nameid_data['Format']
         return nameid_format
 
+    def get_nameid_nq(self):
+        """
+        Gets the NameID NameQualifier provided by the SAML Response from the IdP
+
+        :returns: NameID NameQualifier
+        :rtype: string|None
+        """
+        nameid_nq = None
+        nameid_data = self.get_nameid_data()
+        if nameid_data and 'NameQualifier' in nameid_data.keys():
+            nameid_nq = nameid_data['NameQualifier']
+        return nameid_nq
+
+    def get_nameid_spnq(self):
+        """
+        Gets the NameID SP NameQualifier provided by the SAML response from the IdP.
+
+        :returns: NameID SP NameQualifier
+        :rtype: string|None
+        """
+        nameid_spnq = None
+        nameid_data = self.get_nameid_data()
+        if nameid_data and 'SPNameQualifier' in nameid_data.keys():
+            nameid_spnq = nameid_data['SPNameQualifier']
+        return nameid_spnq
+
     def get_session_not_on_or_after(self):
         """
         Gets the SessionNotOnOrAfter from the AuthnStatement

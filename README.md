@@ -794,17 +794,17 @@ target_url = 'https://example.com'
 auth.logout(return_to=target_url)
 ```
 
-Also there are 4 optional parameters that can be set:
+Also there are another 5 optional parameters that can be set:
 
 * ``name_id``: That will be used to build the ``LogoutRequest``. If no ``name_id`` parameter is set and the auth object processed a
 SAML Response with a ``NameId``, then this ``NameId`` will be used.
 * ``session_index``: ``SessionIndex`` that identifies the session of the user.
 * ``nq``: IDP Name Qualifier.
 * ``name_id_format``: The ``NameID`` Format that will be set in the ``LogoutRequest``.
+* ``spnq``: The ``NameID SP NameQualifier`` will be set in the ``LogoutRequest``.
 
 If no ``name_id`` is provided, the ``LogoutRequest`` will contain a ``NameID`` with the entity Format.
 If ``name_id`` is provided and no ``name_id_format`` is provided, the ``NameIDFormat`` of the settings will be used.
-If ``nq`` is provided, the ``SPNameQualifier`` will be also attached to the ``NameId``.
 
 If a match on the ``LogoutResponse`` ID and the ``LogoutRequest`` ID to be sent is required, that ``LogoutRequest`` ID must to be extracted and stored for future validation, we can get that ID by:
 
@@ -830,7 +830,12 @@ elif 'sso2' in request.args:                       # Another SSO init action
     return_to = '%sattrs/' % request.host_url      # but set a custom RelayState URL
     return redirect(auth.login(return_to))
 elif 'slo' in request.args:                     # SLO action. Will sent a Logout Request to IdP
-    return redirect(auth.logout())
+    nameid = request.session['samlNameId']
+    nameid_format = request.session['samlNameIdFormat']
+    nameid_nq = request.session['samlNameIdNameQualifier']
+    nameid_spnq = request.session['samlNameIdSPNameQualifier']
+    session_index = request.session['samlSessionIndex']
+    return redirect(auth.logout(None, nameid, session_index, nameid_nq, nameid_format, nameid_spnq))
 elif 'acs' in request.args:                 # Assertion Consumer Service
     auth.process_response()                     # Process the Response of the IdP
     errors = auth.get_errors()              # This method receives an array with the errors
@@ -839,6 +844,11 @@ elif 'acs' in request.args:                 # Assertion Consumer Service
             msg = "Not authenticated"           # data retrieved or not (user authenticated)
         else:
             request.session['samlUserdata'] = auth.get_attributes()     # Retrieves user data
+            request.session['samlNameId'] = auth.get_nameid()
+            request.session['samlNameIdFormat'] = auth.get_nameid_format()
+            request.session['samlNameIdNameQualifier'] = auth.get_nameid_nq()
+            request.session['samlNameIdSPNameQualifier'] = auth.get_nameid_spnq()
+            request.session['samlSessionIndex'] = auth.get_session_index()
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
                 return redirect(auth.redirect_to(request.form['RelayState']))   # Redirect if there is a relayState

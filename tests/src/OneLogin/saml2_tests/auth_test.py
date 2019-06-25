@@ -227,6 +227,9 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertEqual(auth.get_attribute('mail'), attributes['mail'])
         session_index = auth.get_session_index()
         self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', session_index)
+        self.assertEqual("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", auth.get_nameid_format())
+        self.assertIsNone(auth.get_nameid_nq())
+        self.assertEqual("http://stuff.com/endpoints/metadata.php", auth.get_nameid_spnq())
 
     def testRedirectTo(self):
         """
@@ -992,6 +995,70 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth.process_response()
         self.assertTrue(auth.is_authenticated())
         self.assertEqual("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified", auth.get_nameid_format())
+
+    def testGetNameIdNameQualifier(self):
+        """
+        Tests the get_nameid_nq method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response_with_namequalifier.xml.base64'))
+        request_data = self.get_request()
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        self.assertIsNone(auth.get_nameid_nq())
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("https://test.example.com/saml/metadata", auth.get_nameid_nq())
+
+    def testGetNameIdNameQualifier2(self):
+        """
+        Tests the get_nameid_nq method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        request_data = self.get_request()
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        self.assertIsNone(auth.get_nameid_nq())
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertIsNone(auth.get_nameid_nq())
+
+    def testGetNameIdSPNameQualifier(self):
+        """
+        Tests the get_nameid_spnq method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response_with_namequalifier.xml.base64'))
+        request_data = self.get_request()
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        self.assertIsNone(auth.get_nameid_spnq())
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertIsNone(auth.get_nameid_spnq())
+
+    def testGetNameIdSPNameQualifier2(self):
+        """
+        Tests the get_nameid_spnq method of the OneLogin_Saml2_Auth
+        """
+        settings = self.loadSettingsJSON()
+        message = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        request_data = self.get_request()
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        self.assertIsNone(auth.get_nameid_spnq())
+        auth.process_response()
+        self.assertTrue(auth.is_authenticated())
+        self.assertEqual("http://stuff.com/endpoints/metadata.php", auth.get_nameid_spnq())
 
     def testBuildRequestSignature(self):
         """

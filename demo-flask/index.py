@@ -50,21 +50,28 @@ def index():
         return_to = '%sattrs/' % request.host_url
         return redirect(auth.login(return_to))
     elif 'slo' in request.args:
-        name_id = None
-        session_index = None
+        name_id = session_index = name_id_format = name_id_nq = name_id_spnq = None
         if 'samlNameId' in session:
             name_id = session['samlNameId']
         if 'samlSessionIndex' in session:
             session_index = session['samlSessionIndex']
+        if 'samlNameIdFormat' in session:
+            name_id_format = session['samlNameIdFormat']
+        if 'samlNameIdNameQualifier' in session:
+            name_id_nq = session['samlNameIdNameQualifier']
+        if 'samlNameIdSPNameQualifier' in session:
+            name_id_spnq = session['samlNameIdSPNameQualifier']
 
-        return redirect(auth.logout(name_id=name_id, session_index=session_index))
+        return redirect(auth.logout(name_id=name_id, session_index=session_index, nq=name_id_nq, name_id_format=name_id_format, spnq=name_id_spnq))
     elif 'acs' in request.args:
         auth.process_response()
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
         if len(errors) == 0:
-            session['samlUserdata'] = auth.get_attributes()
             session['samlNameId'] = auth.get_nameid()
+            session['samlNameIdFormat'] = auth.get_nameid_format()
+            session['samlNameIdNameQualifier'] = auth.get_nameid_nq()
+            session['samlNameIdSPNameQualifier'] = auth.get_nameid_spnq()
             session['samlSessionIndex'] = auth.get_session_index()
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:

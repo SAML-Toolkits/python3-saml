@@ -215,7 +215,6 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
         expected_name_id_data = {
             'Format': 'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress',
             'NameQualifier': idp_data['entityId'],
-            'SPNameQualifier': 'http://stuff.com/endpoints/metadata.php',
             'Value': 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69'
         }
 

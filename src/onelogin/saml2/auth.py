@@ -55,6 +55,8 @@ class OneLogin_Saml2_Auth(object):
         self.__attributes = dict()
         self.__nameid = None
         self.__nameid_format = None
+        self.__nameid_nq = None
+        self.__nameid_spnq = None
         self.__session_index = None
         self.__session_expiration = None
         self.__authenticated = False
@@ -107,6 +109,8 @@ class OneLogin_Saml2_Auth(object):
                 self.__attributes = response.get_attributes()
                 self.__nameid = response.get_nameid()
                 self.__nameid_format = response.get_nameid_format()
+                self.__nameid_nq = response.get_nameid_nq()
+                self.__nameid_spnq = response.get_nameid_spnq()
                 self.__session_index = response.get_session_index()
                 self.__session_expiration = response.get_session_not_on_or_after()
                 self.__last_message_id = response.get_id()
@@ -245,6 +249,24 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__nameid_format
 
+    def get_nameid_nq(self):
+        """
+        Returns the nameID NameQualifier of the Assertion.
+
+        :returns: NameID NameQualifier
+        :rtype: string|None
+        """
+        return self.__nameid_nq
+
+    def get_nameid_spnq(self):
+        """
+        Returns the nameID SP NameQualifier of the Assertion.
+
+        :returns: NameID SP NameQualifier
+        :rtype: string|None
+        """
+        return self.__nameid_spnq
+
     def get_session_index(self):
         """
         Returns the SessionIndex from the AuthnStatement.
@@ -366,7 +388,7 @@ class OneLogin_Saml2_Auth(object):
             self.add_request_signature(parameters, security['signatureAlgorithm'])
         return self.redirect_to(self.get_sso_url(), parameters)
 
-    def logout(self, return_to=None, name_id=None, session_index=None, nq=None, name_id_format=None):
+    def logout(self, return_to=None, name_id=None, session_index=None, nq=None, name_id_format=None, spnq=None):
         """
         Initiates the SLO process.
 
@@ -383,6 +405,9 @@ class OneLogin_Saml2_Auth(object):
         :type: string
 
         :param name_id_format: The NameID Format that will be set in the LogoutRequest.
+        :type: string
+
+        :param spnq: SP Name Qualifier
         :type: string
 
         :returns: Redirection URL
@@ -405,7 +430,8 @@ class OneLogin_Saml2_Auth(object):
             name_id=name_id,
             session_index=session_index,
             nq=nq,
-            name_id_format=name_id_format
+            name_id_format=name_id_format,
+            spnq=spnq
         )
         self.__last_request = logout_request.get_xml()
         self.__last_request_id = logout_request.id

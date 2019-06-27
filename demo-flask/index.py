@@ -46,6 +46,10 @@ def index():
 
     if 'sso' in request.args:
         return redirect(auth.login())
+        # If AuthNRequest ID need to be stored in order to later validate it, do instead
+        # sso_built_url = auth.login()
+        # request.session['AuthNRequestID'] = auth.get_last_request_id()
+        # return redirect(sso_built_url)
     elif 'sso2' in request.args:
         return_to = '%sattrs/' % request.host_url
         return redirect(auth.login(return_to))
@@ -64,10 +68,16 @@ def index():
 
         return redirect(auth.logout(name_id=name_id, session_index=session_index, nq=name_id_nq, name_id_format=name_id_format, spnq=name_id_spnq))
     elif 'acs' in request.args:
-        auth.process_response()
+        request_id = None
+        if 'AuthNRequestID' in session:
+            request_id = session['AuthNRequestID']
+
+        auth.process_response(request_id=request_id)
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
         if len(errors) == 0:
+            if 'AuthNRequestID' in session:
+                del session['AuthNRequestID']
             session['samlNameId'] = auth.get_nameid()
             session['samlNameIdFormat'] = auth.get_nameid_format()
             session['samlNameIdNameQualifier'] = auth.get_nameid_nq()
@@ -77,8 +87,11 @@ def index():
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
                 return redirect(auth.redirect_to(request.form['RelayState']))
     elif 'sls' in request.args:
+        request_id = None
+        if 'LogoutRequestID' in session:
+            request_id = session['LogoutRequestID']
         dscb = lambda: session.clear()
-        url = auth.process_slo(delete_session_cb=dscb)
+        url = auth.process_slo(request_id=request_id, delete_session_cb=dscb)
         errors = auth.get_errors()
         if len(errors) == 0:
             if url is not None:

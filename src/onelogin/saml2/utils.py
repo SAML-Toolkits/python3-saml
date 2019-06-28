@@ -14,7 +14,10 @@ from copy import deepcopy
 import calendar
 from datetime import datetime
 from hashlib import sha1, sha256, sha384, sha512
-from isodate import parse_duration as duration_parser
+from isodate import (
+    parse_duration as duration_parser,
+    parse_datetime as datetime_parser,
+)
 import re
 from textwrap import wrap
 from functools import wraps
@@ -391,7 +394,7 @@ class OneLogin_Saml2_Utils(object):
     @staticmethod
     def parse_time_to_SAML(time):
         r"""
-        Converts a UNIX timestamp to SAML2 timestamp on the form
+        Converts a UNIX timestamp to SAML2 timestamp of the form
         yyyy-mm-ddThh:mm:ss(\.s+)?Z.
 
         :param time: The time we should convert (DateTime).
@@ -406,7 +409,7 @@ class OneLogin_Saml2_Utils(object):
     @staticmethod
     def parse_SAML_to_time(timestr):
         r"""
-        Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z
+        Converts a SAML2 timestamp of the form yyyy-mm-ddThh:mm:ss(\.s+)?Z
         to a UNIX timestamp. The sub-second part is ignored.
 
         :param timestr: The time we should convert (SAML Timestamp).
@@ -415,10 +418,7 @@ class OneLogin_Saml2_Utils(object):
         :return: Converted to a unix timestamp.
         :rtype: int
         """
-        try:
-            data = datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%SZ')
-        except ValueError:
-            data = datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S.%fZ')
+        data = datetime_parser(timestr)
         return calendar.timegm(data.utctimetuple())
 
     @staticmethod

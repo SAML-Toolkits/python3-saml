@@ -65,7 +65,7 @@ def index(request):
         # If LogoutRequest ID need to be stored in order to later validate it, do instead
         # slo_built_url = auth.logout(name_id=name_id, session_index=session_index)
         # request.session['LogoutRequestID'] = auth.get_last_request_id()
-        #return HttpResponseRedirect(slo_built_url)
+        # return HttpResponseRedirect(slo_built_url)
     elif 'acs' in req['get_data']:
         request_id = None
         if 'AuthNRequestID' in request.session:

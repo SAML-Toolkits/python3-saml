@@ -1,4 +1,9 @@
 # python3-saml changelog
+### 1.7.0 (Jun 25, 2019)
+* Adjusted acs endpoint to extract NameQualifier and SPNameQualifier from SAMLResponse. Adjusted single logout service to provide NameQualifier and SPNameQualifier to logout method. Add getNameIdNameQualifier to Auth and SamlResponse. Extend logout method from Auth and LogoutRequest constructor to support SPNameQualifier parameter. Align LogoutRequest constructor with SAML specs
+* Added get_in_response_to method to Response and LogoutResponse classes
+* Update defusexml dependency
+
 ### 1.6.0 (Apr 10, 2019)
 * Add support for Subjects on AuthNRequests by the new name_id_value_req parameter
 * [#127](https://github.com/onelogin/python3-saml/pull/127) Fix for SLO when XML specifies encoding

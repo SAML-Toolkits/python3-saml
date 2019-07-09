@@ -540,7 +540,7 @@ req = {
     "get_data": "",
     "post_data": "",
 
-    /* Advanced request options */
+    # Advanced request options
     "https": "",
     "lowercase_urlencoding": "",
     "request_uri": "",

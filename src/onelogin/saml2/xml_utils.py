@@ -147,7 +147,9 @@ class OneLogin_Saml2_XML(object):
         :rtype: etree.Element
         """
         all_prefixes_to_keep = [
-            OneLogin_Saml2_Constants.NS_PREFIX_XS
+            OneLogin_Saml2_Constants.NS_PREFIX_XS,
+            OneLogin_Saml2_Constants.NS_PREFIX_XSI,
+            OneLogin_Saml2_Constants.NS_PREFIX_XSD
         ]
 
         if keep_ns_prefixes:

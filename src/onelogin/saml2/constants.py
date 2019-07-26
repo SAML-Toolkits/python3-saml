@@ -53,6 +53,7 @@ class OneLogin_Saml2_Constants(object):
     NS_PREFIX_MD = 'md'
     NS_PREFIX_XS = 'xs'
     NS_PREFIX_XSI = 'xsi'
+    NS_PREFIX_XSD = 'xsd'
     NS_PREFIX_XENC = 'xenc'
     NS_PREFIX_DS = 'ds'
 

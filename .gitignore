@@ -28,3 +28,5 @@ __pycache_
 
 settings.py
 advanced_settings.py
+
+.vscode

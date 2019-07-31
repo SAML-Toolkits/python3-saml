@@ -149,7 +149,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_11 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, "The SPNameQualifier value wrong-sp-entityid mistmatch the SP entityID value http://stuff.com/endpoints/metadata.php"):
             response_11.get_nameid()
 
         json_settings['strict'] = True
@@ -254,7 +254,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_11 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, "The SPNameQualifier value wrong-sp-entityid mistmatch the SP entityID value http://stuff.com/endpoints/metadata.php"):
             response_11.get_nameid_format()
 
         json_settings['strict'] = True
@@ -454,7 +454,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'wrong_spnamequalifier.xml.base64'))
         response_11 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value mistmatch the SP entityID value.'):
+        with self.assertRaisesRegex(Exception, 'The SPNameQualifier value wrong-sp-entityid mistmatch the SP entityID value http://stuff.com/endpoints/metadata.php'):
             response_11.get_nameid_data()
 
         expected_nameid_data_5 = {
@@ -638,7 +638,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
         xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'no_issuer_assertion.xml.base64'))
         response_5 = OneLogin_Saml2_Response(settings, xml_5)
-        with self.assertRaisesRegex(Exception, 'Issuer of the Assertion not found or multiple.'):
+        with self.assertRaisesRegex(Exception, "Issuer of the Response not found or multiple: 1"):
             response_5.get_issuers()
 
     def testGetSessionIndex(self):
@@ -975,7 +975,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'invalids', 'duplicated_attributes.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        with self.assertRaisesRegex(Exception, 'Found an Attribute element with duplicated Name'):
+        with self.assertRaisesRegex(Exception, 'Found an Attribute element uid with duplicated Name'):
             response.get_attributes()
 
     def testIsInValidDestination(self):

@@ -67,9 +67,10 @@ class OneLogin_Saml2_Response(object):
         self.__error = None
         try:
             # Checks SAML version
-            if self.document.get('Version', None) != '2.0':
+            version = self.document.get('Version', None)
+            if version != '2.0':
                 raise OneLogin_Saml2_ValidationError(
-                    'Unsupported SAML version',
+                    'Unsupported SAML version {}'.format(version),
                     OneLogin_Saml2_ValidationError.UNSUPPORTED_SAML_VERSION
                 )
 
@@ -209,7 +210,7 @@ class OneLogin_Saml2_Response(object):
                 valid_audiences = self.get_audiences()
                 if valid_audiences and sp_entity_id not in valid_audiences:
                     raise OneLogin_Saml2_ValidationError(
-                        '%s is not a valid audience for this Response' % sp_entity_id,
+                        '%s is not a valid audience for this Response; valid are %s' % (sp_entity_id, valid_audiences),
                         OneLogin_Saml2_ValidationError.WRONG_AUDIENCE
                     )
 
@@ -412,7 +413,7 @@ class OneLogin_Saml2_Response(object):
                     issuers.add(issuer_value)
             else:
                 raise OneLogin_Saml2_ValidationError(
-                    'Issuer of the Response is multiple.',
+                    'Issuer of the Response not found or multiple: %d' % len(message_issuer_nodes),
                     OneLogin_Saml2_ValidationError.ISSUER_MULTIPLE_IN_RESPONSE
                 )
 
@@ -423,7 +424,7 @@ class OneLogin_Saml2_Response(object):
                 issuers.add(issuer_value)
         else:
             raise OneLogin_Saml2_ValidationError(
-                'Issuer of the Assertion not found or multiple.',
+                'Issuer of the Response not found or multiple: %d' % len(message_issuer_nodes),
                 OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_ASSERTION
             )
 
@@ -473,7 +474,7 @@ class OneLogin_Saml2_Response(object):
                         sp_entity_id = sp_data.get('entityId', '')
                         if sp_entity_id != value:
                             raise OneLogin_Saml2_ValidationError(
-                                'The SPNameQualifier value mistmatch the SP entityID value.',
+                                'The SPNameQualifier value %s mistmatch the SP entityID value %s' % (value, sp_entity_id),
                                 OneLogin_Saml2_ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH
                             )
 
@@ -579,7 +580,7 @@ class OneLogin_Saml2_Response(object):
             attr_name = attribute_node.get('Name')
             if attr_name in attributes.keys():
                 raise OneLogin_Saml2_ValidationError(
-                    'Found an Attribute element with duplicated Name',
+                    'Found an Attribute element %s with duplicated Name' % attr_name,
                     OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
                 )
 
@@ -642,7 +643,7 @@ class OneLogin_Saml2_Response(object):
             signed_element = sign_node.getparent().tag
             if signed_element != response_tag and signed_element != assertion_tag:
                 raise OneLogin_Saml2_ValidationError(
-                    'Invalid Signature Element %s SAML Response rejected' % signed_element,
+                    'Invalid Signature Element %s SAML Response rejected; response %s, assertion %s' % (signed_element, response_tag, assertion_tag),
                     OneLogin_Saml2_ValidationError.WRONG_SIGNED_ELEMENT
                 )
 
@@ -655,7 +656,7 @@ class OneLogin_Saml2_Response(object):
             id_value = sign_node.getparent().get('ID')
             if id_value in verified_ids:
                 raise OneLogin_Saml2_ValidationError(
-                    'Duplicated ID. SAML Response rejected',
+                    'Duplicated ID %s. SAML Response rejected' % id_value,
                     OneLogin_Saml2_ValidationError.DUPLICATED_ID_IN_SIGNED_ELEMENTS
                 )
             verified_ids.append(id_value)
@@ -669,13 +670,13 @@ class OneLogin_Saml2_Response(object):
 
                     if sei != id_value:
                         raise OneLogin_Saml2_ValidationError(
-                            'Found an invalid Signed Element. SAML Response rejected',
+                            'Found an invalid Signed Element %s, valid %s. SAML Response rejected' % (sei, id_value),
                             OneLogin_Saml2_ValidationError.INVALID_SIGNED_ELEMENT
                         )
 
                     if sei in verified_seis:
                         raise OneLogin_Saml2_ValidationError(
-                            'Duplicated Reference URI. SAML Response rejected',
+                            'Duplicated Reference URI %s. SAML Response rejected' % sei,
                             OneLogin_Saml2_ValidationError.DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS
                         )
                     verified_seis.append(sei)
@@ -717,7 +718,7 @@ class OneLogin_Saml2_Response(object):
             expected_signature_nodes = OneLogin_Saml2_XML.query(self.document, OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH)
             if len(expected_signature_nodes) != 1:
                 raise OneLogin_Saml2_ValidationError(
-                    'Unexpected number of Response signatures found. SAML Response rejected.',
+                    'Unexpected number of Response signatures found: %d. SAML Response rejected.' % len(expected_signature_nodes),
                     OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE
                 )
 
@@ -725,7 +726,7 @@ class OneLogin_Saml2_Response(object):
             expected_signature_nodes = self.__query(OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH)
             if len(expected_signature_nodes) != 1:
                 raise OneLogin_Saml2_ValidationError(
-                    'Unexpected number of Assertion signatures found. SAML Response rejected.',
+                    'Unexpected number of Assertion signatures found: %d. SAML Response rejected.' % len(expected_signature_nodes),
                     OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION
                 )
 
@@ -850,7 +851,7 @@ class OneLogin_Saml2_Response(object):
                     if 'RetrievalMethod' in child.tag:
                         if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
                             raise OneLogin_Saml2_ValidationError(
-                                'Unsupported Retrieval Method found',
+                                'Unsupported Retrieval Method %s found' % child.attrib['Type'],
                                 OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD
                             )
                         uri = child.attrib['URI']

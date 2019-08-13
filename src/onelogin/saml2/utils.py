@@ -47,7 +47,7 @@ def return_false_on_exception(func):
         if not kwargs.pop('raise_exceptions', False):
             try:
                 return func(*args, **kwargs)
-            except Exception:
+            except (OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError):
                 return False
         else:
             return func(*args, **kwargs)

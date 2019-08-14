@@ -956,10 +956,10 @@ class OneLogin_Saml2_Utils(object):
             )
 
         # Check if Reference URI is empty
-        reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
-        if len(reference_elem) > 0:
-            if reference_elem[0].get('URI') == '':
-                reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
+        # reference_elem = OneLogin_Saml2_XML.query(signature_node, '//ds:Reference')
+        # if len(reference_elem) > 0:
+        #     if reference_elem[0].get('URI') == '':
+        #         reference_elem[0].set('URI', '#%s' % signature_node.getparent().get('ID'))
 
         if validatecert:
             manager = xmlsec.KeysManager()

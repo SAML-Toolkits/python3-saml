@@ -319,7 +319,7 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         assert isinstance(name, compat.str_type)
-        return self.__attributes.get(name)
+        return self.__attributes.get(name, [])
 
     def get_last_request_id(self):
         """

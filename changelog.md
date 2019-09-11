@@ -1,6 +1,8 @@
 # python3-saml changelog
-### 1.7.1 (unrelease)
-* Drop python3.4 support
+### 1.8.0 (Sep 11, 2019)
+* Set true as the default value for strict setting
+* [#152](https://github.com/onelogin/python3-saml/pull/152/files) Don't clean xsd and xsi namespaces
+* Drop python3.4 support due lxml. See lxml 4.4.0 (2019-07-27)
 
 ### 1.7.0 (Jul 02, 2019)
 * Adjusted acs endpoint to extract NameQualifier and SPNameQualifier from SAMLResponse. Adjusted single logout service to provide NameQualifier and SPNameQualifier to logout method. Add getNameIdNameQualifier to Auth and SamlResponse. Extend logout method from Auth and LogoutRequest constructor to support SPNameQualifier parameter. Align LogoutRequest constructor with SAML specs

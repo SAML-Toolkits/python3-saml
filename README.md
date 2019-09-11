@@ -14,6 +14,8 @@ This version supports Python3. There is a separate version that only support Pyt
 
 #### Warning ####
 
+Version 1.8.0 sets strict mode active by default
+
 Update ``python3-saml`` to ``1.5.0``, this version includes security improvements for preventing XEE and Xpath Injections.
 
 Update ``python3-saml`` to ``1.4.0``, this version includes a fix for the [CVE-2017-11427](https://www.cvedetails.com/cve/CVE-2017-11427/) vulnerability.

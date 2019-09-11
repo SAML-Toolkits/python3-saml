@@ -755,7 +755,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         del settings_info['strict']
 
         settings = OneLogin_Saml2_Settings(settings_info)
-        self.assertFalse(settings.is_strict())
+        self.assertTrue(settings.is_strict())
 
         settings_info['strict'] = False
         settings_2 = OneLogin_Saml2_Settings(settings_info)

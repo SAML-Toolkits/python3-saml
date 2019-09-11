@@ -83,7 +83,7 @@ class OneLogin_Saml2_Settings(object):
         """
         self.__sp_validation_only = sp_validation_only
         self.__paths = {}
-        self.__strict = False
+        self.__strict = True
         self.__debug = False
         self.__sp = {}
         self.__idp = {}
@@ -214,7 +214,7 @@ class OneLogin_Saml2_Settings(object):
             self.__errors = []
             self.__sp = settings['sp']
             self.__idp = settings.get('idp', {})
-            self.__strict = settings.get('strict', False)
+            self.__strict = settings.get('strict', True)
             self.__debug = settings.get('debug', False)
             self.__security = settings.get('security', {})
             self.__contacts = settings.get('contactPerson', {})

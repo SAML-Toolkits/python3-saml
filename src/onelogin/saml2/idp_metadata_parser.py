@@ -219,9 +219,9 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         """
         Will update the settings with the provided new settings data extracted from the IdP metadata
         :param settings: Current settings dict data
-        :type settings: string
+        :type settings: dict
         :param new_metadata_settings: Settings to be merged (extracted from IdP metadata after parsing)
-        :type new_metadata_settings: string
+        :type new_metadata_settings: dict
         :returns: merged settings
         :rtype: dict
         """

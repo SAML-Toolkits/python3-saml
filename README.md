@@ -410,7 +410,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         "requestedAuthnContext": true,
 	// Allows the authn comparison parameter to be set, defaults to 'exact' if the setting is not present.
         "requestedAuthnContextComparison": "exact",
-        // Set to true to check that the AuthnContext received matches the one requested.
+        // Set to true to check that the AuthnContext(s) received match(es) the requested.
         "failOnAuthnContextMismatch": false,
 
         // In some environment you will need to set how long the published metadata of the Service Provider gonna be valid.

@@ -166,10 +166,10 @@ class OneLogin_Saml2_Response(object):
                 requested_authn_contexts = security['requestedAuthnContext']
                 if security['failOnAuthnContextMismatch'] and requested_authn_contexts and requested_authn_contexts is not True:
                     authn_contexts = self.get_authn_contexts()
-                    unmatched_contexts = set(requested_authn_contexts).difference(authn_contexts)
+                    unmatched_contexts = set(authn_contexts).difference(requested_authn_contexts)
                     if unmatched_contexts:
                         raise OneLogin_Saml2_ValidationError(
-                            'The AuthnContext "%s" didn\'t include requested context "%s"' % (', '.join(authn_contexts), ', '.join(unmatched_contexts)),
+                            'The AuthnContext "%s" was not a requested context "%s"' % (', '.join(unmatched_contexts), ', '.join(requested_authn_contexts)),
                             OneLogin_Saml2_ValidationError.AUTHN_CONTEXT_MISMATCH
                         )
 

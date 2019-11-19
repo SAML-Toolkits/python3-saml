@@ -95,9 +95,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
         requested_authn_context_str = ''
         if security['requestedAuthnContext'] is not False:
-            authn_comparison = 'exact'
-            if 'requestedAuthnContextComparison' in security.keys():
-                authn_comparison = security['requestedAuthnContextComparison']
+            authn_comparison = security['requestedAuthnContextComparison']
 
             if security['requestedAuthnContext'] is True:
                 requested_authn_context_str = """    <samlp:RequestedAuthnContext Comparison="%s">

@@ -5,18 +5,18 @@ import tornado.httpserver
 import tornado.httputil
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
-##Global session info
+# Global session info
 session = {}
+
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", IndexHandler),
             (r"/attrs", AttrsHandler),
-            (r"/metadata",MetadataHandler),
+            (r"/metadata", MetadataHandler),
         ]
         settings = {
             "template_path": Settings.TEMPLATE_PATH,
@@ -55,7 +55,7 @@ class IndexHandler(tornado.web.RequestHandler):
             if len(session['samlUserdata']) > 0:
                 attributes = session['samlUserdata'].items()
 
-        self.render('index.html',errors=errors,error_reason=error_reason,not_auth_warn=not_auth_warn,success_slo=success_slo,attributes=attributes,paint_logout=paint_logout)
+        self.render('index.html', errors=errors, error_reason=error_reason, not_auth_warn=not_auth_warn, success_slo=success_slo, attributes=attributes, paint_logout=paint_logout)
 
     def get(self):
         req = prepare_tornado_request(self.request)
@@ -99,7 +99,7 @@ class IndexHandler(tornado.web.RequestHandler):
                     error_reason = auth.get_last_error_reason()
         elif 'sls' in req['get_data']:
             print('-sls-')
-            dscb = lambda: session.clear() ## clear out the session
+            dscb = lambda: session.clear()  # clear out the session
             url = auth.process_slo(delete_session_cb=dscb)
             errors = auth.get_errors()
             if len(errors) == 0:
@@ -115,7 +115,8 @@ class IndexHandler(tornado.web.RequestHandler):
             if len(session['samlUserdata']) > 0:
                 attributes = session['samlUserdata'].items()
                 print("ATTRIBUTES", attributes)
-        self.render('index.html',errors=errors,error_reason=error_reason,not_auth_warn=not_auth_warn,success_slo=success_slo,attributes=attributes,paint_logout=paint_logout)
+        self.render('index.html', errors=errors, error_reason=error_reason, not_auth_warn=not_auth_warn, success_slo=success_slo, attributes=attributes, paint_logout=paint_logout)
+
 
 class AttrsHandler(tornado.web.RequestHandler):
     def get(self):
@@ -127,27 +128,28 @@ class AttrsHandler(tornado.web.RequestHandler):
             if len(session['samlUserdata']) > 0:
                 attributes = session['samlUserdata'].items()
 
-        self.render('attrs.html',paint_logout=paint_logout,attributes=attributes)
+        self.render('attrs.html', paint_logout=paint_logout, attributes=attributes)
+
 
 class MetadataHandler(tornado.web.RequestHandler):
     def get(self):
         req = prepare_tornado_request(self.request)
         auth = init_saml_auth(req)
         saml_settings = auth.get_settings()
-        #saml_settings = OneLogin_Saml2_Settings(settings=None, custom_base_path=settings.SAML_FOLDER, sp_validation_only=True)
         metadata = saml_settings.get_sp_metadata()
         errors = saml_settings.validate_metadata(metadata)
 
         if len(errors) == 0:
-            #resp = HttpResponse(content=metadata, content_type='text/xml')
-            self.set_header('Content-Type','text/xml')
+            # resp = HttpResponse(content=metadata, content_type='text/xml')
+            self.set_header('Content-Type', 'text/xml')
             self.write(metadata)
         else:
-            #resp = HttpResponseServerError(content=', '.join(errors))
+            # resp = HttpResponseServerError(content=', '.join(errors))
             self.write(', '.join(errors))
-        #return resp
+        # return resp
 
-def prepare_tornado_request(request):        
+
+def prepare_tornado_request(request):
 
     dataDict = {}
     for key in request.arguments:
@@ -163,6 +165,7 @@ def prepare_tornado_request(request):
         'query_string': request.query
     }
     return result
+
 
 def init_saml_auth(req):
     auth = OneLogin_Saml2_Auth(req, custom_base_path=Settings.SAML_PATH)

@@ -601,7 +601,7 @@ auth.login()      # Method that builds and sends the AuthNRequest
 
 The ``AuthNRequest`` will be sent signed or unsigned based on the security info of the ``advanced_settings.json`` file (i.e. ``authnRequestsSigned``).
 
-The IdP will then return the SAML Response to the user's client. The client is then forwarded to the **Attribute Consumer Service (ACS)** of the SP with this information.
+The IdP will then return the SAML Response to the user's client. The client is then forwarded to the **Assertion Consumer Service (ACS)** of the SP with this information.
 
 We can set a ``return_to`` url parameter to the login function and that will be converted as a ``RelayState`` parameter:
 
@@ -650,7 +650,7 @@ saml_settings = OneLogin_Saml2_Settings(settings=None, custom_base_path=None, sp
 ```
 to get the settings object and with the ``sp_validation_only=True`` parameter we will avoid the IdP settings validation.
 
-***Attribute Consumer Service (ACS)***
+***Assertion Consumer Service (ACS)***
 
 This code handles the SAML response that the IdP forwards to the SP through the user's client.
 

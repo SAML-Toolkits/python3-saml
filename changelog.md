@@ -1,6 +1,9 @@
 # python3-saml changelog
-### 1.8.1 (unreleased)
-* Do not touch message when validate his signature
+### 1.9.0 (Nov 20, 2019)
+* Allow any number of decimal places for seconds on SAML datetimes
+* Fix failOnAuthnContextMismatch code
+* Improve signature validation when no reference uri
+* Update demo versions. Improve them and add Tornado demo.
 
 ### 1.8.0 (Sep 11, 2019)
 * Set true as the default value for strict setting

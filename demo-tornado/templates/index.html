@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if errors %}
+  <div class="alert alert-danger" role="alert">
+    <strong>Errors:</strong>
+    <ul class="list-unstyled">
+        {% for err in errors %}
+          <li>{{err}}</li>
+        {% end %}
+        {% if error_reason %}
+          <span>{{error_reason}}</span>
+        {% end %}
+    </ul>
+  </div>
+{% end %}
+
+{% if not_auth_warn %}
+  <div class="alert alert-danger" role="alert">Not authenticated</div>
+{% end %}
+
+{% if success_slo %}
+  <div class="alert alert-success" role="alert">Successfully logged out</div>
+{% end %}
+
+{% if paint_logout %}
+  {% if attributes %}
+    <table class="table table-striped">
+      <thead>
+        <th>Name</th><th>Values</th>
+      </thead>
+      <tbody>
+        {% for attr in attributes %}
+          <tr>
+              <td>{{ attr[0] }}</td>
+            <td><ul class="list-unstyled">
+              <!-- <li>{{ attr[1][0] }}</li> -->
+              {% for elem in attr[1] %}
+                <li>{{ elem }}</li>
+              {% end %}
+            </ul></td>
+          </tr>
+        {% end %}
+
+
+        <!-- {% for attr, i in attributes %}
+            {% if i == 0 %}
+                <tr><td>{{ attr }}</td>
+                <td><ul class="list-unstyled">
+            {% end %}
+            {% if i == 1 %}
+                {% for val in attr %}
+                    <li>{{ val }}</li>
+                {% end %}
+            {% end %}
+          </ul></td></tr>
+        {% end %} -->
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-danger" role="alert">You don't have any attributes</div>
+  {% end %}
+  <a href="?slo" class="btn btn-danger">Logout</a>
+{% else %}
+  <a href="?sso" class="btn btn-primary">Login</a> <a href="?sso2" class="btn btn-info">Login and access to attrs page</a>
+{% end %}
+
+{% end %}

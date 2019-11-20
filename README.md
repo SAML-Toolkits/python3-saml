@@ -174,6 +174,11 @@ This folder contains a Flask project that will be used as demo to show how to ad
 
 This folder contains a Pyramid project that will be used as demo to show how to add SAML support to the [Pyramid Web Framework](http://docs.pylonsproject.org/projects/pyramid/en/latest/).  ``\_\_init__.py`` is the main file that configures the app and its routes, ``views.py`` is where all the logic and SAML handling takes place, and the templates are stored in the ``templates`` folder. The ``saml`` folder is the same as in the other two demos.
 
+#### demo-tornado ####
+
+This folder contains a Tornado project that will be used as demo to show how to add SAML support to the Tornado Framework. ``views.py`` (with its ``settings.py``) is the main Flask file that has all the code, this file uses the templates stored at the ``templates`` folder. In the ``saml`` folder we found the ``certs`` folder to store the X.509 public and private key, and the SAML toolkit settings (``settings.json`` and ``advanced_settings.json``).
+
+It requires python3.5 (it's using tornado 6.0.3)
 
 #### setup.py ####
 
@@ -1097,7 +1102,7 @@ For more info, look at the source code. Each method is documented and details ab
 Demos included in the toolkit
 -----------------------------
 
-The toolkit includes 2 demos to teach how use the toolkit (A Django and a Flask project), take a look on it.
+The toolkit includes 3 demos to teach how use the toolkit (A Django, Flask and a Tornado project), take a look on it.
 Demos require that SP and IdP are well configured before test it, so edit the settings files.
 
 Notice that each python framework has it own way to handle routes/urls and process request, so focus on
@@ -1170,6 +1175,79 @@ The flask project contains:
 The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways: Settings files or define a setting dict. In the ``demo-flask``, it uses the first method.
 
 In the ``index.py`` file we define the ``app.config['SAML_PATH']``, that will target to the ``saml`` folder. We require it in order to load the settings files.
+
+First we need to edit the ``saml/settings.json`` file, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the ``saml/advanced_settings.json`` files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
+
+#### IdP setup ####
+
+Once the SP is configured, the metadata of the SP is published at the ``/metadata`` url. Based on that info, configure the IdP.
+
+#### How it works ####
+
+ 1. First time you access to the main view (http://localhost:8000), you can select to login and return to the same view or login and be redirected to ``/?attrs`` (attrs view).
+
+ 2. When you click:
+
+    2.1 in the first link, we access to ``/?sso`` (index view). An ``AuthNRequest`` is sent to the IdP, we authenticate at the IdP and then a Response is sent through the user's client to the SP, specifically the Assertion Consumer Service view: ``/?acs``. Notice that a ``RelayState`` parameter is set to the url that initiated the process, the index view.
+
+    2.2 in the second link we access to ``/?attrs`` (attrs view), we will expetience have the same process described at 2.1 with the diference that as ``RelayState`` is set the ``attrs`` url.
+
+ 3. The SAML Response is processed in the ACS ``/?acs``, if the Response is not valid, the process stops here and a message is shown. Otherwise we are redirected to the ``RelayState`` view. a) / or b) ``/?attrs``
+
+ 4. We are logged in the app and the user attributes are showed. At this point, we can test the single log out functionality.
+
+ The single log out functionality could be tested by 2 ways.
+
+    5.1 SLO Initiated by SP. Click on the ``logout`` link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies through the client to the SP with a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint ``/?sls`` of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
+
+    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP side, the logout process is initiated at the IdP, sends a Logout Request to the SP (SLS endpoint, ``/?sls``). The SLS endpoint of the SP process the Logout Request and if is valid, close the session of the user at the local app and send a Logout Response to the IdP (to the SLS endpoint of the IdP). The IdP receives the Logout Response, process it and close the session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
+
+Notice that all the SAML Requests and Responses are handled at a unique view (index) and how GET parameters are used to know the action that must be done.
+
+### Demo Tornado ###
+
+You'll need a virtualenv with the toolkit installed on it.
+
+First of all you need some packages, execute:
+```
+apt-get install libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+```
+
+To run the demo you need to install the requirements first. Load your
+virtualenv and execute:
+```
+ pip install -r demo-tornado/requirements.txt
+```
+
+
+This will install tornado and its dependencies. Once it has finished, you have to complete the configuration
+of the toolkit. You'll find it at `demo-tornado/saml/settings.json`
+
+Now, with the virtualenv loaded, you can run the demo like this:
+```
+ cd demo-tornado
+ python views.py
+```
+
+You'll have the demo running at http://localhost:8000
+
+#### Content ####
+
+The tornado project contains:
+
+* ***views.py*** Is the main flask file, where or the SAML handle take place.
+
+* ***settings.py*** Contains the base path and the path where is located the ``saml`` folder and the ``template`` folder
+
+* ***templates***. Is the folder where tornado stores the templates of the project. It was implemented a base.html template that is extended by index.html and attrs.html, the templates of our simple demo that shows messages, user attributes when available and login and logout links.
+
+* ***saml*** Is a folder that contains the 'certs' folder that could be used to store the X.509 public and private key, and the saml toolkit settings (settings.json and advanced_settings.json).
+
+#### SP setup ####
+
+The Onelogin's Python Toolkit allows you to provide the settings info in 2 ways: Settings files or define a setting dict. In the ``demo-tornado``, it uses the first method.
+
+In the ``settings.py`` file we define the ``SAML_PATH``, that will target to the ``saml`` folder. We require it in order to load the settings files.
 
 First we need to edit the ``saml/settings.json`` file, configure the SP part and review the metadata of the IdP and complete the IdP info.  Later edit the ``saml/advanced_settings.json`` files and configure the how the toolkit will work. Check the settings section of this document if you have any doubt.
 

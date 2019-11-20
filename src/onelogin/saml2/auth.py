@@ -315,7 +315,7 @@ class OneLogin_Saml2_Auth(object):
         :param name: Name of the attribute
         :type name: string
 
-        :returns: Attribute value if exists or []
+        :returns: Attribute value if exists or None
         :rtype: string
         """
         assert isinstance(name, compat.str_type)

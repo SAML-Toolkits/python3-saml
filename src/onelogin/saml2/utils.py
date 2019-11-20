@@ -65,6 +65,10 @@ class OneLogin_Saml2_Utils(object):
     RESPONSE_SIGNATURE_XPATH = '/samlp:Response/ds:Signature'
     ASSERTION_SIGNATURE_XPATH = '/samlp:Response/saml:Assertion/ds:Signature'
 
+    TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+    TIME_FORMAT_2 = "%Y-%m-%dT%H:%M:%S.%fZ"
+    TIME_FORMAT_WITH_FRAGMENT = re.compile(r'^(\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:\d{2,2})(\.\d*)?Z?$')
+
     @staticmethod
     def escape_url(url, lowercase_urlencoding=False):
         """
@@ -401,7 +405,7 @@ class OneLogin_Saml2_Utils(object):
         :rtype: string
         """
         data = datetime.utcfromtimestamp(float(time))
-        return data.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return data.strftime(OneLogin_Saml2_Utils.TIME_FORMAT)
 
     @staticmethod
     def parse_SAML_to_time(timestr):
@@ -416,9 +420,16 @@ class OneLogin_Saml2_Utils(object):
         :rtype: int
         """
         try:
-            data = datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%SZ')
+            data = datetime.strptime(timestr, OneLogin_Saml2_Utils.TIME_FORMAT)
         except ValueError:
-            data = datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S.%fZ')
+            try:
+                data = datetime.strptime(timestr, OneLogin_Saml2_Utils.TIME_FORMAT_2)
+            except ValueError:
+                elem = OneLogin_Saml2_Utils.TIME_FORMAT_WITH_FRAGMENT.match(timestr)
+                if not elem:
+                    raise Exception("time data %s does not match format %s" % (timestr, r'yyyy-mm-ddThh:mm:ss(\.s+)?Z'))
+                data = datetime.strptime(elem.groups()[0] + "Z", OneLogin_Saml2_Utils.TIME_FORMAT)
+
         return calendar.timegm(data.utctimetuple())
 
     @staticmethod

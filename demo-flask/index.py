@@ -39,6 +39,7 @@ def index():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)
     errors = []
+    error_reason = None
     not_auth_warn = False
     success_slo = False
     attributes = False
@@ -86,6 +87,8 @@ def index():
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
                 return redirect(auth.redirect_to(request.form['RelayState']))
+        elif auth.get_settings().is_debug_active():
+                error_reason = auth.get_last_error_reason()
     elif 'sls' in request.args:
         request_id = None
         if 'LogoutRequestID' in session:
@@ -98,6 +101,8 @@ def index():
                 return redirect(url)
             else:
                 success_slo = True
+        elif auth.get_settings().is_debug_active():
+            error_reason = auth.get_last_error_reason()
 
     if 'samlUserdata' in session:
         paint_logout = True
@@ -107,6 +112,7 @@ def index():
     return render_template(
         'index.html',
         errors=errors,
+        error_reason=error_reason,
         not_auth_warn=not_auth_warn,
         success_slo=success_slo,
         attributes=attributes,

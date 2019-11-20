@@ -9,6 +9,9 @@
         {% for err in errors %}
           <li>{{err}}</li>
         {% end %}
+        {% if error_reason %}
+          <span>{{error_reason}}</span>
+        {% end %}
     </ul>
   </div>
 {% end %}

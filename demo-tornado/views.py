@@ -31,31 +31,36 @@ class IndexHandler(tornado.web.RequestHandler):
     def post(self):
         req = prepare_tornado_request(self.request)
         auth = init_saml_auth(req)
+        error_reason = None
         attributes = False
         paint_logout = False
+        success_slo = False
 
         auth.process_response()
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
 
         if len(errors) == 0:
-             session['samlUserdata'] = auth.get_attributes()
-             session['samlNameId'] = auth.get_nameid()
-             session['samlSessionIndex'] = auth.get_session_index()
-             self_url = OneLogin_Saml2_Utils.get_self_url(req)
-             if 'RelayState' in self.request.arguments and self_url != self.request.arguments['RelayState'][0].decode('utf-8'):
+            session['samlUserdata'] = auth.get_attributes()
+            session['samlNameId'] = auth.get_nameid()
+            session['samlSessionIndex'] = auth.get_session_index()
+            self_url = OneLogin_Saml2_Utils.get_self_url(req)
+            if 'RelayState' in self.request.arguments and self_url != self.request.arguments['RelayState'][0].decode('utf-8'):
                 return self.redirect(self.request.arguments['RelayState'][0].decode('utf-8'))
+        elif auth.get_settings().is_debug_active():
+            error_reason = auth.get_last_error_reason()
 
         if 'samlUserdata' in session:
             paint_logout = True
             if len(session['samlUserdata']) > 0:
                 attributes = session['samlUserdata'].items()
 
-        self.render('index.html',errors=errors,not_auth_warn=not_auth_warn,attributes=attributes,paint_logout=paint_logout)
+        self.render('index.html',errors=errors,error_reason=error_reason,not_auth_warn=not_auth_warn,success_slo=success_slo,attributes=attributes,paint_logout=paint_logout)
 
     def get(self):
         req = prepare_tornado_request(self.request)
         auth = init_saml_auth(req)
+        error_reason = None
         errors = []
         not_auth_warn = False
         success_slo = False
@@ -90,6 +95,8 @@ class IndexHandler(tornado.web.RequestHandler):
                 self_url = OneLogin_Saml2_Utils.get_self_url(req)
                 if 'RelayState' in self.request.arguments and self_url != self.request.arguments['RelayState'][0].decode('utf-8'):
                     return self.redirect(auth.redirect_to(self.request.arguments['RelayState'][0].decode('utf-8')))
+                elif auth.get_settings().is_debug_active():
+                    error_reason = auth.get_last_error_reason()
         elif 'sls' in req['get_data']:
             print('-sls-')
             dscb = lambda: session.clear() ## clear out the session
@@ -100,14 +107,15 @@ class IndexHandler(tornado.web.RequestHandler):
                     return self.redirect(url)
                 else:
                     success_slo = True
-
+            elif auth.get_settings().is_debug_active():
+                error_reason = auth.get_last_error_reason()
         if 'samlUserdata' in session:
             print('-samlUserdata-')
             paint_logout = True
             if len(session['samlUserdata']) > 0:
                 attributes = session['samlUserdata'].items()
                 print("ATTRIBUTES", attributes)
-        self.render('index.html',errors=errors,not_auth_warn=not_auth_warn,success_slo=success_slo,attributes=attributes,paint_logout=paint_logout)
+        self.render('index.html',errors=errors,error_reason=error_reason,not_auth_warn=not_auth_warn,success_slo=success_slo,attributes=attributes,paint_logout=paint_logout)
 
 class AttrsHandler(tornado.web.RequestHandler):
     def get(self):

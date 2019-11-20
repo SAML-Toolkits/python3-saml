@@ -178,6 +178,8 @@ This folder contains a Pyramid project that will be used as demo to show how to 
 
 This folder contains a Tornado project that will be used as demo to show how to add SAML support to the Tornado Framework. ``views.py`` (with its ``settings.py``) is the main Flask file that has all the code, this file uses the templates stored at the ``templates`` folder. In the ``saml`` folder we found the ``certs`` folder to store the X.509 public and private key, and the SAML toolkit settings (``settings.json`` and ``advanced_settings.json``).
 
+It requires python3.5 (it's using tornado 6.0.3)
+
 #### setup.py ####
 
 Setup script is the centre of all activity in building, distributing, and installing modules.
@@ -1252,33 +1254,6 @@ First we need to edit the ``saml/settings.json`` file, configure the SP part and
 #### IdP setup ####
 
 Once the SP is configured, the metadata of the SP is published at the ``/metadata`` url. Based on that info, configure the IdP.
-
-##### Test with keycloack #####
-
-You can test your SP with every compatible IdP, for example Keycloack by Red Hat (Check if you need also authorization and not only authentication )
-
-###### Install Docker ######
-
-Install docker as suggested by [docker guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/) 
-
-###### Keycloack starting ######
-
-First run:
-* docker run --name keycloackContainer -d -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e DB_VENDOR=H2 jboss/keycloak
-
-After first run:
-* sudo docker start keycloackContainer
-
-Remember to stop keycloack after usage:
-* sudo docker stop keycloackContainer
-
-
-###### Keycloack useful urls ######
-
-* master: http://localhost:8080/auth/admin
-* users: http://localhost:8080/auth/realms/idp_dacd/account/
-* saml request: http://localhost:8080/auth/realms/idp_dacd/protocol/saml
-* metadata: http://localhost:8080/auth/realms/idp_dacd/protocol/saml/descriptor
 
 #### How it works ####
 

@@ -86,8 +86,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     @staticmethod
     def parse(
             idp_metadata,
-            required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
-            required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
+            required_sso_binding=None,
+            required_slo_binding=None,
             entity_id=None):
         """
         Parses the Identity Provider metadata and return a dict with extracted data.
@@ -95,10 +95,12 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         If there are multiple <IDPSSODescriptor> tags, parse only the first.
 
         Parses only those SSO endpoints with the same binding as given by
-        the `required_sso_binding` parameter.
+        the `required_sso_binding` parameter if provided. If not provided,
+        search for an endpoint with a REDIRECT or a POST binding, in that order.
 
         Parses only those SLO endpoints with the same binding as given by
-        the `required_slo_binding` parameter.
+        the `required_slo_binding`  parameter if provided. If not provided,
+        search for an endpoint with a REDIRECT or a POST binding, in that order.
 
         If the metadata specifies multiple SSO endpoints with the required
         binding, extract only the first (the same holds true for SLO
@@ -109,11 +111,11 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
         :param required_sso_binding: Parse only POST or REDIRECT SSO endpoints.
         :type required_sso_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+            or OneLogin_Saml2_Constants.BINDING_HTTP_POST or None
 
         :param required_slo_binding: Parse only POST or REDIRECT SLO endpoints.
         :type required_slo_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+            or OneLogin_Saml2_Constants.BINDING_HTTP_POST or None
 
         :param entity_id: Specify the entity_id of the EntityDescriptor that you want to parse a XML
                           that contains multiple EntityDescriptor.
@@ -146,18 +148,31 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 if len(name_id_format_nodes) > 0:
                     idp_name_id_format = OneLogin_Saml2_XML.element_text(name_id_format_nodes[0])
 
-                sso_nodes = OneLogin_Saml2_XML.query(
-                    idp_descriptor_node,
-                    "./md:SingleSignOnService[@Binding='%s']" % required_sso_binding
+                valid_bindings = (
+                    OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
+                    OneLogin_Saml2_Constants.BINDING_HTTP_POST,
                 )
+
+                sso_bindings = (required_sso_binding,) if required_sso_binding else valid_bindings
+                for sso_binding in sso_bindings:
+                    sso_nodes = OneLogin_Saml2_XML.query(
+                        idp_descriptor_node,
+                        "./md:SingleSignOnService[@Binding='%s']" % sso_binding
+                    )
+                    if len(sso_nodes):
+                        break
 
                 if len(sso_nodes) > 0:
                     idp_sso_url = sso_nodes[0].get('Location', None)
 
-                slo_nodes = OneLogin_Saml2_XML.query(
-                    idp_descriptor_node,
-                    "./md:SingleLogoutService[@Binding='%s']" % required_slo_binding
-                )
+                slo_bindings = (required_slo_binding,) if required_slo_binding else valid_bindings
+                for slo_binding in slo_bindings:
+                    slo_nodes = OneLogin_Saml2_XML.query(
+                        idp_descriptor_node,
+                        "./md:SingleLogoutService[@Binding='%s']" % slo_binding
+                    )
+                    if len(slo_nodes):
+                        break
 
                 if len(slo_nodes) > 0:
                     idp_slo_url = slo_nodes[0].get('Location', None)
@@ -184,12 +199,12 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 if idp_sso_url is not None:
                     data['idp']['singleSignOnService'] = {}
                     data['idp']['singleSignOnService']['url'] = idp_sso_url
-                    data['idp']['singleSignOnService']['binding'] = required_sso_binding
+                    data['idp']['singleSignOnService']['binding'] = sso_binding
 
                 if idp_slo_url is not None:
                     data['idp']['singleLogoutService'] = {}
                     data['idp']['singleLogoutService']['url'] = idp_slo_url
-                    data['idp']['singleLogoutService']['binding'] = required_slo_binding
+                    data['idp']['singleLogoutService']['binding'] = slo_binding
 
                 if want_authn_requests_signed is not None:
                     data['security'] = {}

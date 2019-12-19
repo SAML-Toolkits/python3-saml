@@ -79,6 +79,7 @@ def index():
         if len(errors) == 0:
             if 'AuthNRequestID' in session:
                 del session['AuthNRequestID']
+            session['samlUserdata'] = auth.get_attributes()
             session['samlNameId'] = auth.get_nameid()
             session['samlNameIdFormat'] = auth.get_nameid_format()
             session['samlNameIdNameQualifier'] = auth.get_nameid_nq()
@@ -88,7 +89,7 @@ def index():
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
                 return redirect(auth.redirect_to(request.form['RelayState']))
         elif auth.get_settings().is_debug_active():
-                error_reason = auth.get_last_error_reason()
+            error_reason = auth.get_last_error_reason()
     elif 'sls' in request.args:
         request_id = None
         if 'LogoutRequestID' in session:

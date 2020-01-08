@@ -1473,7 +1473,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_2 = OneLogin_Saml2_Response(settings_2, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
-        settings_info_3 = self.loadSettingsJSON('settings2.json')
+        settings_info_3 = self.loadSettingsJSON('settings10.json')
         idp_cert = OneLogin_Saml2_Utils.format_cert(settings_info_3['idp']['x509cert'])
         settings_info_3['idp']['certFingerprint'] = OneLogin_Saml2_Utils.calculate_x509_fingerprint(idp_cert)
         settings_info_3['idp']['x509cert'] = ''
@@ -1662,7 +1662,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response_9.is_valid(self.get_request_data()))
 
     def testMessageSignedIsValidSignWithEmptyReferenceURI(self):
-        settings_info = self.loadSettingsJSON()
+        settings_info = self.loadSettingsJSON("settings10.json")
         del settings_info['idp']['x509cert']
         settings_info['idp']['certFingerprint'] = "657302a5e11a4794a1e50a705988d66c9377575d"
         settings = OneLogin_Saml2_Settings(settings_info)
@@ -1671,7 +1671,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertTrue(response.is_valid(self.get_request_data()))
 
     def testAssertionSignedIsValidSignWithEmptyReferenceURI(self):
-        settings_info = self.loadSettingsJSON()
+        settings_info = self.loadSettingsJSON('settings10.json')
         del settings_info['idp']['x509cert']
         settings_info['idp']['certFingerprint'] = "657302a5e11a4794a1e50a705988d66c9377575d"
         settings = OneLogin_Saml2_Settings(settings_info)

@@ -72,7 +72,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 if exists_multix509enc:
                     cert = idp_data['x509certMulti']['encryption'][0]
                 else:
-                    cert = idp_data['x509cert']
+                    cert = self.__settings.get_idp_cert()
 
             if name_id is not None:
                 if not name_id_format and sp_data['NameIDFormat'] != OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED:

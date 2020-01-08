@@ -605,8 +605,7 @@ class OneLogin_Saml2_Auth(object):
                 return True
 
             idp_data = self.get_settings().get_idp_data()
-
-            exists_x509cert = 'x509cert' in idp_data and idp_data['x509cert']
+            exists_x509cert = self.get_settings().get_idp_cert() is not None
             exists_multix509sign = 'x509certMulti' in idp_data and \
                 'signing' in idp_data['x509certMulti'] and \
                 idp_data['x509certMulti']['signing']
@@ -646,7 +645,7 @@ class OneLogin_Saml2_Auth(object):
                     OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
                 )
             else:
-                cert = idp_data['x509cert']
+                cert = self.get_settings().get_idp_cert()
 
                 if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
                                                                  OneLogin_Saml2_Utils.b64decode(signature),

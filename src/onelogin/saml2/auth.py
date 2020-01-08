@@ -605,6 +605,7 @@ class OneLogin_Saml2_Auth(object):
                 return True
 
             idp_data = self.get_settings().get_idp_data()
+
             exists_x509cert = self.get_settings().get_idp_cert() is not None
             exists_multix509sign = 'x509certMulti' in idp_data and \
                 'signing' in idp_data['x509certMulti'] and \

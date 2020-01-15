@@ -171,6 +171,7 @@ def init_saml_auth(req):
     auth = OneLogin_Saml2_Auth(req, custom_base_path=Settings.SAML_PATH)
     return auth
 
+
 if __name__ == "__main__":
     app = Application()
     http_server = tornado.httpserver.HTTPServer(app)

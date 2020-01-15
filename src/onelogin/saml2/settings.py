@@ -559,7 +559,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: string
         """
         cert = self.__idp.get('x509cert')
-        cert_file_name = self.__paths['cert'] + 'idp.crt'
+        cert_file_name = self.get_cert_path() + 'idp.crt'
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
                 cert = f.read()

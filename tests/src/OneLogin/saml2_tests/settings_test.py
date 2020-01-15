@@ -222,6 +222,28 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_3 = OneLogin_Saml2_Settings(settings_data, custom_base_path=custom_base_path)
         self.assertIsNone(settings_3.get_sp_key())
 
+    def testGetIDPCert(self):
+        """
+        Tests the get_idp_cert method of the OneLogin_Saml2_Settings
+        """
+
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings9.json'))
+        cert = "-----BEGIN CERTIFICATE-----\nMIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMC\nTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYD\nVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG\n9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4\nMTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xi\nZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2Zl\naWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5v\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LO\nNoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHIS\nKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d\n1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8\nBUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7n\nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2Qar\nQ4/67OZfHd7R+POBXhophSMv1ZOo\n-----END CERTIFICATE-----\n"
+        self.assertEqual(cert, settings.get_idp_cert())
+
+        settings_data = self.loadSettingsJSON()
+
+        settings = OneLogin_Saml2_Settings(settings_data)
+        settings_data['idp']['x509cert'] = cert
+        self.assertEqual(cert, settings.get_sp_cert())
+
+        del settings_data['idp']['x509cert']
+        del settings_data['custom_base_path']
+        custom_base_path = dirname(__file__)
+
+        settings_3 = OneLogin_Saml2_Settings(settings_data, custom_base_path=custom_base_path)
+        self.assertIsNone(settings_3.get_idp_cert())
+
     def testFormatIdPCert(self):
         """
         Tests the format_idp_cert method of the OneLogin_Saml2_Settings

@@ -293,7 +293,7 @@ class OneLogin_Saml2_Response(object):
                     OneLogin_Saml2_ValidationError.NO_SIGNATURE_FOUND
                 )
             else:
-                cert = idp_data.get('x509cert', None)
+                cert = self.__settings.get_idp_cert()
                 fingerprint = idp_data.get('certFingerprint', None)
                 if fingerprint:
                     fingerprint = OneLogin_Saml2_Utils.format_finger_print(fingerprint)

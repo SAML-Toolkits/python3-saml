@@ -27,7 +27,7 @@ class OneLogin_Saml2_Templates(object):
   Version="2.0"%(provider_name)s%(force_authn_str)s%(is_passive_str)s
   IssueInstant="%(issue_instant)s"
   Destination="%(destination)s"
-  ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+  ProtocolBinding="%(acs_binding)s"
   AssertionConsumerServiceURL="%(assertion_url)s"%(attr_consuming_service_str)s>
     <saml:Issuer>%(entity_id)s</saml:Issuer>%(subject_str)s%(nameid_policy_str)s
 %(requested_authn_context_str)s

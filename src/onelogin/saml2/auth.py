@@ -15,6 +15,8 @@ import xmlsec
 
 from onelogin.saml2 import compat
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
+from onelogin.saml2.artifact_resolve import Artifact_Resolve_Request
+from onelogin.saml2.artifact_response import Artifact_Response
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
@@ -93,6 +95,39 @@ class OneLogin_Saml2_Auth(object):
         """
         assert isinstance(value, bool)
         self.__settings.set_strict(value)
+
+    def artifact_resolve(self, saml_art):
+        """
+        Try to resolve the given artifact
+
+        TODO: should be integrated into the process_response method.
+        """
+        resolve_request = Artifact_Resolve_Request(self.__settings, saml_art)
+        resolve_response = resolve_request.send()
+        if resolve_response.status_code != 200:
+            raise OneLogin_Saml2_ValidationError(
+                "Received a status code {status_code} when trying to resolve the given artifact {saml_art}".format(
+                    status_code=resolve_response.status_code, saml_art=saml_art
+                )
+            )
+
+        artifact_response = Artifact_Response(self.__settings, resolve_response.content)
+        if not artifact_response.is_valid(resolve_request.get_id()):
+            raise OneLogin_Saml2_ValidationError(
+                "The ArtifactResponse could not be validated due to the following error: {error}".format(
+                    error=artifact_response.get_error()
+                )
+            )
+
+        saml2_response = OneLogin_Saml2_Response(self.__settings, artifact_response.get_response_xml())
+        if not saml2_response.is_valid(self.__request_data, check_signatures=False):
+            raise OneLogin_Saml2_ValidationError(
+                "The Response could not be validated due to the following error: {error}".format(
+                    error=artifact_response.get_error()
+                )
+            )
+
+        return saml2_response
 
     def process_response(self, request_id=None):
         """

@@ -33,6 +33,25 @@ class OneLogin_Saml2_Templates(object):
 %(requested_authn_context_str)s
 </samlp:AuthnRequest>"""
 
+    SOAP_ENVELOPE = """\
+<soap:Envelope
+ xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Body>
+%(soap_body)s
+</soap:Body>
+</soap:Envelope>
+    """
+
+    ARTIFACT_RESOLVE_REQUEST = """\
+<samlp:ArtifactResolve
+ xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+ xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+ ID="%(id)s" Version="2.0" IssueInstant="%(issue_instant)s">
+ <saml:Issuer>%(entity_id)s</saml:Issuer>
+ <samlp:Artifact>%(artifact)s</samlp:Artifact>
+</samlp:ArtifactResolve>
+    """
+
     LOGOUT_REQUEST = """\
 <samlp:LogoutRequest
   xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"

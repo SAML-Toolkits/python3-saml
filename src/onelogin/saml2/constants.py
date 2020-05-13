@@ -56,6 +56,7 @@ class OneLogin_Saml2_Constants(object):
     NS_PREFIX_XSD = 'xsd'
     NS_PREFIX_XENC = 'xenc'
     NS_PREFIX_DS = 'ds'
+    NS_PREFIX_SOAP = 'soap'
 
     # Prefix:Namespace Mappings
     NSMAP = {
@@ -63,7 +64,8 @@ class OneLogin_Saml2_Constants(object):
         NS_PREFIX_SAML: NS_SAML,
         NS_PREFIX_DS: NS_DS,
         NS_PREFIX_XENC: NS_XENC,
-        NS_PREFIX_MD: NS_MD
+        NS_PREFIX_MD: NS_MD,
+        NS_PREFIX_SOAP: NS_SOAP
     }
 
     # Bindings

@@ -591,6 +591,19 @@ class OneLogin_Saml2_Response(object):
                     if attr_text:
                         values.append(attr_text)
 
+                # Parse encrypted ids
+                for encrypted_id in attr.iterchildren('{%s}EncryptedID' % OneLogin_Saml2_Constants.NSMAP['saml']):
+                    key = self.__settings.get_sp_key()
+                    encrypted_data = encrypted_id.getchildren()[0]
+                    nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
+                    values.append({
+                        'NameID': {
+                            'Format': nameid.get('Format'),
+                            'NameQualifier': nameid.get('NameQualifier'),
+                            'value': nameid.text
+                        }
+                    })
+
                 # Parse any nested NameID children
                 for nameid in attr.iterchildren('{%s}NameID' % OneLogin_Saml2_Constants.NSMAP['saml']):
                     values.append({

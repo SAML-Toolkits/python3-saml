@@ -378,7 +378,35 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__last_authn_contexts
 
-    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
+    def _create_authn_request(
+        self, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None
+    ):
+        authn_request = self.authn_request_class(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
+
+        self.__last_request = authn_request.get_xml()
+        self.__last_request_id = authn_request.get_id()
+        return authn_request
+
+    def login_post(self, return_to=None, **authn_kwargs):
+        authn_request = self._create_authn_request(**authn_kwargs)
+        saml_request = OneLogin_Saml2_Utils.b64encode(
+            OneLogin_Saml2_Utils.add_sign(
+                authn_request.get_request(deflate=False, base64_encode=False),
+                self.__settings.get_sp_key(), self.__settings.get_sp_cert(),
+                sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256,
+                digest_algorithm=OneLogin_Saml2_Constants.SHA256,),
+
+        )
+        parameters = {'SAMLRequest': saml_request}
+
+        if return_to is not None:
+            parameters['RelayState'] = return_to
+        else:
+            parameters['RelayState'] = OneLogin_Saml2_Utils.get_self_url_no_query(self.__request_data)
+
+        return self.get_sso_url(), parameters
+
+    def login(self, return_to=None, **authn_kwargs):
         """
         Initiates the SSO process.
 
@@ -400,9 +428,7 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = self.authn_request_class(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
-        self.__last_request = authn_request.get_xml()
-        self.__last_request_id = authn_request.get_id()
+        authn_request = self._create_authn_request(**authn_kwargs)
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}

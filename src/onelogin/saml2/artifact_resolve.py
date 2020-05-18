@@ -53,11 +53,11 @@ class Artifact_Resolve_Request:
         index, sha1_entity_id, message_handle = parse_saml2_artifact(saml_art)
 
         idp = self.__settings.get_idp_data()
-        if idp['assertionConsumerService']['index'] != index:
+        if idp['artifactResolutionService']['index'] != index:
             raise OneLogin_Saml2_ValidationError(
                 "The SourceID given in the SAML artifact ({}) does not correspond with a "
                 "configured ACS index ({})".format(
-                    index, idp['assertionConsumerService']['index']
+                    index, idp['artifactResolutionService']['index']
                 )
             )
 
@@ -75,10 +75,10 @@ class Artifact_Resolve_Request:
         idp = self.__settings.get_idp_data()
         headers = {"content-type": "application/soap+xml"}
         return requests.post(
-            url=idp['assertionConsumerService']['url'],
+            url=idp['artifactResolutionService']['url'],
             cert=(
-                idp['assertionConsumerService']['clientKey'],
-                idp['assertionConsumerService']['clientCert'],
+                idp['artifactResolutionService']['clientKey'],
+                idp['artifactResolutionService']['clientCert'],
             ),
             data=self.get_soap_request(),
             headers=headers,

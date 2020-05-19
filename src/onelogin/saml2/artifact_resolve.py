@@ -77,8 +77,8 @@ class Artifact_Resolve_Request:
         return requests.post(
             url=idp['artifactResolutionService']['url'],
             cert=(
-                idp['artifactResolutionService']['clientKey'],
                 idp['artifactResolutionService']['clientCert'],
+                idp['artifactResolutionService']['clientKey'],
             ),
             data=self.get_soap_request(),
             headers=headers,

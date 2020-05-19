@@ -5,6 +5,7 @@ from hashlib import sha1
 import requests
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
 from .errors import OneLogin_Saml2_ValidationError
 
@@ -69,7 +70,13 @@ class Artifact_Resolve_Request:
             {
                 'soap_body': self.__artifact_resolve_request
             }
-        return request
+
+        return OneLogin_Saml2_Utils.add_sign(
+            request,
+            self.__settings.get_sp_key(), self.__settings.get_sp_cert(),
+            sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256,
+            digest_algorithm=OneLogin_Saml2_Constants.SHA256,
+        )
 
     def send(self):
         idp = self.__settings.get_idp_data()

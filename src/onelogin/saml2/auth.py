@@ -11,7 +11,9 @@ Initializes the SP SAML instance
 
 """
 
+import logging
 import xmlsec
+
 
 from onelogin.saml2 import compat
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
@@ -22,6 +24,9 @@ from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xmlparser import tostring
+
+
+logger = logging.getLogger(__name__)
 
 
 class OneLogin_Saml2_Auth(object):
@@ -389,13 +394,20 @@ class OneLogin_Saml2_Auth(object):
 
     def login_post(self, return_to=None, **authn_kwargs):
         authn_request = self._create_authn_request(**authn_kwargs)
+
+        url = self.get_sso_url()
+        data = authn_request.get_request(deflate=False, base64_encode=False)
         saml_request = OneLogin_Saml2_Utils.b64encode(
             OneLogin_Saml2_Utils.add_sign(
-                authn_request.get_request(deflate=False, base64_encode=False),
+                data,
                 self.__settings.get_sp_key(), self.__settings.get_sp_cert(),
                 sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256,
                 digest_algorithm=OneLogin_Saml2_Constants.SHA256,),
 
+        )
+        logger.debug(
+            "Returning form-data to the user for a AuthNRequest to %s with SAMLRequest %s",
+            url, OneLogin_Saml2_Utils.b64decode(saml_request).decode('utf-8')
         )
         parameters = {'SAMLRequest': saml_request}
 
@@ -404,7 +416,7 @@ class OneLogin_Saml2_Auth(object):
         else:
             parameters['RelayState'] = OneLogin_Saml2_Utils.get_self_url_no_query(self.__request_data)
 
-        return self.get_sso_url(), parameters
+        return url, parameters
 
     def login(self, return_to=None, **authn_kwargs):
         """

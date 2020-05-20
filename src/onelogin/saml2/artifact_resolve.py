@@ -1,13 +1,18 @@
+import logging
+import requests
+
 from base64 import b64decode
 from binascii import hexlify
 from hashlib import sha1
 
-import requests
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 
 from .errors import OneLogin_Saml2_ValidationError
+
+
+logger = logging.getLogger(__name__)
 
 
 def parse_saml2_artifact(artifact):
@@ -81,13 +86,21 @@ class Artifact_Resolve_Request:
     def send(self):
         idp = self.__settings.get_idp_data()
         headers = {"content-type": "application/soap+xml"}
+        url = idp['artifactResolutionService']['url']
+        data = self.get_soap_request()
+
+        logger.debug(
+            "Doing a ArtifactResolve (POST) request to %s with data %s",
+            url, data
+        )
+
         return requests.post(
-            url=idp['artifactResolutionService']['url'],
+            url=url,
             cert=(
                 idp['artifactResolutionService']['clientCert'],
                 idp['artifactResolutionService']['clientKey'],
             ),
-            data=self.get_soap_request(),
+            data=data,
             headers=headers,
         )
 

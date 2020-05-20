@@ -91,7 +91,6 @@ class Artifact_Response:
                         },
                         OneLogin_Saml2_ValidationError.WRONG_ISSUER
                     )
-
             return True
         # pylint: disable=R0801
         except Exception as err:

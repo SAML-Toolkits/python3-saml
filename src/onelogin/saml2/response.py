@@ -594,7 +594,9 @@ class OneLogin_Saml2_Response(object):
                 # Parse encrypted ids
                 for encrypted_id in attr.iterchildren('{%s}EncryptedID' % OneLogin_Saml2_Constants.NSMAP['saml']):
                     key = self.__settings.get_sp_key()
+                    self.__prepare_keyinfo(encrypted_id)
                     encrypted_data = encrypted_id.getchildren()[0]
+
                     nameid = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
                     values.append({
                         'NameID': {
@@ -859,6 +861,39 @@ class OneLogin_Saml2_Response(object):
             document = self.document
         return OneLogin_Saml2_XML.query(document, query, None, tagid)
 
+    def __prepare_keyinfo(self, node):
+        """
+        Directly include the EncryptedKey in the KeyInfo of the EncryptedData. This
+        is needed for decrypting with OneLogin_Saml2_Utils.decrypt_element.
+        """
+        encrypted_data_keyinfo = OneLogin_Saml2_XML.query(node, 'xenc:EncryptedData/ds:KeyInfo')
+        if not encrypted_data_keyinfo:
+            raise OneLogin_Saml2_ValidationError(
+                'No KeyInfo present, invalid Assertion',
+                OneLogin_Saml2_ValidationError.KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA
+            )
+        encrypted_data_keyinfo = encrypted_data_keyinfo[0]
+        children = encrypted_data_keyinfo.getchildren()
+        if not children:
+            raise OneLogin_Saml2_ValidationError(
+                'KeyInfo has no children nodes, invalid Assertion',
+                OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO
+            )
+        for child in children:
+            if 'RetrievalMethod' in child.tag:
+                if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
+                    raise OneLogin_Saml2_ValidationError(
+                        'Unsupported Retrieval Method found',
+                        OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD
+                    )
+                uri = child.attrib['URI']
+                if not uri.startswith('#'):
+                    break
+                uri = uri.split('#')[1]
+                encrypted_key = OneLogin_Saml2_XML.query(node, './xenc:EncryptedKey[@Id=$tagid]', None, uri)
+                if encrypted_key:
+                    encrypted_data_keyinfo.append(encrypted_key[0])
+
     def __decrypt_assertion(self, xml):
         """
         Decrypts the Assertion
@@ -882,35 +917,9 @@ class OneLogin_Saml2_Response(object):
         if encrypted_assertion_nodes:
             encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
-                keyinfo = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData/ds:KeyInfo')
-                if not keyinfo:
-                    raise OneLogin_Saml2_ValidationError(
-                        'No KeyInfo present, invalid Assertion',
-                        OneLogin_Saml2_ValidationError.KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA
-                    )
-                keyinfo = keyinfo[0]
-                children = keyinfo.getchildren()
-                if not children:
-                    raise OneLogin_Saml2_ValidationError(
-                        'KeyInfo has no children nodes, invalid Assertion',
-                        OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO
-                    )
-                for child in children:
-                    if 'RetrievalMethod' in child.tag:
-                        if child.attrib['Type'] != 'http://www.w3.org/2001/04/xmlenc#EncryptedKey':
-                            raise OneLogin_Saml2_ValidationError(
-                                'Unsupported Retrieval Method found',
-                                OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD
-                            )
-                        uri = child.attrib['URI']
-                        if not uri.startswith('#'):
-                            break
-                        uri = uri.split('#')[1]
-                        encrypted_key = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], './xenc:EncryptedKey[@Id=$tagid]', None, uri)
-                        if encrypted_key:
-                            keyinfo.append(encrypted_key[0])
-
                 encrypted_data = encrypted_data_nodes[0]
+                self.__prepare_keyinfo(encrypted_data)
+
                 decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug=debug, inplace=True)
                 xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml

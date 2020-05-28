@@ -831,7 +831,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings.set_strict(True)
         response_2 = OneLogin_Saml2_Response(settings, message)
         self.assertFalse(response_2.is_valid(request_data))
-        self.assertEqual('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd', response_2.get_error())
+        self.assertEqual('Invalid SAML Response. Not match the access_control-xacml-2.0-saml-assertion-schema-os.xsd', response_2.get_error())
 
     def testValidateNumAssertions(self):
         """

@@ -666,8 +666,7 @@ class OneLogin_Saml2_Response(object):
         :returns: The signed elements tag names
         :rtype: list
         """
-        sign_nodes = self.__query('//ds:Signature')
-
+        sign_nodes = self.__query('//ds:Signature[not(ancestor::saml:Advice)]')
         signed_elements = []
         verified_seis = []
         verified_ids = []

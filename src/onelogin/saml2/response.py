@@ -918,7 +918,7 @@ class OneLogin_Saml2_Response(object):
             encrypted_data_nodes = OneLogin_Saml2_XML.query(encrypted_assertion_nodes[0], '//saml:EncryptedAssertion/xenc:EncryptedData')
             if encrypted_data_nodes:
                 encrypted_data = encrypted_data_nodes[0]
-                self.__prepare_keyinfo(encrypted_data)
+                self.__prepare_keyinfo(encrypted_data.getparent())
 
                 decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug=debug, inplace=True)
                 xml.replace(encrypted_assertion_nodes[0], decrypted)

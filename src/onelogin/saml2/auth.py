@@ -418,7 +418,7 @@ class OneLogin_Saml2_Auth(object):
 
         return url, parameters
 
-    def login(self, return_to=None, **authn_kwargs):
+    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
         """
         Initiates the SSO process.
 
@@ -440,7 +440,10 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = self._create_authn_request(**authn_kwargs)
+        authn_request = self._create_authn_request(
+            force_authn=force_authn, is_passive=is_passive,
+            set_nameid_policy=set_nameid_policy, name_id_value_req=name_id_value_req
+        )
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}

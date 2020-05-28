@@ -133,7 +133,7 @@ class OneLogin_Saml2_Auth(object):
             )
 
         saml2_response = OneLogin_Saml2_Response(self.__settings, artifact_response.get_response_xml())
-        if not saml2_response.is_valid(self.__request_data, check_signatures=False):
+        if not saml2_response.is_valid(self.__request_data):
             raise OneLogin_Saml2_ValidationError(
                 "The Response could not be validated due to the following error: {error}".format(
                     error=saml2_response.get_error()

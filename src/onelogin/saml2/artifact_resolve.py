@@ -34,7 +34,7 @@ def parse_saml2_artifact(artifact):
 class Artifact_Resolve_Request:
     def __init__(self, settings, saml_art):
         self.__settings = settings
-        self.validate_saml2_artifact(saml_art)
+        self.soap_endpoint = self.find_soap_endpoint(saml_art)
         self.saml_art = saml_art
 
         sp_data = self.__settings.get_sp_data()
@@ -54,20 +54,23 @@ class Artifact_Resolve_Request:
 
         self.__artifact_resolve_request = request
 
-    def validate_saml2_artifact(self, saml_art):
+    def find_soap_endpoint(self, saml_art):
+        idp = self.__settings.get_idp_data()
         index, sha1_entity_id, message_handle = parse_saml2_artifact(saml_art)
 
-        idp = self.__settings.get_idp_data()
-        if idp['artifactResolutionService']['index'] != index:
+        if sha1_entity_id != sha1(idp['entityId'].encode('utf-8')).digest():
             raise OneLogin_Saml2_ValidationError(
-                "The SourceID given in the SAML artifact ({}) does not correspond with a "
-                "configured ACS index ({})".format(
-                    index, idp['artifactResolutionService']['index']
-                )
+                f"The sha1 hash of the entityId returned in the SAML Artifact ({sha1_entity_id})"
+                f"does not match the sha1 hash of the configured entityId ({idp['entityId']})"
             )
 
-        if sha1_entity_id != sha1(idp['entityId'].encode('utf-8')).digest():
-            raise OneLogin_Saml2_ValidationError()
+        for ars_node in idp['artifactResolutionService']:
+            if ars_node['binding'] != "urn:oasis:names:tc:SAML:2.0:bindings:SOAP":
+                continue
+            if ars_node['index'] == index:
+                return ars_node
+
+        return None
 
     def get_soap_request(self):
         request = OneLogin_Saml2_Templates.SOAP_ENVELOPE % \
@@ -83,10 +86,9 @@ class Artifact_Resolve_Request:
         )
 
     def send(self):
-        idp = self.__settings.get_idp_data()
         security_data = self.__settings.get_security_data()
         headers = {"content-type": "application/soap+xml"}
-        url = idp['artifactResolutionService']['url']
+        url = self.soap_endpoint['url']
         data = self.get_soap_request()
 
         logger.debug(

@@ -82,11 +82,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
               "url": "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
               "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
             },
-            "artifactResolutionService": {
+            "artifactResolutionService": [{
                 "url": "https://idp.testshib.org:8443/idp/profile/SAML2/SOAP/ArtifactResolution",
                 "index": "2",
                 "binding": "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
-            }
+            }]
           }
         }
         """
@@ -148,11 +148,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
               "url": "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
               "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
             },
-            "artifactResolutionService": {
+            "artifactResolutionService": [{
                 "url": "https://idp.testshib.org:8443/idp/profile/SAML2/SOAP/ArtifactResolution",
                 "index": "2",
                 "binding": "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
-            }
+            }]
           }
         }
         """
@@ -191,11 +191,11 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
               "url": "https://idp.testshib.org/idp/profile/SAML2/POST/SSO",
               "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
             },
-            "artifactResolutionService": {
+            "artifactResolutionService": [{
                 "url": "https://idp.testshib.org:8443/idp/profile/SAML2/SOAP/ArtifactResolution",
                 "index": "2",
                 "binding": "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
-            }
+            }]
           }
         }
         """

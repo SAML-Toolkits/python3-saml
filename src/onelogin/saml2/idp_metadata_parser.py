@@ -168,9 +168,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     "./md:ArtifactResolutionService[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:SOAP']"
                 )
 
-                if len(ars_nodes) > 0:
-                    idp_ars_url = ars_nodes[0].get('Location', None)
-                    idp_ars_index = ars_nodes[0].get('index', None)
+
 
                 signing_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, "./md:KeyDescriptor[not(contains(@use, 'encryption'))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate")
                 encryption_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, "./md:KeyDescriptor[not(contains(@use, 'signing'))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate")
@@ -201,11 +199,16 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     data['idp']['singleLogoutService']['url'] = idp_slo_url
                     data['idp']['singleLogoutService']['binding'] = required_slo_binding
 
-                if idp_ars_url is not None:
-                    data['idp']['artifactResolutionService'] = {}
-                    data['idp']['artifactResolutionService']['url'] = idp_ars_url
-                    data['idp']['artifactResolutionService']['index'] = idp_ars_index
-                    data['idp']['artifactResolutionService']['binding'] = "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                for ars_node in ars_nodes:
+                    idp_ars_url = ars_node.get('Location', None)
+                    idp_ars_index = ars_node.get('index', None)
+                    if idp_ars_url is not None:
+                        ars_list = data['idp'].setdefault('artifactResolutionService', [])
+                        ars_list.append({
+                            'url': idp_ars_url,
+                            'index': idp_ars_index,
+                            'binding': "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
+                        })
 
                 if want_authn_requests_signed is not None:
                     data['security'] = {}

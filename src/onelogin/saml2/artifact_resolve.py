@@ -2,7 +2,6 @@ import logging
 import requests
 
 from base64 import b64decode
-from binascii import hexlify
 from hashlib import sha1
 
 from onelogin.saml2.utils import OneLogin_Saml2_Utils

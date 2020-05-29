@@ -85,6 +85,7 @@ class Artifact_Resolve_Request:
 
     def send(self):
         idp = self.__settings.get_idp_data()
+        security_data = self.__settings.get_security_data()
         headers = {"content-type": "application/soap+xml"}
         url = idp['artifactResolutionService']['url']
         data = self.get_soap_request()
@@ -93,12 +94,11 @@ class Artifact_Resolve_Request:
             "Doing a ArtifactResolve (POST) request to %s with data %s",
             url, data
         )
-
         return requests.post(
             url=url,
             cert=(
-                idp['artifactResolutionService']['clientCert'],
-                idp['artifactResolutionService']['clientKey'],
+                security_data['soapClientCert'],
+                security_data['soapClientKey'],
             ),
             data=data,
             headers=headers,

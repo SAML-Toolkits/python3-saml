@@ -1,2 +1,2 @@
-Django==1.11.26
+Django==1.11.29
 python3-saml

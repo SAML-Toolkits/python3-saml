@@ -1,9 +1,8 @@
 from base64 import b64encode
-
+from defusedxml.lxml import tostring
 from onelogin.saml2.utils import (OneLogin_Saml2_Utils,
                                   OneLogin_Saml2_ValidationError)
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
-from lxml import etree
 
 
 class Artifact_Response:
@@ -138,7 +137,7 @@ class Artifact_Response:
 
     def get_response_xml(self):
         return b64encode(
-            etree.tostring(
+            tostring(
                 self.__query('//samlp:ArtifactResponse/samlp:Response')[0]
             )
         )

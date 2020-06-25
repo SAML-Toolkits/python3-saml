@@ -23,7 +23,7 @@ class Artifact_Response:
 
     def get_issuer(self):
         """
-        Gets the Issuer of the Logout Response Message
+        Gets the Issuer of the Artifact Response
         :return: The Issuer
         :rtype: string
         """
@@ -114,8 +114,8 @@ class Artifact_Response:
 
     def get_in_response_to(self):
         """
-        Gets the ID of the LogoutRequest which this response is in response to
-        :returns: ID of LogoutRequest this LogoutResponse is in response to or None if it is not present
+        Gets the ID of the ArtifactResolve which this response is in response to
+        :returns: ID of ArtifactResolve this LogoutResponse is in response to or None if it is not present
         :rtype: str
         """
         return self.document.get('InResponseTo')
@@ -136,6 +136,10 @@ class Artifact_Response:
         return self.__artifact_response
 
     def get_response_xml(self):
+        """
+        The response is base64 encoded to make it possible to feed
+        it to the OneLogin_Saml2_Response class.
+        """
         return b64encode(
             tostring(
                 self.__query('//samlp:ArtifactResponse/samlp:Response')[0]

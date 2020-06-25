@@ -119,7 +119,6 @@ class OneLogin_Saml2_ValidationError(Exception):
             * (int)   code.      The code error (defined in the error class).
         """
         assert isinstance(code, int)
-
         if errors is not None:
             message = message % errors
 

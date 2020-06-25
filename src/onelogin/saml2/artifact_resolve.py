@@ -22,7 +22,10 @@ def parse_saml2_artifact(artifact):
     type_code = b'\x00\x04'
 
     if decoded[:2] != type_code:
-        raise OneLogin_Saml2_ValidationError()
+        raise OneLogin_Saml2_ValidationError(
+            "The received Artifact does not have the correct header.",
+            OneLogin_Saml2_ValidationError.WRONG_ARTIFACT_FORMAT
+        )
 
     index = str(int.from_bytes(decoded[2:4], byteorder="big"))
     sha1_entity_id = decoded[4:24]
@@ -107,8 +110,8 @@ class Artifact_Resolve_Request:
 
     def get_id(self):
         """
-        Returns the AuthNRequest ID.
-        :return: AuthNRequest ID
+        Returns the ArtifactResolve ID.
+        :return: ArtifactResolve ID
         :rtype: string
         """
         return self.__id

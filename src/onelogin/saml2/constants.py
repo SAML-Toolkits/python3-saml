@@ -96,6 +96,7 @@ class OneLogin_Saml2_Constants(object):
     STATUS_NO_PASSIVE = 'urn:oasis:names:tc:SAML:2.0:status:NoPassive'
     STATUS_PARTIAL_LOGOUT = 'urn:oasis:names:tc:SAML:2.0:status:PartialLogout'
     STATUS_PROXY_COUNT_EXCEEDED = 'urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded'
+    STATUS_AUTHN_FAILED = 'urn:oasis:names:tc:SAML:2.0:status:AuthnFailed'
 
     # Sign & Crypto
     SHA1 = 'http://www.w3.org/2000/09/xmldsig#sha1'

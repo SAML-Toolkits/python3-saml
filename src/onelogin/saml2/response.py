@@ -334,17 +334,24 @@ class OneLogin_Saml2_Response(object):
         :raises: Exception. If the status is not success
         """
         status = OneLogin_Saml2_Utils.get_status(self.document)
-        code = status.get('code', None)
-        if code and code != OneLogin_Saml2_Constants.STATUS_SUCCESS:
-            splited_code = code.split(':')
+        codes = status.get('codes', None)
+        if codes and codes[0] != OneLogin_Saml2_Constants.STATUS_SUCCESS:
+            splited_code = codes[0].split(':')
             printable_code = splited_code.pop()
             status_exception_msg = 'The status code of the Response was not Success, was %s' % printable_code
             status_msg = status.get('msg', None)
             if status_msg:
                 status_exception_msg += ' -> ' + status_msg
+
+            exception_code = OneLogin_Saml2_ValidationError.STATUS_CODE_IS_NOT_SUCCESS
+
+            # See SAMLCore - 3.2.2.2. AuthnFailed is a second-level status code.
+            if len(codes) >= 2 and codes[1] == OneLogin_Saml2_Constants.STATUS_AUTHN_FAILED:
+                exception_code = OneLogin_Saml2_ValidationError.STATUS_CODE_AUTHNFAILED
+
             raise OneLogin_Saml2_ValidationError(
                 status_exception_msg,
-                OneLogin_Saml2_ValidationError.STATUS_CODE_IS_NOT_SUCCESS
+                exception_code
             )
 
     def check_one_condition(self):

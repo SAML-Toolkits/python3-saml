@@ -6,6 +6,7 @@
 import json
 from os.path import dirname, join, exists
 import unittest
+import xml.etree.ElementTree as ET
 
 from onelogin.saml2 import compat
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
@@ -304,6 +305,34 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         payload = exploded['SAMLRequest'][0]
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
         self.assertRegex(inflated, '^<samlp:AuthnRequest')
+
+    def testSAMLRequestURLParameterWithAmpersand(self):
+        """
+        Tests the OneLogin_Saml2_Authn_Request Constructor.
+        Test that ampersand
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON(name='settings9.json'))
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        parameters = {
+            'SAMLRequest': authn_request.get_request()
+        }
+        auth_url = OneLogin_Saml2_Utils.redirect('http://idp.example.com/SSOService.php', parameters, True)
+        self.assertRegex(auth_url, r'^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=')
+        exploded = urlparse(auth_url)
+        exploded = parse_qs(exploded[4])
+        payload = exploded['SAMLRequest'][0]
+        inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(payload))
+        self.assertRegex(inflated, '^<samlp:AuthnRequest')
+
+        try:
+            root = ET.fromstring(inflated)
+        except ET.ParseError:
+            self.fail('Unable to parse AuthnRequest')
+
+        destination = root.get('Destination')
+        # This URL includes an un-escaped ampersand as should be the case after parsing the XML.
+        url = 'http://idp.example.com/SSOService.php?arg1=a&arg2=b'
+        self.assertEqual(url, destination)
 
     def testCreateEncSAMLRequest(self):
         """

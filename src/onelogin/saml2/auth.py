@@ -34,6 +34,11 @@ class OneLogin_Saml2_Auth(object):
     SAML Response, a Logout Request or a Logout Response).
     """
 
+    authn_request_class = OneLogin_Saml2_Authn_Request
+    logout_request_class = OneLogin_Saml2_Logout_Request
+    logout_response_class = OneLogin_Saml2_Logout_Response
+    response_class = OneLogin_Saml2_Response
+
     def __init__(self, request_data, old_settings=None, custom_base_path=None):
         """
         Initializes the SP SAML instance.
@@ -102,7 +107,7 @@ class OneLogin_Saml2_Auth(object):
 
         if 'post_data' in self.__request_data and 'SAMLResponse' in self.__request_data['post_data']:
             # AuthnResponse -- HTTP_POST Binding
-            response = OneLogin_Saml2_Response(self.__settings, self.__request_data['post_data']['SAMLResponse'])
+            response = self.response_class(self.__settings, self.__request_data['post_data']['SAMLResponse'])
             self.__last_response = response.get_xml_document()
 
             if response.is_valid(self.__request_data, request_id):
@@ -147,7 +152,7 @@ class OneLogin_Saml2_Auth(object):
 
         get_data = 'get_data' in self.__request_data and self.__request_data['get_data']
         if get_data and 'SAMLResponse' in get_data:
-            logout_response = OneLogin_Saml2_Logout_Response(self.__settings, get_data['SAMLResponse'])
+            logout_response = self.logout_response_class(self.__settings, get_data['SAMLResponse'])
             self.__last_response = logout_response.get_xml()
             if not self.validate_response_signature(get_data):
                 self.__errors.append('invalid_logout_response_signature')
@@ -163,7 +168,7 @@ class OneLogin_Saml2_Auth(object):
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
         elif get_data and 'SAMLRequest' in get_data:
-            logout_request = OneLogin_Saml2_Logout_Request(self.__settings, get_data['SAMLRequest'])
+            logout_request = self.logout_request_class(self.__settings, get_data['SAMLRequest'])
             self.__last_request = logout_request.get_xml()
             if not self.validate_request_signature(get_data):
                 self.__errors.append("invalid_logout_request_signature")
@@ -177,7 +182,7 @@ class OneLogin_Saml2_Auth(object):
 
                 in_response_to = logout_request.id
                 self.__last_message_id = logout_request.id
-                response_builder = OneLogin_Saml2_Logout_Response(self.__settings)
+                response_builder = self.logout_response_class(self.__settings)
                 response_builder.build(in_response_to)
                 self.__last_response = response_builder.get_xml()
                 logout_response = response_builder.get_response()
@@ -371,7 +376,7 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
+        authn_request = self.authn_request_class(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
         self.__last_request = authn_request.get_xml()
         self.__last_request_id = authn_request.get_id()
 
@@ -425,7 +430,7 @@ class OneLogin_Saml2_Auth(object):
         if name_id_format is None and self.__nameid_format is not None:
             name_id_format = self.__nameid_format
 
-        logout_request = OneLogin_Saml2_Logout_Request(
+        logout_request = self.logout_request_class(
             self.__settings,
             name_id=name_id,
             session_index=session_index,

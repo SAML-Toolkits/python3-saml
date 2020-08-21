@@ -66,6 +66,8 @@ class OneLogin_Saml2_Settings(object):
 
     """
 
+    metadata_class = OneLogin_Saml2_Metadata
+
     def __init__(self, settings=None, custom_base_path=None, sp_validation_only=False):
         """
         Initializes the settings:
@@ -616,7 +618,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: SP metadata (xml)
         :rtype: string
         """
-        metadata = OneLogin_Saml2_Metadata.builder(
+        metadata = self.metadata_class.builder(
             self.__sp, self.__security['authnRequestsSigned'],
             self.__security['wantAssertionsSigned'],
             self.__security['metadataValidUntil'],
@@ -627,10 +629,10 @@ class OneLogin_Saml2_Settings(object):
         add_encryption = self.__security['wantNameIdEncrypted'] or self.__security['wantAssertionsEncrypted']
 
         cert_new = self.get_sp_cert_new()
-        metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert_new, add_encryption)
+        metadata = self.metadata_class.add_x509_key_descriptors(metadata, cert_new, add_encryption)
 
         cert = self.get_sp_cert()
-        metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert, add_encryption)
+        metadata = self.metadata_class.add_x509_key_descriptors(metadata, cert, add_encryption)
 
         # Sign metadata
         if 'signMetadata' in self.__security and self.__security['signMetadata'] is not False:
@@ -684,7 +686,7 @@ class OneLogin_Saml2_Settings(object):
             signature_algorithm = self.__security['signatureAlgorithm']
             digest_algorithm = self.__security['digestAlgorithm']
 
-            metadata = OneLogin_Saml2_Metadata.sign_metadata(metadata, key_metadata, cert_metadata, signature_algorithm, digest_algorithm)
+            metadata = self.metadata_class.sign_metadata(metadata, key_metadata, cert_metadata, signature_algorithm, digest_algorithm)
 
         return metadata
 

@@ -47,8 +47,7 @@ class OneLogin_Saml2_Authn_Request(object):
         idp_data = self.__settings.get_idp_data()
         security = self.__settings.get_security_data()
 
-        uid = OneLogin_Saml2_Utils.generate_unique_id()
-        self.__id = uid
+        self.__id = self._generate_request_id()
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
         destination = idp_data['singleSignOnService']['url']
@@ -113,7 +112,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {
-                'id': uid,
+                'id': self.__id,
                 'provider_name': provider_name_str,
                 'force_authn_str': force_authn_str,
                 'is_passive_str': is_passive_str,
@@ -128,6 +127,14 @@ class OneLogin_Saml2_Authn_Request(object):
             }
 
         self.__authn_request = request
+
+    def _generate_request_id(self):
+        """
+        Generate an unique request ID.
+
+        You can override this in a subclass.
+        """
+        return OneLogin_Saml2_Utils.generate_unique_id()
 
     def get_request(self, deflate=True):
         """

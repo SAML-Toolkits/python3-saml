@@ -34,8 +34,8 @@ class OneLogin_Saml2_Metadata(object):
     TIME_VALID = 172800   # 2 days
     TIME_CACHED = 604800  # 1 week
 
-    @staticmethod
-    def builder(sp, authnsign=False, wsign=False, valid_until=None, cache_duration=None, contacts=None, organization=None):
+    @classmethod
+    def builder(cls, sp, authnsign=False, wsign=False, valid_until=None, cache_duration=None, contacts=None, organization=None):
         """
         Builds the metadata of the SP
 
@@ -61,7 +61,7 @@ class OneLogin_Saml2_Metadata(object):
         :type organization: dict
         """
         if valid_until is None:
-            valid_until = int(time()) + OneLogin_Saml2_Metadata.TIME_VALID
+            valid_until = int(time()) + cls.TIME_VALID
         if not isinstance(valid_until, basestring):
             if isinstance(valid_until, datetime):
                 valid_until_time = valid_until.timetuple()
@@ -72,7 +72,7 @@ class OneLogin_Saml2_Metadata(object):
             valid_until_str = valid_until
 
         if cache_duration is None:
-            cache_duration = OneLogin_Saml2_Metadata.TIME_CACHED
+            cache_duration = cls.TIME_CACHED
         if not isinstance(cache_duration, compat.str_type):
             cache_duration_str = 'PT%sS' % cache_duration  # Period of Time x Seconds
         else:
@@ -228,8 +228,8 @@ class OneLogin_Saml2_Metadata(object):
         x509_certificate.text = OneLogin_Saml2_Utils.format_cert(cert, False)
         key_descriptor.set('use', ('encryption', 'signing')[signing])
 
-    @staticmethod
-    def add_x509_key_descriptors(metadata, cert=None, add_encryption=True):
+    @classmethod
+    def add_x509_key_descriptors(cls, metadata, cert=None, add_encryption=True):
         """
         Adds the x509 descriptors (sign/encryption) to the metadata
         The same cert will be used for sign/encrypt
@@ -260,6 +260,6 @@ class OneLogin_Saml2_Metadata(object):
             raise Exception('Malformed metadata.')
 
         if add_encryption:
-            OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
-        OneLogin_Saml2_Metadata.__add_x509_key_descriptors(sp_sso_descriptor, cert, True)
+            cls.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
+        cls.__add_x509_key_descriptors(sp_sso_descriptor, cert, True)
         return OneLogin_Saml2_XML.to_string(root)

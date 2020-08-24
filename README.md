@@ -614,11 +614,12 @@ We can set a ``return_to`` url parameter to the login function and that will be 
 target_url = 'https://example.com'
 auth.login(return_to=target_url)
 ```
-The login method can recieve 3 more optional parameters:
+The login method can receive 3 more optional parameters:
 
-* ``force_authn``       When ``true``, the ``AuthNReuqest`` will set the ``ForceAuthn='true'``
-* ``is_passive``        When true, the ``AuthNReuqest`` will set the ``Ispassive='true'``
-* ``set_nameid_policy`` When true, the ``AuthNReuqest`` will set a ``nameIdPolicy`` element.
+* ``force_authn``       When ``true``, the ``AuthNRequest`` will set the ``ForceAuthn='true'``
+* ``is_passive``        When true, the ``AuthNRequest`` will set the ``Ispassive='true'``
+* ``set_nameid_policy`` When true, the ``AuthNRequest`` will set a ``nameIdPolicy`` element.
+* ``request_id``        When specified, the ``AuthNRequest`` will set a user provided ``ID`` attribute.
 
 If a match on the future ``SAMLResponse`` ID and the ``AuthNRequest`` ID to be sent is required, that ``AuthNRequest`` ID must to be extracted and stored for future validation, we can get that ID by
 

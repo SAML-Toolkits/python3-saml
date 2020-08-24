@@ -22,7 +22,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
     """
 
-    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
+    def __init__(self, settings, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None, request_id=None):
         """
         Constructs the AuthnRequest object.
 
@@ -40,6 +40,9 @@ class OneLogin_Saml2_Authn_Request(object):
 
         :param name_id_value_req: Optional argument. Indicates to the IdP the subject that should be authenticated
         :type name_id_value_req: string
+
+        :param request_id: Optional argument. Allows a user specified request id in the Authn Request
+        :type request_id: string
         """
         self.__settings = settings
 
@@ -47,7 +50,12 @@ class OneLogin_Saml2_Authn_Request(object):
         idp_data = self.__settings.get_idp_data()
         security = self.__settings.get_security_data()
 
-        uid = OneLogin_Saml2_Utils.generate_unique_id()
+        if request_id is None:
+            uid = OneLogin_Saml2_Utils.generate_unique_id()
+
+        else:
+            uid = request_id
+
         self.__id = uid
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 

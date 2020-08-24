@@ -349,7 +349,7 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__last_authn_contexts
 
-    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
+    def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None, request_id=None):
         """
         Initiates the SSO process.
 
@@ -371,7 +371,7 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
+        authn_request = OneLogin_Saml2_Authn_Request(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req, request_id)
         self.__last_request = authn_request.get_xml()
         self.__last_request_id = authn_request.get_id()
 

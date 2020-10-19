@@ -34,6 +34,7 @@ except NameError:
 url_regex = re.compile(
     r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
     r'(?:(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_]))|'  # single-label-domain
     r'localhost|'  # localhost...
     r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
     r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6

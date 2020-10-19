@@ -64,12 +64,9 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn('Invalid dict settings: idp_sso_url_invalid', str(e))
 
-        settings_info['idp']['singleSignOnService']['url'] = 'http://invalid_domain'
-        try:
-            settings_3 = OneLogin_Saml2_Settings(settings_info)
-            self.assertNotEqual(len(settings_3.get_errors()), 0)
-        except Exception as e:
-            self.assertIn('Invalid dict settings: idp_sso_url_invalid', str(e))
+        settings_info['idp']['singleSignOnService']['url'] = 'http://single-label-domain'
+        settings_3 = OneLogin_Saml2_Settings(settings_info)
+        self.assertEqual(len(settings_3.get_errors()), 0)
 
         del settings_info['sp']
         del settings_info['idp']

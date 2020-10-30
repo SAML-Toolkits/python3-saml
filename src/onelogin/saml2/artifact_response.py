@@ -105,7 +105,7 @@ class Artifact_Response:
                 in_response_to = self.get_in_response_to()
                 if in_response_to and in_response_to != request_id:
                     raise OneLogin_Saml2_ValidationError(
-                        'The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id),
+                        'The InResponseTo of the Artifact Response: %s, does not match the ID of the Artifact Resolve Request sent by the SP: %s' % (in_response_to, request_id),
                         OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
                     )
 

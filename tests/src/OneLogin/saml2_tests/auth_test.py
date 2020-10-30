@@ -1564,3 +1564,41 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertEqual(auth.get_last_message_id(), '_1072ee96')
         self.assertEqual(auth.get_last_assertion_id(), '_dc9f70e61c')
         self.assertEqual(auth.get_last_assertion_not_on_or_after(), None)
+
+    @unittest.mock.patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_sign')
+    @responses.activate
+    def testArtifactErrorCase(self, mock):
+        mock.return_value = True
+
+        saml_art = create_example_artifact(
+            "https://idp.com/saml/idp/metadata"
+        ).decode('utf-8')
+        response = self.file_contents(join(
+            self.data_path, 'artifact_response', 'artifact_response_invalid.xml'
+        ))
+        responses.add(
+            responses.POST,
+            "https://idp.com/saml/idp/resolve_artifact",
+            body=response,
+            status=200,
+        )
+
+        settings_info = self.loadSettingsJSON(name='settings11.json')
+        request_data = self.get_request()
+        request_data['get_data'] = {
+            'SAMLArt': saml_art
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
+        auth.set_strict(True)
+        auth.process_response()
+
+        self.assertIn(
+            'The ArtifactResponse could not be validated due to the following error: '
+            'The InResponseTo of the Artifact Response: ',
+            auth.get_last_error_reason(),
+        )
+
+        self.assertEqual(len(auth.get_errors()), 1)
+        self.assertIsNone(auth.get_last_message_id())
+        self.assertIsNone(auth.get_last_assertion_id())
+        self.assertIsNone(auth.get_last_assertion_not_on_or_after())

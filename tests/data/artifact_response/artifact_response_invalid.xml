@@ -1,0 +1,56 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <samlp:ArtifactResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" ID="_1330416516" Version="2.0" IssueInstant="2020-04-09T08:31:46Z" InResponseTo="ONELOGIN_5ba93c9db0cff93f52b521d7420e43f6eda2784f">
+      <saml:Issuer>https://idp.com/saml/idp/metadata</saml:Issuer>
+      <samlp:Status>
+        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+      </samlp:Status>
+      <samlp:Response InResponseTo="_7afa5ce49" Version="2.0" ID="_1072ee96" IssueInstant="2020-04-09T08:31:46Z">
+        <saml:Issuer>https://idp.com/saml/idp/metadata</saml:Issuer>
+        <ds:Signature>
+          <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+            <ds:Reference URI="#_1072ee96">
+              <ds:Transforms>
+                <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                  <ec:InclusiveNamespaces xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="xacml-saml"/>
+                </ds:Transform>
+              </ds:Transforms>
+              <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+              <ds:DigestValue/>
+            </ds:Reference>
+          </ds:SignedInfo>
+          <ds:SignatureValue/>
+          <ds:KeyInfo>
+            <ds:KeyName/>
+          </ds:KeyInfo>
+        </ds:Signature>
+        <samlp:Status>
+          <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+        </samlp:Status>
+        <saml:Assertion Version="2.0" ID="_dc9f70e61c" IssueInstant="2020-04-09T08:31:46Z">
+          <saml:Issuer>https://idp.com/saml/idp/metadata</saml:Issuer>
+          <saml:Subject>
+            <saml:NameID>s00000000:12345678</saml:NameID>
+            <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+              <saml:SubjectConfirmationData InResponseTo="_7afa5ce49" Recipient="https://sp.com/acs/" NotOnOrAfter="2020-04-10T08:31:46Z"/>
+            </saml:SubjectConfirmation>
+          </saml:Subject>
+          <saml:Conditions NotBefore="2012-12-20T18:48:27Z" NotOnOrAfter="2020-04-10T08:31:46Z">
+            <saml:AudienceRestriction>
+              <saml:Audience>sp.com</saml:Audience>
+            </saml:AudienceRestriction>
+          </saml:Conditions>
+          <saml:AuthnStatement SessionIndex="17" AuthnInstant="2020-04-09T08:31:46Z">
+            <saml:SubjectLocality Address="127.0.0.1"/>
+            <saml:AuthnContext>
+              <saml:AuthnContextClassRef> urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+            </saml:AuthnContext>
+          </saml:AuthnStatement>
+        </saml:Assertion>
+      </samlp:Response>
+    </samlp:ArtifactResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

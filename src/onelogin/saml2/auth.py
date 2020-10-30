@@ -104,8 +104,6 @@ class OneLogin_Saml2_Auth(object):
     def artifact_resolve(self, saml_art):
         """
         Try to resolve the given artifact
-
-        TODO: should be integrated into the process_response method.
         """
         logger.debug(
             "Retrieved the SAMLArt %s via the ACS.", saml_art
@@ -144,6 +142,21 @@ class OneLogin_Saml2_Auth(object):
 
         return saml2_response
 
+    def store_valid_response(self, response):
+        self.__attributes = response.get_attributes()
+        self.__friendlyname_attributes = response.get_friendlyname_attributes()
+        self.__nameid = response.get_nameid()
+        self.__nameid_format = response.get_nameid_format()
+        self.__nameid_nq = response.get_nameid_nq()
+        self.__nameid_spnq = response.get_nameid_spnq()
+        self.__session_index = response.get_session_index()
+        self.__session_expiration = response.get_session_not_on_or_after()
+        self.__last_message_id = response.get_id()
+        self.__last_assertion_id = response.get_assertion_id()
+        self.__last_authn_contexts = response.get_authn_contexts()
+        self.__authenticated = True
+        self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
+
     def process_response(self, request_id=None):
         """
         Process the SAML Response sent by the IdP.
@@ -162,24 +175,18 @@ class OneLogin_Saml2_Auth(object):
             self.__last_response = response.get_xml_document()
 
             if response.is_valid(self.__request_data, request_id):
-                self.__attributes = response.get_attributes()
-                self.__friendlyname_attributes = response.get_friendlyname_attributes()
-                self.__nameid = response.get_nameid()
-                self.__nameid_format = response.get_nameid_format()
-                self.__nameid_nq = response.get_nameid_nq()
-                self.__nameid_spnq = response.get_nameid_spnq()
-                self.__session_index = response.get_session_index()
-                self.__session_expiration = response.get_session_not_on_or_after()
-                self.__last_message_id = response.get_id()
-                self.__last_assertion_id = response.get_assertion_id()
-                self.__last_authn_contexts = response.get_authn_contexts()
-                self.__authenticated = True
-                self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
-
+                self.store_valid_response(response)
             else:
                 self.__errors.append('invalid_response')
                 self.__error_reason = response.get_error()
-
+        elif 'get_data' in self.__request_data and 'SAMLArt' in self.__request_data['get_data']:
+            try:
+                response = self.artifact_resolve(self.__request_data['get_data']['SAMLArt'])
+            except OneLogin_Saml2_ValidationError as e:
+                self.__errors.append('invalid_response')
+                self.__error_reason = str(e)
+            else:
+                self.store_valid_response(response)
         else:
             self.__errors.append('invalid_binding')
             raise OneLogin_Saml2_Error(

@@ -4,9 +4,12 @@
 # MIT License
 
 from base64 import b64decode, b64encode
+from hashlib import sha1
 import json
 from os.path import dirname, join, exists
 import unittest
+
+import responses
 
 from onelogin.saml2 import compat
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
@@ -19,6 +22,14 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
+
+
+def create_example_artifact(endpoint_url, endpoint_index=b"\x00\x00"):
+    type_code = b"\x00\x04"
+    source_id = sha1(endpoint_url.encode("utf-8")).digest()
+    message_handle = b"01234567890123456789"  # something random
+
+    return b64encode(type_code + endpoint_index + source_id + message_handle)
 
 
 class OneLogin_Saml2_Auth_Test(unittest.TestCase):
@@ -1478,3 +1489,78 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_slo()
         self.assertIn(auth.get_last_message_id(), '_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859')
+
+    @unittest.mock.patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_sign')
+    @responses.activate
+    def testArtifactResponseSoapRequest(self, mock):
+        """
+        Test that a Artifact Response, makes a SOAP request using the received
+        saml artifact and returns the response.
+        """
+        mock.return_value = True
+
+        saml_art = create_example_artifact(
+            "https://idp.com/saml/idp/metadata"
+        ).decode('utf-8')
+        response = self.file_contents(join(
+            self.data_path, 'artifact_response', 'artifact_response.xml'
+        ))
+        responses.add(
+            responses.POST,
+            "https://idp.com/saml/idp/resolve_artifact",
+            body=response,
+            status=200,
+        )
+
+        settings_info = self.loadSettingsJSON(name='settings11.json')
+        request_data = self.get_request()
+        request_data['get_data'] = {
+            'SAMLArt': saml_art
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
+        auth.process_response()
+
+        self.assertEqual(
+            responses.calls[0].request.url,
+            'https://idp.com/saml/idp/resolve_artifact'
+        )
+        self.assertEqual(
+            responses.calls[0].request.method,
+            'POST'
+        )
+
+        self.assertIn(
+            f'<samlp:Artifact>{saml_art}</samlp:Artifact>',
+            responses.calls[0].request.body.decode('utf-8')
+        )
+
+    @unittest.mock.patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_sign')
+    @responses.activate
+    def testArtifactGetInfoFromLastResponseReceived(self, mock):
+        mock.return_value = True
+
+        saml_art = create_example_artifact(
+            "https://idp.com/saml/idp/metadata"
+        ).decode('utf-8')
+        response = self.file_contents(join(
+            self.data_path, 'artifact_response', 'artifact_response.xml'
+        ))
+        responses.add(
+            responses.POST,
+            "https://idp.com/saml/idp/resolve_artifact",
+            body=response,
+            status=200,
+        )
+
+        settings_info = self.loadSettingsJSON(name='settings11.json')
+        request_data = self.get_request()
+        request_data['get_data'] = {
+            'SAMLArt': saml_art
+        }
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
+        auth.process_response()
+
+        self.assertEqual(len(auth.get_errors()), 0)
+        self.assertEqual(auth.get_last_message_id(), '_1072ee96')
+        self.assertEqual(auth.get_last_assertion_id(), '_dc9f70e61c')
+        self.assertEqual(auth.get_last_assertion_not_on_or_after(), None)

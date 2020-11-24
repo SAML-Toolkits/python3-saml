@@ -21,7 +21,7 @@ class Application(tornado.web.Application):
         settings = {
             "template_path": Settings.TEMPLATE_PATH,
             "saml_path": Settings.SAML_PATH,
-            "autorealod": True,
+            "autoreload": True,
             "debug": True
         }
         tornado.web.Application.__init__(self, handlers, **settings)

@@ -279,7 +279,7 @@ class OneLogin_Saml2_Auth(object):
         """
         Returns the SessionNotOnOrAfter from the AuthnStatement.
         :returns: The SessionNotOnOrAfter of the assertion
-        :rtype: DateTime|None
+        :rtype: unix/posix timestamp|None
         """
         return self.__session_expiration
 

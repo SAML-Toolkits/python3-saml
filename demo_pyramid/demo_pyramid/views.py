@@ -16,6 +16,10 @@ def init_saml_auth(req):
 
 def prepare_pyramid_request(request):
     # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
+
+    if 'X-Forwarded-Proto' in request.headers:
+        request.scheme = request.headers['X-Forwarded-Proto']
+
     return {
         'https': 'on' if request.scheme == 'https' else 'off',
         'http_host': request.host,

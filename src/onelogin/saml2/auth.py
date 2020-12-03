@@ -190,7 +190,7 @@ class OneLogin_Saml2_Auth(object):
                 if security['logoutResponseSigned']:
                     self.add_response_signature(parameters, security['signatureAlgorithm'])
 
-                return self.redirect_to(self.get_slo_return_url(), parameters)
+                return self.redirect_to(self.get_slo_response_url(), parameters)
         else:
             self.__errors.append('invalid_binding')
             raise OneLogin_Saml2_Error(
@@ -468,7 +468,7 @@ class OneLogin_Saml2_Auth(object):
         if 'url' in idp_data['singleLogoutService']:
             return idp_data['singleLogoutService']['url']
 
-    def get_slo_return_url(self):
+    def get_slo_response_url(self):
         """
         Gets the SLO return URL for IdP-initiated logout.
 
@@ -476,7 +476,7 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         slo_data = self.__settings.get_idp_data()['singleLogoutService']
-        return slo_data.get('returnUrl', self.get_slo_url())
+        return slo_data.get('responseUrl', self.get_slo_url())
 
     def add_request_signature(self, request_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
         """

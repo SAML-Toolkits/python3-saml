@@ -304,6 +304,9 @@ This is the ``settings.json`` file:
         "singleLogoutService": {
             // URL Location of the IdP where SLO Request will be sent.
             "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/<onelogin_connector_id>",
+            // URL Location where the <Response> from the SP will returned (after IdP-initiated logout)
+            // OPTIONAL: only specify if different from url parameter 
+            "returnUrl": "<idp-domain>/slo_return/"
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.

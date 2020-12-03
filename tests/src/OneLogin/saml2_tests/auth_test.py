@@ -92,6 +92,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         Tests the get_slo_return_url method of the OneLogin_Saml2_Auth class
         """
         settings_info = self.loadSettingsJSON()
+        settings_info['idp']['singleLogoutService']['returnUrl'] = "http://idp.example.com/SingleLogoutReturn.php"
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
         slo_url = settings_info['idp']['singleLogoutService']['returnUrl']
         self.assertEqual(auth.get_slo_return_url(), slo_url)

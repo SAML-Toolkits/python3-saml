@@ -468,7 +468,7 @@ class OneLogin_Saml2_Auth(object):
         if 'url' in idp_data['singleLogoutService']:
             return idp_data['singleLogoutService']['url']
 
-    def get_return_slo_url(self):
+    def get_slo_return_url(self):
         """
         Gets the SLO return URL for IdP-initiated logout.
 

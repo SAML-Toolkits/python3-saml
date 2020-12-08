@@ -881,11 +881,8 @@ class OneLogin_Saml2_Response(object):
         :rtype: list
         """
         try:
-            parsed = list(urlsplit(url))
-            #scheme and hostname converted to lowercase
-            parsed[0] = parsed[0].lower()
-            parsed[1] = parsed[1].lower()
-            normalized_url = urlunsplit(parsed)
+            scheme, netloc, *rest = urlsplit(url)
+            normalized_url = urlunsplit((scheme.lower(), netloc.lower(), *rest))
             return normalized_url
         except Exception:
             return url

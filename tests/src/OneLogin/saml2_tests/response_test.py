@@ -1036,7 +1036,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response_2.is_valid(self.get_request_data()))
         self.assertIn('The response was received at', response_2.get_error())
 
-    def testIsInValidCapitalizationOfDestinationElements(self):
+    def testIsInValidDestinationCapitalizationOfElements(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class
         Case Invalid Response due to differences in capitalization of path
@@ -1056,7 +1056,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response_2.is_valid(self.get_request_data_both_capitalized()))
         self.assertIn('The response was received at', response_2.get_error())
 
-    def testIsValidCapitalizationOfDestinationHost(self):
+    def testIsValidDestinationCapitalizationOfHost(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class
         Case Valid Response, even if host is differently capitalized (per RFC)
@@ -1064,11 +1064,13 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
         
-        #Test path capitalized
+        #Test domain capitalized
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
         self.assertFalse(response.is_valid(self.get_request_data_domain_capitalized()))
         self.assertNotIn('The response was received at', response.get_error())
+        #Assert we got past the destination check, which appears later
+        self.assertIn('A valid SubjectConfirmation was not found', response.get_error())
 
     def testIsInValidAudience(self):
         """

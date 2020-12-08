@@ -10,6 +10,7 @@ SAML Response class of OneLogin's Python Toolkit.
 """
 
 from copy import deepcopy
+from urllib.parse import urlsplit, urlunsplit
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
@@ -191,7 +192,7 @@ class OneLogin_Saml2_Response(object):
                 # Checks destination
                 destination = self.document.get('Destination', None)
                 if destination:
-                    if not destination.startswith(current_url):
+                    if not self.__standardize_url(destination).startswith(self.__standardize_url(current_url)):
                         # TODO: Review if following lines are required, since we can control the
                         # request_data
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
@@ -865,6 +866,15 @@ class OneLogin_Saml2_Response(object):
                 decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug=debug, inplace=True)
                 xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml
+            
+    def __standardize_url(self, url):
+        try:
+            parsed = list(urlsplit(url))
+            parsed[1] = parsed[1].lower()
+            standardized_url = urlunsplit(parsed)
+            return standardized_url
+        except Exception:
+            return url
 
     def get_error(self):
         """

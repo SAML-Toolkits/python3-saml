@@ -18,7 +18,6 @@ from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
-
 class OneLogin_Saml2_Response_Test(unittest.TestCase):
     data_path = join(dirname(dirname(dirname(dirname(__file__)))), 'data')
     settings_path = join(dirname(dirname(dirname(dirname(__file__)))), 'settings')
@@ -48,6 +47,24 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         return {
             'http_host': 'example.com',
             'script_name': 'index.html'
+        }
+
+    def get_request_data_domain_capitalized(self):
+        return {
+            'http_host': 'StuFF.Com',
+            'script_name': 'endpoints/endpoints/acs.php'
+        }
+    
+    def get_request_data_path_capitalized(self):
+        return {
+            'http_host': 'stuff.com',
+            'script_name': 'Endpoints/endPoints/acs.php'
+        }
+
+    def get_request_data_both_capitalized(self):
+        return {
+            'http_host': 'StuFF.Com',
+            'script_name': 'Endpoints/endPoints/aCs.php'
         }
 
     def testConstruct(self):
@@ -977,7 +994,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response = OneLogin_Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, 'Found an Attribute element with duplicated Name'):
             response.get_attributes()
-
+    
     def testIsInValidDestination(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class
@@ -1013,6 +1030,45 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_5 = OneLogin_Saml2_Response(settings, message_4)
         self.assertFalse(response_5.is_valid(self.get_request_data()))
         self.assertIn('A valid SubjectConfirmation was not found on this Response', response_5.get_error())
+
+        settings.set_strict(True)
+        response_2 = OneLogin_Saml2_Response(settings, message)
+        self.assertFalse(response_2.is_valid(self.get_request_data()))
+        self.assertIn('The response was received at', response_2.get_error())
+
+    def testIsInValidCapitalizationOfDestinationElements(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response class
+        Case Invalid Response due to differences in capitalization of path
+        """
+
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
+        
+        #Test path capitalized
+        settings.set_strict(True)
+        response = OneLogin_Saml2_Response(settings, message)
+        self.assertFalse(response.is_valid(self.get_request_data_path_capitalized()))
+        self.assertIn('The response was received at', response.get_error())
+
+        #Test both domain and path capitalized
+        response_2 = OneLogin_Saml2_Response(settings, message)
+        self.assertFalse(response_2.is_valid(self.get_request_data_both_capitalized()))
+        self.assertIn('The response was received at', response_2.get_error())
+
+    def testIsValidCapitalizationOfDestinationHost(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response class
+        Case Valid Response, even if host is differently capitalized (per RFC)
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
+        
+        #Test path capitalized
+        settings.set_strict(True)
+        response = OneLogin_Saml2_Response(settings, message)
+        self.assertFalse(response.is_valid(self.get_request_data_domain_capitalized()))
+        self.assertNotIn('The response was received at', response.get_error())
 
     def testIsInValidAudience(self):
         """

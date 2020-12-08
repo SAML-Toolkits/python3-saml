@@ -870,7 +870,7 @@ class OneLogin_Saml2_Response(object):
     def __normalize_url(self, url):
         """
         Returns normalized URL for comparison. 
-        This method converts the hostname to lowercase, as it should be case-insensitive (per RFC 4343)
+        This method converts the netloc to lowercase, as it should be case-insensitive (per RFC 4343, RFC 7617)
         If standardization fails, the original URL is returned
         Python documentation indicates that URL split also normalizes query strings if empty query fields are present
 
@@ -882,6 +882,8 @@ class OneLogin_Saml2_Response(object):
         """
         try:
             parsed = list(urlsplit(url))
+            #scheme and hostname converted to lowercase
+            parsed[0] = parsed[0].lower()
             parsed[1] = parsed[1].lower()
             normalized_url = urlunsplit(parsed)
             return normalized_url

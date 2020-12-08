@@ -192,7 +192,7 @@ class OneLogin_Saml2_Response(object):
                 # Checks destination
                 destination = self.document.get('Destination', None)
                 if destination:
-                    if not self.__standardize_url(destination).startswith(self.__standardize_url(current_url)):
+                    if not self.__normalize_url(destination).startswith(self.__normalize_url(current_url)):
                         # TODO: Review if following lines are required, since we can control the
                         # request_data
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
@@ -867,12 +867,24 @@ class OneLogin_Saml2_Response(object):
                 xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml
             
-    def __standardize_url(self, url):
+    def __normalize_url(self, url):
+        """
+        Returns normalized URL for comparison. 
+        This method converts the hostname to lowercase, as it should be case-insensitive (per RFC 4343)
+        If standardization fails, the original URL is returned
+        Python documentation indicates that URL split also normalizes query strings if empty query fields are present
+
+        :param url: URL
+        :type url: String
+
+        :returns: A normalized URL, or the given URL string if parsing fails
+        :rtype: list
+        """
         try:
             parsed = list(urlsplit(url))
             parsed[1] = parsed[1].lower()
-            standardized_url = urlunsplit(parsed)
-            return standardized_url
+            normalized_url = urlunsplit(parsed)
+            return normalized_url
         except Exception:
             return url
 

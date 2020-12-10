@@ -385,6 +385,11 @@ In addition to the required settings data (idp, sp), extra settings can be defin
 
         /** signatures and encryptions required **/
 
+        // Indicates a requirement of having the encryption key present in the
+        // metadata even if this SP does not explicitly require encrypted
+        // responses. This is to accomodate IdPs that require encryption.
+        "forceEncryptionKeyInMetadata": false,
+
         // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest>
         // and <samlp:LogoutResponse> elements received by this SP to be signed.
         "wantMessagesSigned": false,

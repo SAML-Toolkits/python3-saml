@@ -290,6 +290,7 @@ class OneLogin_Saml2_Settings(object):
         self.__security.setdefault('wantNameId', True)
 
         # Encrypt expected
+        self.__security.setdefault('forceEncryptionKeyInMetadata', False)
         self.__security.setdefault('wantAssertionsEncrypted', False)
         self.__security.setdefault('wantNameIdEncrypted', False)
 
@@ -624,7 +625,7 @@ class OneLogin_Saml2_Settings(object):
             self.get_contacts(), self.get_organization()
         )
 
-        add_encryption = self.__security['wantNameIdEncrypted'] or self.__security['wantAssertionsEncrypted']
+        add_encryption = self.__security['wantNameIdEncrypted'] or self.__security['wantAssertionsEncrypted'] or self.__security['forceEncryptionKeyInMetadata']
 
         cert_new = self.get_sp_cert_new()
         metadata = OneLogin_Saml2_Metadata.add_x509_key_descriptors(metadata, cert_new, add_encryption)

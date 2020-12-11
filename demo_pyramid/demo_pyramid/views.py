@@ -19,6 +19,8 @@ def prepare_pyramid_request(request):
 
     if 'X-Forwarded-Proto' in request.headers:
         request.scheme = request.headers['X-Forwarded-Proto']
+    if 'X-Forwarded-Port' in request.headers:
+        request.server_port = int(request.headers['X-Forwarded-Port'])
 
     return {
         'https': 'on' if request.scheme == 'https' else 'off',

@@ -605,6 +605,37 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('RelayState', parsed_query)
         self.assertIn(relay_state, parsed_query['RelayState'])
 
+    def testLoginPost(self):
+        settings_info = self.loadSettingsJSON()
+        request_data = self.get_request()
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+
+        url, parameters = auth.login_post()
+        self.assertEqual(url, 'http://idp.example.com/SSOService.php')
+        # self.assertEqual(parameters['RelayState'], relay_state)
+        saml_request = b64decode(parameters['SAMLRequest'])
+        self.assertTrue(saml_request.startswith(b'<samlp:AuthnRequest'))
+
+        hostname = OneLogin_Saml2_Utils.get_self_host(request_data)
+        self.assertEqual(parameters['RelayState'], 'http://%s/index.html' % hostname)
+
+        self.assertIn(b'<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', saml_request)
+        self.assertIn(b'<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', saml_request)
+
+    def testLoginPostWithRelayState(self):
+        settings_info = self.loadSettingsJSON()
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        relay_state = 'http://sp.example.com'
+
+        url, parameters = auth.login_post(relay_state)
+        self.assertEqual(url, 'http://idp.example.com/SSOService.php')
+        self.assertEqual(parameters['RelayState'], relay_state)
+        saml_request = b64decode(parameters['SAMLRequest'])
+        self.assertTrue(saml_request.startswith(b'<samlp:AuthnRequest'))
+
+        self.assertIn(b'<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', saml_request)
+        self.assertIn(b'<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', saml_request)
+
     def testLoginSigned(self):
         """
         Tests the login method of the OneLogin_Saml2_Auth class

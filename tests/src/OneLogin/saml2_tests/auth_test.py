@@ -67,42 +67,6 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth_settings = auth.get_settings()
         self.assertEqual(settings.get_sp_data(), auth_settings.get_sp_data())
 
-    def testGetSSOurl(self):
-        """
-        Tests the get_sso_url method of the OneLogin_Saml2_Auth class
-        """
-        settings_info = self.loadSettingsJSON()
-        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
-
-        sso_url = settings_info['idp']['singleSignOnService']['url']
-        self.assertEqual(auth.get_sso_url(), sso_url)
-
-    def testGetSLOurl(self):
-        """
-        Tests the get_slo_url method of the OneLogin_Saml2_Auth class
-        """
-        settings_info = self.loadSettingsJSON()
-        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
-
-        slo_url = settings_info['idp']['singleLogoutService']['url']
-        self.assertEqual(auth.get_slo_url(), slo_url)
-
-    def testGetSLOresponseUrl(self):
-        """
-        Tests the get_slo_response_url method of the OneLogin_Saml2_Auth class
-        """
-        settings_info = self.loadSettingsJSON()
-        settings_info['idp']['singleLogoutService']['responseUrl'] = "http://idp.example.com/SingleLogoutReturn.php"
-        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
-        slo_url = settings_info['idp']['singleLogoutService']['responseUrl']
-        self.assertEqual(auth.get_slo_response_url(), slo_url)
-        # test that the function falls back to the url setting if responseUrl is not set
-        settings_info['idp']['singleLogoutService'].pop('responseUrl')
-        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
-        slo_url = settings_info['idp']['singleLogoutService']['url']
-        self.assertEqual(auth.get_slo_response_url(), slo_url)
-
-
     def testGetSessionIndex(self):
         """
         Tests the get_session_index method of the OneLogin_Saml2_Auth class

@@ -190,7 +190,7 @@ class OneLogin_Saml2_Auth(object):
                 if security['logoutResponseSigned']:
                     self.add_response_signature(parameters, security['signatureAlgorithm'])
 
-                return self.redirect_to(self.get_slo_response_url(), parameters)
+                return self.redirect_to(self.__settings.get_slo_response_url(), parameters)
         else:
             self.__errors.append('invalid_binding')
             raise OneLogin_Saml2_Error(
@@ -386,7 +386,7 @@ class OneLogin_Saml2_Auth(object):
         security = self.__settings.get_security_data()
         if security.get('authnRequestsSigned', False):
             self.add_request_signature(parameters, security['signatureAlgorithm'])
-        return self.redirect_to(self.get_sso_url(), parameters)
+        return self.redirect_to(self.__settings.get_sso_url(), parameters)
 
     def logout(self, return_to=None, name_id=None, session_index=None, nq=None, name_id_format=None, spnq=None):
         """
@@ -412,7 +412,7 @@ class OneLogin_Saml2_Auth(object):
 
         :returns: Redirection URL
         """
-        slo_url = self.get_slo_url()
+        slo_url = self.__settings.get_slo_url()
         if slo_url is None:
             raise OneLogin_Saml2_Error(
                 'The IdP does not support Single Log Out',
@@ -446,37 +446,6 @@ class OneLogin_Saml2_Auth(object):
         if security.get('logoutRequestSigned', False):
             self.add_request_signature(parameters, security['signatureAlgorithm'])
         return self.redirect_to(slo_url, parameters)
-
-    def get_sso_url(self):
-        """
-        Gets the SSO URL.
-
-        :returns: An URL, the SSO endpoint of the IdP
-        :rtype: string
-        """
-        idp_data = self.__settings.get_idp_data()
-        return idp_data['singleSignOnService']['url']
-
-    def get_slo_url(self):
-        """
-        Gets the SLO URL.
-
-        :returns: An URL, the SLO endpoint of the IdP
-        :rtype: string
-        """
-        idp_data = self.__settings.get_idp_data()
-        if 'url' in idp_data['singleLogoutService']:
-            return idp_data['singleLogoutService']['url']
-
-    def get_slo_response_url(self):
-        """
-        Gets the SLO return URL for IdP-initiated logout.
-
-        :returns: an URL, the SLO return endpoint of the IdP
-        :rtype: string
-        """
-        slo_data = self.__settings.get_idp_data()['singleLogoutService']
-        return slo_data.get('responseUrl', self.get_slo_url())
 
     def add_request_signature(self, request_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
         """

@@ -20,7 +20,7 @@ from textwrap import wrap
 from functools import wraps
 from uuid import uuid4
 from xml.dom.minidom import Element
-
+from urllib.parse import urlsplit, urlunsplit
 import zlib
 import xmlsec
 
@@ -1063,8 +1063,8 @@ class OneLogin_Saml2_Utils(object):
                 print(e)
             return False
 
-        @staticmethod
-        def normalize_url(self, url):
+    @staticmethod
+    def normalize_url(url):
         """
         Returns normalized URL for comparison. 
         This method converts the netloc to lowercase, as it should be case-insensitive (per RFC 4343, RFC 7617)

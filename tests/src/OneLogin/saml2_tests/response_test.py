@@ -1063,12 +1063,12 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
-        
         #Test domain capitalized
         settings.set_strict(True)
         response = OneLogin_Saml2_Response(settings, message)
         self.assertFalse(response.is_valid(self.get_request_data_domain_capitalized()))
         self.assertNotIn('The response was received at', response.get_error())
+
         #Assert we got past the destination check, which appears later
         self.assertIn('A valid SubjectConfirmation was not found', response.get_error())
 

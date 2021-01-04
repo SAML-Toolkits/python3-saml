@@ -192,7 +192,7 @@ class OneLogin_Saml2_Response(object):
                 # Checks destination
                 destination = self.document.get('Destination', None)
                 if destination:
-                    if not OneLogin_Saml2_Utils.normalize_url(destination).startswith(OneLogin_Saml2_Utils.normalize_url(current_url)):
+                    if not OneLogin_Saml2_Utils.normalize_url(url=destination).startswith(OneLogin_Saml2_Utils.normalize_url(url=current_url)):
                         # TODO: Review if following lines are required, since we can control the
                         # request_data
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)

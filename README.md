@@ -241,11 +241,13 @@ This is the ``settings.json`` file:
             // HTTP-POST binding only.
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
         },
-        // Specifies info about where and how the <Logout Response> message MUST be
-        // returned to the requester, in this case our SP.
+        // Specifies info about where and how the <Logout Request/Response> message MUST be sent.
         "singleLogoutService": {
-            // URL Location where the <Response> from the IdP will be returned
+            // URL Location where the <LogoutRequest> from the IdP will be sent (IdP-initiated logout)
             "url": "https://<sp_domain>/?sls",
+            // URL Location where the <LogoutResponse> from the IdP will sent (SP-initiated logout, reply)
+            // OPTIONAL: only specify if different from url parameter
+            //"responseUrl": "https://<sp_domain>/?sls",
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.
@@ -302,11 +304,11 @@ This is the ``settings.json`` file:
         },
         // SLO endpoint info of the IdP.
         "singleLogoutService": {
-            // URL Location of the IdP where SLO Request will be sent.
+            // URL Location where the <LogoutRequest> from the IdP will be sent (IdP-initiated logout)
             "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/<onelogin_connector_id>",
-            // URL Location where the <Response> from the SP will returned (after IdP-initiated logout)
+            // URL Location where the <LogoutResponse> from the IdP will sent (SP-initiated logout, reply)
             // OPTIONAL: only specify if different from url parameter 
-            "responseUrl": "https://app.onelogin.com/trust/saml2/http-redirect/slo_return/<onelogin_connector_id>"
+            "responseUrl": "https://app.onelogin.com/trust/saml2/http-redirect/slo_return/<onelogin_connector_id>",
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.

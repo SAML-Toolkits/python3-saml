@@ -110,7 +110,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 {
                     'id': uid,
                     'issue_instant': issue_instant,
-                    'single_logout_url': idp_data['singleLogoutService']['url'],
+                    'single_logout_url': self.__settings.get_idp_slo_response_url(),
                     'entity_id': sp_data['entityId'],
                     'name_id': name_id_obj,
                     'session_index': session_index_str,

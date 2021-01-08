@@ -165,6 +165,41 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         base = settings.get_base_path()
         self.assertEqual(join(base, 'lib', 'schemas') + sep, settings.get_schemas_path())
 
+    def testGetIdPSSOurl(self):
+        """
+        Tests the get_idp_sso_url method of the OneLogin_Saml2_Settings class
+        """
+        settings_info = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(settings_info)
+
+        sso_url = settings_info['idp']['singleSignOnService']['url']
+        self.assertEqual(settings.get_idp_sso_url(), sso_url)
+
+    def testGetIdPSLOurl(self):
+        """
+        Tests the get_idp_slo_url method of the OneLogin_Saml2_Settings class
+        """
+        settings_info = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(settings_info)
+
+        slo_url = settings_info['idp']['singleLogoutService']['url']
+        self.assertEqual(settings.get_idp_slo_url(), slo_url)
+
+    def testGetIdPSLOresponseUrl(self):
+        """
+        Tests the get_idp_slo_response_url method of the OneLogin_Saml2_Settings class
+        """
+        settings_info = self.loadSettingsJSON()
+        settings_info['idp']['singleLogoutService']['responseUrl'] = "http://idp.example.com/SingleLogoutReturn.php"
+        settings = OneLogin_Saml2_Settings(settings_info)
+        slo_url = settings_info['idp']['singleLogoutService']['responseUrl']
+        self.assertEqual(settings.get_idp_slo_response_url(), slo_url)
+        # test that the function falls back to the url setting if responseUrl is not set
+        settings_info['idp']['singleLogoutService'].pop('responseUrl')
+        settings = OneLogin_Saml2_Settings(settings_info)
+        slo_url = settings_info['idp']['singleLogoutService']['url']
+        self.assertEqual(settings.get_idp_slo_response_url(), slo_url)
+
     def testGetSPCert(self):
         """
         Tests the get_sp_cert method of the OneLogin_Saml2_Settings

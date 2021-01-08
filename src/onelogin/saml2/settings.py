@@ -506,6 +506,37 @@ class OneLogin_Saml2_Settings(object):
         cert = self.get_sp_cert()
         return key is not None and cert is not None
 
+    def get_idp_sso_url(self):
+        """
+        Gets the IdP SSO URL.
+
+        :returns: An URL, the SSO endpoint of the IdP
+        :rtype: string
+        """
+        idp_data = self.get_idp_data()
+        return idp_data['singleSignOnService']['url']
+
+    def get_idp_slo_url(self):
+        """
+        Gets the IdP SLO URL.
+
+        :returns: An URL, the SLO endpoint of the IdP
+        :rtype: string
+        """
+        idp_data = self.get_idp_data()
+        if 'url' in idp_data['singleLogoutService']:
+            return idp_data['singleLogoutService']['url']
+
+    def get_idp_slo_response_url(self):
+        """
+        Gets the IdP SLO return URL for IdP-initiated logout.
+
+        :returns: an URL, the SLO return endpoint of the IdP
+        :rtype: string
+        """
+        slo_data = self.get_idp_data()['singleLogoutService']
+        return slo_data.get('responseUrl', self.get_idp_slo_url())
+
     def get_sp_key(self):
         """
         Returns the x509 private key of the SP.

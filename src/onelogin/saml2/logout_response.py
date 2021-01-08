@@ -167,7 +167,7 @@ class OneLogin_Saml2_Logout_Response(object):
             {
                 'id': uid,
                 'issue_instant': issue_instant,
-                'destination': idp_data['singleLogoutService']['url'],
+                'destination': self.__settings.get_idp_slo_response_url(),
                 'in_response_to': in_response_to,
                 'entity_id': sp_data['entityId'],
                 'status': "urn:oasis:names:tc:SAML:2.0:status:Success"

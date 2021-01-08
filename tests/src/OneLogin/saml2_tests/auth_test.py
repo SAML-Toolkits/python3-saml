@@ -102,7 +102,6 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         slo_url = settings_info['idp']['singleLogoutService']['url']
         self.assertEqual(auth.get_slo_response_url(), slo_url)
 
-
     def testGetSessionIndex(self):
         """
         Tests the get_session_index method of the OneLogin_Saml2_Auth class

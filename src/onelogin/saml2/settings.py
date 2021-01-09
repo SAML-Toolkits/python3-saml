@@ -56,6 +56,8 @@ def validate_url(url, allow_single_label_domain=False):
     Auxiliary method to validate an urllib
     :param url: An url to be validated
     :type url: string
+    :param allow_single_label_domain: In order to allow or not single label domain
+    :type url: bool
     :returns: True if the url is valid
     :rtype: bool
     """

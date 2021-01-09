@@ -430,6 +430,10 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         // Provide the desire Duration, for example PT518400S (6 days)
         "metadataCacheDuration": null,
 
+        // If enabled, URLs with single-label-domains will
+        // be allowed and not rejected by the settings validator (Enable it under Docker/Kubernetes/testing env, not recommended on production)
+        "allowSingleLabelDomains": false,
+
         // Algorithm that the toolkit will use on signing process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
         //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'

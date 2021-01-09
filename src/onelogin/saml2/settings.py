@@ -39,10 +39,19 @@ url_regex = re.compile(
     r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
     r'(?::\d+)?'  # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+url_regex_single_label_domain = re.compile(
+    r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
+    r'(?:(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_]))|'  # single-label-domain
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
+    r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 url_schemes = ['http', 'https', 'ftp', 'ftps']
 
 
-def validate_url(url):
+def validate_url(url, allow_single_label_domain=False):
     """
     Auxiliary method to validate an urllib
     :param url: An url to be validated
@@ -54,8 +63,12 @@ def validate_url(url):
     scheme = url.split('://')[0].lower()
     if scheme not in url_schemes:
         return False
-    if not bool(url_regex.search(url)):
-        return False
+    if allow_single_label_domain:
+        if not bool(url_regex_single_label_domain.search(url)):
+            return False
+    else:
+        if not bool(url_regex.search(url)):
+            return False
     return True
 
 
@@ -353,17 +366,18 @@ class OneLogin_Saml2_Settings(object):
             if not settings.get('idp'):
                 errors.append('idp_not_found')
             else:
+                allow_single_domain_urls = self._get_allow_single_label_domain(settings)
                 idp = settings['idp']
                 if not idp.get('entityId'):
                     errors.append('idp_entityId_not_found')
 
                 if not idp.get('singleSignOnService', {}).get('url'):
                     errors.append('idp_sso_not_found')
-                elif not validate_url(idp['singleSignOnService']['url']):
+                elif not validate_url(idp['singleSignOnService']['url'], allow_single_domain_urls):
                     errors.append('idp_sso_url_invalid')
 
                 slo_url = idp.get('singleLogoutService', {}).get('url')
-                if slo_url and not validate_url(slo_url):
+                if slo_url and not validate_url(slo_url, allow_single_domain_urls):
                     errors.append('idp_slo_url_invalid')
 
                 if 'security' in settings:
@@ -407,6 +421,7 @@ class OneLogin_Saml2_Settings(object):
             if not settings.get('sp'):
                 errors.append('sp_not_found')
             else:
+                allow_single_domain_urls = self._get_allow_single_label_domain(settings)
                 # check_sp_certs uses self.__sp so I add it
                 old_sp = self.__sp
                 self.__sp = settings['sp']
@@ -419,7 +434,7 @@ class OneLogin_Saml2_Settings(object):
 
                 if not sp.get('assertionConsumerService', {}).get('url'):
                     errors.append('sp_acs_not_found')
-                elif not validate_url(sp['assertionConsumerService']['url']):
+                elif not validate_url(sp['assertionConsumerService']['url'], allow_single_domain_urls):
                     errors.append('sp_acs_url_invalid')
 
                 if sp.get('attributeConsumingService'):
@@ -448,7 +463,7 @@ class OneLogin_Saml2_Settings(object):
                         errors.append('sp_attributeConsumingService_serviceDescription_type_invalid')
 
                 slo_url = sp.get('singleLogoutService', {}).get('url')
-                if slo_url and not validate_url(slo_url):
+                if slo_url and not validate_url(slo_url, allow_single_domain_urls):
                     errors.append('sp_sls_url_invalid')
 
                 if 'signMetadata' in security and isinstance(security['signMetadata'], dict):
@@ -833,3 +848,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: boolean
         """
         return self.__debug
+
+    def _get_allow_single_label_domain(self, settings):
+        security = settings.get('security', {})
+        return 'allowSingleLabelDomains' in security.keys() and security['allowSingleLabelDomains']

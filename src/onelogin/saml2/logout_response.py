@@ -158,7 +158,6 @@ class OneLogin_Saml2_Logout_Response(object):
         :type in_response_to: string
         """
         sp_data = self.__settings.get_sp_data()
-        idp_data = self.__settings.get_idp_data()
 
         uid = OneLogin_Saml2_Utils.generate_unique_id()
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())

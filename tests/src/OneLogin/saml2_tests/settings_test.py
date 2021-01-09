@@ -71,11 +71,18 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn('Invalid dict settings: idp_sso_url_invalid', str(e))
 
+        settings_info['idp']['singleSignOnService']['url'] = 'http://single-label-domain'
+        settings_info['security'] = {}
+        settings_info['security']['allowSingleLabelDomains'] = True
+        settings_4 = OneLogin_Saml2_Settings(settings_info)
+        self.assertEqual(len(settings_4.get_errors()), 0)
+
+        del settings_info['security']
         del settings_info['sp']
         del settings_info['idp']
         try:
-            settings_4 = OneLogin_Saml2_Settings(settings_info)
-            self.assertNotEqual(len(settings_4.get_errors()), 0)
+            settings_5 = OneLogin_Saml2_Settings(settings_info)
+            self.assertNotEqual(len(settings_5.get_errors()), 0)
         except Exception as e:
             self.assertIn('Invalid dict settings', str(e))
             self.assertIn('idp_not_found', str(e))
@@ -85,8 +92,8 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info['security']['authnRequestsSigned'] = True
         settings_info['custom_base_path'] = dirname(__file__)
         try:
-            settings_5 = OneLogin_Saml2_Settings(settings_info)
-            self.assertNotEqual(len(settings_5.get_errors()), 0)
+            settings_6 = OneLogin_Saml2_Settings(settings_info)
+            self.assertNotEqual(len(settings_6.get_errors()), 0)
         except Exception as e:
             self.assertIn('Invalid dict settings: sp_cert_not_found_and_required', str(e))
 
@@ -94,8 +101,8 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info['security']['nameIdEncrypted'] = True
         del settings_info['idp']['x509cert']
         try:
-            settings_6 = OneLogin_Saml2_Settings(settings_info)
-            self.assertNotEqual(len(settings_6.get_errors()), 0)
+            settings_7 = OneLogin_Saml2_Settings(settings_info)
+            self.assertNotEqual(len(settings_7.get_errors()), 0)
         except Exception as e:
             self.assertIn('Invalid dict settings: idp_cert_not_found_and_required', str(e))
 

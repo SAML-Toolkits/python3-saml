@@ -148,29 +148,57 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
         self.assertEqual(self.settings_path + sep + 'certs' + sep, settings.get_cert_path())
 
+    def testSetCertPath(self):
+        """
+        Tests setCertPath method of the OneLogin_Saml2_Settings
+        """
+        settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
+        self.assertEqual(self.settings_path + sep + 'certs' + sep, settings.get_cert_path())
+
+        settings.set_cert_path('/tmp')
+        self.assertEqual('/tmp', settings.get_cert_path())
+
     def testGetLibPath(self):
         """
         Tests getLibPath method of the OneLogin_Saml2_Settings
         """
-        settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
-        base = settings.get_base_path()
-        self.assertEqual(join(base, 'lib') + sep, settings.get_lib_path())
+        settingsInfo = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(settingsInfo)
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_lib_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/../../../tests/data/customPath/'))
 
-    def testGetExtLibPath(self):
-        """
-        Tests getExtLibPath method of the OneLogin_Saml2_Settings
-        """
+        del settingsInfo['custom_base_path']
+        settings = OneLogin_Saml2_Settings(settingsInfo)
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_lib_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/'))
+
         settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
-        base = settings.get_base_path()
-        self.assertEqual(join(base, 'extlib') + sep, settings.get_ext_lib_path())
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_lib_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), 'settings/'))
 
     def testGetSchemasPath(self):
         """
         Tests getSchemasPath method of the OneLogin_Saml2_Settings
         """
+        settingsInfo = self.loadSettingsJSON()
+        settings = OneLogin_Saml2_Settings(settingsInfo)
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_schemas_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/schemas/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/../../../tests/data/customPath/'))
+
+        del settingsInfo['custom_base_path']
+        settings = OneLogin_Saml2_Settings(settingsInfo)
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_schemas_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/schemas/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/'))
+
         settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
-        base = settings.get_base_path()
-        self.assertEqual(join(base, 'lib', 'schemas') + sep, settings.get_schemas_path())
+        path = settings.get_base_path()
+        self.assertEqual(settings.get_schemas_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/schemas/'))
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), 'settings/')) 
 
     def testGetIdPSSOurl(self):
         """

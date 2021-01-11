@@ -20,7 +20,6 @@ from textwrap import wrap
 from functools import wraps
 from uuid import uuid4
 from xml.dom.minidom import Element
-from urllib.parse import urlsplit, urlunsplit
 import zlib
 import xmlsec
 
@@ -31,8 +30,9 @@ from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 try:
-    from urllib.parse import quote_plus  # py3
+    from urllib.parse import quote_plus, urlsplit, urlunsplit  # py3
 except ImportError:
+    from urlparse import urlsplit, urlunsplit
     from urllib import quote_plus  # py2
 
 
@@ -1078,8 +1078,8 @@ class OneLogin_Saml2_Utils(object):
         :rtype: String
         """
         try:
-            scheme, netloc, *rest = urlsplit(url)
-            normalized_url = urlunsplit((scheme.lower(), netloc.lower(), *rest))
+            scheme, netloc, path, query, fragment = urlsplit(url)
+            normalized_url = urlunsplit((scheme.lower(), netloc.lower(), path, query, fragment))
             return normalized_url
         except Exception:
             return url

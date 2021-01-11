@@ -10,7 +10,6 @@ SAML Response class of OneLogin's Python Toolkit.
 """
 
 from copy import deepcopy
-from urllib.parse import urlsplit, urlunsplit
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML

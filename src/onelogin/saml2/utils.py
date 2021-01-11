@@ -20,7 +20,6 @@ from textwrap import wrap
 from functools import wraps
 from uuid import uuid4
 from xml.dom.minidom import Element
-
 import zlib
 import xmlsec
 
@@ -31,8 +30,9 @@ from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 try:
-    from urllib.parse import quote_plus  # py3
+    from urllib.parse import quote_plus, urlsplit, urlunsplit  # py3
 except ImportError:
+    from urlparse import urlsplit, urlunsplit
     from urllib import quote_plus  # py2
 
 
@@ -1062,3 +1062,24 @@ class OneLogin_Saml2_Utils(object):
             if debug:
                 print(e)
             return False
+
+    @staticmethod
+    def normalize_url(url):
+        """
+        Returns normalized URL for comparison. 
+        This method converts the netloc to lowercase, as it should be case-insensitive (per RFC 4343, RFC 7617)
+        If standardization fails, the original URL is returned
+        Python documentation indicates that URL split also normalizes query strings if empty query fields are present
+
+        :param url: URL
+        :type url: String
+
+        :returns: A normalized URL, or the given URL string if parsing fails
+        :rtype: String
+        """
+        try:
+            scheme, netloc, path, query, fragment = urlsplit(url)
+            normalized_url = urlunsplit((scheme.lower(), netloc.lower(), path, query, fragment))
+            return normalized_url
+        except Exception:
+            return url

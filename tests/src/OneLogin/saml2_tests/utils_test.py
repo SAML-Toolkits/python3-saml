@@ -917,3 +917,15 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         # Signature Wrapping attack
         wrapping_attack1 = b64decode(self.file_contents(join(self.data_path, 'responses', 'invalids', 'signature_wrapping_attack.xml.base64')))
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(wrapping_attack1, cert))
+
+    def testNormalizeUrl(self):
+        base_url = 'https://blah.com/path'
+        capital_scheme = 'hTTps://blah.com/path'
+        capital_domain = 'https://blAH.Com/path'
+        capital_path = 'https://blah.com/PAth'
+        capital_all = 'HTTPS://BLAH.COM/PATH'
+
+        self.assertIn(base_url, OneLogin_Saml2_Utils.normalize_url(capital_scheme))
+        self.assertIn(base_url, OneLogin_Saml2_Utils.normalize_url(capital_domain))
+        self.assertNotIn(base_url, OneLogin_Saml2_Utils.normalize_url(capital_path))
+        self.assertNotIn(base_url, OneLogin_Saml2_Utils.normalize_url(capital_all))

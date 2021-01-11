@@ -311,19 +311,18 @@ class OneLogin_Saml2_Logout_Request(object):
                         )
 
                 # Check destination
-                if root.get('Destination', None):
-                    destination = root.get('Destination')
-                    if destination != '':
-                        if current_url not in destination:
-                            raise OneLogin_Saml2_ValidationError(
-                                'The LogoutRequest was received at '
-                                '%(currentURL)s instead of %(destination)s' %
-                                {
-                                    'currentURL': current_url,
-                                    'destination': destination,
-                                },
-                                OneLogin_Saml2_ValidationError.WRONG_DESTINATION
-                            )
+                destination = root.get('Destination', None)
+                if destination:
+                    if not OneLogin_Saml2_Utils.normalize_url(url=destination).startswith(OneLogin_Saml2_Utils.normalize_url(url=current_url)):
+                        raise OneLogin_Saml2_ValidationError(
+                            'The LogoutRequest was received at '
+                            '%(currentURL)s instead of %(destination)s' %
+                            {
+                                'currentURL': current_url,
+                                'destination': destination,
+                            },
+                            OneLogin_Saml2_ValidationError.WRONG_DESTINATION
+                        )
 
                 # Check issuer
                 issuer = OneLogin_Saml2_Logout_Request.get_issuer(root)

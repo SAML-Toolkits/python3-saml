@@ -118,11 +118,12 @@ class OneLogin_Saml2_Logout_Response(object):
 
                 # Check destination
                 destination = self.document.get('Destination', None)
-                if destination and current_url not in destination:
-                    raise OneLogin_Saml2_ValidationError(
-                        'The LogoutResponse was received at %s instead of %s' % (current_url, destination),
-                        OneLogin_Saml2_ValidationError.WRONG_DESTINATION
-                    )
+                if destination:
+                    if not OneLogin_Saml2_Utils.normalize_url(url=destination).startswith(OneLogin_Saml2_Utils.normalize_url(url=current_url)):
+                        raise OneLogin_Saml2_ValidationError(
+                            'The LogoutResponse was received at %s instead of %s' % (current_url, destination),
+                            OneLogin_Saml2_ValidationError.WRONG_DESTINATION
+                        )
 
                 if security['wantMessagesSigned']:
                     if 'Signature' not in get_data:

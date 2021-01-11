@@ -656,7 +656,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
 
     def testGetAttributes(self):
         """
-        Tests the getAttributes method of the OneLogin_Saml2_Response
+        Tests the get_attributes method of the OneLogin_Saml2_Response
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
@@ -677,6 +677,30 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml_3 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_attrs.xml.base64'))
         response_3 = OneLogin_Saml2_Response(settings, xml_3)
         self.assertEqual({}, response_3.get_attributes())
+
+    def testGetFriendlyAttributes(self):
+        """
+        Tests the get_friendlyname_attributes method of the OneLogin_Saml2_Response
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        xml = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertEqual({}, response.get_friendlyname_attributes())
+
+        expected_attributes = {
+            'username': ['demo']
+        }
+        xml_2 = self.file_contents(join(self.data_path, 'responses', 'response1_with_friendlyname.xml.base64'))
+        response_2 = OneLogin_Saml2_Response(settings, xml_2)
+        self.assertEqual(expected_attributes, response_2.get_friendlyname_attributes())
+
+        xml_3 = self.file_contents(join(self.data_path, 'responses', 'response2.xml.base64'))
+        response_3 = OneLogin_Saml2_Response(settings, xml_3)
+        self.assertEqual({}, response_3.get_friendlyname_attributes())
+
+        xml_4 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'encrypted_attrs.xml.base64'))
+        response_4 = OneLogin_Saml2_Response(settings, xml_4)
+        self.assertEqual({}, response_4.get_friendlyname_attributes())
 
     def testGetNestedNameIDAttributes(self):
         """

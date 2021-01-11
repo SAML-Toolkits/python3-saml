@@ -240,6 +240,8 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         attributes = auth.get_attributes()
         self.assertNotEqual(len(attributes), 0)
         self.assertEqual(auth.get_attribute('mail'), attributes['mail'])
+        friendlyname_attributes = auth.get_friendlyname_attributes()
+        self.assertEqual(len(friendlyname_attributes), 0)
         session_index = auth.get_session_index()
         self.assertEqual('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', session_index)
         self.assertEqual("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", auth.get_nameid_format())

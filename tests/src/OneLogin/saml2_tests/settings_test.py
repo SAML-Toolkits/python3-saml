@@ -198,7 +198,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(custom_base_path=self.settings_path)
         path = settings.get_base_path()
         self.assertEqual(settings.get_schemas_path(), join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'src/onelogin/saml2/schemas/'))
-        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), 'settings/')) 
+        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), 'settings/'))
 
     def testGetIdPSSOurl(self):
         """

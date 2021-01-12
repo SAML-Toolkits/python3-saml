@@ -25,8 +25,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     A class that contain methods related to obtaining and parsing metadata from IdP
     """
 
-    @staticmethod
-    def get_metadata(url, validate_cert=True):
+    @classmethod
+    def get_metadata(cls, url, validate_cert=True):
         """
         Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -63,8 +63,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
         return xml
 
-    @staticmethod
-    def parse_remote(url, validate_cert=True, entity_id=None, **kwargs):
+    @classmethod
+    def parse_remote(cls, url, validate_cert=True, entity_id=None, **kwargs):
         """
         Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -80,11 +80,12 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :returns: settings dict with extracted data
         :rtype: dict
         """
-        idp_metadata = OneLogin_Saml2_IdPMetadataParser.get_metadata(url, validate_cert)
-        return OneLogin_Saml2_IdPMetadataParser.parse(idp_metadata, entity_id=entity_id, **kwargs)
+        idp_metadata = cls.get_metadata(url, validate_cert)
+        return cls.parse(idp_metadata, entity_id=entity_id, **kwargs)
 
-    @staticmethod
+    @classmethod
     def parse(
+            cls,
             idp_metadata,
             required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
             required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,

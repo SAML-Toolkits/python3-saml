@@ -901,7 +901,7 @@ class OneLogin_Saml2_Response(object):
                 decrypted = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key, debug=debug, inplace=True)
                 xml.replace(encrypted_assertion_nodes[0], decrypted)
         return xml
-            
+
     def get_error(self):
         """
         After executing a validation process, if it fails this method returns the cause

@@ -1066,7 +1066,7 @@ class OneLogin_Saml2_Utils(object):
     @staticmethod
     def normalize_url(url):
         """
-        Returns normalized URL for comparison. 
+        Returns normalized URL for comparison.
         This method converts the netloc to lowercase, as it should be case-insensitive (per RFC 4343, RFC 7617)
         If standardization fails, the original URL is returned
         Python documentation indicates that URL split also normalizes query strings if empty query fields are present

@@ -160,12 +160,13 @@ class OneLogin_Saml2_Logout_Response(object):
         """
         sp_data = self.__settings.get_sp_data()
 
-        uid = OneLogin_Saml2_Utils.generate_unique_id()
+        self.id = self._generate_request_id()
+
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
         logout_response = OneLogin_Saml2_Templates.LOGOUT_RESPONSE % \
             {
-                'id': uid,
+                'id': self.id,
                 'issue_instant': issue_instant,
                 'destination': self.__settings.get_idp_slo_response_url(),
                 'in_response_to': in_response_to,
@@ -211,3 +212,9 @@ class OneLogin_Saml2_Logout_Response(object):
         :rtype: string
         """
         return self.__logout_response
+
+    def _generate_request_id(self):
+        """
+        Generate an unique logout response ID.
+        """
+        return OneLogin_Saml2_Utils.generate_unique_id()

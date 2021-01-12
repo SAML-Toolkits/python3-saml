@@ -59,8 +59,7 @@ class OneLogin_Saml2_Logout_Request(object):
             idp_data = self.__settings.get_idp_data()
             security = self.__settings.get_security_data()
 
-            uid = OneLogin_Saml2_Utils.generate_unique_id()
-            self.id = uid
+            self.id = self._generate_request_id()
 
             issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
@@ -108,7 +107,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
             logout_request = OneLogin_Saml2_Templates.LOGOUT_REQUEST % \
                 {
-                    'id': uid,
+                    'id': self.id,
                     'issue_instant': issue_instant,
                     'single_logout_url': self.__settings.get_idp_slo_response_url(),
                     'entity_id': sp_data['entityId'],
@@ -144,8 +143,8 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         return self.__logout_request
 
-    @staticmethod
-    def get_id(request):
+    @classmethod
+    def get_id(cls, request):
         """
         Returns the ID of the Logout Request
         :param request: Logout Request Message
@@ -157,8 +156,8 @@ class OneLogin_Saml2_Logout_Request(object):
         elem = OneLogin_Saml2_XML.to_etree(request)
         return elem.get('ID', None)
 
-    @staticmethod
-    def get_nameid_data(request, key=None):
+    @classmethod
+    def get_nameid_data(cls, request, key=None):
         """
         Gets the NameID Data of the the Logout Request
         :param request: Logout Request Message
@@ -234,8 +233,8 @@ class OneLogin_Saml2_Logout_Request(object):
             name_id_format = name_id_data['Format']
         return name_id_format
 
-    @staticmethod
-    def get_issuer(request):
+    @classmethod
+    def get_issuer(cls, request):
         """
         Gets the Issuer of the Logout Request Message
         :param request: Logout Request Message
@@ -251,8 +250,8 @@ class OneLogin_Saml2_Logout_Request(object):
             issuer = OneLogin_Saml2_XML.element_text(issuer_nodes[0])
         return issuer
 
-    @staticmethod
-    def get_session_indexes(request):
+    @classmethod
+    def get_session_indexes(cls, request):
         """
         Gets the SessionIndexes from the Logout Request
         :param request: Logout Request Message
@@ -359,3 +358,9 @@ class OneLogin_Saml2_Logout_Request(object):
         After executing a validation process, if it fails this method returns the cause
         """
         return self.__error
+
+    def _generate_request_id(self):
+        """
+        Generate an unique logout request ID.
+        """
+        return OneLogin_Saml2_Utils.generate_unique_id()

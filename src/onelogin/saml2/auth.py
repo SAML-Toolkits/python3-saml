@@ -2,7 +2,7 @@
 
 """ OneLogin_Saml2_Auth class
 
-Copyright (c) 2010-2018 OneLogin, Inc.
+Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
 
 Main class of OneLogin's Python Toolkit.
@@ -12,16 +12,16 @@ Initializes the SP SAML instance
 """
 
 import xmlsec
-from defusedxml.lxml import tostring
 
 from onelogin.saml2 import compat
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
-from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
+from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
+from onelogin.saml2.response import OneLogin_Saml2_Response
+from onelogin.saml2.settings import OneLogin_Saml2_Settings
+from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
+from onelogin.saml2.xmlparser import tostring
 
 
 class OneLogin_Saml2_Auth(object):

@@ -2,7 +2,7 @@
 
 """ OneLogin_Saml2_XML class
 
-Copyright (c) 2010-2018 OneLogin, Inc.
+Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
 
 Auxiliary class of OneLogin's Python Toolkit.
@@ -11,9 +11,9 @@ Auxiliary class of OneLogin's Python Toolkit.
 
 from os.path import join, dirname
 from lxml import etree
-from defusedxml.lxml import tostring, fromstring
 from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from onelogin.saml2.xmlparser import tostring, fromstring
 
 
 for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
@@ -63,9 +63,9 @@ class OneLogin_Saml2_XML(object):
         if isinstance(xml, OneLogin_Saml2_XML._element_class):
             return xml
         if isinstance(xml, OneLogin_Saml2_XML._bytes_class):
-            return OneLogin_Saml2_XML._parse_etree(xml, forbid_dtd=True)
+            return OneLogin_Saml2_XML._parse_etree(xml, forbid_dtd=True, forbid_entities=True)
         if isinstance(xml, OneLogin_Saml2_XML._text_class):
-            return OneLogin_Saml2_XML._parse_etree(compat.to_bytes(xml), forbid_dtd=True)
+            return OneLogin_Saml2_XML._parse_etree(compat.to_bytes(xml), forbid_dtd=True, forbid_entities=True)
 
         raise ValueError('unsupported type %r' % type(xml))
 
@@ -172,5 +172,6 @@ class OneLogin_Saml2_XML(object):
 
     @staticmethod
     def element_text(node):
+        # Double check, the LXML Parser already removes comments
         etree.strip_tags(node, etree.Comment)
         return node.text

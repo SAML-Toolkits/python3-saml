@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2018 OneLogin, Inc.
+# Copyright (c) 2010-2021 OneLogin, Inc.
 # MIT License
 
 from base64 import b64decode
@@ -8,13 +8,13 @@ import json
 from lxml import etree
 from os.path import dirname, join, exists
 import unittest
-from defusedxml.lxml import fromstring
 from xml.dom.minidom import parseString
 
 from onelogin.saml2 import compat
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xmlparser import fromstring
 
 
 class OneLogin_Saml2_Utils_Test(unittest.TestCase):

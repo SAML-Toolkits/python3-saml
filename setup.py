@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2018 OneLogin, Inc.
+# Copyright (c) 2010-2021 OneLogin, Inc.
 # MIT License
 
 from setuptools import setup
@@ -37,8 +37,9 @@ setup(
     test_suite='tests',
     install_requires=[
         'isodate>=0.5.0',
+        'lxml>=3.3.5',
         'xmlsec>=0.6.0',
-        'defusedxml>=0.5.0'
+        'defusedxml==0.6.0'
     ],
     dependency_links=['http://github.com/mehcode/python-xmlsec/tarball/master'],
     extras_require={

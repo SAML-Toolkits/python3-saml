@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2010-2018 OneLogin, Inc.
+Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
 
 Add SAML support to your Python softwares using this library.

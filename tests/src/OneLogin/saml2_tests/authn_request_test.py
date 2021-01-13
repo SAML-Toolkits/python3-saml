@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2018 OneLogin, Inc.
+# Copyright (c) 2010-2021 OneLogin, Inc.
 # MIT License
 
 import json

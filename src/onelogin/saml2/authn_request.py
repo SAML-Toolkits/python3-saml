@@ -2,7 +2,7 @@
 
 """ OneLogin_Saml2_Authn_Request class
 
-Copyright (c) 2010-2018 OneLogin, Inc.
+Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
 
 AuthNRequest class of OneLogin's Python Toolkit.
@@ -131,8 +131,6 @@ class OneLogin_Saml2_Authn_Request(object):
     def _generate_request_id(self):
         """
         Generate an unique request ID.
-
-        You can override this in a subclass.
         """
         return OneLogin_Saml2_Utils.generate_unique_id()
 

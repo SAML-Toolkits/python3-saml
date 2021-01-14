@@ -1,4 +1,17 @@
 # python3-saml changelog
+### 1.10.0 (Jan 14, 2021)
+* Added custom lxml parser based on the one defined at xmldefused. Parser will ignore comments and processing instructions and by default have deactivated huge_tree, DTD and access to external documents
+* Destination URL Comparison is now case-insensitive for netloc
+* Support single-label-domains as valid. New security parameter allowSingleLabelDomains
+* Added get_idp_sso_url, get_idp_slo_url and get_idp_slo_response_url methods to the Settings class and use it in the toolkit
+* [#212](https://github.com/onelogin/python3-saml/pull/212) Overridability enhancements. Made classes overridable by subclassing. Use of classmethods instead staticmethods
+* Add get_friendlyname_attributes support
+* Remove external lib method get_ext_lib_path. Add set_cert_path in order to allow set the cert path in a different folder than the toolkit
+* Add sha256 instead sha1 algorithm for sign/digest as recommended value on documentation and settings
+* [#178](https://github.com/onelogin/python3-saml/pull/178) Support for adding idp.crt from filesystem
+* Add samlUserdata to demo-flask session
+* Fix autoreloading in demo-tornado
+
 ### 1.9.0 (Nov 20, 2019)
 * Allow any number of decimal places for seconds on SAML datetimes
 * Fix failOnAuthnContextMismatch code

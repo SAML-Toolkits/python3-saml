@@ -15,12 +15,13 @@ def init_saml_auth(req):
 
 
 def prepare_pyramid_request(request):
-    # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
-
-    if 'X-Forwarded-Proto' in request.headers:
-        request.scheme = request.headers['X-Forwarded-Proto']
-    if 'X-Forwarded-Port' in request.headers:
-        request.server_port = int(request.headers['X-Forwarded-Port'])
+    ## Uncomment this portion to set the request.scheme and request.server_port
+    ## based on the supplied `X-Forwarded` headers
+    #
+    # if 'X-Forwarded-Proto' in request.headers:
+    #    request.scheme = request.headers['X-Forwarded-Proto']
+    # if 'X-Forwarded-Port' in request.headers:
+    #    request.server_port = int(request.headers['X-Forwarded-Port'])
 
     return {
         'https': 'on' if request.scheme == 'https' else 'off',

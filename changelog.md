@@ -1,4 +1,7 @@
 # python3-saml changelog
+### 1.10.1 (Jan 27, 2021)
+* Fix bug on LogoutRequest class, get_idp_slo_response_url was used instead get_idp_slo_url
+
 ### 1.10.0 (Jan 14, 2021)
 * Added custom lxml parser based on the one defined at xmldefused. Parser will ignore comments and processing instructions and by default have deactivated huge_tree, DTD and access to external documents
 * Destination URL Comparison is now case-insensitive for netloc

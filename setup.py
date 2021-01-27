@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='python3-saml',
-    version='1.10.0',
+    version='1.10.1',
     description='Onelogin Python Toolkit. Add SAML support to your Python software using this library',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -21,8 +21,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-	'Programming Language :: Python :: 3.8',
-	'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     author='OneLogin',
     author_email='support@onelogin.com',

@@ -15,9 +15,9 @@ def init_saml_auth(req):
 
 
 def prepare_pyramid_request(request):
-    ## Uncomment this portion to set the request.scheme and request.server_port
-    ## based on the supplied `X-Forwarded` headers.
-    ## Useful for running behind reverse proxies or balancers.
+    # Uncomment this portion to set the request.scheme and request.server_port
+    # based on the supplied `X-Forwarded` headers.
+    # Useful for running behind reverse proxies or balancers.
     #
     # if 'X-Forwarded-Proto' in request.headers:
     #    request.scheme = request.headers['X-Forwarded-Proto']

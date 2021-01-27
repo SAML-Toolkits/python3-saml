@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Based on the lxml example from defusedxml
+# DTDForbidden, EntitiesForbidden, NotSupportedError are clones of the classes defined at defusedxml
 #
 # Copyright (c) 2013 by Christian Heimes <christian@python.org>
 # Licensed to PSF under a Contributor Agreement.
@@ -13,13 +14,49 @@ import threading
 
 from lxml import etree as _etree
 
-from defusedxml.lxml import DTDForbidden, EntitiesForbidden, NotSupportedError
-
 LXML3 = _etree.LXML_VERSION[0] >= 3
 
 __origin__ = "lxml.etree"
 
 tostring = _etree.tostring
+
+
+class DTDForbidden(ValueError):
+    """Document type definition is forbidden
+    """
+
+    def __init__(self, name, sysid, pubid):
+        super(DTDForbidden, self).__init__()
+        self.name = name
+        self.sysid = sysid
+        self.pubid = pubid
+
+    def __str__(self):
+        tpl = "DTDForbidden(name='{}', system_id={!r}, public_id={!r})"
+        return tpl.format(self.name, self.sysid, self.pubid)
+
+
+class EntitiesForbidden(ValueError):
+    """Entity definition is forbidden
+    """
+
+    def __init__(self, name, value, base, sysid, pubid, notation_name):
+        super(EntitiesForbidden, self).__init__()
+        self.name = name
+        self.value = value
+        self.base = base
+        self.sysid = sysid
+        self.pubid = pubid
+        self.notation_name = notation_name
+
+    def __str__(self):
+        tpl = "EntitiesForbidden(name='{}', system_id={!r}, public_id={!r})"
+        return tpl.format(self.name, self.sysid, self.pubid)
+
+
+class NotSupportedError(ValueError):
+    """The operation is not supported
+    """
 
 
 class RestrictedElement(_etree.ElementBase):

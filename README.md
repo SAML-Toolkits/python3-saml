@@ -92,7 +92,6 @@ Installation
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
  duration parser and formatter
- * [defusedxml](https://pypi.python.org/pypi/defusedxml) XML bomb protection for Python stdlib modules
 
 Review the ``setup.py`` file to know the version of the library that ``python3-saml`` is using
 

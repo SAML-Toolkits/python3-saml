@@ -257,6 +257,11 @@ This is the ``settings.json`` file:
         // attributeConsumingService. nameFormat, attributeValue and
         // friendlyName can be ommited
         "attributeConsumingService": {
+                // OPTIONAL: only specifiy if SP requires this.
+                // index is an integer which identifies the attributeConsumingService used
+                // to the SP. OneLogin toolkit supports configuring only one attributeConsumingService
+                // but in certain cases the SP requires a different value.  Defaults to '1'.
+                // "index": '1',
                 "serviceName": "SP test",
                 "serviceDescription": "Test Service",
                 "requestedAttributes": [

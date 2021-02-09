@@ -162,7 +162,7 @@ publish that X.509 certificate on Service Provider metadata.
 If you want to create self-signed certs, you can do it at the https://www.samltool.com/self_signed_certs.php service, or using the command:
 
 ```bash
-openssl req -new -x509 -days 3652 -nodes -out sp.crt -keyout saml.key
+openssl req -new -x509 -days 3652 -nodes -out sp.crt -keyout sp.key
 ```
 
 #### demo-flask ####

@@ -94,6 +94,21 @@ class OneLogin_Saml2_Auth(object):
         assert isinstance(value, bool)
         self.__settings.set_strict(value)
 
+    def store_valid_response(self, response):
+        self.__attributes = response.get_attributes()
+        self.__friendlyname_attributes = response.get_friendlyname_attributes()
+        self.__nameid = response.get_nameid()
+        self.__nameid_format = response.get_nameid_format()
+        self.__nameid_nq = response.get_nameid_nq()
+        self.__nameid_spnq = response.get_nameid_spnq()
+        self.__session_index = response.get_session_index()
+        self.__session_expiration = response.get_session_not_on_or_after()
+        self.__last_message_id = response.get_id()
+        self.__last_assertion_id = response.get_assertion_id()
+        self.__last_authn_contexts = response.get_authn_contexts()
+        self.__authenticated = True
+        self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
+
     def process_response(self, request_id=None):
         """
         Process the SAML Response sent by the IdP.
@@ -112,20 +127,7 @@ class OneLogin_Saml2_Auth(object):
             self.__last_response = response.get_xml_document()
 
             if response.is_valid(self.__request_data, request_id):
-                self.__attributes = response.get_attributes()
-                self.__friendlyname_attributes = response.get_friendlyname_attributes()
-                self.__nameid = response.get_nameid()
-                self.__nameid_format = response.get_nameid_format()
-                self.__nameid_nq = response.get_nameid_nq()
-                self.__nameid_spnq = response.get_nameid_spnq()
-                self.__session_index = response.get_session_index()
-                self.__session_expiration = response.get_session_not_on_or_after()
-                self.__last_message_id = response.get_id()
-                self.__last_assertion_id = response.get_assertion_id()
-                self.__last_authn_contexts = response.get_authn_contexts()
-                self.__authenticated = True
-                self.__last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
-
+                self.store_valid_response(response)
             else:
                 self.__errors.append('invalid_response')
                 self.__error_reason = response.get_error()

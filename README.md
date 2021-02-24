@@ -689,7 +689,7 @@ if not errors:
     else:
       print('Not authenticated')
 else:
-    print("Error when processing SAML Response: %s" % (', '.join(errors)))
+    print("Error when processing SAML Response: %s %s" % (', '.join(errors), auth.get_last_error_reason()))
 ```
 
 The SAML response is processed and then checked that there are no errors. It also verifies that the user is authenticated and stored the userdata in session.
@@ -748,7 +748,7 @@ if len(errors) == 0:
     else:
         print("Sucessfully Logged out")
 else:
-    print("Error when processing SLO: %s" % (', '.join(errors)))
+    print("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason()))
 ```
 
 If the SLS endpoints receives a Logout Response, the response is validated and the session could be closed, using the callback.

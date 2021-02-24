@@ -162,7 +162,7 @@ class OneLogin_Saml2_Metadata(object):
 
                 requested_attribute_data.append(requested_attribute)
 
-            str_attribute_consuming_service = """        <md:AttributeConsumingService index="1">
+            str_attribute_consuming_service = """        <md:AttributeConsumingService index="%(attribute_consuming_service_index)s">
             <md:ServiceName xml:lang="en">%(service_name)s</md:ServiceName>
 %(attr_cs_desc)s%(requested_attribute_str)s
         </md:AttributeConsumingService>
@@ -170,6 +170,7 @@ class OneLogin_Saml2_Metadata(object):
                 {
                     'service_name': sp['attributeConsumingService']['serviceName'],
                     'attr_cs_desc': attr_cs_desc_str,
+                    'attribute_consuming_service_index': sp['attributeConsumingService'].get('index', '1'),
                     'requested_attribute_str': '\n'.join(requested_attribute_data)
                 }
 

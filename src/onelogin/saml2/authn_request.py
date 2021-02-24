@@ -108,7 +108,7 @@ class OneLogin_Saml2_Authn_Request(object):
 
         attr_consuming_service_str = ''
         if 'attributeConsumingService' in sp_data and sp_data['attributeConsumingService']:
-            attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"1\""
+            attr_consuming_service_str = "\n    AttributeConsumingServiceIndex=\"%s\"" % sp_data['attributeConsumingService'].get('index', '1')
 
         request = OneLogin_Saml2_Templates.AUTHN_REQUEST % \
             {

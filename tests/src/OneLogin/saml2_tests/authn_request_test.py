@@ -370,3 +370,26 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         inflated = compat.to_string(OneLogin_Saml2_Utils.decode_base64_and_inflate(authn_request_encoded))
 
         self.assertRegex(inflated, 'AttributeConsumingServiceIndex="1"')
+
+    def testGetRequest(self):
+        """
+        Tests the get_request method of the OneLogin_Saml2_Authn_Request.
+        """
+        saml_settings = self.loadSettingsJSON()
+        saml_settings['deflate'] = True
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_xml = authn_request.get_xml()
+
+        authn_request_encoded = authn_request.get_request()
+        self.assertEqual(authn_request_encoded, OneLogin_Saml2_Utils.deflate_and_base64_encode(authn_request_xml))
+
+        saml_settings['deflate'] = False
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Authn_Request(settings)
+        authn_request_xml = authn_request.get_xml()
+
+        authn_request_encoded = authn_request.get_request()
+        self.assertEqual(authn_request_encoded, OneLogin_Saml2_Utils.b64encode(authn_request_xml))

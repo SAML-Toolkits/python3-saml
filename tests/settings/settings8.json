@@ -1,6 +1,7 @@
 {
     "strict": false,
     "debug": false,
+    "deflate": true,
     "custom_base_path": "../../../tests/data/customPath/",
     "sp": {
         "entityId": "http://stuff.com/endpoints/metadata.php",

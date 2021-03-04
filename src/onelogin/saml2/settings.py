@@ -102,6 +102,7 @@ class OneLogin_Saml2_Settings(object):
         self.__paths = {}
         self.__strict = True
         self.__debug = False
+        self.__deflate = True
         self.__sp = {}
         self.__idp = {}
         self.__security = {}
@@ -229,6 +230,7 @@ class OneLogin_Saml2_Settings(object):
             self.__idp = settings.get('idp', {})
             self.__strict = settings.get('strict', True)
             self.__debug = settings.get('debug', False)
+            self.__deflate = settings.get('deflate', True)
             self.__security = settings.get('security', {})
             self.__contacts = settings.get('contactPerson', {})
             self.__organization = settings.get('organization', {})
@@ -848,6 +850,15 @@ class OneLogin_Saml2_Settings(object):
         :rtype: boolean
         """
         return self.__debug
+
+    def is_deflate_active(self):
+        """
+        Returns if the deflate is active.
+
+        :returns: Deflate parameter
+        :rtype: boolean
+        """
+        return self.__deflate
 
     def _get_allow_single_label_domain(self, settings):
         security = settings.get('security', {})

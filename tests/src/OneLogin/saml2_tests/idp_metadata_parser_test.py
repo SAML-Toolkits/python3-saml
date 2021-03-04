@@ -513,6 +513,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
             "signMetadata": false
           },
           "debug": false,
+          "deflate": true,
           "organization": {
             "en-US": {
               "displayname": "SP test",
@@ -532,6 +533,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         expected_settings2_json = """
         {
           "debug": false,
+          "deflate": true,
           "idp": {
             "singleLogoutService": {
               "url": "http://idp.example.com/SingleLogoutService.php"
@@ -589,6 +591,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         expected_settings3_json = """
         {
           "debug": false,
+          "deflate": true,
           "strict": false,
           "custom_base_path": "../../../tests/data/customPath/",
           "sp": {

@@ -529,6 +529,22 @@ class OneLogin_Saml2_Auth(object):
         return self.__build_signature(response_data, 'SAMLResponse', sign_algorithm)
 
     @staticmethod
+    def __build_sign_query_from_qs(query_string, saml_type):
+        """
+        Build sign query from query string
+
+        :param query_string: The query string
+        :type query_string: str
+
+        :param saml_type: The target URL the user should be redirected to
+        :type saml_type: string SAMLRequest | SAMLResponse
+        """
+        args = ('%s=' % saml_type, 'RelayState=', 'SigAlg=')
+        parts = query_string.split('&')
+        # Join in the order of arguments rather than the original order of parts.
+        return '&'.join(part for arg in args for part in parts if part.startswith(arg))
+
+    @staticmethod
     def __build_sign_query(saml_data, relay_state, algorithm, saml_type, lowercase_urlencoding=False):
         """
         Build sign query
@@ -660,16 +676,16 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
 
-            lowercase_urlencoding = False
-            if 'lowercase_urlencoding' in self.__request_data.keys():
-                lowercase_urlencoding = self.__request_data['lowercase_urlencoding']
-
-            signed_query = self.__build_sign_query(data[saml_type],
-                                                   data.get('RelayState', None),
-                                                   sign_alg,
-                                                   saml_type,
-                                                   lowercase_urlencoding
-                                                   )
+            query_string = self.__request_data.get('query_string')
+            if query_string and self.__request_data.get('validate_signature_from_qs'):
+                signed_query = self.__build_sign_query_from_qs(query_string, saml_type)
+            else:
+                lowercase_urlencoding = self.__request_data.get('lowercase_urlencoding', False)
+                signed_query = self.__build_sign_query(data[saml_type],
+                                                       data.get('RelayState'),
+                                                       sign_alg,
+                                                       saml_type,
+                                                       lowercase_urlencoding)
 
             if exists_multix509sign:
                 for cert in idp_data['x509certMulti']['signing']:

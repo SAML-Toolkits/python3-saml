@@ -526,7 +526,7 @@ Using ````parse_remote```` IdP metadata can be obtained and added to the setting
 idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata')
 ``
 
-You can specify a timeout in seconds for metadata retrieval, if not it is not guaranteed that the request will complete
+You can specify a timeout in seconds for metadata retrieval, without it is not guaranteed that the request will complete
 
 ``
 idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata', timeout=5)

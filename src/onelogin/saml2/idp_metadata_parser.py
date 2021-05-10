@@ -26,7 +26,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     """
 
     @classmethod
-    def get_metadata(cls, url, validate_cert=True):
+    def get_metadata(cls, url, validate_cert=True, timeout=None):
         """
         Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -35,18 +35,21 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :param validate_cert: If the url uses https schema, that flag enables or not the verification of the associated certificate.
         :type validate_cert: bool
 
+        :param timeout: Timeout in seconds to wait for metadata response
+        :type timeout: int
+
         :returns: metadata XML
         :rtype: string
         """
         valid = False
 
         if validate_cert:
-            response = urllib2.urlopen(url)
+            response = urllib2.urlopen(url, timeout=timeout)
         else:
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
-            response = urllib2.urlopen(url, context=ctx)
+            response = urllib2.urlopen(url, context=ctx, timeout=timeout)
         xml = response.read()
 
         if xml:
@@ -59,12 +62,12 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 pass
 
         if not valid:
-            raise Exception('Not valid IdP XML found from URL: %s' % (url))
+            raise Exception('Not valid IdP XML found from URL: %s' % (url,))
 
         return xml
 
     @classmethod
-    def parse_remote(cls, url, validate_cert=True, entity_id=None, **kwargs):
+    def parse_remote(cls, url, validate_cert=True, entity_id=None, timeout=None, **kwargs):
         """
         Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -77,10 +80,13 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                           that contains multiple EntityDescriptor.
         :type entity_id: string
 
+        :param timeout: Timeout in seconds to wait for metadata response
+        :type timeout: int
+
         :returns: settings dict with extracted data
         :rtype: dict
         """
-        idp_metadata = cls.get_metadata(url, validate_cert)
+        idp_metadata = cls.get_metadata(url, validate_cert, timeout)
         return cls.parse(idp_metadata, entity_id=entity_id, **kwargs)
 
     @classmethod

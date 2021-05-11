@@ -62,7 +62,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 pass
 
         if not valid:
-            raise Exception('Not valid IdP XML found from URL: %s' % (url,))
+            raise Exception('Not valid IdP XML found from URL: %s' % (url))
 
         return xml
 

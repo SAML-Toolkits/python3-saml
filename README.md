@@ -568,9 +568,10 @@ req = {
 
     # Advanced request options
     "https": "",
-    "lowercase_urlencoding": "",
     "request_uri": "",
-    "query_string": ""
+    "query_string": "",
+    "validate_signature_from_qs": False,
+    "lowercase_urlencoding": False
 }
 ```
 
@@ -602,11 +603,11 @@ An explanation of some advanced request parameters:
 
 * `https` - Defaults to ``off``. Set this to ``on`` if you receive responses over HTTPS.
 
-* `lowercase_urlencoding` - Defaults to `false`. ADFS users should set this to `true`.
-
-* `request_uri` - The path where your SAML server recieves requests. Set this if requests are not recieved at the server's root.
+* `request_uri` - The path where your SAML server receives requests. Set this if requests are not received at the server's root.
 
 * `query_string` - Set this with additional query parameters that should be passed to the request endpoint.
+
+* `validate_signature_from_qs` - If `True`, use `query_string` to validate request and response signatures. Otherwise, use `get_data`. Defaults to `False`. Note that when using `get_data`, query parameters need to be url-encoded for validation. By default we use upper-case url-encoding. Some IdPs, notably Microsoft AD, use lower-case url-encoding, which makes signature validation to fail. To fix this issue, either pass `query_string` and set `validate_signature_from_qs` to `True`, which works for all IdPs, or set `lowercase_urlencoding` to `True`, which only works for AD.
 
 
 #### Initiate SSO ####

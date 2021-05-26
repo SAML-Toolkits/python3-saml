@@ -522,6 +522,13 @@ There's an easier method -- use a metadata exchange.  Metadata is just an XML fi
 
 Using ````parse_remote```` IdP metadata can be obtained and added to the settings without further ado.
 
+Take in mind that the OneLogin_Saml2_IdPMetadataParser class does not validate in any way the URL that is introduced in order to be parsed. 
+
+Usually the same administrator that handles the Service Provider also sets the URL to the IdP, which should be a trusted resource.
+
+But there are other scenarios, like a SAAS app where the administrator of the app delegates this functionality to other users. In this case, extra precaution should be taken in order to validate such URL inputs and avoid attacks like SSRF.
+
+
 ``
 idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata')
 ``

@@ -50,7 +50,7 @@ class OneLogin_Saml2_Authn_Request(object):
         self.__id = self._generate_request_id()
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
-        destination = idp_data['singleSignOnService']['url']
+        destination = idp_data['singleSignOnService']['url'].replace("&", "&amp;")
 
         provider_name_str = ''
         organization_data = settings.get_organization()

@@ -3,7 +3,7 @@
 # Copyright (c) 2010-2021 OneLogin, Inc.
 # MIT License
 
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from lxml import etree
 from datetime import datetime
 from datetime import timedelta
@@ -14,9 +14,11 @@ import unittest
 from xml.dom.minidom import parseString
 
 from onelogin.saml2 import compat
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Response_Test(unittest.TestCase):
@@ -1861,3 +1863,49 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response.is_valid(request_data)
         self.assertIsNone(response.get_error())
         self.assertEqual(response.get_assertion_not_on_or_after(), 2671081021)
+
+    def testEncryptedId(self):
+        """
+        Test that decrypting EncryptedID elements works as expected.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        base64_content = self.file_contents(join(self.data_path, 'responses', 'valid_unsigned_response.xml.base64'))
+        xml = b64decode(base64_content)
+        response_element = OneLogin_Saml2_XML.to_etree(xml)
+
+        # Add an EncryptedID element to the existing response.
+        encrypted_id = OneLogin_Saml2_Utils.generate_name_id(
+            "123456782",
+            sp_nq=None,
+            nq="urn:etoegang:1.9:EntityConcernedID:RSIN",
+            sp_format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+            cert=settings.get_sp_cert(),
+        )
+        attribute = (
+            '<saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" FriendlyName="ActingSubjectID" Name="urn:etoegang:core:LegalSubjectID">'
+            "<saml:AttributeValue>"
+            + encrypted_id +
+            "</saml:AttributeValue></saml:Attribute>"
+        )
+        statement_element = OneLogin_Saml2_XML.query(response_element, '//saml:AttributeStatement')
+        encrypted_attribute_element = OneLogin_Saml2_XML.to_etree(attribute)
+        statement_element[0].append(encrypted_attribute_element)
+
+        # Try to parse the Response
+        response = OneLogin_Saml2_Response(
+            settings, b64encode(OneLogin_Saml2_XML.to_string(response_element))
+        )
+        response.is_valid(self.get_request_data())
+        attributes = response.get_attributes()
+
+        self.assertEqual(
+            attributes['urn:etoegang:core:LegalSubjectID'],
+            [
+                {'NameID': {
+                    'Format': 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+                    'NameQualifier': 'urn:etoegang:1.9:EntityConcernedID:RSIN',
+                    'value': '123456782'}
+                }
+            ]
+        )

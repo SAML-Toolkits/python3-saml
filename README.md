@@ -522,6 +522,13 @@ There's an easier method -- use a metadata exchange.  Metadata is just an XML fi
 
 Using ````parse_remote```` IdP metadata can be obtained and added to the settings without further ado.
 
+Take in mind that the OneLogin_Saml2_IdPMetadataParser class does not validate in any way the URL that is introduced in order to be parsed. 
+
+Usually the same administrator that handles the Service Provider also sets the URL to the IdP, which should be a trusted resource.
+
+But there are other scenarios, like a SAAS app where the administrator of the app delegates this functionality to other users. In this case, extra precaution should be taken in order to validate such URL inputs and avoid attacks like SSRF.
+
+
 ``
 idp_data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://example.com/auth/saml2/idp/metadata')
 ``
@@ -568,9 +575,10 @@ req = {
 
     # Advanced request options
     "https": "",
-    "lowercase_urlencoding": "",
     "request_uri": "",
-    "query_string": ""
+    "query_string": "",
+    "validate_signature_from_qs": False,
+    "lowercase_urlencoding": False
 }
 ```
 
@@ -602,11 +610,11 @@ An explanation of some advanced request parameters:
 
 * `https` - Defaults to ``off``. Set this to ``on`` if you receive responses over HTTPS.
 
-* `lowercase_urlencoding` - Defaults to `false`. ADFS users should set this to `true`.
-
-* `request_uri` - The path where your SAML server recieves requests. Set this if requests are not recieved at the server's root.
+* `request_uri` - The path where your SAML server receives requests. Set this if requests are not received at the server's root.
 
 * `query_string` - Set this with additional query parameters that should be passed to the request endpoint.
+
+* `validate_signature_from_qs` - If `True`, use `query_string` to validate request and response signatures. Otherwise, use `get_data`. Defaults to `False`. Note that when using `get_data`, query parameters need to be url-encoded for validation. By default we use upper-case url-encoding. Some IdPs, notably Microsoft AD, use lower-case url-encoding, which makes signature validation to fail. To fix this issue, either pass `query_string` and set `validate_signature_from_qs` to `True`, which works for all IdPs, or set `lowercase_urlencoding` to `True`, which only works for AD.
 
 
 #### Initiate SSO ####

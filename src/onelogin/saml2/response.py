@@ -613,12 +613,6 @@ class OneLogin_Saml2_Response(object):
         for attribute_node in attribute_nodes:
             attr_friendlyname = attribute_node.get('FriendlyName')
             if attr_friendlyname:
-                if attr_friendlyname in attributes.keys():
-                    raise OneLogin_Saml2_ValidationError(
-                        'Found an Attribute element with duplicated FriendlyName',
-                        OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
-                    )
-
                 values = []
                 for attr in attribute_node.iterchildren('{%s}AttributeValue' % OneLogin_Saml2_Constants.NSMAP['saml']):
                     attr_text = OneLogin_Saml2_XML.element_text(attr)
@@ -636,7 +630,10 @@ class OneLogin_Saml2_Response(object):
                                 'value': nameid.text
                             }
                         })
-                attributes[attr_friendlyname] = values
+                if attr_friendlyname in attributes:
+                    attributes[attr_friendlyname].extend(values)
+                else:
+                    attributes[attr_friendlyname] = values
         return attributes
 
     def validate_num_assertions(self):

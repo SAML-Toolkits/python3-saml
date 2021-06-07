@@ -451,7 +451,11 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         //    'http://www.w3.org/2001/04/xmlenc#sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
-        'digestAlgorithm': "http://www.w3.org/2001/04/xmlenc#sha256"
+        'digestAlgorithm': "http://www.w3.org/2001/04/xmlenc#sha256",
+            
+        // Specify if you want the SP to view assertions with duplicated Name or FriendlyName attributes to be valid
+        // Defaults to false if not specified
+        'allowRepeatAttributeName': false
     },
 
     // Contact information template, it is recommended to suply a

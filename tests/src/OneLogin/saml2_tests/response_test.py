@@ -14,6 +14,7 @@ import unittest
 from xml.dom.minidom import parseString
 
 from onelogin.saml2 import compat
+from onelogin.saml2.errors import OneLogin_Saml2_ValidationError
 from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -696,6 +697,24 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_3 = OneLogin_Saml2_Response(settings, xml_3)
         self.assertEqual({}, response_3.get_attributes())
 
+        # Test retrieving duplicate attributes
+        xml_4 = self.file_contents(join(self.data_path, 'responses',
+                                        'response1_with_duplicate_attributes.xml.base64'))
+        response_4 = OneLogin_Saml2_Response(settings, xml_4)
+        with self.assertRaises(OneLogin_Saml2_ValidationError) as duplicate_name_exc:
+            response_4.get_attributes()
+        self.assertIn('Found an Attribute element with duplicated Name', str(duplicate_name_exc.exception))
+
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings11.json'))
+        expected_attributes = {'another_value': ['value'],
+                               'duplicate_name': ['name1', 'name2'],
+                               'friendly1': ['friendly1'],
+                               'friendly2': ['friendly2'],
+                               'uid': ['demo']}
+
+        response_5 = OneLogin_Saml2_Response(settings, xml_4)
+        self.assertEqual(expected_attributes, response_5.get_attributes())
+
     def testGetFriendlyAttributes(self):
         """
         Tests the get_friendlyname_attributes method of the OneLogin_Saml2_Response
@@ -721,14 +740,22 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
         self.assertEqual({}, response_4.get_friendlyname_attributes())
 
+        # Test retrieving duplicate attributes
+        xml_5 = self.file_contents(join(self.data_path, 'responses',
+                                        'response1_with_duplicate_attributes.xml.base64'))
+        response_5 = OneLogin_Saml2_Response(settings, xml_5)
+        with self.assertRaises(OneLogin_Saml2_ValidationError) as duplicate_name_exc:
+            response_5.get_friendlyname_attributes()
+        self.assertIn('Found an Attribute element with duplicated FriendlyName', str(duplicate_name_exc.exception))
+
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings11.json'))
         expected_attributes = {
             'username': ['demo'],
             'friendlytest': ['friendly1', 'friendly2']
         }
-        xml_5 = self.file_contents(join(self.data_path, 'responses',
-                                        'response1_with_duplicate_friendlynames.xml.base64'))
-        response_5 = OneLogin_Saml2_Response(settings, xml_5)
-        self.assertEqual(expected_attributes, response_5.get_friendlyname_attributes())
+
+        response_6 = OneLogin_Saml2_Response(settings, xml_5)
+        self.assertEqual(expected_attributes, response_6.get_friendlyname_attributes())
 
     def testGetNestedNameIDAttributes(self):
         """

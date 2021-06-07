@@ -315,6 +315,9 @@ class OneLogin_Saml2_Settings(object):
         # AttributeStatement required by default
         self.__security.setdefault('wantAttributeStatement', True)
 
+        # Disallow duplicate attribute names by default
+        self.__security.setdefault('allowRepeatAttributeName', False)
+
         self.__idp.setdefault('x509cert', '')
         self.__idp.setdefault('certFingerprint', '')
         self.__idp.setdefault('certFingerprintAlgorithm', 'sha1')

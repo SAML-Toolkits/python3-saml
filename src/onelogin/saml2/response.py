@@ -591,7 +591,7 @@ class OneLogin_Saml2_Response(object):
             if attr_key:
                 if not allow_duplicates and attr_key in attributes:
                     raise OneLogin_Saml2_ValidationError(
-                        f'Found an Attribute element with duplicated {attr_name}',
+                        'Found an Attribute element with duplicated ' + attr_name,
                         OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
                     )
 

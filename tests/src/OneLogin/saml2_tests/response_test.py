@@ -777,6 +777,17 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         }
         self.assertEqual(expected_attributes, response.get_attributes())
 
+        expected_attributes = {
+            'another_friendly_value': [{
+                'NameID': {
+                    'Format': 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+                    'NameQualifier': 'https://idpID',
+                    'value': 'value'
+                }
+            }]
+        }
+        self.assertEqual(expected_attributes, response.get_friendlyname_attributes())
+
     def testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference(self):
         """
         Tests the get_nameid method of the OneLogin_Saml2_Response

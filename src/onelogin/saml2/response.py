@@ -573,49 +573,25 @@ class OneLogin_Saml2_Response(object):
         Gets the Attributes from the AttributeStatement element.
         EncryptedAttributes are not supported
         """
-        attributes = {}
-        attribute_nodes = self.__query_assertion('/saml:AttributeStatement/saml:Attribute')
-        for attribute_node in attribute_nodes:
-            attr_name = attribute_node.get('Name')
-            if attr_name in attributes.keys():
-                raise OneLogin_Saml2_ValidationError(
-                    'Found an Attribute element with duplicated Name',
-                    OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
-                )
-
-            values = []
-            for attr in attribute_node.iterchildren('{%s}AttributeValue' % OneLogin_Saml2_Constants.NSMAP['saml']):
-                attr_text = OneLogin_Saml2_XML.element_text(attr)
-                if attr_text:
-                    attr_text = attr_text.strip()
-                    if attr_text:
-                        values.append(attr_text)
-
-                # Parse any nested NameID children
-                for nameid in attr.iterchildren('{%s}NameID' % OneLogin_Saml2_Constants.NSMAP['saml']):
-                    values.append({
-                        'NameID': {
-                            'Format': nameid.get('Format'),
-                            'NameQualifier': nameid.get('NameQualifier'),
-                            'value': nameid.text
-                        }
-                    })
-            attributes[attr_name] = values
-        return attributes
+        return self._get_attributes('Name')
 
     def get_friendlyname_attributes(self):
         """
         Gets the Attributes from the AttributeStatement element indexed by FiendlyName.
         EncryptedAttributes are not supported
         """
+        return self._get_attributes('FriendlyName')
+
+    def _get_attributes(self, attr_name):
+        allow_duplicates = self.__settings.get_security_data().get('allowRepeatAttributeName', False)
         attributes = {}
         attribute_nodes = self.__query_assertion('/saml:AttributeStatement/saml:Attribute')
         for attribute_node in attribute_nodes:
-            attr_friendlyname = attribute_node.get('FriendlyName')
-            if attr_friendlyname:
-                if attr_friendlyname in attributes.keys():
+            attr_key = attribute_node.get(attr_name)
+            if attr_key:
+                if not allow_duplicates and attr_key in attributes:
                     raise OneLogin_Saml2_ValidationError(
-                        'Found an Attribute element with duplicated FriendlyName',
+                        'Found an Attribute element with duplicated ' + attr_name,
                         OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND
                     )
 
@@ -636,7 +612,10 @@ class OneLogin_Saml2_Response(object):
                                 'value': nameid.text
                             }
                         })
-                attributes[attr_friendlyname] = values
+                if attr_key in attributes:
+                    attributes[attr_key].extend(values)
+                else:
+                    attributes[attr_key] = values
         return attributes
 
     def validate_num_assertions(self):

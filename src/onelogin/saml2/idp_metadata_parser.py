@@ -23,7 +23,7 @@ from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 class OneLogin_Saml2_IdPMetadataParser(object):
     """
     A class that contain methods related to obtaining and parsing metadata from IdP
-    
+
     This class does not validate in any way the URL that is introduced,
     make sure to validate it properly before use it in a get_metadata method.
     """

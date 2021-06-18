@@ -22,6 +22,7 @@ class OneLogin_Saml2_Response(object):
     a Logout Response object.
 
     """
+    NO_REQUEST_ID = object()
 
     def __init__(self, settings, response):
         """
@@ -121,14 +122,8 @@ class OneLogin_Saml2_Response(object):
                 security = self.__settings.get_security_data()
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
-                # Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
                 in_response_to = self.get_in_response_to()
-                if in_response_to is not None and request_id is not None:
-                    if in_response_to != request_id:
-                        raise OneLogin_Saml2_ValidationError(
-                            'The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id),
-                            OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
-                        )
+                self.validate_in_response_to(request_id, in_response_to)
 
                 if not self.encrypted and security['wantAssertionsEncrypted']:
                     raise OneLogin_Saml2_ValidationError(
@@ -617,6 +612,25 @@ class OneLogin_Saml2_Response(object):
                 else:
                     attributes[attr_key] = values
         return attributes
+
+    def validate_in_response_to(self, request_id, in_response_to):
+        """
+        Check if the InResponseTo of the Response matches the ID of the AuthNRequest (requestId) if provided
+        """
+        if request_id is None:
+            return
+
+        if request_id is self.NO_REQUEST_ID and in_response_to is not None:
+            raise OneLogin_Saml2_ValidationError(
+                'The InResponseTo of the Response: %s, should not be present' % in_response_to,
+                OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
+            )
+
+        if request_id is not self.NO_REQUEST_ID and in_response_to != request_id:
+            raise OneLogin_Saml2_ValidationError(
+                'The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id),
+                OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
+            )
 
     def validate_num_assertions(self):
         """

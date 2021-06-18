@@ -1408,6 +1408,80 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response.is_valid(request_data, valid_request_id)
         self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
 
+    def testInResponseToPresentInAssertion(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response class
+        Case InResponseTo present and request id is explicitly missing
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html'
+        }
+        current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
+        xml = self.file_contents(join(self.data_path, 'responses', 'unsigned_response.xml.base64'))
+        plain_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(xml))
+        plain_message = plain_message.replace('http://stuff.com/endpoints/endpoints/acs.php', current_url)
+        message = OneLogin_Saml2_Utils.b64encode(plain_message)
+
+        response = OneLogin_Saml2_Response(settings, message)
+        request_id = OneLogin_Saml2_Response.NO_REQUEST_ID
+        response.is_valid(request_data, request_id)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
+
+        settings.set_strict(True)
+        response = OneLogin_Saml2_Response(settings, message)
+        with self.assertRaisesRegex(Exception, 'The InResponseTo of the Response.* should not be present'):
+            response.is_valid(request_data, request_id, raise_exceptions=True)
+
+        valid_request_id = '_57bcbf70-7b1f-012e-c821-782bcb13bb38'
+        response.is_valid(request_data, valid_request_id)
+        self.assertEqual('No Signature found. SAML Response rejected', response.get_error())
+
+    def testInResponseToIsNotPresentInAssertionButRequestIdIsSpecified(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response class
+        Case InResponseTo is not present but request id is specified
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings.set_strict(True)
+        xml = self.file_contents(join(self.data_path, 'responses', 'valid_response_without_inresponseto.xml.base64'))
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html'
+        }
+        response = OneLogin_Saml2_Response(settings, xml)
+        request_id = "someid"
+        with self.assertRaisesRegex(Exception, 'The InResponseTo of the Response'):
+            response.is_valid(request_data, request_id, raise_exceptions=True)
+
+    def testInResponseToIsNotPresentInAssertionAndRequestIdIsExplicitlyMissing(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response class
+        Case InResponseTo is not present and request id is explicitly missing
+        """
+        settings_info = self.loadSettingsJSON()
+        settings_info['strict'] = True
+        settings_info['idp']['entityId'] = 'https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php'
+        settings_info['sp']['entityId'] = 'https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php'
+
+        settings = OneLogin_Saml2_Settings(settings_info)
+        settings.set_strict(True)
+
+        xml = self.file_contents(join(self.data_path, 'responses', 'valid_response_without_inresponseto.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        request_id = OneLogin_Saml2_Response.NO_REQUEST_ID
+
+        not_on_or_after = datetime.strptime('2014-02-19T09:37:01Z', '%Y-%m-%dT%H:%M:%SZ')
+        not_on_or_after -= timedelta(seconds=150)
+
+        with freeze_time(not_on_or_after):
+            self.assertTrue(response.is_valid({
+                'https': 'on',
+                'http_host': 'pitbulk.no-ip.org',
+                'script_name': 'newonelogin/demo1/index.php?acs'
+            }, request_id=request_id, raise_exceptions=True))
+
     def testIsInValidSignIssues(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class

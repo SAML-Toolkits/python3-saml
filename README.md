@@ -323,8 +323,8 @@ This is the ``settings.json`` file:
         /*
          *  Instead of using the whole X.509cert you can use a fingerprint in order to
          *  validate a SAMLResponse (but you still need the X.509cert to validate LogoutRequest and LogoutResponse using the HTTP-Redirect binding).
-         *  But take in mind that the fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass,
-         *  that why we don't recommend it use for production environments.
+         *  But take in mind that the algortithm for the fingerprint should be as strong as the algorithm in a normal certificate signature
+	 *  (e.g. SHA256 or strong)
          *
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *  or add for example the -sha256 , -sha384 or -sha512 parameter)

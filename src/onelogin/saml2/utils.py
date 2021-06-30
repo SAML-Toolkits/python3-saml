@@ -210,7 +210,7 @@ class OneLogin_Saml2_Utils(object):
             url = '%s%s' % (OneLogin_Saml2_Utils.get_self_url_host(request_data), url)
 
         # Verify that the URL is to a http or https site.
-        if re.search('^https?://', url) is None:
+        if re.search('^https?://', url, flags=re.IGNORECASE) is None:
             raise OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' + url,
                 OneLogin_Saml2_Error.REDIRECT_INVALID_URL

@@ -98,37 +98,37 @@ class OneLogin_Saml2_Settings(object):
         :param sp_validation_only: Avoid the IdP validation
         :type sp_validation_only: boolean
         """
-        self.__sp_validation_only = sp_validation_only
-        self.__paths = {}
-        self.__strict = True
-        self.__debug = False
-        self.__sp = {}
-        self.__idp = {}
-        self.__security = {}
-        self.__contacts = {}
-        self.__organization = {}
-        self.__errors = []
+        self._sp_validation_only = sp_validation_only
+        self._paths = {}
+        self._strict = True
+        self._debug = False
+        self._sp = {}
+        self._idp = {}
+        self._security = {}
+        self._contacts = {}
+        self._organization = {}
+        self._errors = []
 
-        self.__load_paths(base_path=custom_base_path)
-        self.__update_paths(settings)
+        self._load_paths(base_path=custom_base_path)
+        self._update_paths(settings)
 
         if settings is None:
             try:
-                valid = self.__load_settings_from_file()
+                valid = self._load_settings_from_file()
             except Exception as e:
                 raise e
             if not valid:
                 raise OneLogin_Saml2_Error(
                     'Invalid dict settings at the file: %s',
                     OneLogin_Saml2_Error.SETTINGS_INVALID,
-                    ','.join(self.__errors)
+                    ','.join(self._errors)
                 )
         elif isinstance(settings, dict):
-            if not self.__load_settings_from_dict(settings):
+            if not self._load_settings_from_dict(settings):
                 raise OneLogin_Saml2_Error(
                     'Invalid dict settings: %s',
                     OneLogin_Saml2_Error.SETTINGS_INVALID,
-                    ','.join(self.__errors)
+                    ','.join(self._errors)
                 )
         else:
             raise OneLogin_Saml2_Error(
@@ -137,14 +137,14 @@ class OneLogin_Saml2_Settings(object):
             )
 
         self.format_idp_cert()
-        if 'x509certMulti' in self.__idp:
+        if 'x509certMulti' in self._idp:
             self.format_idp_cert_multi()
         self.format_sp_cert()
-        if 'x509certNew' in self.__sp:
+        if 'x509certNew' in self._sp:
             self.format_sp_cert_new()
         self.format_sp_key()
 
-    def __load_paths(self, base_path=None):
+    def _load_paths(self, base_path=None):
         """
         Set the paths of the different folders
         """
@@ -152,13 +152,13 @@ class OneLogin_Saml2_Settings(object):
             base_path = dirname(dirname(dirname(__file__)))
         if not base_path.endswith(sep):
             base_path += sep
-        self.__paths = {
+        self._paths = {
             'base': base_path,
             'cert': base_path + 'certs' + sep,
             'lib': dirname(__file__) + sep
         }
 
-    def __update_paths(self, settings):
+    def _update_paths(self, settings):
         """
         Set custom paths if necessary
         """
@@ -168,7 +168,7 @@ class OneLogin_Saml2_Settings(object):
         if 'custom_base_path' in settings:
             base_path = settings['custom_base_path']
             base_path = join(dirname(__file__), base_path)
-            self.__load_paths(base_path)
+            self._load_paths(base_path)
 
     def get_base_path(self):
         """
@@ -177,7 +177,7 @@ class OneLogin_Saml2_Settings(object):
         :return: The base toolkit folder path
         :rtype: string
         """
-        return self.__paths['base']
+        return self._paths['base']
 
     def get_cert_path(self):
         """
@@ -186,13 +186,13 @@ class OneLogin_Saml2_Settings(object):
         :return: The cert folder path
         :rtype: string
         """
-        return self.__paths['cert']
+        return self._paths['cert']
 
     def set_cert_path(self, path):
         """
         Set a new cert path
         """
-        self.__paths['cert'] = path
+        self._paths['cert'] = path
 
     def get_lib_path(self):
         """
@@ -201,7 +201,7 @@ class OneLogin_Saml2_Settings(object):
         :return: The library folder path
         :rtype: string
         """
-        return self.__paths['lib']
+        return self._paths['lib']
 
     def get_schemas_path(self):
         """
@@ -210,9 +210,9 @@ class OneLogin_Saml2_Settings(object):
         :return: The schema folder path
         :rtype: string
         """
-        return self.__paths['lib'] + 'schemas/'
+        return self._paths['lib'] + 'schemas/'
 
-    def __load_settings_from_dict(self, settings):
+    def _load_settings_from_dict(self, settings):
         """
         Loads settings info from a settings Dict
 
@@ -224,22 +224,22 @@ class OneLogin_Saml2_Settings(object):
         """
         errors = self.check_settings(settings)
         if len(errors) == 0:
-            self.__errors = []
-            self.__sp = settings['sp']
-            self.__idp = settings.get('idp', {})
-            self.__strict = settings.get('strict', True)
-            self.__debug = settings.get('debug', False)
-            self.__security = settings.get('security', {})
-            self.__contacts = settings.get('contactPerson', {})
-            self.__organization = settings.get('organization', {})
+            self._errors = []
+            self._sp = settings['sp']
+            self._idp = settings.get('idp', {})
+            self._strict = settings.get('strict', True)
+            self._debug = settings.get('debug', False)
+            self._security = settings.get('security', {})
+            self._contacts = settings.get('contactPerson', {})
+            self._organization = settings.get('organization', {})
 
-            self.__add_default_values()
+            self._add_default_values()
             return True
 
-        self.__errors = errors
+        self._errors = errors
         return False
 
-    def __load_settings_from_file(self):
+    def _load_settings_from_file(self):
         """
         Loads settings info from the settings json file
 
@@ -265,69 +265,69 @@ class OneLogin_Saml2_Settings(object):
             with open(advanced_filename, 'r') as json_data:
                 settings.update(json.loads(json_data.read()))  # Merge settings
 
-        return self.__load_settings_from_dict(settings)
+        return self._load_settings_from_dict(settings)
 
-    def __add_default_values(self):
+    def _add_default_values(self):
         """
         Add default values if the settings info is not complete
         """
-        self.__sp.setdefault('assertionConsumerService', {})
-        self.__sp['assertionConsumerService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
+        self._sp.setdefault('assertionConsumerService', {})
+        self._sp['assertionConsumerService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_POST)
 
-        self.__sp.setdefault('attributeConsumingService', {})
+        self._sp.setdefault('attributeConsumingService', {})
 
-        self.__sp.setdefault('singleLogoutService', {})
-        self.__sp['singleLogoutService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+        self._sp.setdefault('singleLogoutService', {})
+        self._sp['singleLogoutService'].setdefault('binding', OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
 
-        self.__idp.setdefault('singleLogoutService', {})
+        self._idp.setdefault('singleLogoutService', {})
 
         # Related to nameID
-        self.__sp.setdefault('NameIDFormat', OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED)
-        self.__security.setdefault('nameIdEncrypted', False)
+        self._sp.setdefault('NameIDFormat', OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED)
+        self._security.setdefault('nameIdEncrypted', False)
 
         # Metadata format
-        self.__security.setdefault('metadataValidUntil', None)  # None means use default
-        self.__security.setdefault('metadataCacheDuration', None)  # None means use default
+        self._security.setdefault('metadataValidUntil', None)  # None means use default
+        self._security.setdefault('metadataCacheDuration', None)  # None means use default
 
         # Sign provided
-        self.__security.setdefault('authnRequestsSigned', False)
-        self.__security.setdefault('logoutRequestSigned', False)
-        self.__security.setdefault('logoutResponseSigned', False)
-        self.__security.setdefault('signMetadata', False)
+        self._security.setdefault('authnRequestsSigned', False)
+        self._security.setdefault('logoutRequestSigned', False)
+        self._security.setdefault('logoutResponseSigned', False)
+        self._security.setdefault('signMetadata', False)
 
         # Sign expected
-        self.__security.setdefault('wantMessagesSigned', False)
-        self.__security.setdefault('wantAssertionsSigned', False)
+        self._security.setdefault('wantMessagesSigned', False)
+        self._security.setdefault('wantAssertionsSigned', False)
 
         # NameID element expected
-        self.__security.setdefault('wantNameId', True)
+        self._security.setdefault('wantNameId', True)
 
         # Encrypt expected
-        self.__security.setdefault('wantAssertionsEncrypted', False)
-        self.__security.setdefault('wantNameIdEncrypted', False)
+        self._security.setdefault('wantAssertionsEncrypted', False)
+        self._security.setdefault('wantNameIdEncrypted', False)
 
         # Signature Algorithm
-        self.__security.setdefault('signatureAlgorithm', OneLogin_Saml2_Constants.RSA_SHA1)
+        self._security.setdefault('signatureAlgorithm', OneLogin_Saml2_Constants.RSA_SHA1)
 
         # Digest Algorithm
-        self.__security.setdefault('digestAlgorithm', OneLogin_Saml2_Constants.SHA1)
+        self._security.setdefault('digestAlgorithm', OneLogin_Saml2_Constants.SHA1)
 
         # AttributeStatement required by default
-        self.__security.setdefault('wantAttributeStatement', True)
+        self._security.setdefault('wantAttributeStatement', True)
 
         # Disallow duplicate attribute names by default
-        self.__security.setdefault('allowRepeatAttributeName', False)
+        self._security.setdefault('allowRepeatAttributeName', False)
 
-        self.__idp.setdefault('x509cert', '')
-        self.__idp.setdefault('certFingerprint', '')
-        self.__idp.setdefault('certFingerprintAlgorithm', 'sha1')
+        self._idp.setdefault('x509cert', '')
+        self._idp.setdefault('certFingerprint', '')
+        self._idp.setdefault('certFingerprintAlgorithm', 'sha1')
 
-        self.__sp.setdefault('x509cert', '')
-        self.__sp.setdefault('privateKey', '')
+        self._sp.setdefault('x509cert', '')
+        self._sp.setdefault('privateKey', '')
 
-        self.__security.setdefault('requestedAuthnContext', True)
-        self.__security.setdefault('requestedAuthnContextComparison', 'exact')
-        self.__security.setdefault('failOnAuthnContextMismatch', False)
+        self._security.setdefault('requestedAuthnContext', True)
+        self._security.setdefault('requestedAuthnContextComparison', 'exact')
+        self._security.setdefault('failOnAuthnContextMismatch', False)
 
     def check_settings(self, settings):
         """
@@ -345,7 +345,7 @@ class OneLogin_Saml2_Settings(object):
         if not isinstance(settings, dict) or len(settings) == 0:
             errors.append('invalid_syntax')
         else:
-            if not self.__sp_validation_only:
+            if not self._sp_validation_only:
                 errors += self.check_idp_settings(settings)
             sp_errors = self.check_sp_settings(settings)
             errors += sp_errors
@@ -425,9 +425,9 @@ class OneLogin_Saml2_Settings(object):
                 errors.append('sp_not_found')
             else:
                 allow_single_domain_urls = self._get_allow_single_label_domain(settings)
-                # check_sp_certs uses self.__sp so I add it
-                old_sp = self.__sp
-                self.__sp = settings['sp']
+                # check_sp_certs uses self._sp so I add it
+                old_sp = self._sp
+                self._sp = settings['sp']
 
                 sp = settings['sp']
                 security = settings.get('security', {})
@@ -508,9 +508,9 @@ class OneLogin_Saml2_Settings(object):
                             ('url' not in organization or len(organization['url']) == 0):
                         errors.append('organization_not_enought_data')
                         break
-        # Restores the value that had the self.__sp
+        # Restores the value that had the self._sp
         if 'old_sp' in locals():
-            self.__sp = old_sp
+            self._sp = old_sp
 
         return errors
 
@@ -562,8 +562,8 @@ class OneLogin_Saml2_Settings(object):
         :returns: SP private key
         :rtype: string or None
         """
-        key = self.__sp.get('privateKey')
-        key_file_name = self.__paths['cert'] + 'sp.key'
+        key = self._sp.get('privateKey')
+        key_file_name = self._paths['cert'] + 'sp.key'
 
         if not key and exists(key_file_name):
             with open(key_file_name) as f:
@@ -577,8 +577,8 @@ class OneLogin_Saml2_Settings(object):
         :returns: SP public cert
         :rtype: string or None
         """
-        cert = self.__sp.get('x509cert')
-        cert_file_name = self.__paths['cert'] + 'sp.crt'
+        cert = self._sp.get('x509cert')
+        cert_file_name = self._paths['cert'] + 'sp.crt'
 
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
@@ -593,8 +593,8 @@ class OneLogin_Saml2_Settings(object):
         :returns: SP public cert new
         :rtype: string or None
         """
-        cert = self.__sp.get('x509certNew')
-        cert_file_name = self.__paths['cert'] + 'sp_new.crt'
+        cert = self._sp.get('x509certNew')
+        cert_file_name = self._paths['cert'] + 'sp_new.crt'
 
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
@@ -608,7 +608,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: IdP public cert
         :rtype: string
         """
-        cert = self.__idp.get('x509cert')
+        cert = self._idp.get('x509cert')
         cert_file_name = self.get_cert_path() + 'idp.crt'
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
@@ -622,7 +622,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: IdP info
         :rtype: dict
         """
-        return self.__idp
+        return self._idp
 
     def get_sp_data(self):
         """
@@ -631,7 +631,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: SP info
         :rtype: dict
         """
-        return self.__sp
+        return self._sp
 
     def get_security_data(self):
         """
@@ -640,7 +640,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Security info
         :rtype: dict
         """
-        return self.__security
+        return self._security
 
     def get_contacts(self):
         """
@@ -649,7 +649,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Contacts info
         :rtype: dict
         """
-        return self.__contacts
+        return self._contacts
 
     def get_organization(self):
         """
@@ -658,7 +658,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Organization info
         :rtype: dict
         """
-        return self.__organization
+        return self._organization
 
     def get_sp_metadata(self):
         """
@@ -667,14 +667,14 @@ class OneLogin_Saml2_Settings(object):
         :rtype: string
         """
         metadata = self.metadata_class.builder(
-            self.__sp, self.__security['authnRequestsSigned'],
-            self.__security['wantAssertionsSigned'],
-            self.__security['metadataValidUntil'],
-            self.__security['metadataCacheDuration'],
+            self._sp, self._security['authnRequestsSigned'],
+            self._security['wantAssertionsSigned'],
+            self._security['metadataValidUntil'],
+            self._security['metadataCacheDuration'],
             self.get_contacts(), self.get_organization()
         )
 
-        add_encryption = self.__security['wantNameIdEncrypted'] or self.__security['wantAssertionsEncrypted']
+        add_encryption = self._security['wantNameIdEncrypted'] or self._security['wantAssertionsEncrypted']
 
         cert_new = self.get_sp_cert_new()
         metadata = self.metadata_class.add_x509_key_descriptors(metadata, cert_new, add_encryption)
@@ -683,8 +683,8 @@ class OneLogin_Saml2_Settings(object):
         metadata = self.metadata_class.add_x509_key_descriptors(metadata, cert, add_encryption)
 
         # Sign metadata
-        if 'signMetadata' in self.__security and self.__security['signMetadata'] is not False:
-            if self.__security['signMetadata'] is True:
+        if 'signMetadata' in self._security and self._security['signMetadata'] is not False:
+            if self._security['signMetadata'] is True:
                 # Use the SP's normal key to sign the metadata:
                 if not cert:
                     raise OneLogin_Saml2_Error(
@@ -700,16 +700,16 @@ class OneLogin_Saml2_Settings(object):
                     )
             else:
                 # Use a custom key to sign the metadata:
-                if ('keyFileName' not in self.__security['signMetadata'] or
-                        'certFileName' not in self.__security['signMetadata']):
+                if ('keyFileName' not in self._security['signMetadata'] or
+                        'certFileName' not in self._security['signMetadata']):
                     raise OneLogin_Saml2_Error(
                         'Invalid Setting: signMetadata value of the sp is not valid',
                         OneLogin_Saml2_Error.SETTINGS_INVALID_SYNTAX
                     )
-                key_file_name = self.__security['signMetadata']['keyFileName']
-                cert_file_name = self.__security['signMetadata']['certFileName']
-                key_metadata_file = self.__paths['cert'] + key_file_name
-                cert_metadata_file = self.__paths['cert'] + cert_file_name
+                key_file_name = self._security['signMetadata']['keyFileName']
+                cert_file_name = self._security['signMetadata']['certFileName']
+                key_metadata_file = self._paths['cert'] + key_file_name
+                cert_metadata_file = self._paths['cert'] + cert_file_name
 
                 try:
                     with open(key_metadata_file, 'r') as f_metadata_key:
@@ -731,8 +731,8 @@ class OneLogin_Saml2_Settings(object):
                         cert_metadata_file
                     )
 
-            signature_algorithm = self.__security['signatureAlgorithm']
-            digest_algorithm = self.__security['digestAlgorithm']
+            signature_algorithm = self._security['signatureAlgorithm']
+            digest_algorithm = self._security['digestAlgorithm']
 
             metadata = self.metadata_class.sign_metadata(metadata, key_metadata, cert_metadata, signature_algorithm, digest_algorithm)
 
@@ -755,7 +755,7 @@ class OneLogin_Saml2_Settings(object):
             raise Exception('Empty string supplied as input')
 
         errors = []
-        root = OneLogin_Saml2_XML.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self.__debug)
+        root = OneLogin_Saml2_XML.validate_xml(xml, 'saml-schema-metadata-2.0.xsd', self._debug)
         if isinstance(root, str):
             errors.append(root)
         else:
@@ -781,38 +781,38 @@ class OneLogin_Saml2_Settings(object):
         """
         Formats the IdP cert.
         """
-        self.__idp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509cert'])
+        self._idp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self._idp['x509cert'])
 
     def format_idp_cert_multi(self):
         """
         Formats the Multple IdP certs.
         """
-        if 'x509certMulti' in self.__idp:
-            if 'signing' in self.__idp['x509certMulti']:
-                for idx in range(len(self.__idp['x509certMulti']['signing'])):
-                    self.__idp['x509certMulti']['signing'][idx] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509certMulti']['signing'][idx])
+        if 'x509certMulti' in self._idp:
+            if 'signing' in self._idp['x509certMulti']:
+                for idx in range(len(self._idp['x509certMulti']['signing'])):
+                    self._idp['x509certMulti']['signing'][idx] = OneLogin_Saml2_Utils.format_cert(self._idp['x509certMulti']['signing'][idx])
 
-            if 'encryption' in self.__idp['x509certMulti']:
-                for idx in range(len(self.__idp['x509certMulti']['encryption'])):
-                    self.__idp['x509certMulti']['encryption'][idx] = OneLogin_Saml2_Utils.format_cert(self.__idp['x509certMulti']['encryption'][idx])
+            if 'encryption' in self._idp['x509certMulti']:
+                for idx in range(len(self._idp['x509certMulti']['encryption'])):
+                    self._idp['x509certMulti']['encryption'][idx] = OneLogin_Saml2_Utils.format_cert(self._idp['x509certMulti']['encryption'][idx])
 
     def format_sp_cert(self):
         """
         Formats the SP cert.
         """
-        self.__sp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509cert'])
+        self._sp['x509cert'] = OneLogin_Saml2_Utils.format_cert(self._sp['x509cert'])
 
     def format_sp_cert_new(self):
         """
         Formats the SP cert.
         """
-        self.__sp['x509certNew'] = OneLogin_Saml2_Utils.format_cert(self.__sp['x509certNew'])
+        self._sp['x509certNew'] = OneLogin_Saml2_Utils.format_cert(self._sp['x509certNew'])
 
     def format_sp_key(self):
         """
         Formats the private key.
         """
-        self.__sp['privateKey'] = OneLogin_Saml2_Utils.format_private_key(self.__sp['privateKey'])
+        self._sp['privateKey'] = OneLogin_Saml2_Utils.format_private_key(self._sp['privateKey'])
 
     def get_errors(self):
         """
@@ -821,7 +821,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Errors
         :rtype: list
         """
-        return self.__errors
+        return self._errors
 
     def set_strict(self, value):
         """
@@ -832,7 +832,7 @@ class OneLogin_Saml2_Settings(object):
         """
         assert isinstance(value, bool)
 
-        self.__strict = value
+        self._strict = value
 
     def is_strict(self):
         """
@@ -841,7 +841,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Strict parameter
         :rtype: boolean
         """
-        return self.__strict
+        return self._strict
 
     def is_debug_active(self):
         """
@@ -850,7 +850,7 @@ class OneLogin_Saml2_Settings(object):
         :returns: Debug parameter
         :rtype: boolean
         """
-        return self.__debug
+        return self._debug
 
     def _get_allow_single_label_domain(self, settings):
         security = settings.get('security', {})

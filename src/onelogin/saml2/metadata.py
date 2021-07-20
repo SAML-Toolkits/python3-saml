@@ -218,7 +218,7 @@ class OneLogin_Saml2_Metadata(object):
         return OneLogin_Saml2_Utils.add_sign(metadata, key, cert, False, sign_algorithm, digest_algorithm)
 
     @staticmethod
-    def __add_x509_key_descriptors(root, cert, signing):
+    def _add_x509_key_descriptors(root, cert, signing):
         key_descriptor = OneLogin_Saml2_XML.make_child(root, '{%s}KeyDescriptor' % OneLogin_Saml2_Constants.NS_MD)
         root.remove(key_descriptor)
         root.insert(0, key_descriptor)
@@ -261,6 +261,6 @@ class OneLogin_Saml2_Metadata(object):
             raise Exception('Malformed metadata.')
 
         if add_encryption:
-            cls.__add_x509_key_descriptors(sp_sso_descriptor, cert, False)
-        cls.__add_x509_key_descriptors(sp_sso_descriptor, cert, True)
+            cls._add_x509_key_descriptors(sp_sso_descriptor, cert, False)
+        cls._add_x509_key_descriptors(sp_sso_descriptor, cert, True)
         return OneLogin_Saml2_XML.to_string(root)

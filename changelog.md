@@ -1,4 +1,16 @@
 # python3-saml changelog
+### 1.11.0 (Jul 23, 2021)
+* [#261](https://github.com/onelogin/python3-saml/pull/261) Allow duplicate named attributes, controlled by a new setting
+* [#268](https://github.com/onelogin/python3-saml/pull/268) Make the redirect scheme matcher case-insensitive
+* [#256](https://github.com/onelogin/python3-saml/pull/256) Improve signature validation process. Add an option to use query string for validation
+* [#259](https://github.com/onelogin/python3-saml/pull/259) Add get metadata timeout
+* [#246](https://github.com/onelogin/python3-saml/pull/246) Add the ability to change the ProtocolBinding in the authn request.
+* [#248](https://github.com/onelogin/python3-saml/pull/248) Move storing the response data into its own method in the Auth class
+* Remove the dependency on defusedxml
+* [#241](https://github.com/onelogin/python3-saml/pull/241) Improve AttributeConsumingService support
+* Update expired dates from test responses
+* Migrate from Travis to Github Actions
+
 ### 1.10.1 (Jan 27, 2021)
 * Fix bug on LogoutRequest class, get_idp_slo_response_url was used instead get_idp_slo_url
 

@@ -4,6 +4,7 @@
 # MIT License
 
 from base64 import b64decode
+
 from lxml import etree
 from datetime import datetime
 from datetime import timedelta
@@ -1528,22 +1529,31 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response_5.is_valid(request_data))
         self.assertEqual('The NameID of the Response is not encrypted and the SP require it', response_5.get_error())
 
+    def testIsInValidEncIssues_2(self):
         settings_info_2 = self.loadSettingsJSON('settings3.json')
         settings_info_2['strict'] = True
         settings_info_2['security']['wantNameIdEncrypted'] = True
         settings_2 = OneLogin_Saml2_Settings(settings_info_2)
 
         request_data = {
-            'http_host': 'pytoolkit.com',
-            'server_port': 8000,
             'script_name': '',
             'request_uri': '?acs',
         }
+        for separate_port in (False, True):
+            if separate_port:
+                request_data.update({
+                    'http_host': 'pytoolkit.com',
+                    'server_port': 8000,
+                })
+            else:
+                request_data.update({
+                    'http_host': 'pytoolkit.com:8000',
+                })
 
-        message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
-        response_6 = OneLogin_Saml2_Response(settings_2, message_2)
-        self.assertFalse(response_6.is_valid(request_data))
-        self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
+            message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
+            response_6 = OneLogin_Saml2_Response(settings_2, message_2)
+            self.assertFalse(response_6.is_valid(request_data))
+            self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
 
     def testIsInValidCert(self):
         """

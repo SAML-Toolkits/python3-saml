@@ -190,7 +190,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         request_data = {
             'http_host': 'example.com:443'
         }
-        self.assertEqual('example.com', OneLogin_Saml2_Utils.get_self_host(request_data))
+        self.assertEqual('example.com:443', OneLogin_Saml2_Utils.get_self_host(request_data))
 
         request_data = {
             'http_host': 'example.com:ok'
@@ -210,11 +210,6 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
             'https': 'on'
         }
         self.assertTrue(OneLogin_Saml2_Utils.is_https(request_data))
-
-        request_data = {
-            'server_port': '80'
-        }
-        self.assertFalse(OneLogin_Saml2_Utils.is_https(request_data))
 
         request_data = {
             'server_port': '443'

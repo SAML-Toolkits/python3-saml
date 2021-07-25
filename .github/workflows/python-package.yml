@@ -32,8 +32,27 @@ jobs:
         make install-req
         make install-test
     - name: Test
+      run: make pytest
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
       run: |
-        make pytest
+        sudo apt-get update -qq
+        sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
+        make install-req
+        make install-test
+    - name: Run linters
+      run: |
         make pycodestyle
         make flake8
-

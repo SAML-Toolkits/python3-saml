@@ -19,14 +19,18 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
         sudo apt-get update -qq
         sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
         make install-req
         make install-test
-
     - name: Test
       run: |
         make pytest

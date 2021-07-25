@@ -25,7 +25,7 @@ pycodestyle:
 	$(PYCODESTYLE) --ignore=E501,E731,W504 $(SOURCES) --config=$(PEP8_CONFIG)
 
 flake8:
-	$(FLAKE8) --ignore=E501,E731,W504 $(SOURCES)
+	$(FLAKE8) $(SOURCES)
 
 clean: 
 	rm -rf .pytest_cache/

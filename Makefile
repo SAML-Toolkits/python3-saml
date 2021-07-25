@@ -6,9 +6,9 @@ COVERAGE=coverage
 COVERAGE_CONFIG=tests/coverage.rc
 PEP8_CONFIG=tests/pep8.rc
 MAIN_SOURCE=src/onelogin/saml2
-DEMOS=demo-django demo-flask
+DEMOS=demo-django demo-flask demo-tornado demo_pyramid
 TESTS=tests/src/OneLogin/saml2_tests
-SOURCES=$(MAIN_SOURCE) $(DEMO) $(TESTS)
+SOURCES=$(MAIN_SOURCE) $(DEMOS) $(TESTS)
 
 install-req:
 	$(PIP) install --upgrade 'setuptools<45.0.0'

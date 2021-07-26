@@ -10,6 +10,7 @@ Auxiliary class of OneLogin's Python Toolkit.
 """
 
 import base64
+import warnings
 from copy import deepcopy
 import calendar
 from datetime import datetime
@@ -254,27 +255,25 @@ class OneLogin_Saml2_Utils(object):
         :rtype: string
         """
         current_host = OneLogin_Saml2_Utils.get_self_host(request_data)
-        port = ''
-        if OneLogin_Saml2_Utils.is_https(request_data):
-            protocol = 'https'
-        else:
-            protocol = 'http'
+        protocol = 'https' if OneLogin_Saml2_Utils.is_https(request_data) else 'http'
 
-        if 'server_port' in request_data and request_data['server_port'] is not None:
-            port_number = str(request_data['server_port'])
-            port = ':' + port_number
+        if request_data.get('server_port') is not None:
+            warnings.warn(
+                'The server_port key in request data is deprecated. '
+                'The http_host key should include a port, if required.',
+                category=DeprecationWarning,
+            )
+            port_suffix = ':%s' % request_data['server_port']
+            if not current_host.endswith(port_suffix):
+                if not ((protocol == 'https' and port_suffix == ':443') or (protocol == 'http' and port_suffix == ':80')):
+                    current_host += port_suffix
 
-            if protocol == 'http' and port_number == '80':
-                port = ''
-            elif protocol == 'https' and port_number == '443':
-                port = ''
-
-        return '%s://%s%s' % (protocol, current_host, port)
+        return '%s://%s' % (protocol, current_host)
 
     @staticmethod
     def get_self_host(request_data):
         """
-        Returns the current host.
+        Returns the current host (which may include a port number part).
 
         :param request_data: The request as a dict
         :type: dict
@@ -283,22 +282,11 @@ class OneLogin_Saml2_Utils(object):
         :rtype: string
         """
         if 'http_host' in request_data:
-            current_host = request_data['http_host']
+            return request_data['http_host']
         elif 'server_name' in request_data:
-            current_host = request_data['server_name']
-        else:
-            raise Exception('No hostname defined')
-
-        if ':' in current_host:
-            current_host_data = current_host.split(':')
-            possible_port = current_host_data[-1]
-            try:
-                int(possible_port)
-                current_host = current_host_data[0]
-            except ValueError:
-                current_host = ':'.join(current_host_data)
-
-        return current_host
+            warnings.warn("The server_name key in request data is undocumented & deprecated.", category=DeprecationWarning)
+            return request_data['server_name']
+        raise Exception('No hostname defined')
 
     @staticmethod
     def is_https(request_data):
@@ -312,6 +300,7 @@ class OneLogin_Saml2_Utils(object):
         :rtype: boolean
         """
         is_https = 'https' in request_data and request_data['https'] != 'off'
+        # TODO: this use of server_port should be removed too
         is_https = is_https or ('server_port' in request_data and str(request_data['server_port']) == '443')
         return is_https
 

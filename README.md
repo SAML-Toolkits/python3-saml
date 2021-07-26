@@ -573,7 +573,6 @@ This parameter has the following scheme:
 req = {
     "http_host": "",
     "script_name": "",
-    "server_port": "",
     "get_data": "",
     "post_data": "",
 
@@ -594,7 +593,6 @@ def prepare_from_django_request(request):
     return {
         'http_host': request.META['HTTP_HOST'],
         'script_name': request.META['PATH_INFO'],
-        'server_port': request.META['SERVER_PORT'],
         'get_data': request.GET.copy(),
         'post_data': request.POST.copy()
     }
@@ -602,8 +600,7 @@ def prepare_from_django_request(request):
 def prepare_from_flask_request(request):
     url_data = urlparse(request.url)
     return {
-        'http_host': request.host,
-        'server_port': url_data.port,
+        'http_host': request.netloc,
         'script_name': request.path,
         'get_data': request.args.copy(),
         'post_data': request.form.copy()

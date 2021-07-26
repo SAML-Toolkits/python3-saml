@@ -15,19 +15,16 @@ def init_saml_auth(req):
 
 
 def prepare_pyramid_request(request):
-    # Uncomment this portion to set the request.scheme and request.server_port
+    # Uncomment this portion to set the request.scheme
     # based on the supplied `X-Forwarded` headers.
     # Useful for running behind reverse proxies or balancers.
     #
     # if 'X-Forwarded-Proto' in request.headers:
     #    request.scheme = request.headers['X-Forwarded-Proto']
-    # if 'X-Forwarded-Port' in request.headers:
-    #    request.server_port = int(request.headers['X-Forwarded-Port'])
 
     return {
         'https': 'on' if request.scheme == 'https' else 'off',
         'http_host': request.host,
-        'server_port': request.server_port,
         'script_name': request.path,
         'get_data': request.GET.copy(),
         # Uncomment if using ADFS as IdP, https://github.com/onelogin/python-saml/pull/144

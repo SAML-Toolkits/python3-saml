@@ -157,9 +157,8 @@ def prepare_tornado_request(request):
 
     result = {
         'https': 'on' if request == 'https' else 'off',
-        'http_host': tornado.httputil.split_host_and_port(request.host)[0],
+        'http_host': request.host,
         'script_name': request.path,
-        'server_port': tornado.httputil.split_host_and_port(request.host)[1],
         'get_data': dataDict,
         'post_data': dataDict,
         'query_string': request.query

@@ -792,8 +792,10 @@ class OneLogin_Saml2_Response(object):
             # Check if the message is signed
             signed_message_query = '/samlp:Response' + signature_expr
             message_reference_nodes = self.__query(signed_message_query)
-            if message_reference_nodes:
-                message_id = message_reference_nodes[0].get('URI')
+            # we can have reference node but URI can be empty
+            message_id = message_reference_nodes and \
+                message_reference_nodes[0].get('URI')
+            if message_id:
                 final_query = "/samlp:Response[@ID=$tagid]/"
                 tagid = message_id[1:]
             else:
@@ -801,8 +803,11 @@ class OneLogin_Saml2_Response(object):
             final_query += assertion_expr
         else:
             assertion_id = assertion_reference_nodes[0].get('URI')
-            final_query = '/samlp:Response' + assertion_expr + "[@ID=$tagid]"
-            tagid = assertion_id[1:]
+            if assertion_id:
+                final_query = '/samlp:Response' + assertion_expr + "[@ID=$tagid]"
+                tagid = assertion_id[1:]
+            else:
+                final_query = '/samlp:Response' + assertion_expr
         final_query += xpath_expr
         return self.__query(final_query, tagid)
 

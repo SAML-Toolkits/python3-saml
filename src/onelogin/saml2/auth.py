@@ -11,7 +11,9 @@ Initializes the SP SAML instance
 
 """
 
+import logging
 import xmlsec
+
 
 from onelogin.saml2 import compat
 from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
@@ -22,6 +24,9 @@ from onelogin.saml2.response import OneLogin_Saml2_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xmlparser import tostring
+
+
+logger = logging.getLogger(__name__)
 
 
 class OneLogin_Saml2_Auth(object):
@@ -380,6 +385,41 @@ class OneLogin_Saml2_Auth(object):
         """
         return self.__last_authn_contexts
 
+    def _create_authn_request(
+        self, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None
+    ):
+        authn_request = self.authn_request_class(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
+
+        self.__last_request = authn_request.get_xml()
+        self.__last_request_id = authn_request.get_id()
+        return authn_request
+
+    def login_post(self, return_to=None, **authn_kwargs):
+        authn_request = self._create_authn_request(**authn_kwargs)
+
+        url = self.get_sso_url()
+        data = authn_request.get_request(deflate=False, base64_encode=False)
+        saml_request = OneLogin_Saml2_Utils.b64encode(
+            OneLogin_Saml2_Utils.add_sign(
+                data,
+                self.__settings.get_sp_key(), self.__settings.get_sp_cert(),
+                sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256,
+                digest_algorithm=OneLogin_Saml2_Constants.SHA256,),
+
+        )
+        logger.debug(
+            "Returning form-data to the user for a AuthNRequest to %s with SAMLRequest %s",
+            url, OneLogin_Saml2_Utils.b64decode(saml_request).decode('utf-8')
+        )
+        parameters = {'SAMLRequest': saml_request}
+
+        if return_to is not None:
+            parameters['RelayState'] = return_to
+        else:
+            parameters['RelayState'] = OneLogin_Saml2_Utils.get_self_url_no_query(self.__request_data)
+
+        return url, parameters
+
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
         """
         Initiates the SSO process.
@@ -402,9 +442,10 @@ class OneLogin_Saml2_Auth(object):
         :returns: Redirection URL
         :rtype: string
         """
-        authn_request = self.authn_request_class(self.__settings, force_authn, is_passive, set_nameid_policy, name_id_value_req)
-        self.__last_request = authn_request.get_xml()
-        self.__last_request_id = authn_request.get_id()
+        authn_request = self._create_authn_request(
+            force_authn=force_authn, is_passive=is_passive,
+            set_nameid_policy=set_nameid_policy, name_id_value_req=name_id_value_req
+        )
 
         saml_request = authn_request.get_request()
         parameters = {'SAMLRequest': saml_request}

@@ -874,3 +874,21 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
         settings_info['debug'] = True
         settings_3 = OneLogin_Saml2_Settings(settings_info)
         self.assertTrue(settings_3.is_debug_active())
+
+    def testIsDeflateActive(self):
+        """
+        Tests the isDeflateActive method of the OneLogin_Saml2_Settings
+        """
+        settings_info = self.loadSettingsJSON()
+        del settings_info['deflate']
+
+        settings = OneLogin_Saml2_Settings(settings_info)
+        self.assertTrue(settings.is_deflate_active())
+
+        settings_info['deflate'] = False
+        settings_2 = OneLogin_Saml2_Settings(settings_info)
+        self.assertFalse(settings_2.is_deflate_active())
+
+        settings_info['deflate'] = True
+        settings_3 = OneLogin_Saml2_Settings(settings_info)
+        self.assertTrue(settings_3.is_deflate_active())

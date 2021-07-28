@@ -1,6 +1,7 @@
 {
     "strict": false,
     "debug": false,
+    "deflate": true,
     "sp": {
         "entityId": "http://stuff.com/endpoints/metadata.php",
         "assertionConsumerService": {

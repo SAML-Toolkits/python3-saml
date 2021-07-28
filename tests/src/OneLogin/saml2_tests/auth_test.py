@@ -1217,7 +1217,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testIsValidLogoutRequestSign(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         """
         request_data = {
             'http_host': 'example.com',

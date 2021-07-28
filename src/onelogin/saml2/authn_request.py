@@ -135,15 +135,13 @@ class OneLogin_Saml2_Authn_Request(object):
         """
         return OneLogin_Saml2_Utils.generate_unique_id()
 
-    def get_request(self, deflate=True):
+    def get_request(self):
         """
         Returns unsigned AuthnRequest.
-        :param deflate: It makes the deflate process optional
-        :type: bool
         :return: AuthnRequest maybe deflated and base64 encoded
         :rtype: str object
         """
-        if deflate:
+        if self.__settings.is_deflate_active():
             request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self.__authn_request)
         else:
             request = OneLogin_Saml2_Utils.b64encode(self.__authn_request)

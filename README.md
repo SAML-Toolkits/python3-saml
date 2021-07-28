@@ -226,6 +226,9 @@ This is the ``settings.json`` file:
     // Enable debug mode (outputs errors).
     "debug": true,
 
+    // Enable deflate mode (request compression).
+    "deflate": true,
+
     // Service Provider Data that we are deploying.
     "sp": {
         // Identifier of the SP entity  (must be a URI)
@@ -1064,6 +1067,7 @@ Configuration of the OneLogin Python Toolkit
 * ***set_strict*** Activates or deactivates the strict mode.
 * ***is_strict*** Returns if the ``strict`` mode is active.
 * ***is_debug_active*** Returns if the debug is active.
+* ***is_deflate_active*** Returns if the deflate is active.
 
 #### OneLogin_Saml2_Metadata - metadata.py ####
 

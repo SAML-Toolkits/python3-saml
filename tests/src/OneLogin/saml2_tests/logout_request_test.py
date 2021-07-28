@@ -55,7 +55,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testConstructor(self):
         """
-        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Tests the OneLogin_Saml2_Logout_Request Constructor.
         """
         settings_info = self.loadSettingsJSON()
         settings_info['security']['nameIdEncrypted'] = True
@@ -74,7 +74,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testCreateDeflatedSAMLLogoutRequestURLParameter(self):
         """
-        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Tests the OneLogin_Saml2_Logout_Request Constructor.
         The creation of a deflated SAML Logout Request
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
@@ -91,7 +91,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testConstructorWithNameIdFormatOnSettings(self):
         """
-        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Tests the OneLogin_Saml2_Logout_Request Constructor.
         Case: Defines NameIDFormat from settings
         """
         settings_info = self.loadSettingsJSON()
@@ -110,7 +110,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testConstructorWithoutNameIdFormat(self):
         """
-        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Tests the OneLogin_Saml2_Logout_Request Constructor.
         Case: Checks that NameIDFormat is not added
         """
         settings_info = self.loadSettingsJSON()
@@ -128,7 +128,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testConstructorEncryptIdUsingX509certMulti(self):
         """
-        Tests the OneLogin_Saml2_LogoutRequest Constructor.
+        Tests the OneLogin_Saml2_Logout_Request Constructor.
         Case: Able to generate encryptedID with MultiCert
         """
         settings_info = self.loadSettingsJSON('settings8.json')
@@ -149,7 +149,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetIDFromSAMLLogoutRequest(self):
         """
-        Tests the get_id method of the OneLogin_Saml2_LogoutRequest
+        Tests the get_id method of the OneLogin_Saml2_Logout_Request
         """
         logout_request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         id1 = OneLogin_Saml2_Logout_Request.get_id(logout_request)
@@ -161,7 +161,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetIDFromDeflatedSAMLLogoutRequest(self):
         """
-        Tests the get_id method of the OneLogin_Saml2_LogoutRequest
+        Tests the get_id method of the OneLogin_Saml2_Logout_Request
         """
         deflated_logout_request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request_deflated.xml.base64'))
         logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(deflated_logout_request)
@@ -170,7 +170,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetNameIdData(self):
         """
-        Tests the get_nameid_data method of the OneLogin_Saml2_LogoutRequest
+        Tests the get_nameid_data method of the OneLogin_Saml2_Logout_Request
         """
         expected_name_id_data = {
             'Value': 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c',
@@ -240,7 +240,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetNameId(self):
         """
-        Tests the get_nameid of the OneLogin_Saml2_LogoutRequest
+        Tests the get_nameid of the OneLogin_Saml2_Logout_Request
         """
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
         name_id = OneLogin_Saml2_Logout_Request.get_nameid(request)
@@ -257,7 +257,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetIssuer(self):
         """
-        Tests the get_issuer of the OneLogin_Saml2_LogoutRequest
+        Tests the get_issuer of the OneLogin_Saml2_Logout_Request
         """
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
 
@@ -275,7 +275,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testGetSessionIndexes(self):
         """
-        Tests the get_session_indexes of the OneLogin_Saml2_LogoutRequest
+        Tests the get_session_indexes of the OneLogin_Saml2_Logout_Request
         """
         request = self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml'))
 
@@ -292,7 +292,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsInvalidXML(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         Case Invalid XML
         """
         request = OneLogin_Saml2_Utils.b64encode('<xml>invalid</xml>')
@@ -312,7 +312,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsInvalidIssuer(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         Case Invalid Issuer
         """
         request = self.file_contents(join(self.data_path, 'logout_requests', 'invalids', 'invalid_issuer.xml'))
@@ -333,7 +333,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsInvalidDestination(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         Case Invalid Destination
         """
         request_data = {
@@ -361,7 +361,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsInvalidNotOnOrAfter(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         Case Invalid NotOnOrAfter
         """
         request_data = {
@@ -383,7 +383,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsValid(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         """
         request_data = {
             'http_host': 'example.com',
@@ -415,7 +415,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsValidWithCapitalization(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         """
         request_data = {
             'http_host': 'exaMPLe.com',
@@ -447,7 +447,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsInValidWithCapitalization(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         """
         request_data = {
             'http_host': 'example.com',
@@ -479,7 +479,7 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
     def testIsValidWithXMLEncoding(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the is_valid method of the OneLogin_Saml2_Logout_Request
         """
         request_data = {
             'http_host': 'example.com',
@@ -544,3 +544,26 @@ class OneLogin_Saml2_Logout_Request_Test(unittest.TestCase):
 
         logout_request_processed = OneLogin_Saml2_Logout_Request(settings, OneLogin_Saml2_Utils.b64encode(request))
         self.assertEqual(request, logout_request_processed.get_xml())
+
+    def testGetRequest(self):
+        """
+        Tests the get_request method of the OneLogin_Saml2_Logout_Request.
+        """
+        saml_settings = self.loadSettingsJSON()
+        saml_settings['deflate'] = True
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Logout_Request(settings)
+        authn_request_xml = authn_request.get_xml()
+
+        authn_request_encoded = authn_request.get_request()
+        self.assertEqual(authn_request_encoded, OneLogin_Saml2_Utils.deflate_and_base64_encode(authn_request_xml))
+
+        saml_settings['deflate'] = False
+        settings = OneLogin_Saml2_Settings(saml_settings)
+
+        authn_request = OneLogin_Saml2_Logout_Request(settings)
+        authn_request_xml = authn_request.get_xml()
+
+        authn_request_encoded = authn_request.get_request()
+        self.assertEqual(authn_request_encoded, OneLogin_Saml2_Utils.b64encode(authn_request_xml))

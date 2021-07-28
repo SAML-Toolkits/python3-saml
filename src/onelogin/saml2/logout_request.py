@@ -120,15 +120,13 @@ class OneLogin_Saml2_Logout_Request(object):
 
         self.__logout_request = compat.to_string(logout_request)
 
-    def get_request(self, deflate=True):
+    def get_request(self):
         """
         Returns the Logout Request deflated, base64encoded
-        :param deflate: It makes the deflate process optional
-        :type: bool
         :return: Logout Request maybe deflated and base64 encoded
         :rtype: str object
         """
-        if deflate:
+        if self.__settings.is_deflate_active():
             request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self.__logout_request)
         else:
             request = OneLogin_Saml2_Utils.b64encode(self.__logout_request)

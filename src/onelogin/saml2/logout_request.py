@@ -50,14 +50,14 @@ class OneLogin_Saml2_Logout_Request(object):
         :param spnq: SP Name Qualifier
         :type: string
         """
-        self.__settings = settings
-        self.__error = None
+        self._settings = settings
+        self._error = None
         self.id = None
 
         if request is None:
-            sp_data = self.__settings.get_sp_data()
-            idp_data = self.__settings.get_idp_data()
-            security = self.__settings.get_security_data()
+            sp_data = self._settings.get_sp_data()
+            idp_data = self._settings.get_idp_data()
+            security = self._settings.get_security_data()
 
             self.id = self._generate_request_id()
 
@@ -71,7 +71,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 if exists_multix509enc:
                     cert = idp_data['x509certMulti']['encryption'][0]
                 else:
-                    cert = self.__settings.get_idp_cert()
+                    cert = self._settings.get_idp_cert()
 
             if name_id is not None:
                 if not name_id_format and sp_data['NameIDFormat'] != OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED:
@@ -109,7 +109,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 {
                     'id': self.id,
                     'issue_instant': issue_instant,
-                    'single_logout_url': self.__settings.get_idp_slo_url(),
+                    'single_logout_url': self._settings.get_idp_slo_url(),
                     'entity_id': sp_data['entityId'],
                     'name_id': name_id_obj,
                     'session_index': session_index_str,
@@ -118,7 +118,7 @@ class OneLogin_Saml2_Logout_Request(object):
             logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(request, ignore_zip=True)
             self.id = self.get_id(logout_request)
 
-        self.__logout_request = compat.to_string(logout_request)
+        self._logout_request = compat.to_string(logout_request)
 
     def get_request(self, deflate=True):
         """
@@ -129,9 +129,9 @@ class OneLogin_Saml2_Logout_Request(object):
         :rtype: str object
         """
         if deflate:
-            request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self.__logout_request)
+            request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self._logout_request)
         else:
-            request = OneLogin_Saml2_Utils.b64encode(self.__logout_request)
+            request = OneLogin_Saml2_Utils.b64encode(self._logout_request)
         return request
 
     def get_xml(self):
@@ -141,7 +141,7 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: XML request body
         :rtype: string
         """
-        return self.__logout_request
+        return self._logout_request
 
     @classmethod
     def get_id(cls, request):
@@ -279,24 +279,24 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: If the Logout Request is or not valid
         :rtype: boolean
         """
-        self.__error = None
+        self._error = None
         try:
-            root = OneLogin_Saml2_XML.to_etree(self.__logout_request)
+            root = OneLogin_Saml2_XML.to_etree(self._logout_request)
 
-            idp_data = self.__settings.get_idp_data()
+            idp_data = self._settings.get_idp_data()
             idp_entity_id = idp_data['entityId']
 
             get_data = ('get_data' in request_data and request_data['get_data']) or dict()
 
-            if self.__settings.is_strict():
-                res = OneLogin_Saml2_XML.validate_xml(root, 'saml-schema-protocol-2.0.xsd', self.__settings.is_debug_active())
+            if self._settings.is_strict():
+                res = OneLogin_Saml2_XML.validate_xml(root, 'saml-schema-protocol-2.0.xsd', self._settings.is_debug_active())
                 if isinstance(res, str):
                     raise OneLogin_Saml2_ValidationError(
                         'Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd',
                         OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT
                     )
 
-                security = self.__settings.get_security_data()
+                security = self._settings.get_security_data()
 
                 current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
 
@@ -345,8 +345,8 @@ class OneLogin_Saml2_Logout_Request(object):
             return True
         except Exception as err:
             # pylint: disable=R0801
-            self.__error = str(err)
-            debug = self.__settings.is_debug_active()
+            self._error = str(err)
+            debug = self._settings.is_debug_active()
             if debug:
                 print(err)
             if raise_exceptions:
@@ -357,7 +357,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         After executing a validation process, if it fails this method returns the cause
         """
-        return self.__error
+        return self._error
 
     def _generate_request_id(self):
         """

@@ -1,4 +1,7 @@
 # python3-saml changelog
+### 1.12.0 (Aug 13, 2021)
+* [#276](https://github.com/onelogin/python3-saml/pull/276) Deprecate server_port from request data dictionary
+
 ### 1.11.0 (Jul 23, 2021)
 * [#261](https://github.com/onelogin/python3-saml/pull/261) Allow duplicate named attributes, controlled by a new setting
 * [#268](https://github.com/onelogin/python3-saml/pull/268) Make the redirect scheme matcher case-insensitive

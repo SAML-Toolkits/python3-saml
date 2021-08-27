@@ -1433,7 +1433,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIsNone(auth.get_last_assertion_not_on_or_after())
         self.assertEqual(auth.get_last_assertion_issue_instant(), 1392773821)
 
-        # NotOnOrAfter is only calculated with strict = true 
+        # NotOnOrAfter is only calculated with strict = true
         # If invalid, response id and assertion id are not obtained
 
         settings['strict'] = True

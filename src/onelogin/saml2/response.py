@@ -917,3 +917,16 @@ class OneLogin_Saml2_Response(object):
                 OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS
             )
         return self._query_assertion('')[0].get('ID', None)
+
+    def get_assertion_issue_instant(self):
+        """
+        :returns: the IssueInstant of the assertion in the response
+        :rtype: unix/posix timestamp|None
+        """
+        if not self.validate_num_assertions():
+            raise OneLogin_Saml2_ValidationError(
+                'SAML Response must contain 1 assertion',
+                OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS
+            )
+        issue_instant = self._query_assertion('')[0].get('IssueInstant', None)
+        return OneLogin_Saml2_Utils.parse_SAML_to_time(issue_instant)

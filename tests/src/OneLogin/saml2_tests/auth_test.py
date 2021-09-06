@@ -1415,7 +1415,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testGetInfoFromLastResponseReceived(self):
         """
-        Tests the get_last_message_id, get_last_assertion_id and get_last_assertion_not_on_or_after
+        Tests the get_last_message_id, get_last_assertion_id, get_last_assertion_not_on_or_after and get_last_assertion_issue_instant
         of the OneLogin_Saml2_Auth class
         """
         settings = self.loadSettingsJSON()
@@ -1431,6 +1431,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
         self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
         self.assertIsNone(auth.get_last_assertion_not_on_or_after())
+        self.assertEqual(auth.get_last_assertion_issue_instant(), 1392773821)
 
         # NotOnOrAfter is only calculated with strict = true
         # If invalid, response id and assertion id are not obtained
@@ -1442,6 +1443,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIsNone(auth.get_last_message_id())
         self.assertIsNone(auth.get_last_assertion_id())
         self.assertIsNone(auth.get_last_assertion_not_on_or_after())
+        self.assertIsNone(auth.get_last_assertion_issue_instant())
 
         request_data['https'] = 'on'
         request_data['http_host'] = 'pitbulk.no-ip.org'
@@ -1452,6 +1454,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
         self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
         self.assertEqual(auth.get_last_assertion_not_on_or_after(), 2671081021)
+        self.assertEqual(auth.get_last_assertion_issue_instant(), 1392773821)
 
     def testGetIdFromLogoutRequest(self):
         """

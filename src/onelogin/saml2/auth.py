@@ -71,6 +71,7 @@ class OneLogin_Saml2_Auth(object):
         self._last_request_id = None
         self._last_message_id = None
         self._last_assertion_id = None
+        self._last_assertion_issue_instant = None
         self._last_authn_contexts = []
         self._last_request = None
         self._last_response = None
@@ -105,6 +106,7 @@ class OneLogin_Saml2_Auth(object):
         self._session_expiration = response.get_session_not_on_or_after()
         self._last_message_id = response.get_id()
         self._last_assertion_id = response.get_assertion_id()
+        self._last_assertion_issue_instant = response.get_assertion_issue_instant()
         self._last_authn_contexts = response.get_authn_contexts()
         self._authenticated = True
         self._last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
@@ -372,6 +374,13 @@ class OneLogin_Saml2_Auth(object):
         :rtype: string
         """
         return self._last_assertion_id
+
+    def get_last_assertion_issue_instant(self):
+        """
+        :returns: The IssueInstant of the last assertion processed.
+        :rtype: unix/posix timestamp|None
+        """
+        return self._last_assertion_issue_instant
 
     def get_last_authn_contexts(self):
         """

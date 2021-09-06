@@ -970,6 +970,7 @@ Main class of OneLogin Python Toolkit
 * ***get_last_message_id*** The ID of the last Response SAML message processed.
 * ***get_last_assertion_id*** The ID of the last assertion processed.
 * ***get_last_assertion_not_on_or_after*** The ``NotOnOrAfter`` value of the valid ``SubjectConfirmationData`` node (if any) of the last assertion processed (is only calculated with strict = true)
+* ***get_last_assertion_issue_instant*** The `IssueInstant` value of the last assertion processed.
 
 #### OneLogin_Saml2_Auth - authn_request.py ####
 

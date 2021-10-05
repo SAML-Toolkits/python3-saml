@@ -967,6 +967,7 @@ Main class of OneLogin Python Toolkit
 * ***set_strict*** Set the strict mode active/disable.
 * ***get_last_request_xml*** Returns the most recently-constructed/processed XML SAML request (``AuthNRequest``, ``LogoutRequest``)
 * ***get_last_response_xml*** Returns the most recently-constructed/processed XML SAML response (``SAMLResponse``, ``LogoutResponse``). If the SAMLResponse had an encrypted assertion, decrypts it.
+* ***get_last_response_in_response_to*** The `InResponseTo` of the most recently processed SAML Response.
 * ***get_last_message_id*** The ID of the last Response SAML message processed.
 * ***get_last_assertion_id*** The ID of the last assertion processed.
 * ***get_last_assertion_not_on_or_after*** The ``NotOnOrAfter`` value of the valid ``SubjectConfirmationData`` node (if any) of the last assertion processed (is only calculated with strict = true)

@@ -83,6 +83,8 @@ def index():
             session['samlSessionIndex'] = auth.get_session_index()
             self_url = OneLogin_Saml2_Utils.get_self_url(req)
             if 'RelayState' in request.form and self_url != request.form['RelayState']:
+                # To avoid 'Open Redirect' attacks, before execute the redirection confirm
+                # the value of the request.form['RelayState'] is a trusted URL.
                 return redirect(auth.redirect_to(request.form['RelayState']))
         elif auth.get_settings().is_debug_active():
             error_reason = auth.get_last_error_reason()
@@ -95,6 +97,8 @@ def index():
         errors = auth.get_errors()
         if len(errors) == 0:
             if url is not None:
+                # To avoid 'Open Redirect' attacks, before execute the redirection confirm
+                # the value of the url is a trusted URL.
                 return redirect(url)
             else:
                 success_slo = True

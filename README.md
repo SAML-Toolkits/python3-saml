@@ -125,6 +125,36 @@ your environment is not secure and will be exposed to attacks.
 
 In production also we highly recommend to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
 
+
+### Avoiding Open Redirect attacks ###
+
+Some implementations uses the RelayState parameter as a way to control the flow when SSO and SLO succeeded. So basically the
+user is redirected to the value of the RelayState.
+
+If you are using Signature Validation on the HTTP-Redirect binding, you will have the RelayState value integrity covered, otherwise, and
+on HTTP-POST binding, you can't trust the RelayState so before
+executing the validation, you need to verify that its value belong
+a trusted and expected URL.
+
+Read more about Open Redirect [CWE-601](https://cwe.mitre.org/data/definitions/601.html).
+
+### Avoiding Reply attacks ###
+
+A reply attack is basically try to reuse an intercepted valid SAML Message in order to impersonate a SAML action (SSO or SLO).
+
+SAML Messages have a limited timelife (NotBefore, NotOnOrAfter) that
+make harder this kind of attacks, but they are still possible.
+
+In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs alredy valdidated and processed. Those values only need
+to be stored the amount of time of the SAML Message life time, so 
+we don't need to store all processed message/assertion Ids, but the most recent ones.
+
+The OneLogin_Saml2_Auth class contains the [get_last_request_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L357), [get_last_message_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L364) and [get_last_assertion_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L371) methods to retrieve the IDs 
+
+Checking that the ID of the current Message/Assertion does not exists in the lis of the ones already processed will prevent reply
+attacks.
+
+
 Getting Started
 ---------------
 

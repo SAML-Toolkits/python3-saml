@@ -209,7 +209,7 @@ class OneLogin_Saml2_Response(object):
                 valid_audiences = self.get_audiences()
                 if valid_audiences and sp_entity_id not in valid_audiences:
                     raise OneLogin_Saml2_ValidationError(
-                        '%s is not a valid audience for this Response' % sp_entity_id,
+                        '%s is a valid audience for this Response' % sp_entity_id,
                         OneLogin_Saml2_ValidationError.WRONG_AUDIENCE
                     )
 

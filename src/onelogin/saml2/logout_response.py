@@ -10,6 +10,7 @@ Logout Response class of OneLogin's Python Toolkit.
 """
 
 from onelogin.saml2 import compat
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_ValidationError
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
@@ -152,11 +153,13 @@ class OneLogin_Saml2_Logout_Response(object):
         """
         return OneLogin_Saml2_XML.query(self.document, query)
 
-    def build(self, in_response_to):
+    def build(self, in_response_to, status=OneLogin_Saml2_Constants.STATUS_SUCCESS):
         """
         Creates a Logout Response object.
         :param in_response_to: InResponseTo value for the Logout Response.
         :type in_response_to: string
+        :param: status: The status of the response
+        :type: status: string
         """
         sp_data = self._settings.get_sp_data()
 
@@ -164,15 +167,14 @@ class OneLogin_Saml2_Logout_Response(object):
 
         issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
 
-        logout_response = OneLogin_Saml2_Templates.LOGOUT_RESPONSE % \
-            {
-                'id': self.id,
-                'issue_instant': issue_instant,
-                'destination': self._settings.get_idp_slo_response_url(),
-                'in_response_to': in_response_to,
-                'entity_id': sp_data['entityId'],
-                'status': "urn:oasis:names:tc:SAML:2.0:status:Success"
-            }
+        logout_response = OneLogin_Saml2_Templates.LOGOUT_RESPONSE % {
+            "id": self.id,
+            "issue_instant": issue_instant,
+            "destination": self._settings.get_idp_slo_response_url(),
+            "in_response_to": in_response_to,
+            "entity_id": sp_data["entityId"],
+            "status": status,
+        }
 
         self._logout_response = logout_response
 

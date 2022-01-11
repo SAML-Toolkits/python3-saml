@@ -401,3 +401,23 @@ class OneLogin_Saml2_Logout_Response_Test(unittest.TestCase):
 
         logout_response_processed = OneLogin_Saml2_Logout_Response(settings, OneLogin_Saml2_Utils.deflate_and_base64_encode(response))
         self.assertEqual(response, logout_response_processed.get_xml())
+
+    def testBuildWithStatus(self):
+        """
+        Tests the build method when called specifying a non-default status for the LogoutResponse.
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        response_builder = OneLogin_Saml2_Logout_Response(settings)
+        response_builder.build("InResponseValue", status=OneLogin_Saml2_Constants.STATUS_REQUESTER)
+        generated_encoded_response = response_builder.get_response()
+
+        # Parse and verify the status of the response, as the receiver will do:
+        parsed_response = OneLogin_Saml2_Logout_Response(settings, generated_encoded_response)
+        expectedFragment = (
+            '    <samlp:Status>\n'
+            '        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Requester" />\n'
+            '    </samlp:Status>\n'
+        )
+        self.assertIn(expectedFragment, parsed_response.get_xml())
+        self.assertEqual(parsed_response.get_status(), OneLogin_Saml2_Constants.STATUS_REQUESTER)

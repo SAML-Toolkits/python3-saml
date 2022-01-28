@@ -14,6 +14,8 @@ This version supports Python3. There is a separate version that only support Pyt
 
 #### Warning ####
 
+Version 1.13.0 sets sha256 and rsa-sha256 as default algorithms
+
 Version 1.8.0 sets strict mode active by default
 
 Update ``python3-saml`` to ``1.5.0``, this version includes security improvements for preventing XEE and Xpath Injections.
@@ -485,7 +487,12 @@ In addition to the required settings data (idp, sp), extra settings can be defin
             
         // Specify if you want the SP to view assertions with duplicated Name or FriendlyName attributes to be valid
         // Defaults to false if not specified
-        'allowRepeatAttributeName': false
+        'allowRepeatAttributeName': false,
+
+        // If the toolkit receive a message signed with a
+        // deprecated algoritm (defined at the constant class)
+        // will raise an error and reject the message
+        "rejectDeprecatedAlgorithm": true
     },
 
     // Contact information template, it is recommended to suply a

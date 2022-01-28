@@ -167,7 +167,6 @@ class OneLogin_Saml2_Auth(object):
                 self._errors.append('Signature validation failed. Logout Response rejected')
             elif not logout_response.is_valid(self._request_data, request_id):
                 self._errors.append('invalid_logout_response')
-                self._error_reason = logout_response.get_error()
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
                 self._errors.append('logout_not_success')
             else:
@@ -183,7 +182,6 @@ class OneLogin_Saml2_Auth(object):
                 self._errors.append('Signature validation failed. Logout Request rejected')
             elif not logout_request.is_valid(self._request_data):
                 self._errors.append('invalid_logout_request')
-                self._error_reason = logout_request.get_error()
             else:
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
@@ -693,6 +691,15 @@ class OneLogin_Saml2_Auth(object):
             sign_alg = data.get('SigAlg', OneLogin_Saml2_Constants.RSA_SHA1)
             if isinstance(sign_alg, bytes):
                 sign_alg = sign_alg.decode('utf8')
+
+            security = self._settings.get_security_data()
+            reject_deprecated_alg = security.get('rejectDeprecatedAlgorithm', False)
+            if reject_deprecated_alg:
+                if sign_alg in OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS:
+                    raise OneLogin_Saml2_ValidationError(
+                        'Deprecated signature algorithm found: %s' % sign_alg,
+                        OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD
+                    )
 
             query_string = self._request_data.get('query_string')
             if query_string and self._request_data.get('validate_signature_from_qs'):

@@ -1030,6 +1030,19 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         with self.assertRaisesRegex(Exception, 'Signature validation failed. SAML Response rejected'):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
 
+    def testIsInValidDeprecatedAlgorithm(self):
+        """
+        Tests the is_valid method of the OneLogin_Saml2_Response
+        Case Deprecated algorithm used
+        """
+        settings_dict = self.loadSettingsJSON()
+        settings_dict['security']['rejectDeprecatedAlgorithm'] = True
+        settings = OneLogin_Saml2_Settings(settings_dict)
+        xml = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        with self.assertRaisesRegex(Exception, 'Deprecated signature algorithm found: http://www.w3.org/2000/09/xmldsig#rsa-sha1'):
+            response.is_valid(self.get_request_data(), raise_exceptions=True)
+
     def testIsInValidMultipleAssertions(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response

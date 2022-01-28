@@ -1215,9 +1215,31 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth.process_slo()
         self.assertIn('Signature validation failed. Logout Response rejected', auth.get_errors())
 
+    def testIsInValidLogoutResponseSignatureRejectingDeprecatedAlgorithm(self):
+        """
+        Tests the process_slo method of the OneLogin_Saml2_Auth
+        """
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {
+                'SAMLResponse': 'fZHbasJAEIZfJey9ZrNZc1gSodRSBKtQxYveyGQz1kCyu2Q24OM3jS21UHo3p++f4Z+CoGud2th3O/hXJGcNYXDtWkNqapVs6I2yQA0pAx2S8lrtH142Ssy5cr31VtuW3SH/E0CEvW+sYcF6VbLTIktFLMWZgxQR8DSP85wDB4GJGMOqShYVaoBUsOCIPY1kyUahEScacG3Ig/FjiUdyxuOZ4IcoUVGq4vSNBSsk3xjwE3Xx3qkwJD+cz3NtuxBN7WxjPN1F1NLcXdwob77tONiS7bZPm93zenvCqopxgVJmuU50jREsZF4noKWAOuNZJbNznnBky+LTDDVd2S+/dje1m+MVOtfidEER3g8Vt2fsPfiBfmePtsbgCO2A/9tL07TaD1ojEQuXtw0/ouFfD19+AA==',
+                'RelayState': 'http://stuff.com/endpoints/endpoints/index.php',
+                'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+                'Signature': 'OV9c4R0COSjN69fAKCpV7Uj/yx6/KFxvbluVCzdK3UuortpNMpgHFF2wYNlMSG9GcYGk6p3I8nB7Z+1TQchMWZOlO/StjAqgtZhtpiwPcWryNuq8vm/6hnJ3zMDhHTS7F8KG4qkCXmJ9sQD3Y31UNcuygBwIbNakvhDT5Qo9Nsw='
+            }
+        }
+        settings_info = self.loadSettingsJSON('settings8.json')
+        settings_info['security']['rejectDeprecatedAlgorithm'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('Signature validation failed. Logout Response rejected', auth.get_errors())
+        self.assertEqual('Deprecated signature algorithm found: http://www.w3.org/2000/09/xmldsig#rsa-sha1', auth.get_last_error_reason())
+
     def testIsValidLogoutRequestSign(self):
         """
-        Tests the is_valid method of the OneLogin_Saml2_LogoutRequest
+        Tests the process_slo method of the OneLogin_Saml2_Auth
         """
         request_data = {
             'http_host': 'example.com',
@@ -1302,6 +1324,29 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_2)
         auth.process_slo()
         self.assertIn('Signature validation failed. Logout Request rejected', auth.get_errors())
+
+    def testIsInValidLogoutRequestSignatureRejectingDeprecatedAlgorithm(self):
+        """
+        Tests the process_slo method of the OneLogin_Saml2_Auth
+        """
+        request_data = {
+            'http_host': 'example.com',
+            'script_name': 'index.html',
+            'get_data': {
+                'SAMLRequest': 'fZJNa+MwEIb/itHdiTz6sC0SQyEsBPoB27KHXoIsj7cGW3IlGfLzV7G7kN1DL2KYmeedmRcdgp7GWT26326JP/FzwRCz6zTaoNbKkSzeKqfDEJTVEwYVjXp9eHpUsKNq9i4640Zyh3xP6BDQx8FZkp1PR3KpqexAl72QmpUCS8SW01IiZz2TVVGD4X1VQYlAsl/oQyKPJAklPIQFzzZEbWNK0YLnlOVA3wqpQCoB7yQ7pWsGq+NKfcQ4q/0+xKXvd8ZNe7Td7AYbw10UxrCbP2aSPbv4Yl/8Qx/R3+SB5bTOoXiDQvFNvjnc7lXrIr75kh+6eYdXPc0jrkMO+/umjXhOtpxP2Q/nJx2/9+uWGbq8X1tV9NqGAW0kzaVvoe1AAJeCSWqYaUVRM2SilKKuqDTpFSlszdcK29RthVm9YriZebYdXpsLdhVAB7VJzif3haYMqqTVcl0JMBR4y+s2zak3sf/4v8l/vlHzBw==',
+                'RelayState': '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
+                'SigAlg': 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+                'Signature': 'Ouxo9BV6zmq4yrgamT9EbSKy/UmvSxGS8z26lIMgKOEP4LFR/N23RftdANmo4HafrzSfA0YTXwhKDqbOByS0j+Ql8OdQOes7vGioSjo5qq/Bi+5i6jXwQfphnfcHAQiJL4gYVIifkhhHRWpvYeiysF1Y9J02me0izwazFmoRXr4='
+            }
+        }
+        settings_info = self.loadSettingsJSON('settings8.json')
+        settings_info = self.loadSettingsJSON('settings8.json')
+        settings_info['security']['rejectDeprecatedAlgorithm'] = True
+        settings = OneLogin_Saml2_Settings(settings_info)
+        auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
+        auth.process_slo()
+        self.assertIn('Signature validation failed. Logout Request rejected', auth.get_errors())
+        self.assertEqual('Deprecated signature algorithm found: http://www.w3.org/2000/09/xmldsig#rsa-sha1', auth.get_last_error_reason())
 
     def testGetLastRequestID(self):
         settings_info = self.loadSettingsJSON()

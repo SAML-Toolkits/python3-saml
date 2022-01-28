@@ -1415,7 +1415,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
 
     def testGetInfoFromLastResponseReceived(self):
         """
-        Tests the get_last_message_id, get_last_assertion_id, get_last_assertion_not_on_or_after and get_last_assertion_issue_instant
+        Tests the get_last_response_in_response_to, get_last_message_id, get_last_assertion_id, get_last_assertion_not_on_or_after and get_last_assertion_issue_instant
         of the OneLogin_Saml2_Auth class
         """
         settings = self.loadSettingsJSON()
@@ -1428,6 +1428,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
 
         auth.process_response()
+        self.assertEqual(auth.get_last_response_in_response_to(), 'ONELOGIN_5fe9d6e499b2f0913206aab3f7191729049bb807')
         self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
         self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
         self.assertIsNone(auth.get_last_assertion_not_on_or_after())
@@ -1440,6 +1441,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
         self.assertNotEqual(len(auth.get_errors()), 0)
+        self.assertIsNone(auth.get_last_response_in_response_to())
         self.assertIsNone(auth.get_last_message_id())
         self.assertIsNone(auth.get_last_assertion_id())
         self.assertIsNone(auth.get_last_assertion_not_on_or_after())
@@ -1451,6 +1453,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
         self.assertEqual(len(auth.get_errors()), 0)
+        self.assertEqual(auth.get_last_response_in_response_to(), 'ONELOGIN_5fe9d6e499b2f0913206aab3f7191729049bb807')
         self.assertEqual(auth.get_last_message_id(), 'pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e')
         self.assertEqual(auth.get_last_assertion_id(), 'pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb')
         self.assertEqual(auth.get_last_assertion_not_on_or_after(), 2671081021)

@@ -75,6 +75,7 @@ class OneLogin_Saml2_Auth(object):
         self._last_authn_contexts = []
         self._last_request = None
         self._last_response = None
+        self._last_response_in_response_to = None
         self._last_assertion_not_on_or_after = None
 
     def get_settings(self):
@@ -109,6 +110,7 @@ class OneLogin_Saml2_Auth(object):
         self._last_assertion_issue_instant = response.get_assertion_issue_instant()
         self._last_authn_contexts = response.get_authn_contexts()
         self._authenticated = True
+        self._last_response_in_response_to = response.get_in_response_to()
         self._last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
 
     def process_response(self, request_id=None):
@@ -388,6 +390,13 @@ class OneLogin_Saml2_Auth(object):
         :rtype: list
         """
         return self._last_authn_contexts
+
+    def get_last_response_in_response_to(self):
+        """
+        :returns: InResponseTo attribute of the last Response SAML processed or None if it is not present.
+        :rtype: string
+        """
+        return self._last_response_in_response_to
 
     def login(self, return_to=None, force_authn=False, is_passive=False, set_nameid_policy=True, name_id_value_req=None):
         """

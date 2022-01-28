@@ -1,6 +1,5 @@
 # python3-saml changelog
 ### 1.13.0 (Jan 28, 2022)
-
 - [#296](https://github.com/onelogin/python3-saml/pull/296) Add rejectDeprecatedAlgorithm settings in order to be able reject messages signed with deprecated algorithms.
 - Set sha256 and rsa-sha256 as default algorithms
 - [#288](https://github.com/onelogin/python3-saml/pull/288) Support building a LogoutResponse with non-success status

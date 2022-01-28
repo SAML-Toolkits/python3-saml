@@ -38,9 +38,9 @@ setup(
     },
     test_suite='tests',
     install_requires=[
-        'isodate>=0.5.0',
-        'lxml>=3.3.5',
-        'xmlsec>=1.0.5'
+        'lxml>=4.7.1',
+        'isodate>=0.6.1',
+        'xmlsec>=1.3.9'
     ],
     dependency_links=['http://github.com/mehcode/python-xmlsec/tarball/master'],
     extras_require={

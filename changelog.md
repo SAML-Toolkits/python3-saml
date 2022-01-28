@@ -1,4 +1,14 @@
 # python3-saml changelog
+### 1.13.0 (Jan 28, 2022)
+
+- [#296](https://github.com/onelogin/python3-saml/pull/296) Add rejectDeprecatedAlgorithm settings in order to be able reject messages signed with deprecated algorithms.
+- Set sha256 and rsa-sha256 as default algorithms
+- [#288](https://github.com/onelogin/python3-saml/pull/288) Support building a LogoutResponse with non-success status
+- Added warning about Open Redirect and Reply attacks
+- [##274](https://github.com/onelogin/python3-saml/pull/274) Replace double-underscored names with single underscores
+- Add at OneLogin_Saml2_Auth get_last_assertion_issue_instant() and get_last_response_in_response_to() methods
+- Upgrade dependencies
+
 ### 1.12.0 (Aug 13, 2021)
 * [#276](https://github.com/onelogin/python3-saml/pull/276) Deprecate server_port from request data dictionary
 

@@ -653,6 +653,9 @@ class OneLogin_Saml2_Response(object):
         response_tag = '{%s}Response' % OneLogin_Saml2_Constants.NS_SAMLP
         assertion_tag = '{%s}Assertion' % OneLogin_Saml2_Constants.NS_SAML
 
+        security = self._settings.get_security_data()
+        reject_deprecated_alg = security.get('rejectDeprecatedAlgorithm', False)
+
         for sign_node in sign_nodes:
             signed_element = sign_node.getparent().tag
             if signed_element != response_tag and signed_element != assertion_tag:
@@ -694,6 +697,26 @@ class OneLogin_Saml2_Response(object):
                             OneLogin_Saml2_ValidationError.DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS
                         )
                     verified_seis.append(sei)
+
+            # Check the signature and digest algorithm
+            if reject_deprecated_alg:
+                sig_method_node = OneLogin_Saml2_XML.query(sign_node, './/ds:SignatureMethod')
+                if sig_method_node:
+                    sig_method = sig_method_node[0].get("Algorithm")
+                    if sig_method in OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS:
+                        raise OneLogin_Saml2_ValidationError(
+                            'Deprecated signature algorithm found: %s' % sig_method,
+                            OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD
+                        )
+
+                dig_method_node = OneLogin_Saml2_XML.query(sign_node, './/ds:DigestMethod')
+                if dig_method_node:
+                    dig_method = dig_method_node[0].get("Algorithm")
+                    if dig_method in OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS:
+                        raise OneLogin_Saml2_ValidationError(
+                            'Deprecated digest algorithm found: %s' % dig_method,
+                            OneLogin_Saml2_ValidationError.DEPRECATED_DIGEST_METHOD
+                        )
 
             signed_elements.append(signed_element)
 

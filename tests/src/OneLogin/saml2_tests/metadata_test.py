@@ -222,8 +222,8 @@ class OneLogin_Saml2_Metadata_Test(unittest.TestCase):
         self.assertIn('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', signed_metadata)
 
         self.assertIn('<ds:SignedInfo>\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', signed_metadata)
-        self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', signed_metadata)
-        self.assertIn('<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>', signed_metadata)
+        self.assertIn('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', signed_metadata)
+        self.assertIn('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', signed_metadata)
         self.assertIn('<ds:Reference', signed_metadata)
         self.assertIn('<ds:KeyInfo>\n<ds:X509Data>\n<ds:X509Certificate>', signed_metadata)
 

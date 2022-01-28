@@ -567,7 +567,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SigAlg', parsed_query)
         self.assertIn('Signature', parsed_query)
         self.assertIn('http://relaystate.com', parsed_query['RelayState'])
-        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA1, parsed_query['SigAlg'])
+        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA256, parsed_query['SigAlg'])
 
     def testLogin(self):
         """
@@ -624,7 +624,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SigAlg', parsed_query)
         self.assertIn('Signature', parsed_query)
         self.assertIn(return_to, parsed_query['RelayState'])
-        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA1, parsed_query['SigAlg'])
+        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA256, parsed_query['SigAlg'])
 
     def testLoginForceAuthN(self):
         """
@@ -824,7 +824,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         self.assertIn('SigAlg', parsed_query)
         self.assertIn('Signature', parsed_query)
         self.assertIn(return_to, parsed_query['RelayState'])
-        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA1, parsed_query['SigAlg'])
+        self.assertIn(OneLogin_Saml2_Constants.RSA_SHA256, parsed_query['SigAlg'])
 
     def testLogoutNoSLO(self):
         """
@@ -1088,7 +1088,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings)
 
         auth.add_request_signature(parameters)
-        valid_signature = 'Pb1EXAX5TyipSJ1SndEKZstLQTsT+1D00IZAhEepBM+OkAZQSToivu3njgJu47HZiZAqgXZFgloBuuWE/+GdcSsRYEMkEkiSDWTpUr25zKYLJDSg6GNo6iAHsKSuFt46Z54Xe/keYxYP03Hdy97EwuuSjBzzgRc5tmpV+KC7+a0='
+        valid_signature = 'CqdIlbO6GieeJFV+PYqyqz1QVJunQXdZZl+ZyIby9O3/eMJM0XHi+TWReRrpgNxKkbmmvx5fp/t7mphbLiVYNMgGINEaaa/OfoaGwU9GM5YCVULA2t7qZBel1yrIXGMxijJizB7UPR2ZMo4G+Wdhx1zbmbB0GYM0A27w6YCe/+k='
         self.assertEqual(valid_signature, parameters["Signature"])
 
         settings['sp']['privateKey'] = ''
@@ -1109,7 +1109,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         parameters = {"SAMLResponse": message, 'RelayState': relay_state}
 
         auth.add_response_signature(parameters)
-        valid_signature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM='
+        valid_signature = 'fFGaOuO/2+ch/xlwU5o7iS6R+v2quWchLAtiDyQTxStFQZKY1NsBs/eYIin2Meq7oTl1Ks6tpT6JshH5OwhPh/08K7M2oa6FIKb99cjg+jIJ/WwpuJ5h9SH0XXP8y3RLhCxLIomHDsBOGQK8WvOlXFUg+9nvOaEMNi6raUWrGhA='
         self.assertEqual(valid_signature, parameters['Signature'])
 
         settings['sp']['privateKey'] = ''

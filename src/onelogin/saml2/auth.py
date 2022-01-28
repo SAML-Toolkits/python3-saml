@@ -523,7 +523,7 @@ class OneLogin_Saml2_Auth(object):
         """
         return self._settings.get_idp_slo_response_url()
 
-    def add_request_signature(self, request_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
+    def add_request_signature(self, request_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256):
         """
         Builds the Signature of the SAML Request.
 
@@ -535,7 +535,7 @@ class OneLogin_Saml2_Auth(object):
         """
         return self._build_signature(request_data, 'SAMLRequest', sign_algorithm)
 
-    def add_response_signature(self, response_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
+    def add_response_signature(self, response_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256):
         """
         Builds the Signature of the SAML Response.
         :param response_data: The Response parameters
@@ -588,7 +588,7 @@ class OneLogin_Saml2_Auth(object):
         sign_data.append('SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(algorithm, lowercase_urlencoding))
         return '&'.join(sign_data)
 
-    def _build_signature(self, data, saml_type, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA1):
+    def _build_signature(self, data, saml_type, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256):
         """
         Builds the Signature
         :param data: The Request data
@@ -621,7 +621,7 @@ class OneLogin_Saml2_Auth(object):
             OneLogin_Saml2_Constants.RSA_SHA384: xmlsec.Transform.RSA_SHA384,
             OneLogin_Saml2_Constants.RSA_SHA512: xmlsec.Transform.RSA_SHA512
         }
-        sign_algorithm_transform = sign_algorithm_transform_map.get(sign_algorithm, xmlsec.Transform.RSA_SHA1)
+        sign_algorithm_transform = sign_algorithm_transform_map.get(sign_algorithm, xmlsec.Transform.RSA_SHA256)
 
         signature = OneLogin_Saml2_Utils.sign_binary(msg, key, sign_algorithm_transform, self._settings.is_debug_active())
         data['Signature'] = OneLogin_Saml2_Utils.b64encode(signature)

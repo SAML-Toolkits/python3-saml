@@ -38,7 +38,7 @@ setup(
     },
     test_suite='tests',
     install_requires=[
-        'lxml==4.7.0',
+        'lxml~=4.7.1',
         'isodate>=0.6.1',
         'xmlsec>=1.3.9'
     ],

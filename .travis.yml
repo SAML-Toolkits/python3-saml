@@ -23,5 +23,3 @@ script:
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
   - 'flake8 .'
-
-after_success: 'coveralls'

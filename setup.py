@@ -50,7 +50,6 @@ setup(
             'freezegun>=0.3.11, <=1.1.0',
             'pylint==1.9.4',
             'flake8>=3.6.0',
-            'coveralls>=1.11.1',
             'pytest>=4.6',
         ),
     },

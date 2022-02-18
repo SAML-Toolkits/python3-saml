@@ -1,4 +1,9 @@
 # python3-saml changelog
+### 1.14.0 (Feb 18, 2022)
+- [#297](https://github.com/onelogin/python3-saml/pull/297) Don't require yanked version of lxml.
+- [#298](https://github.com/onelogin/python3-saml/pull/298) Add support for python 3.10 and cleanup the GHA.
+- [#299](https://github.com/onelogin/python3-saml/pull/299) Remove stats from coveralls removed as they are no longer maintained.
+
 ### 1.13.0 (Jan 28, 2022)
 - [#296](https://github.com/onelogin/python3-saml/pull/296) Add rejectDeprecatedAlgorithm settings in order to be able reject messages signed with deprecated algorithms.
 - Set sha256 and rsa-sha256 as default algorithms

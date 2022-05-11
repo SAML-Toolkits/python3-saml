@@ -1,2 +1,8 @@
-Django==1.11.29
-python3-saml
+asgiref==3.5.1
+Django==4.0.4
+isodate==0.6.1
+lxml==4.6.5
+python3-saml==1.14.0
+six==1.16.0
+sqlparse==0.4.2
+xmlsec==1.3.12

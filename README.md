@@ -139,9 +139,9 @@ a trusted and expected URL.
 
 Read more about Open Redirect [CWE-601](https://cwe.mitre.org/data/definitions/601.html).
 
-### Avoiding Reply attacks ###
+### Avoiding Replay attacks ###
 
-A reply attack is basically try to reuse an intercepted valid SAML Message in order to impersonate a SAML action (SSO or SLO).
+A replay attack is basically try to reuse an intercepted valid SAML Message in order to impersonate a SAML action (SSO or SLO).
 
 SAML Messages have a limited timelife (NotBefore, NotOnOrAfter) that
 make harder this kind of attacks, but they are still possible.
@@ -152,8 +152,7 @@ we don't need to store all processed message/assertion Ids, but the most recent 
 
 The OneLogin_Saml2_Auth class contains the [get_last_request_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L357), [get_last_message_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L364) and [get_last_assertion_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L371) methods to retrieve the IDs 
 
-Checking that the ID of the current Message/Assertion does not exists in the lis of the ones already processed will prevent reply
-attacks.
+Checking that the ID of the current Message/Assertion does not exists in the lis of the ones already processed will prevent replay attacks.
 
 
 Getting Started

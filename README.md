@@ -4,6 +4,7 @@
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
 ![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)
 
+**Notice:** This project is currently not under active development, please see [#320](https://github.com/onelogin/python3-saml/issues/320) for more information.
 
 Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided

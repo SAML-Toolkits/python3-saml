@@ -523,7 +523,7 @@ In the ``security`` section, you can set the way that the SP will handle the mes
 
 Once we know what kind of data could be configured, let's talk about the way settings are handled within the toolkit.
 
-The settings files described (``settings.json`` and ``advanced_settings.json``) are loaded by the toolkit if not other dict with settings info is provided in the constructors of the toolkit. Let's see some examples.
+The settings files described (``settings.json`` and ``advanced_settings.json``) are loaded by the toolkit if no other dict with settings info is provided in the constructors of the toolkit. Let's see some examples.
 
 ```python
 # Initializes toolkit with settings.json & advanced_settings.json files.

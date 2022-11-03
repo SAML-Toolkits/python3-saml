@@ -32,4 +32,4 @@ jobs:
           flake8 saml2/* --count --show-source --statistics
       - name: Lint with black
         run: |
-          black saml2/* --check --line-length=119
+          black saml2/* --check

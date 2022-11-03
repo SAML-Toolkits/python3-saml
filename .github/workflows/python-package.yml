@@ -30,9 +30,6 @@ jobs:
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 saml2/* --count --show-source --statistics
-      - name: Lint with pylint
-        run: |
-          pylint saml2/* --fail-under 10 --disable=all --enable=classes --disable=W
       - name: Lint with black
         run: |
           black saml2/* --check --line-length=119

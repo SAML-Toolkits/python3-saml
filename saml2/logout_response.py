@@ -138,7 +138,6 @@ class Saml2_Logout_Response(object):
                             Saml2_ValidationError.NO_SIGNED_MESSAGE,
                         )
             return True
-        # pylint: disable=R0801
         except Exception as err:
             self._error = str(err)
             debug = self._settings.is_debug_active()

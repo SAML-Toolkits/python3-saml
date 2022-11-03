@@ -356,7 +356,6 @@ class Saml2_Logout_Request(object):
 
             return True
         except Exception as err:
-            # pylint: disable=R0801
             self._error = str(err)
             debug = self._settings.is_debug_active()
             if debug:

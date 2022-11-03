@@ -10,15 +10,11 @@ requirements = []
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
-extra_requirements = {
-    "test": (
-        "coverage>=4.5.2",
-        "freezegun>=0.3.11, <=1.1.0",
-        "pylint==1.9.4",
-        "flake8>=3.6.0",
-        "pytest>=4.6",
-    ),
-}
+test_requirements = None
+with open("requirements-test.txt") as f:
+    test_requirements = (item for item in f.read().splitlines())
+
+extra_requirements = {"test": test_requirements}
 
 setup(
     name="python3-saml",
@@ -42,10 +38,10 @@ setup(
     author="Alloy",
     license="MIT",
     url="https://github.com/UseAlloy/python3-saml",
-    packages=["onelogin", "onelogin/saml2"],
+    packages=["saml2"],
     include_package_data=True,
     package_data={
-        "onelogin/saml2/schemas": ["*.xsd"],
+        "saml2/schemas": ["*.xsd"],
     },
     package_dir={
         "": "src",

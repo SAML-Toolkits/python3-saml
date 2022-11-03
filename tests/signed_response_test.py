@@ -7,12 +7,12 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
-from saml2.response import OneLogin_Saml2_Response
-from saml2.settings import OneLogin_Saml2_Settings
-from saml2.utils import OneLogin_Saml2_Utils
+from saml2.response import Saml2_Response
+from saml2.settings import Saml2_Settings
+from saml2.utils import Saml2_Utils
 
 
-class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
+class Saml2_SignedResponse_Test(unittest.TestCase):
     data_path = join(dirname(__file__), "..", "..", "..", "data")
 
     def loadSettingsJSON(self):
@@ -33,22 +33,22 @@ class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
 
     def testResponseSignedAssertionNot(self):
         """
-        Tests the getNameId method of the OneLogin_Saml2_Response
+        Tests the getNameId method of the Saml2_Response
         Case valid signed response, unsigned assertion
         """
-        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, "responses", "open_saml_response.xml"))
-        response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
+        response = Saml2_Response(settings, Saml2_Utils.b64encode(message))
 
         self.assertEqual("someone@example.org", response.get_nameid())
 
     def testResponseAndAssertionSigned(self):
         """
-        Tests the getNameId method of the OneLogin_Saml2_Response
+        Tests the getNameId method of the Saml2_Response
         Case valid signed response, signed assertion
         """
-        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+        settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(join(self.data_path, "responses", "simple_saml_php.xml"))
-        response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
+        response = Saml2_Response(settings, Saml2_Utils.b64encode(message))
 
         self.assertEqual("someone@example.com", response.get_nameid())

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_IdPMetadataParser class
+""" Saml2_IdPMetadataParser class
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
 Metadata class of OneLogin's Python Toolkit.
@@ -16,11 +16,11 @@ except ImportError:
 
 import ssl
 
-from saml2.constants import OneLogin_Saml2_Constants
-from saml2.xml_utils import OneLogin_Saml2_XML
+from saml2.constants import Saml2_Constants
+from saml2.xml_utils import Saml2_XML
 
 
-class OneLogin_Saml2_IdPMetadataParser(object):
+class Saml2_IdPMetadataParser(object):
     """
     A class that contain methods related to obtaining and parsing metadata from IdP
 
@@ -57,8 +57,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
         if xml:
             try:
-                dom = OneLogin_Saml2_XML.to_etree(xml)
-                idp_descriptor_nodes = OneLogin_Saml2_XML.query(dom, "//md:IDPSSODescriptor")
+                dom = Saml2_XML.to_etree(xml)
+                idp_descriptor_nodes = Saml2_XML.query(dom, "//md:IDPSSODescriptor")
                 if idp_descriptor_nodes:
                     valid = True
             except Exception:
@@ -96,8 +96,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     def parse(
         cls,
         idp_metadata,
-        required_sso_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
-        required_slo_binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT,
+        required_sso_binding=Saml2_Constants.BINDING_HTTP_REDIRECT,
+        required_slo_binding=Saml2_Constants.BINDING_HTTP_REDIRECT,
         entity_id=None,
     ):
         """
@@ -119,12 +119,12 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :type idp_metadata: string
 
         :param required_sso_binding: Parse only POST or REDIRECT SSO endpoints.
-        :type required_sso_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+        :type required_sso_binding: one of Saml2_Constants.BINDING_HTTP_REDIRECT
+            or Saml2_Constants.BINDING_HTTP_POST
 
         :param required_slo_binding: Parse only POST or REDIRECT SLO endpoints.
-        :type required_slo_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT
-            or OneLogin_Saml2_Constants.BINDING_HTTP_POST
+        :type required_slo_binding: one of Saml2_Constants.BINDING_HTTP_REDIRECT
+            or Saml2_Constants.BINDING_HTTP_POST
 
         :param entity_id: Specify the entity_id of the EntityDescriptor that you want to parse a XML
                           that contains multiple EntityDescriptor.
@@ -135,7 +135,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         """
         data = {}
 
-        dom = OneLogin_Saml2_XML.to_etree(idp_metadata)
+        dom = Saml2_XML.to_etree(idp_metadata)
         idp_entity_id = (
             want_authn_requests_signed
         ) = idp_name_id_format = idp_sso_url = idp_slo_url = certs = None
@@ -143,13 +143,11 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         entity_desc_path = "//md:EntityDescriptor"
         if entity_id:
             entity_desc_path += "[@entityID='%s']" % entity_id
-        entity_descriptor_nodes = OneLogin_Saml2_XML.query(dom, entity_desc_path)
+        entity_descriptor_nodes = Saml2_XML.query(dom, entity_desc_path)
 
         if len(entity_descriptor_nodes) > 0:
             entity_descriptor_node = entity_descriptor_nodes[0]
-            idp_descriptor_nodes = OneLogin_Saml2_XML.query(
-                entity_descriptor_node, "./md:IDPSSODescriptor"
-            )
+            idp_descriptor_nodes = Saml2_XML.query(entity_descriptor_node, "./md:IDPSSODescriptor")
             if len(idp_descriptor_nodes) > 0:
                 idp_descriptor_node = idp_descriptor_nodes[0]
 
@@ -159,13 +157,11 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                     "WantAuthnRequestsSigned", None
                 )
 
-                name_id_format_nodes = OneLogin_Saml2_XML.query(
-                    idp_descriptor_node, "./md:NameIDFormat"
-                )
+                name_id_format_nodes = Saml2_XML.query(idp_descriptor_node, "./md:NameIDFormat")
                 if len(name_id_format_nodes) > 0:
-                    idp_name_id_format = OneLogin_Saml2_XML.element_text(name_id_format_nodes[0])
+                    idp_name_id_format = Saml2_XML.element_text(name_id_format_nodes[0])
 
-                sso_nodes = OneLogin_Saml2_XML.query(
+                sso_nodes = Saml2_XML.query(
                     idp_descriptor_node,
                     "./md:SingleSignOnService[@Binding='%s']" % required_sso_binding,
                 )
@@ -173,7 +169,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 if len(sso_nodes) > 0:
                     idp_sso_url = sso_nodes[0].get("Location", None)
 
-                slo_nodes = OneLogin_Saml2_XML.query(
+                slo_nodes = Saml2_XML.query(
                     idp_descriptor_node,
                     "./md:SingleLogoutService[@Binding='%s']" % required_slo_binding,
                 )
@@ -181,11 +177,11 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                 if len(slo_nodes) > 0:
                     idp_slo_url = slo_nodes[0].get("Location", None)
 
-                signing_nodes = OneLogin_Saml2_XML.query(
+                signing_nodes = Saml2_XML.query(
                     idp_descriptor_node,
                     "./md:KeyDescriptor[not(contains(@use, 'encryption'))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate",
                 )
-                encryption_nodes = OneLogin_Saml2_XML.query(
+                encryption_nodes = Saml2_XML.query(
                     idp_descriptor_node,
                     "./md:KeyDescriptor[not(contains(@use, 'signing'))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate",
                 )
@@ -196,13 +192,13 @@ class OneLogin_Saml2_IdPMetadataParser(object):
                         certs["signing"] = []
                         for cert_node in signing_nodes:
                             certs["signing"].append(
-                                "".join(OneLogin_Saml2_XML.element_text(cert_node).split())
+                                "".join(Saml2_XML.element_text(cert_node).split())
                             )
                     if len(encryption_nodes) > 0:
                         certs["encryption"] = []
                         for cert_node in encryption_nodes:
                             certs["encryption"].append(
-                                "".join(OneLogin_Saml2_XML.element_text(cert_node).split())
+                                "".join(Saml2_XML.element_text(cert_node).split())
                             )
 
                 data["idp"] = {}

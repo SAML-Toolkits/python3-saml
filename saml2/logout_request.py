@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_Logout_Request class
+""" Saml2_Logout_Request class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
@@ -10,17 +10,17 @@ Logout Request class of OneLogin's Python Toolkit.
 """
 
 from saml2 import compat
-from saml2.constants import OneLogin_Saml2_Constants
+from saml2.constants import Saml2_Constants
 from saml2.utils import (
-    OneLogin_Saml2_Utils,
-    OneLogin_Saml2_Error,
-    OneLogin_Saml2_ValidationError,
+    Saml2_Utils,
+    Saml2_Error,
+    Saml2_ValidationError,
 )
-from saml2.xml_templates import OneLogin_Saml2_Templates
-from saml2.xml_utils import OneLogin_Saml2_XML
+from saml2.xml_templates import Saml2_Templates
+from saml2.xml_utils import Saml2_XML
 
 
-class OneLogin_Saml2_Logout_Request(object):
+class Saml2_Logout_Request(object):
     """
 
     This class handles a Logout Request.
@@ -43,7 +43,7 @@ class OneLogin_Saml2_Logout_Request(object):
         Constructs the Logout Request object.
 
         :param settings: Setting data
-        :type settings: OneLogin_Saml2_Settings
+        :type settings: Saml2_Settings
 
         :param request: Optional. A LogoutRequest to be loaded instead build one.
         :type request: string
@@ -74,7 +74,7 @@ class OneLogin_Saml2_Logout_Request(object):
 
             self.id = self._generate_request_id()
 
-            issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
+            issue_instant = Saml2_Utils.parse_time_to_SAML(Saml2_Utils.now())
 
             cert = None
             if security["nameIdEncrypted"]:
@@ -91,25 +91,25 @@ class OneLogin_Saml2_Logout_Request(object):
             if name_id is not None:
                 if (
                     not name_id_format
-                    and sp_data["NameIDFormat"] != OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED
+                    and sp_data["NameIDFormat"] != Saml2_Constants.NAMEID_UNSPECIFIED
                 ):
                     name_id_format = sp_data["NameIDFormat"]
             else:
                 name_id = idp_data["entityId"]
-                name_id_format = OneLogin_Saml2_Constants.NAMEID_ENTITY
+                name_id_format = Saml2_Constants.NAMEID_ENTITY
 
             # From saml-core-2.0-os 8.3.6, when the entity Format is used:
             # "The NameQualifier, SPNameQualifier, and SPProvidedID attributes
             # MUST be omitted.
-            if name_id_format and name_id_format == OneLogin_Saml2_Constants.NAMEID_ENTITY:
+            if name_id_format and name_id_format == Saml2_Constants.NAMEID_ENTITY:
                 nq = None
                 spnq = None
 
             # NameID Format UNSPECIFIED omitted
-            if name_id_format and name_id_format == OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED:
+            if name_id_format and name_id_format == Saml2_Constants.NAMEID_UNSPECIFIED:
                 name_id_format = None
 
-            name_id_obj = OneLogin_Saml2_Utils.generate_name_id(
+            name_id_obj = Saml2_Utils.generate_name_id(
                 name_id, spnq, name_id_format, cert, False, nq
             )
 
@@ -118,7 +118,7 @@ class OneLogin_Saml2_Logout_Request(object):
             else:
                 session_index_str = ""
 
-            logout_request = OneLogin_Saml2_Templates.LOGOUT_REQUEST % {
+            logout_request = Saml2_Templates.LOGOUT_REQUEST % {
                 "id": self.id,
                 "issue_instant": issue_instant,
                 "single_logout_url": self._settings.get_idp_slo_url(),
@@ -127,9 +127,7 @@ class OneLogin_Saml2_Logout_Request(object):
                 "session_index": session_index_str,
             }
         else:
-            logout_request = OneLogin_Saml2_Utils.decode_base64_and_inflate(
-                request, ignore_zip=True
-            )
+            logout_request = Saml2_Utils.decode_base64_and_inflate(request, ignore_zip=True)
             self.id = self.get_id(logout_request)
 
         self._logout_request = compat.to_string(logout_request)
@@ -143,9 +141,9 @@ class OneLogin_Saml2_Logout_Request(object):
         :rtype: str object
         """
         if deflate:
-            request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self._logout_request)
+            request = Saml2_Utils.deflate_and_base64_encode(self._logout_request)
         else:
-            request = OneLogin_Saml2_Utils.b64encode(self._logout_request)
+            request = Saml2_Utils.b64encode(self._logout_request)
         return request
 
     def get_xml(self):
@@ -167,7 +165,7 @@ class OneLogin_Saml2_Logout_Request(object):
         :rtype: str object
         """
 
-        elem = OneLogin_Saml2_XML.to_etree(request)
+        elem = Saml2_XML.to_etree(request)
         return elem.get("ID", None)
 
     @classmethod
@@ -181,34 +179,34 @@ class OneLogin_Saml2_Logout_Request(object):
         :return: Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
         :rtype: dict
         """
-        elem = OneLogin_Saml2_XML.to_etree(request)
+        elem = Saml2_XML.to_etree(request)
         name_id = None
-        encrypted_entries = OneLogin_Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:EncryptedID")
+        encrypted_entries = Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:EncryptedID")
 
         if len(encrypted_entries) == 1:
             if key is None:
-                raise OneLogin_Saml2_Error(
+                raise Saml2_Error(
                     "Private Key is required in order to decrypt the NameID, check settings",
-                    OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND,
+                    Saml2_Error.PRIVATE_KEY_NOT_FOUND,
                 )
 
-            encrypted_data_nodes = OneLogin_Saml2_XML.query(
+            encrypted_data_nodes = Saml2_XML.query(
                 elem, "/samlp:LogoutRequest/saml:EncryptedID/xenc:EncryptedData"
             )
             if len(encrypted_data_nodes) == 1:
                 encrypted_data = encrypted_data_nodes[0]
-                name_id = OneLogin_Saml2_Utils.decrypt_element(encrypted_data, key)
+                name_id = Saml2_Utils.decrypt_element(encrypted_data, key)
         else:
-            entries = OneLogin_Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:NameID")
+            entries = Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:NameID")
             if len(entries) == 1:
                 name_id = entries[0]
 
         if name_id is None:
-            raise OneLogin_Saml2_ValidationError(
-                "NameID not found in the Logout Request", OneLogin_Saml2_ValidationError.NO_NAMEID
+            raise Saml2_ValidationError(
+                "NameID not found in the Logout Request", Saml2_ValidationError.NO_NAMEID
             )
 
-        name_id_data = {"Value": OneLogin_Saml2_XML.element_text(name_id)}
+        name_id_data = {"Value": Saml2_XML.element_text(name_id)}
         for attr in ["Format", "SPNameQualifier", "NameQualifier"]:
             if attr in name_id.attrib:
                 name_id_data[attr] = name_id.attrib[attr]
@@ -256,11 +254,11 @@ class OneLogin_Saml2_Logout_Request(object):
         :rtype: string
         """
 
-        elem = OneLogin_Saml2_XML.to_etree(request)
+        elem = Saml2_XML.to_etree(request)
         issuer = None
-        issuer_nodes = OneLogin_Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:Issuer")
+        issuer_nodes = Saml2_XML.query(elem, "/samlp:LogoutRequest/saml:Issuer")
         if len(issuer_nodes) == 1:
-            issuer = OneLogin_Saml2_XML.element_text(issuer_nodes[0])
+            issuer = Saml2_XML.element_text(issuer_nodes[0])
         return issuer
 
     @classmethod
@@ -273,13 +271,11 @@ class OneLogin_Saml2_Logout_Request(object):
         :rtype: list
         """
 
-        elem = OneLogin_Saml2_XML.to_etree(request)
+        elem = Saml2_XML.to_etree(request)
         session_indexes = []
-        session_index_nodes = OneLogin_Saml2_XML.query(
-            elem, "/samlp:LogoutRequest/samlp:SessionIndex"
-        )
+        session_index_nodes = Saml2_XML.query(elem, "/samlp:LogoutRequest/samlp:SessionIndex")
         for session_index_node in session_index_nodes:
-            session_indexes.append(OneLogin_Saml2_XML.element_text(session_index_node))
+            session_indexes.append(Saml2_XML.element_text(session_index_node))
         return session_indexes
 
     def is_valid(self, request_data, raise_exceptions=False):
@@ -296,7 +292,7 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         self._error = None
         try:
-            root = OneLogin_Saml2_XML.to_etree(self._logout_request)
+            root = Saml2_XML.to_etree(self._logout_request)
 
             idp_data = self._settings.get_idp_data()
             idp_entity_id = idp_data["entityId"]
@@ -304,58 +300,58 @@ class OneLogin_Saml2_Logout_Request(object):
             get_data = ("get_data" in request_data and request_data["get_data"]) or dict()
 
             if self._settings.is_strict():
-                res = OneLogin_Saml2_XML.validate_xml(
+                res = Saml2_XML.validate_xml(
                     root, "saml-schema-protocol-2.0.xsd", self._settings.is_debug_active()
                 )
                 if isinstance(res, str):
-                    raise OneLogin_Saml2_ValidationError(
+                    raise Saml2_ValidationError(
                         "Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd",
-                        OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT,
+                        Saml2_ValidationError.INVALID_XML_FORMAT,
                     )
 
                 security = self._settings.get_security_data()
 
-                current_url = OneLogin_Saml2_Utils.get_self_url_no_query(request_data)
+                current_url = Saml2_Utils.get_self_url_no_query(request_data)
 
                 # Check NotOnOrAfter
                 if root.get("NotOnOrAfter", None):
-                    na = OneLogin_Saml2_Utils.parse_SAML_to_time(root.get("NotOnOrAfter"))
-                    if na <= OneLogin_Saml2_Utils.now():
-                        raise OneLogin_Saml2_ValidationError(
+                    na = Saml2_Utils.parse_SAML_to_time(root.get("NotOnOrAfter"))
+                    if na <= Saml2_Utils.now():
+                        raise Saml2_ValidationError(
                             "Could not validate timestamp: expired. Check system clock.)",
-                            OneLogin_Saml2_ValidationError.RESPONSE_EXPIRED,
+                            Saml2_ValidationError.RESPONSE_EXPIRED,
                         )
 
                 # Check destination
                 destination = root.get("Destination", None)
                 if destination:
-                    if not OneLogin_Saml2_Utils.normalize_url(url=destination).startswith(
-                        OneLogin_Saml2_Utils.normalize_url(url=current_url)
+                    if not Saml2_Utils.normalize_url(url=destination).startswith(
+                        Saml2_Utils.normalize_url(url=current_url)
                     ):
-                        raise OneLogin_Saml2_ValidationError(
+                        raise Saml2_ValidationError(
                             "The LogoutRequest was received at "
                             "%(currentURL)s instead of %(destination)s"
                             % {
                                 "currentURL": current_url,
                                 "destination": destination,
                             },
-                            OneLogin_Saml2_ValidationError.WRONG_DESTINATION,
+                            Saml2_ValidationError.WRONG_DESTINATION,
                         )
 
                 # Check issuer
                 issuer = self.get_issuer(root)
                 if issuer is not None and issuer != idp_entity_id:
-                    raise OneLogin_Saml2_ValidationError(
+                    raise Saml2_ValidationError(
                         "Invalid issuer in the Logout Request (expected %(idpEntityId)s, got %(issuer)s)"
                         % {"idpEntityId": idp_entity_id, "issuer": issuer},
-                        OneLogin_Saml2_ValidationError.WRONG_ISSUER,
+                        Saml2_ValidationError.WRONG_ISSUER,
                     )
 
                 if security["wantMessagesSigned"]:
                     if "Signature" not in get_data:
-                        raise OneLogin_Saml2_ValidationError(
+                        raise Saml2_ValidationError(
                             "The Message of the Logout Request is not signed and the SP require it",
-                            OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE,
+                            Saml2_ValidationError.NO_SIGNED_MESSAGE,
                         )
 
             return True
@@ -379,4 +375,4 @@ class OneLogin_Saml2_Logout_Request(object):
         """
         Generate an unique logout request ID.
         """
-        return OneLogin_Saml2_Utils.generate_unique_id()
+        return Saml2_Utils.generate_unique_id()

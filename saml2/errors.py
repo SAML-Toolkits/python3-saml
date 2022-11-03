@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_Error class
+""" Saml2_Error class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
@@ -12,7 +12,7 @@ Defines common Error codes and has a custom initializator.
 """
 
 
-class OneLogin_Saml2_Error(Exception):
+class Saml2_Error(Exception):
     """
 
     This class implements a custom Exception handler.
@@ -56,7 +56,7 @@ class OneLogin_Saml2_Error(Exception):
         self.code = code
 
 
-class OneLogin_Saml2_ValidationError(Exception):
+class Saml2_ValidationError(Exception):
     """
     This class implements another custom Exception handler, related
     to exceptions that happens during validation process.

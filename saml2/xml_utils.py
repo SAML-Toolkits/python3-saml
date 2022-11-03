@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_XML class
+""" Saml2_XML class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
@@ -12,15 +12,15 @@ Auxiliary class of OneLogin's Python Toolkit.
 from os.path import join, dirname
 from lxml import etree
 from saml2 import compat
-from saml2.constants import OneLogin_Saml2_Constants
+from saml2.constants import Saml2_Constants
 from saml2.xmlparser import tostring, fromstring
 
 
-for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
+for prefix, url in Saml2_Constants.NSMAP.items():
     etree.register_namespace(prefix, url)
 
 
-class OneLogin_Saml2_XML(object):
+class Saml2_XML(object):
     _element_class = type(etree.Element("root"))
     _parse_etree = staticmethod(fromstring)
     _schema_class = etree.XMLSchema
@@ -42,12 +42,12 @@ class OneLogin_Saml2_XML(object):
         :rtype: string
         """
 
-        if isinstance(xml, OneLogin_Saml2_XML._text_class):
+        if isinstance(xml, Saml2_XML._text_class):
             return xml
 
-        if isinstance(xml, OneLogin_Saml2_XML._element_class):
-            OneLogin_Saml2_XML.cleanup_namespaces(xml)
-            return OneLogin_Saml2_XML._unparse_etree(xml, **kwargs)
+        if isinstance(xml, Saml2_XML._element_class):
+            Saml2_XML.cleanup_namespaces(xml)
+            return Saml2_XML._unparse_etree(xml, **kwargs)
 
         raise ValueError("unsupported type %r" % type(xml))
 
@@ -58,14 +58,14 @@ class OneLogin_Saml2_XML(object):
         :param xml: the string to parse
         :type xml: str|bytes|xml.dom.minidom.Document|etree.Element
         :returns: the root node
-        :rtype: OneLogin_Saml2_XML._element_class
+        :rtype: Saml2_XML._element_class
         """
-        if isinstance(xml, OneLogin_Saml2_XML._element_class):
+        if isinstance(xml, Saml2_XML._element_class):
             return xml
-        if isinstance(xml, OneLogin_Saml2_XML._bytes_class):
-            return OneLogin_Saml2_XML._parse_etree(xml, forbid_dtd=True, forbid_entities=True)
-        if isinstance(xml, OneLogin_Saml2_XML._text_class):
-            return OneLogin_Saml2_XML._parse_etree(
+        if isinstance(xml, Saml2_XML._bytes_class):
+            return Saml2_XML._parse_etree(xml, forbid_dtd=True, forbid_entities=True)
+        if isinstance(xml, Saml2_XML._text_class):
+            return Saml2_XML._parse_etree(
                 compat.to_bytes(xml), forbid_dtd=True, forbid_entities=True
             )
 
@@ -87,7 +87,7 @@ class OneLogin_Saml2_XML(object):
 
         assert isinstance(schema, compat.str_type)
         try:
-            xml = OneLogin_Saml2_XML.to_etree(xml)
+            xml = Saml2_XML.to_etree(xml)
         except Exception as e:
             if debug:
                 print(e)
@@ -95,7 +95,7 @@ class OneLogin_Saml2_XML(object):
 
         schema_file = join(dirname(__file__), "schemas", schema)
         with open(schema_file, "r") as f_schema:
-            xmlschema = OneLogin_Saml2_XML._schema_class(etree.parse(f_schema))
+            xmlschema = Saml2_XML._schema_class(etree.parse(f_schema))
 
         if not xmlschema.validate(xml):
             if debug:
@@ -131,9 +131,9 @@ class OneLogin_Saml2_XML(object):
             source = context
 
         if tagid is None:
-            return source.xpath(query, namespaces=OneLogin_Saml2_Constants.NSMAP)
+            return source.xpath(query, namespaces=Saml2_Constants.NSMAP)
         else:
-            return source.xpath(query, tagid=tagid, namespaces=OneLogin_Saml2_Constants.NSMAP)
+            return source.xpath(query, tagid=tagid, namespaces=Saml2_Constants.NSMAP)
 
     @staticmethod
     def cleanup_namespaces(tree_or_element, top_nsmap=None, keep_ns_prefixes=None):
@@ -149,9 +149,9 @@ class OneLogin_Saml2_XML(object):
         :rtype: etree.Element
         """
         all_prefixes_to_keep = [
-            OneLogin_Saml2_Constants.NS_PREFIX_XS,
-            OneLogin_Saml2_Constants.NS_PREFIX_XSI,
-            OneLogin_Saml2_Constants.NS_PREFIX_XSD,
+            Saml2_Constants.NS_PREFIX_XS,
+            Saml2_Constants.NS_PREFIX_XSI,
+            Saml2_Constants.NS_PREFIX_XSD,
         ]
 
         if keep_ns_prefixes:
@@ -164,7 +164,7 @@ class OneLogin_Saml2_XML(object):
         open_tag = compat.to_bytes("<%s" % tagname)
         close_tag = compat.to_bytes("</%s>" % tagname)
 
-        xml = OneLogin_Saml2_XML.to_string(xml)
+        xml = Saml2_XML.to_string(xml)
         start = xml.find(open_tag)
         assert start != -1
 

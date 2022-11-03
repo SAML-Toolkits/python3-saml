@@ -13,10 +13,10 @@ from time import gmtime, strftime, time
 from datetime import datetime
 
 from saml2 import compat
-from saml2.constants import OneLogin_Saml2_Constants
-from saml2.utils import OneLogin_Saml2_Utils
-from saml2.xml_templates import OneLogin_Saml2_Templates
-from saml2.xml_utils import OneLogin_Saml2_XML
+from saml2.constants import Saml2_Constants
+from saml2.utils import Saml2_Utils
+from saml2.xml_templates import Saml2_Templates
+from saml2.xml_utils import Saml2_XML
 
 try:
     basestring
@@ -24,7 +24,7 @@ except NameError:
     basestring = str
 
 
-class OneLogin_Saml2_Metadata(object):
+class Saml2_Metadata(object):
     """
 
     A class that contains methods related to the metadata of the SP
@@ -94,7 +94,7 @@ class OneLogin_Saml2_Metadata(object):
 
         sls = ""
         if "singleLogoutService" in sp and "url" in sp["singleLogoutService"]:
-            sls = OneLogin_Saml2_Templates.MD_SLS % {
+            sls = Saml2_Templates.MD_SLS % {
                 "binding": sp["singleLogoutService"]["binding"],
                 "location": sp["singleLogoutService"]["url"],
             }
@@ -135,7 +135,7 @@ class OneLogin_Saml2_Metadata(object):
         if len(contacts) > 0:
             contacts_info = []
             for (ctype, info) in contacts.items():
-                contact = OneLogin_Saml2_Templates.MD_CONTACT_PERSON % {
+                contact = Saml2_Templates.MD_CONTACT_PERSON % {
                     "type": ctype,
                     "name": info["givenName"],
                     "email": info["emailAddress"],
@@ -205,7 +205,7 @@ class OneLogin_Saml2_Metadata(object):
                 "requested_attribute_str": "\n".join(requested_attribute_data),
             }
 
-        metadata = OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR % {
+        metadata = Saml2_Templates.MD_ENTITY_DESCRIPTOR % {
             "valid": ('validUntil="%s"' % valid_until_str) if valid_until_str else "",
             "cache": ('cacheDuration="%s"' % cache_duration_str) if cache_duration_str else "",
             "entity_id": sp["entityId"],
@@ -227,8 +227,8 @@ class OneLogin_Saml2_Metadata(object):
         metadata,
         key,
         cert,
-        sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256,
-        digest_algorithm=OneLogin_Saml2_Constants.SHA256,
+        sign_algorithm=Saml2_Constants.RSA_SHA256,
+        digest_algorithm=Saml2_Constants.SHA256,
     ):
         """
         Signs the metadata with the key/cert provided
@@ -251,28 +251,20 @@ class OneLogin_Saml2_Metadata(object):
         :param digest_algorithm: Digest algorithm method
         :type digest_algorithm: string
         """
-        return OneLogin_Saml2_Utils.add_sign(
-            metadata, key, cert, False, sign_algorithm, digest_algorithm
-        )
+        return Saml2_Utils.add_sign(metadata, key, cert, False, sign_algorithm, digest_algorithm)
 
     @staticmethod
     def _add_x509_key_descriptors(root, cert, signing):
-        key_descriptor = OneLogin_Saml2_XML.make_child(
-            root, "{%s}KeyDescriptor" % OneLogin_Saml2_Constants.NS_MD
-        )
+        key_descriptor = Saml2_XML.make_child(root, "{%s}KeyDescriptor" % Saml2_Constants.NS_MD)
         root.remove(key_descriptor)
         root.insert(0, key_descriptor)
-        key_info = OneLogin_Saml2_XML.make_child(
-            key_descriptor, "{%s}KeyInfo" % OneLogin_Saml2_Constants.NS_DS
-        )
-        key_data = OneLogin_Saml2_XML.make_child(
-            key_info, "{%s}X509Data" % OneLogin_Saml2_Constants.NS_DS
-        )
+        key_info = Saml2_XML.make_child(key_descriptor, "{%s}KeyInfo" % Saml2_Constants.NS_DS)
+        key_data = Saml2_XML.make_child(key_info, "{%s}X509Data" % Saml2_Constants.NS_DS)
 
-        x509_certificate = OneLogin_Saml2_XML.make_child(
-            key_data, "{%s}X509Certificate" % OneLogin_Saml2_Constants.NS_DS
+        x509_certificate = Saml2_XML.make_child(
+            key_data, "{%s}X509Certificate" % Saml2_Constants.NS_DS
         )
-        x509_certificate.text = OneLogin_Saml2_Utils.format_cert(cert, False)
+        x509_certificate.text = Saml2_Utils.format_cert(cert, False)
         key_descriptor.set("use", ("encryption", "signing")[signing])
 
     @classmethod
@@ -296,14 +288,14 @@ class OneLogin_Saml2_Metadata(object):
         if cert is None or cert == "":
             return metadata
         try:
-            root = OneLogin_Saml2_XML.to_etree(metadata)
+            root = Saml2_XML.to_etree(metadata)
         except Exception as e:
             raise Exception("Error parsing metadata. " + str(e))
 
-        assert root.tag == "{%s}EntityDescriptor" % OneLogin_Saml2_Constants.NS_MD
+        assert root.tag == "{%s}EntityDescriptor" % Saml2_Constants.NS_MD
         try:
             sp_sso_descriptor = next(
-                root.iterfind(".//md:SPSSODescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
+                root.iterfind(".//md:SPSSODescriptor", namespaces=Saml2_Constants.NSMAP)
             )
         except StopIteration:
             raise Exception("Malformed metadata.")
@@ -311,4 +303,4 @@ class OneLogin_Saml2_Metadata(object):
         if add_encryption:
             cls._add_x509_key_descriptors(sp_sso_descriptor, cert, False)
         cls._add_x509_key_descriptors(sp_sso_descriptor, cert, True)
-        return OneLogin_Saml2_XML.to_string(root)
+        return Saml2_XML.to_string(root)

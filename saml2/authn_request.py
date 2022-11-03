@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_Authn_Request class
+""" Saml2_Authn_Request class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
@@ -9,12 +9,12 @@ AuthNRequest class of OneLogin's Python Toolkit.
 
 """
 
-from saml2.constants import OneLogin_Saml2_Constants
-from saml2.utils import OneLogin_Saml2_Utils
-from saml2.xml_templates import OneLogin_Saml2_Templates
+from saml2.constants import Saml2_Constants
+from saml2.utils import Saml2_Utils
+from saml2.xml_templates import Saml2_Templates
 
 
-class OneLogin_Saml2_Authn_Request(object):
+class Saml2_Authn_Request(object):
     """
 
     This class handles an AuthNRequest. It builds an
@@ -34,7 +34,7 @@ class OneLogin_Saml2_Authn_Request(object):
         Constructs the AuthnRequest object.
 
         :param settings: OSetting data
-        :type settings: OneLogin_Saml2_Settings
+        :type settings: Saml2_Settings
 
         :param force_authn: Optional argument. When true the AuthNRequest will set the ForceAuthn='true'.
         :type force_authn: bool
@@ -55,7 +55,7 @@ class OneLogin_Saml2_Authn_Request(object):
         security = self._settings.get_security_data()
 
         self._id = self._generate_request_id()
-        issue_instant = OneLogin_Saml2_Utils.parse_time_to_SAML(OneLogin_Saml2_Utils.now())
+        issue_instant = Saml2_Utils.parse_time_to_SAML(Saml2_Utils.now())
 
         destination = idp_data["singleSignOnService"]["url"]
 
@@ -99,7 +99,7 @@ class OneLogin_Saml2_Authn_Request(object):
         if set_nameid_policy:
             name_id_policy_format = sp_data["NameIDFormat"]
             if security["wantNameIdEncrypted"]:
-                name_id_policy_format = OneLogin_Saml2_Constants.NAMEID_ENCRYPTED
+                name_id_policy_format = Saml2_Constants.NAMEID_ENCRYPTED
 
             nameid_policy_str = (
                 """
@@ -136,7 +136,7 @@ class OneLogin_Saml2_Authn_Request(object):
                 "attributeConsumingService"
             ].get("index", "1")
 
-        request = OneLogin_Saml2_Templates.AUTHN_REQUEST % {
+        request = Saml2_Templates.AUTHN_REQUEST % {
             "id": self._id,
             "provider_name": provider_name_str,
             "force_authn_str": force_authn_str,
@@ -160,7 +160,7 @@ class OneLogin_Saml2_Authn_Request(object):
         """
         Generate an unique request ID.
         """
-        return OneLogin_Saml2_Utils.generate_unique_id()
+        return Saml2_Utils.generate_unique_id()
 
     def get_request(self, deflate=True):
         """
@@ -171,9 +171,9 @@ class OneLogin_Saml2_Authn_Request(object):
         :rtype: str object
         """
         if deflate:
-            request = OneLogin_Saml2_Utils.deflate_and_base64_encode(self._authn_request)
+            request = Saml2_Utils.deflate_and_base64_encode(self._authn_request)
         else:
-            request = OneLogin_Saml2_Utils.b64encode(self._authn_request)
+            request = Saml2_Utils.b64encode(self._authn_request)
         return request
 
     def get_id(self):

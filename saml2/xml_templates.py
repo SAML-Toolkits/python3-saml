@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" OneLogin_Saml2_Auth class
+""" Saml2_Auth class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
 MIT License
@@ -12,7 +12,7 @@ Initializes the SP SAML instance
 """
 
 
-class OneLogin_Saml2_Templates(object):
+class Saml2_Templates(object):
 
     ATTRIBUTE = """
         <saml:Attribute Name="%s" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">

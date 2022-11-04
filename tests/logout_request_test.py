@@ -4,7 +4,7 @@
 # MIT License
 
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 from xml.dom.minidom import parseString
 
@@ -16,8 +16,10 @@ from urllib.parse import urlparse, parse_qs
 
 
 class Saml2_Logout_Request_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -36,8 +38,8 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
             return self.assertRaisesRegexp(exception, regexp)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -157,37 +159,37 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the get_id method of the Saml2_LogoutRequest
         """
         logout_request = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request.xml")
+            self.data_path / "logout_requests" / "logout_request.xml"
         )
         id1 = Saml2_Logout_Request.get_id(logout_request)
-        self.assertEqual("21584ccdfaca36a145ae990442dcd96bfe60151e", id1)
+        self.assertEqual("ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e", id1)
 
         dom = parseString(logout_request)
         id2 = Saml2_Logout_Request.get_id(dom.toxml())
-        self.assertEqual("21584ccdfaca36a145ae990442dcd96bfe60151e", id2)
+        self.assertEqual("ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e", id2)
 
     def testGetIDFromDeflatedSAMLLogoutRequest(self):
         """
         Tests the get_id method of the Saml2_LogoutRequest
         """
         deflated_logout_request = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         logout_request = Saml2_Utils.decode_base64_and_inflate(deflated_logout_request)
         id1 = Saml2_Logout_Request.get_id(logout_request)
-        self.assertEqual("21584ccdfaca36a145ae990442dcd96bfe60151e", id1)
+        self.assertEqual("ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e", id1)
 
     def testGetNameIdData(self):
         """
         Tests the get_nameid_data method of the Saml2_LogoutRequest
         """
         expected_name_id_data = {
-            "Value": "1e442c129e1f822c8096086a1103c5ee2c7cae1c",
+            "Value": "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c",
             "Format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
             "SPNameQualifier": "http://idp.example.com/",
         }
 
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         name_id_data = Saml2_Logout_Request.get_nameid_data(request)
         self.assertEqual(expected_name_id_data, name_id_data)
 
@@ -196,7 +198,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(expected_name_id_data, name_id_data_2)
 
         request_2 = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_encrypted_nameid.xml")
+            self.data_path / "logout_requests" / "logout_request_encrypted_nameid.xml"
         )
         with self.assertRaisesRegex(Exception, "Key is required in order to decrypt the NameID"):
             Saml2_Logout_Request.get_nameid(request_2)
@@ -205,7 +207,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         key = settings.get_sp_key()
         name_id_data_4 = Saml2_Logout_Request.get_nameid_data(request_2, key)
         expected_name_id_data = {
-            "Value": "9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69",
+            "Value": "ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69",
             "Format": "urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress",
             "SPNameQualifier": "https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php",
         }
@@ -219,7 +221,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
             Saml2_Logout_Request.get_nameid(dom_2.toxml(), key)
 
         inv_request = self.file_contents(
-            join(self.data_path, "logout_requests", "invalids", "no_nameId.xml")
+            self.data_path / "logout_requests" / "invalids" / "no_nameId.xml"
         )
         with self.assertRaisesRegex(Exception, "NameID not found in the Logout Request"):
             Saml2_Logout_Request.get_nameid(inv_request)
@@ -269,12 +271,12 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         """
         Tests the get_nameid of the Saml2_LogoutRequest
         """
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         name_id = Saml2_Logout_Request.get_nameid(request)
-        self.assertEqual(name_id, "1e442c129e1f822c8096086a1103c5ee2c7cae1c")
+        self.assertEqual(name_id, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c")
 
         request_2 = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_encrypted_nameid.xml")
+            self.data_path / "logout_requests" / "logout_request_encrypted_nameid.xml"
         )
         with self.assertRaisesRegex(Exception, "Key is required in order to decrypt the NameID"):
             Saml2_Logout_Request.get_nameid(request_2)
@@ -282,13 +284,13 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         settings = Saml2_Settings(self.loadSettingsJSON())
         key = settings.get_sp_key()
         name_id_3 = Saml2_Logout_Request.get_nameid(request_2, key)
-        self.assertEqual("9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69", name_id_3)
+        self.assertEqual("ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69", name_id_3)
 
     def testGetIssuer(self):
         """
         Tests the get_issuer of the Saml2_LogoutRequest
         """
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
 
         issuer = Saml2_Logout_Request.get_issuer(request)
         self.assertEqual("http://idp.example.com/", issuer)
@@ -306,7 +308,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         """
         Tests the get_session_indexes of the Saml2_LogoutRequest
         """
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
 
         session_indexes = Saml2_Logout_Request.get_session_indexes(request)
         self.assertEqual(len(session_indexes), 0)
@@ -316,7 +318,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         self.assertEqual(len(session_indexes_2), 0)
 
         request_2 = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_with_sessionindex.xml")
+            self.data_path / "logout_requests" / "logout_request_with_sessionindex.xml"
         )
         session_indexes_3 = Saml2_Logout_Request.get_session_indexes(request_2)
         self.assertEqual(["_ac72a76526cb6ca19f8438e73879a0e6c8ae5131"], session_indexes_3)
@@ -347,7 +349,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Case Invalid Issuer
         """
         request = self.file_contents(
-            join(self.data_path, "logout_requests", "invalids", "invalid_issuer.xml")
+            self.data_path / "logout_requests" / "invalids" / "invalid_issuer.xml"
         )
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
@@ -367,7 +369,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Case Invalid Destination
         """
         request_data = {"http_host": "example.com", "script_name": "index.html"}
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
         logout_request = Saml2_Logout_Request(settings, Saml2_Utils.b64encode(request))
         self.assertTrue(logout_request.is_valid(request_data))
@@ -393,7 +395,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         """
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         request = self.file_contents(
-            join(self.data_path, "logout_requests", "invalids", "not_after_failed.xml")
+            self.data_path / "logout_requests" / "invalids" / "not_after_failed.xml"
         )
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
         request = request.replace("http://stuff.com/endpoints/endpoints/sls.php", current_url)
@@ -414,7 +416,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the is_valid method of the Saml2_LogoutRequest
         """
         request_data = {"http_host": "example.com", "script_name": "index.html"}
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         logout_request = Saml2_Logout_Request(settings, Saml2_Utils.b64encode(request))
@@ -443,7 +445,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the is_valid method of the Saml2_LogoutRequest
         """
         request_data = {"http_host": "exaMPLe.com", "script_name": "index.html"}
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         logout_request = Saml2_Logout_Request(settings, Saml2_Utils.b64encode(request))
@@ -474,7 +476,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Tests the is_valid method of the Saml2_LogoutRequest
         """
         request_data = {"http_host": "example.com", "script_name": "INdex.html"}
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         logout_request = Saml2_Logout_Request(settings, Saml2_Utils.b64encode(request))
@@ -506,7 +508,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         """
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         request = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_with_encoding.xml")
+            self.data_path / "logout_requests" / "logout_request_with_encoding.xml"
         )
         settings = Saml2_Settings(self.loadSettingsJSON())
 
@@ -552,7 +554,7 @@ class Saml2_Logout_Request_Test(unittest.TestCase):
         Tests that we can get the logout request XML directly without
         going through intermediate steps
         """
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         logout_request_generated = Saml2_Logout_Request(settings)

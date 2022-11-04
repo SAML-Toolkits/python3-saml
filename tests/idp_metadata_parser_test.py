@@ -3,14 +3,11 @@
 # Copyright (c) 2010-2021 OneLogin, Inc.
 # MIT License
 
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError
+from urllib.error import URLError
 
 from copy import deepcopy
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 from lxml.etree import XMLSyntaxError
 import unittest
 
@@ -24,12 +21,13 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
     # Set self.maxDiff to None to see it." from showing up.
     maxDiff = None
 
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     def loadSettingsJSON(self, filename="settings1.json"):
-        filename = join(self.settings_path, filename)
-        if exists(filename):
+        filename = self.settings_path / filename
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -66,7 +64,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             data = Saml2_IdPMetadataParser.parse_remote("https://idp.testshib.org/idp/shibboleth")
         except URLError:
-            xml = self.file_contents(join(self.data_path, "metadata", "testshib-providers.xml"))
+            xml = self.file_contents(self.data_path / "metadata" / "testshib-providers.xml")
             data = Saml2_IdPMetadataParser.parse(xml)
 
         self.assertTrue(data is not None and data is not {})
@@ -95,13 +93,11 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         with self.assertRaises(XMLSyntaxError):
             data = Saml2_IdPMetadataParser.parse("")
 
-        xml_sp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "metadata_settings1.xml")
-        )
+        xml_sp_metadata = self.file_contents(self.data_path / "metadata" / "metadata_settings1.xml")
         data = Saml2_IdPMetadataParser.parse(xml_sp_metadata)
         self.assertEqual({}, data)
 
-        xml_idp_metadata = self.file_contents(join(self.data_path, "metadata", "idp_metadata.xml"))
+        xml_idp_metadata = self.file_contents(self.data_path / "metadata" / "idp_metadata.xml")
         data = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
 
         # W/o further specification, expect to get the redirect binding SSO
@@ -151,7 +147,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             xmldoc = Saml2_IdPMetadataParser.get_metadata("https://idp.testshib.org/idp/shibboleth")
         except URLError:
-            xmldoc = self.file_contents(join(self.data_path, "metadata", "testshib-providers.xml"))
+            xmldoc = self.file_contents(self.data_path / "metadata" / "testshib-providers.xml")
 
         # Parse, require SSO REDIRECT binding, implicitly.
         settings1 = Saml2_IdPMetadataParser.parse(xmldoc)
@@ -187,7 +183,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         try:
             xmldoc = Saml2_IdPMetadataParser.get_metadata("https://idp.testshib.org/idp/shibboleth")
         except URLError:
-            xmldoc = self.file_contents(join(self.data_path, "metadata", "testshib-providers.xml"))
+            xmldoc = self.file_contents(self.data_path / "metadata" / "testshib-providers.xml")
 
         # Parse, require POST binding.
         settings = Saml2_IdPMetadataParser.parse(
@@ -223,7 +219,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
           }
         }
         """
-        xmldoc = self.file_contents(join(self.data_path, "metadata", "idp_metadata2.xml"))
+        xmldoc = self.file_contents(self.data_path / "metadata" / "idp_metadata2.xml")
 
         expected_settings = json.loads(expected_settings_json)
 
@@ -284,7 +280,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
               EntitiesDescriptor
         """
         xml_idp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "idp_multiple_descriptors.xml")
+            self.data_path / "metadata" / "idp_multiple_descriptors.xml"
         )
 
         # should find first descriptor
@@ -325,7 +321,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         Case: IdP metadata contains multiple certs
         """
         xml_idp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "idp_metadata_multi_certs.xml")
+            self.data_path / "metadata" / "idp_metadata_multi_certs.xml"
         )
         data = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
 
@@ -365,7 +361,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         Case: IdP metadata contains multiple signing certs and no encryption certs
         """
         xml_idp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "idp_metadata_multi_signing_certs.xml")
+            self.data_path / "metadata" / "idp_metadata_multi_signing_certs.xml"
         )
         data = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
 
@@ -404,7 +400,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
               that is the same
         """
         xml_idp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "idp_metadata_same_sign_and_encrypt_cert.xml")
+            self.data_path / "metadata" / "idp_metadata_same_sign_and_encrypt_cert.xml"
         )
         data = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
 
@@ -427,7 +423,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         self.assertEqual(expected_settings, data)
 
         xml_idp_metadata_2 = self.file_contents(
-            join(self.data_path, "metadata", "idp_metadata_different_sign_and_encrypt_cert.xml")
+            self.data_path / "metadata" / "idp_metadata_different_sign_and_encrypt_cert.xml"
         )
         data_2 = Saml2_IdPMetadataParser.parse(xml_idp_metadata_2)
         expected_settings_json_2 = """
@@ -465,7 +461,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         with self.assertRaises(TypeError):
             settings_result = Saml2_IdPMetadataParser.merge_settings({}, None)
 
-        xml_idp_metadata = self.file_contents(join(self.data_path, "metadata", "idp_metadata.xml"))
+        xml_idp_metadata = self.file_contents(self.data_path / "metadata" / "idp_metadata.xml")
 
         # Parse XML metadata.
         data = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
@@ -483,7 +479,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
 
         expected_settings_json = """
         {
-          "custom_base_path": "../../../tests/data/customPath/",
+          "custom_base_path": "../tests/data/customPath/",
           "contactPerson": {
             "support": {
               "emailAddress": "support@example.com",
@@ -577,7 +573,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
             "entityId": "http://stuff.com/endpoints/metadata.php",
             "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
           },
-          "custom_base_path": "../../../tests/data/customPath/",
+          "custom_base_path": "../tests/data/customPath/",
           "organization": {
             "en-US": {
               "displayname": "SP test",
@@ -592,7 +588,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
 
         # Test merging multiple certs
         xml_idp_metadata = self.file_contents(
-            join(self.data_path, "metadata", "idp_metadata_multi_certs.xml")
+            self.data_path / "metadata" / "idp_metadata_multi_certs.xml"
         )
         data3 = Saml2_IdPMetadataParser.parse(xml_idp_metadata)
         settings_result3 = Saml2_IdPMetadataParser.merge_settings(settings, data3)
@@ -600,7 +596,7 @@ class Saml2_IdPMetadataParser_Test(unittest.TestCase):
         {
           "debug": false,
           "strict": false,
-          "custom_base_path": "../../../tests/data/customPath/",
+          "custom_base_path": "../tests/data/customPath/",
           "sp": {
             "singleLogoutService": {
               "url": "http://stuff.com/endpoints/endpoints/sls.php"

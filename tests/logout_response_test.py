@@ -4,7 +4,7 @@
 # MIT License
 
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 from xml.dom.minidom import parseString
 
@@ -18,8 +18,10 @@ from urllib.parse import urlparse, parse_qs
 
 
 class Saml2_Logout_Response_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -38,8 +40,8 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
             return self.assertRaisesRegexp(exception, regexp)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -59,7 +61,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         response = Saml2_Logout_Response(settings, message)
         self.assertRegex(
@@ -98,7 +100,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         response = Saml2_Logout_Response(settings, message)
         status = response.get_status()
@@ -118,7 +120,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         response = Saml2_Logout_Response(settings, message)
 
@@ -140,7 +142,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         response = Saml2_Logout_Response(settings, message)
 
@@ -171,7 +173,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -202,7 +204,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -232,7 +234,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         settings.set_strict(False)
@@ -266,7 +268,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         response = Saml2_Logout_Response(settings, message)
@@ -294,7 +296,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "exaMPLe.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         response = Saml2_Logout_Response(settings, message)
@@ -323,7 +325,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "INdex.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         response = Saml2_Logout_Response(settings, message)
@@ -351,11 +353,9 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html", "get_data": {}}
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(
-                self.data_path,
-                "logout_responses",
-                "logout_response_with_encoding_deflated.xml.base64",
-            )
+            self.data_path
+            / "logout_responses"
+            / "logout_response_with_encoding_deflated.xml.base64"
         )
 
         response = Saml2_Logout_Response(settings, message)
@@ -394,9 +394,7 @@ class Saml2_Logout_Response_Test(unittest.TestCase):
         Tests that we can get the logout response XML directly without
         going through intermediate steps
         """
-        response = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response.xml")
-        )
+        response = self.file_contents(self.data_path / "logout_responses" / "logout_response.xml")
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         logout_response_generated = Saml2_Logout_Response(settings)

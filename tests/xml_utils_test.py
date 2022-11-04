@@ -9,11 +9,15 @@ import unittest
 from base64 import b64decode
 from lxml import etree
 from os.path import dirname, join, exists
+from pathlib import Path
 from saml2.utils import Saml2_XML
 
 
 class TestSaml2Xml(unittest.TestCase):
-    data_path = join(dirname(__file__), "..", "..", "..", "data")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     def loadSettingsJSON(self, filename=None):
         if filename:

@@ -10,7 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 from freezegun import freeze_time
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 from xml.dom.minidom import parseString
 
@@ -22,8 +22,10 @@ from saml2.utils import Saml2_Utils
 
 
 class Saml2_Response_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     # assertRaisesRegexp deprecated on python3
     def assertRaisesRegex(self, exception, regexp, msg=None):
@@ -33,8 +35,8 @@ class Saml2_Response_Test(unittest.TestCase):
             return self.assertRaisesRegexp(exception, regexp)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -63,13 +65,13 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the Saml2_Response Constructor.
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
 
         self.assertIsInstance(response, Saml2_Response)
 
         xml_enc = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_enc = Saml2_Response(settings, xml_enc)
 
@@ -84,11 +86,11 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         pretty_xml = self.file_contents(
-            join(self.data_path, "responses", "pretty_signed_message_response.xml")
+            self.data_path / "responses" / "pretty_signed_message_response.xml"
         )
         self.assertEqual(
             etree.tostring(response.get_xml_document(), encoding="unicode", pretty_print=True),
@@ -96,11 +98,11 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         decrypted = self.file_contents(
-            join(self.data_path, "responses", "decrypted_valid_encrypted_assertion.xml")
+            self.data_path / "responses" / "decrypted_valid_encrypted_assertion.xml"
         )
         self.assertEqual(
             etree.tostring(response_2.get_xml_document(), encoding="unicode"), decrypted
@@ -113,18 +115,18 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings = self.loadSettingsJSON()
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual("support@onelogin.com", response.get_nameid())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+            self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual("2de11defd199f8d5bb63f9b7deb265ba5c675c10", response_2.get_nameid())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual("_68392312d490db6d355555cfbbd8ec95d746516f60", response_3.get_nameid())
@@ -134,7 +136,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_nameid.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         with self.assertRaisesRegex(Exception, "NameID not found in the assertion of the Response"):
@@ -170,7 +172,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_10 = Saml2_Response(settings, xml_5)
         self.assertEqual("test@example.com", response_10.get_nameid())
@@ -179,7 +181,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_11 = Saml2_Response(settings, xml_5)
         with self.assertRaisesRegex(
@@ -192,7 +194,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "empty_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "empty_nameid.xml.base64"
         )
         response_12 = Saml2_Response(settings, xml_6)
         with self.assertRaisesRegex(Exception, "An empty NameID value found"):
@@ -232,14 +234,14 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings = self.loadSettingsJSON()
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual(
             "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", response.get_nameid_format()
         )
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+            self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(
@@ -247,7 +249,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(
@@ -259,7 +261,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_nameid.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         with self.assertRaisesRegex(Exception, "NameID not found in the assertion of the Response"):
@@ -295,7 +297,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_10 = Saml2_Response(settings, xml_5)
         self.assertEqual(
@@ -307,7 +309,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_11 = Saml2_Response(settings, xml_5)
         with self.assertRaisesRegex(
@@ -320,7 +322,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "empty_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "empty_nameid.xml.base64"
         )
         response_12 = Saml2_Response(settings, xml_6)
         with self.assertRaisesRegex(Exception, "An empty NameID value found"):
@@ -372,28 +374,28 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings = self.loadSettingsJSON()
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertIsNone(response.get_nameid_nq())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+            self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertIsNone(response_2.get_nameid_nq())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertIsNone(response_3.get_nameid_nq())
 
-        xml_4 = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml_4 = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response_4 = Saml2_Response(settings, xml_4)
         self.assertIsNone(response_4.get_nameid_nq())
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "valid_response_with_namequalifier.xml.base64")
+            self.data_path / "responses" / "valid_response_with_namequalifier.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         self.assertEqual("https://test.example.com/saml/metadata", response_5.get_nameid_nq())
@@ -401,7 +403,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings["strict"] = True
         settings = Saml2_Settings(json_settings)
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_nameid.xml.base64"
         )
         response_6 = Saml2_Response(settings, xml_6)
         with self.assertRaisesRegex(Exception, "NameID not found in the assertion of the Response"):
@@ -414,28 +416,28 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings = self.loadSettingsJSON()
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertIsNone(response.get_nameid_spnq())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+            self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual("http://stuff.com/endpoints/metadata.php", response_2.get_nameid_spnq())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual("http://stuff.com/endpoints/metadata.php", response_3.get_nameid_spnq())
 
-        xml_4 = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml_4 = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response_4 = Saml2_Response(settings, xml_4)
         self.assertEqual("http://stuff.com/endpoints/metadata.php", response_4.get_nameid_spnq())
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "valid_response_with_namequalifier.xml.base64")
+            self.data_path / "responses" / "valid_response_with_namequalifier.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         self.assertIsNone(response_5.get_nameid_spnq())
@@ -443,7 +445,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings["strict"] = True
         settings = Saml2_Settings(json_settings)
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_nameid.xml.base64"
         )
         response_6 = Saml2_Response(settings, xml_6)
         with self.assertRaisesRegex(Exception, "NameID not found in the assertion of the Response"):
@@ -456,7 +458,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings = self.loadSettingsJSON()
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         expected_nameid_data = {
             "Value": "support@onelogin.com",
@@ -466,7 +468,7 @@ class Saml2_Response_Test(unittest.TestCase):
         self.assertEqual(expected_nameid_data, nameid_data)
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+            self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         expected_nameid_data_2 = {
@@ -478,7 +480,7 @@ class Saml2_Response_Test(unittest.TestCase):
         self.assertEqual(expected_nameid_data_2, nameid_data_2)
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         expected_nameid_data_3 = {
@@ -494,7 +496,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_nameid.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         with self.assertRaisesRegex(Exception, "NameID not found in the assertion of the Response"):
@@ -539,7 +541,7 @@ class Saml2_Response_Test(unittest.TestCase):
         json_settings["strict"] = False
         settings = Saml2_Settings(json_settings)
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_10 = Saml2_Response(settings, xml_5)
         nameid_data_10 = response_10.get_nameid_data()
@@ -549,7 +551,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "wrong_spnamequalifier.xml.base64")
+            self.data_path / "responses" / "invalids" / "wrong_spnamequalifier.xml.base64"
         )
         response_11 = Saml2_Response(settings, xml_5)
         with self.assertRaisesRegex(
@@ -567,7 +569,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(json_settings)
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "empty_nameid.xml.base64")
+            self.data_path / "responses" / "invalids" / "empty_nameid.xml.base64"
         )
         response_12 = Saml2_Response(settings, xml_6)
         with self.assertRaisesRegex(Exception, "An empty NameID value found"):
@@ -609,18 +611,18 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the check_status method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         response.check_status()
 
         xml_enc = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_enc = Saml2_Response(settings, xml_enc)
         response_enc.check_status()
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "status_code_responder.xml.base64")
+            self.data_path / "responses" / "invalids" / "status_code_responder.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         with self.assertRaisesRegex(
@@ -629,7 +631,7 @@ class Saml2_Response_Test(unittest.TestCase):
             response_2.check_status()
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "status_code_responer_and_msg.xml.base64")
+            self.data_path / "responses" / "invalids" / "status_code_responer_and_msg.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         with self.assertRaisesRegex(
@@ -644,7 +646,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_conditions.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_conditions.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertFalse(response.check_one_condition())
@@ -655,7 +657,7 @@ class Saml2_Response_Test(unittest.TestCase):
         self.assertFalse(response.is_valid(self.get_request_data()))
         self.assertEqual("The Assertion must include a Conditions element", response.get_error())
 
-        xml_2 = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.check_one_condition())
 
@@ -665,7 +667,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_authnstatement.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_authnstatement.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertFalse(response.check_one_authnstatement())
@@ -678,7 +680,7 @@ class Saml2_Response_Test(unittest.TestCase):
             "The Assertion must include an AuthnStatement element", response.get_error()
         )
 
-        xml_2 = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.check_one_authnstatement())
 
@@ -687,16 +689,16 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the get_audiences method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "no_audience.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "no_audience.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual([], response.get_audiences())
 
-        xml_2 = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(["{audience}"], response_2.get_audiences())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(["http://stuff.com/endpoints/metadata.php"], response_3.get_audiences())
@@ -707,18 +709,18 @@ class Saml2_Response_Test(unittest.TestCase):
         Saml2_Response using the get_issuers call
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "adfs_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "adfs_response.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual(["http://login.example.com/issuer"], response.get_issuers())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(["http://idp.example.com/"], response_2.get_issuers())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "double_signed_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(
@@ -730,7 +732,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_response.xml.base64")
+            self.data_path / "responses" / "double_signed_response.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         self.assertEqual(
@@ -739,7 +741,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "signed_message_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "signed_message_encrypted_assertion.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         self.assertEqual(
@@ -751,7 +753,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "signed_assertion_response.xml.base64")
+            self.data_path / "responses" / "signed_assertion_response.xml.base64"
         )
         response_6 = Saml2_Response(settings, xml_6)
         self.assertEqual(
@@ -760,7 +762,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_7 = self.file_contents(
-            join(self.data_path, "responses", "signed_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "signed_encrypted_assertion.xml.base64"
         )
         response_7 = Saml2_Response(settings, xml_7)
         self.assertEqual(["http://idp.example.com/"], response_7.get_issuers())
@@ -770,18 +772,18 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the get_issuers method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "adfs_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "adfs_response.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual(["http://login.example.com/issuer"], response.get_issuers())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(["http://idp.example.com/"], response_2.get_issuers())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "double_signed_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(
@@ -793,7 +795,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_issuer_response.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_issuer_response.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         response_4.get_issuers()
@@ -803,7 +805,7 @@ class Saml2_Response_Test(unittest.TestCase):
         )
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_issuer_assertion.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_issuer_assertion.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         with self.assertRaisesRegex(Exception, "Issuer of the Assertion not found or multiple."):
@@ -814,12 +816,12 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the get_session_index method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual("_531c32d283bdff7e04e487bcdbc4dd8d", response.get_session_index())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(
@@ -831,27 +833,27 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the get_attributes method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         expected_attributes = {"uid": ["demo"], "another_value": ["value"]}
         self.assertEqual(expected_attributes, response.get_attributes())
 
         # An assertion that has no attributes should return an empty
         # array when asked for the attributes
-        xml_2 = self.file_contents(join(self.data_path, "responses", "response2.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "response2.xml.base64")
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual({}, response_2.get_attributes())
 
         # Encrypted Attributes are not supported
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "encrypted_attrs.xml.base64")
+            self.data_path / "responses" / "invalids" / "encrypted_attrs.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual({}, response_3.get_attributes())
 
         # Test retrieving duplicate attributes
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "response1_with_duplicate_attributes.xml.base64")
+            self.data_path / "responses" / "response1_with_duplicate_attributes.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         with self.assertRaises(Saml2_ValidationError) as duplicate_name_exc:
@@ -878,30 +880,30 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
 
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual({}, response.get_friendlyname_attributes())
 
         expected_attributes = {"username": ["demo"]}
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "response1_with_friendlyname.xml.base64")
+            self.data_path / "responses" / "response1_with_friendlyname.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(expected_attributes, response_2.get_friendlyname_attributes())
 
-        xml_3 = self.file_contents(join(self.data_path, "responses", "response2.xml.base64"))
+        xml_3 = self.file_contents(self.data_path / "responses" / "response2.xml.base64")
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual({}, response_3.get_friendlyname_attributes())
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "encrypted_attrs.xml.base64")
+            self.data_path / "responses" / "invalids" / "encrypted_attrs.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         self.assertEqual({}, response_4.get_friendlyname_attributes())
 
         # Test retrieving duplicate attributes
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "response1_with_duplicate_attributes.xml.base64")
+            self.data_path / "responses" / "response1_with_duplicate_attributes.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         with self.assertRaises(Saml2_ValidationError) as duplicate_name_exc:
@@ -924,7 +926,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "response_with_nested_nameid_values.xml.base64")
+            self.data_path / "responses" / "response_with_nested_nameid_values.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         expected_attributes = {
@@ -960,7 +962,7 @@ class Saml2_Response_Test(unittest.TestCase):
         The Assertion is unsigned so the method fails
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "wrapped_response_2.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "wrapped_response_2.xml.base64")
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(
             Exception,
@@ -976,7 +978,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Test that the SignatureWrappingAttack is not allowed
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response4.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response4.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual("test@onelogin.com", response.get_nameid())
         self.assertFalse(response.is_valid(self.get_request_data()))
@@ -987,7 +989,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Test that the node text with comment attack (VU#475445) is not allowed
         """
         xml = self.file_contents(
-            join(self.data_path, "responses", "response_node_text_attack.xml.base64")
+            self.data_path / "responses" / "response_node_text_attack.xml.base64"
         )
         settings = Saml2_Settings(self.loadSettingsJSON())
         response = Saml2_Response(settings, xml)
@@ -1001,17 +1003,17 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the get_session_not_on_or_after method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertEqual(1290203857, response.get_session_not_on_or_after())
 
         # An assertion that do not specified Session timeout should return NULL
-        xml_2 = self.file_contents(join(self.data_path, "responses", "response2.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "response2.xml.base64")
         response_2 = Saml2_Response(settings, xml_2)
         self.assertEqual(None, response_2.get_session_not_on_or_after())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(2696012228, response_3.get_session_not_on_or_after())
@@ -1024,16 +1026,16 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         # Response without an InResponseTo element should return None
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertIsNone(response.get_in_response_to())
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertEqual(
-            "be60b8caf8e9d19b7a3551b244f116c947ff247d", response_3.get_in_response_to()
+            "ONELOGIN_be60b8caf8e9d19b7a3551b244f116c947ff247d", response_3.get_in_response_to()
         )
 
     def testIsInvalidXML(self):
@@ -1066,12 +1068,12 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the validate_num_assertions method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.validate_num_assertions())
 
         xml_multi_assertion = self.file_contents(
-            join(self.data_path, "responses", "invalids", "multiple_assertions.xml.base64")
+            self.data_path / "responses" / "invalids" / "multiple_assertions.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_multi_assertion)
         self.assertFalse(response_2.validate_num_assertions())
@@ -1081,28 +1083,28 @@ class Saml2_Response_Test(unittest.TestCase):
         Tests the validate_timestamps method of the Saml2_Response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.validate_timestamps())
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.validate_timestamps())
 
-        xml_3 = self.file_contents(join(self.data_path, "responses", "expired_response.xml.base64"))
+        xml_3 = self.file_contents(self.data_path / "responses" / "expired_response.xml.base64")
         response_3 = Saml2_Response(settings, xml_3)
         self.assertFalse(response_3.validate_timestamps())
 
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "not_after_failed.xml.base64")
+            self.data_path / "responses" / "invalids" / "not_after_failed.xml.base64"
         )
         response_4 = Saml2_Response(settings, xml_4)
         self.assertFalse(response_4.validate_timestamps())
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "not_before_failed.xml.base64")
+            self.data_path / "responses" / "invalids" / "not_before_failed.xml.base64"
         )
         response_5 = Saml2_Response(settings, xml_5)
         self.assertFalse(response_5.validate_timestamps())
@@ -1113,9 +1115,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case invalid version
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_saml2.xml.base64")
-        )
+        xml = self.file_contents(self.data_path / "responses" / "invalids" / "no_saml2.xml.base64")
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, "Unsupported SAML version"):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
@@ -1126,7 +1126,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case invalid no ID
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "invalids", "no_id.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "invalids" / "no_id.xml.base64")
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, "Missing ID attribute on SAML Response"):
             response.is_valid(self.get_request_data(), raise_exceptions=True)
@@ -1137,7 +1137,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case invalid reference
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertFalse(response.is_valid(self.get_request_data()))
         self.assertEqual(
@@ -1155,7 +1155,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case expired response
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "expired_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "expired_response.xml.base64")
         response = Saml2_Response(settings, xml)
         response.is_valid(self.get_request_data())
         self.assertEqual("No Signature found. SAML Response rejected", response.get_error())
@@ -1174,7 +1174,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_signature.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_signature.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         response.is_valid(self.get_request_data())
@@ -1199,7 +1199,7 @@ class Saml2_Response_Test(unittest.TestCase):
         self.assertTrue(settings.get_security_data()["wantAttributeStatement"])
 
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "signed_assertion_response.xml.base64")
+            self.data_path / "responses" / "invalids" / "signed_assertion_response.xml.base64"
         )
 
         response = Saml2_Response(settings, xml)
@@ -1226,7 +1226,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case no key
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        xml = self.file_contents(join(self.data_path, "responses", "invalids", "no_key.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "invalids" / "no_key.xml.base64")
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(
             Exception, "Signature validation failed. SAML Response rejected"
@@ -1241,7 +1241,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_dict = self.loadSettingsJSON()
         settings_dict["security"]["rejectDeprecatedAlgorithm"] = True
         settings = Saml2_Settings(settings_dict)
-        xml = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(
             Exception,
@@ -1257,7 +1257,7 @@ class Saml2_Response_Test(unittest.TestCase):
 
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "multiple_assertions.xml.base64")
+            self.data_path / "responses" / "invalids" / "multiple_assertions.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, "SAML Response must contain 1 assertion"):
@@ -1270,7 +1270,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "encrypted_attrs.xml.base64")
+            self.data_path / "responses" / "invalids" / "encrypted_attrs.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         response.is_valid(self.get_request_data())
@@ -1290,7 +1290,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "duplicated_attributes.xml.base64")
+            self.data_path / "responses" / "invalids" / "duplicated_attributes.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(Exception, "Found an Attribute element with duplicated Name"):
@@ -1302,9 +1302,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case Invalid Response, Invalid Destination
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        message = self.file_contents(
-            join(self.data_path, "responses", "unsigned_response.xml.base64")
-        )
+        message = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         response = Saml2_Response(settings, message)
         response.is_valid(self.get_request_data())
         self.assertEqual("No Signature found. SAML Response rejected", response.get_error())
@@ -1323,7 +1321,7 @@ class Saml2_Response_Test(unittest.TestCase):
         self.assertIn("The response has an empty Destination value", response_3.get_error())
 
         message_3 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "empty_destination.xml.base64")
+            self.data_path / "responses" / "invalids" / "empty_destination.xml.base64"
         )
         response_4 = Saml2_Response(settings, message_3)
         self.assertFalse(response_4.is_valid(self.get_request_data()))
@@ -1349,9 +1347,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case Invalid Response due to differences in capitalization of path
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        message = self.file_contents(
-            join(self.data_path, "responses", "unsigned_response.xml.base64")
-        )
+        message = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
 
         # Test path capitalized
         settings.set_strict(True)
@@ -1370,9 +1366,7 @@ class Saml2_Response_Test(unittest.TestCase):
         Case Valid Response, even if host is differently capitalized (per RFC)
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
-        message = self.file_contents(
-            join(self.data_path, "responses", "unsigned_response.xml.base64")
-        )
+        message = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         # Test domain capitalized
         settings.set_strict(True)
         response = Saml2_Response(settings, message)
@@ -1393,7 +1387,7 @@ class Saml2_Response_Test(unittest.TestCase):
         }
         settings = Saml2_Settings(self.loadSettingsJSON())
         message = self.file_contents(
-            join(self.data_path, "responses", "invalids", "invalid_audience.xml.base64")
+            self.data_path / "responses" / "invalids" / "invalid_audience.xml.base64"
         )
 
         response = Saml2_Response(settings, message)
@@ -1414,7 +1408,7 @@ class Saml2_Response_Test(unittest.TestCase):
         that didn't complete the two-factor step.
         """
         request_data = self.get_request_data()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         two_factor_context = "urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken"
         password_context = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
         settings_dict = self.loadSettingsJSON()
@@ -1457,7 +1451,7 @@ class Saml2_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "invalid_issuer_assertion.xml.base64")
+            self.data_path / "responses" / "invalids" / "invalid_issuer_assertion.xml.base64"
         )
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
@@ -1466,7 +1460,7 @@ class Saml2_Response_Test(unittest.TestCase):
         message = Saml2_Utils.b64encode(plain_message)
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "invalid_issuer_message.xml.base64")
+            self.data_path / "responses" / "invalids" / "invalid_issuer_message.xml.base64"
         )
         plain_message_2 = compat.to_string(Saml2_Utils.b64decode(xml_2))
         plain_message_2 = plain_message_2.replace(
@@ -1500,7 +1494,7 @@ class Saml2_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "invalid_sessionindex.xml.base64")
+            self.data_path / "responses" / "invalids" / "invalid_sessionindex.xml.base64"
         )
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
@@ -1531,7 +1525,7 @@ class Saml2_Response_Test(unittest.TestCase):
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
 
         xml = self.file_contents(
-            join(self.data_path, "responses", "unsigned_response_with_miliseconds.xm.base64")
+            self.data_path / "responses" / "unsigned_response_with_miliseconds.xm.base64"
         )
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
@@ -1551,9 +1545,7 @@ class Saml2_Response_Test(unittest.TestCase):
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
         xml = self.file_contents(
-            join(
-                self.data_path, "responses", "invalids", "no_subjectconfirmation_method.xml.base64"
-            )
+            self.data_path / "responses" / "invalids" / "no_subjectconfirmation_method.xml.base64"
         )
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
@@ -1562,7 +1554,7 @@ class Saml2_Response_Test(unittest.TestCase):
         message = Saml2_Utils.b64encode(plain_message)
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_subjectconfirmation_data.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_subjectconfirmation_data.xml.base64"
         )
         plain_message_2 = compat.to_string(Saml2_Utils.b64decode(xml_2))
         plain_message_2 = plain_message_2.replace(
@@ -1571,12 +1563,10 @@ class Saml2_Response_Test(unittest.TestCase):
         message_2 = Saml2_Utils.b64encode(plain_message_2)
 
         xml_3 = self.file_contents(
-            join(
-                self.data_path,
-                "responses",
-                "invalids",
-                "invalid_subjectconfirmation_inresponse.xml.base64",
-            )
+            self.data_path
+            / "responses"
+            / "invalids"
+            / "invalid_subjectconfirmation_inresponse.xml.base64",
         )
         plain_message_3 = compat.to_string(Saml2_Utils.b64decode(xml_3))
         plain_message_3 = plain_message_3.replace(
@@ -1585,12 +1575,10 @@ class Saml2_Response_Test(unittest.TestCase):
         message_3 = Saml2_Utils.b64encode(plain_message_3)
 
         xml_4 = self.file_contents(
-            join(
-                self.data_path,
-                "responses",
-                "invalids",
-                "invalid_subjectconfirmation_recipient.xml.base64",
-            )
+            self.data_path
+            / "responses"
+            / "invalids"
+            / "invalid_subjectconfirmation_recipient.xml.base64"
         )
         plain_message_4 = compat.to_string(Saml2_Utils.b64decode(xml_4))
         plain_message_4 = plain_message_4.replace(
@@ -1599,12 +1587,10 @@ class Saml2_Response_Test(unittest.TestCase):
         message_4 = Saml2_Utils.b64encode(plain_message_4)
 
         xml_5 = self.file_contents(
-            join(
-                self.data_path,
-                "responses",
-                "invalids",
-                "invalid_subjectconfirmation_noa.xml.base64",
-            )
+            self.data_path
+            / "responses"
+            / "invalids"
+            / "invalid_subjectconfirmation_noa.xml.base64",
         )
         plain_message_5 = compat.to_string(Saml2_Utils.b64decode(xml_5))
         plain_message_5 = plain_message_5.replace(
@@ -1613,9 +1599,7 @@ class Saml2_Response_Test(unittest.TestCase):
         message_5 = Saml2_Utils.b64encode(plain_message_5)
 
         xml_6 = self.file_contents(
-            join(
-                self.data_path, "responses", "invalids", "invalid_subjectconfirmation_nb.xml.base64"
-            )
+            self.data_path / "responses" / "invalids" / "invalid_subjectconfirmation_nb.xml.base64"
         )
         plain_message_6 = compat.to_string(Saml2_Utils.b64decode(xml_6))
         plain_message_6 = plain_message_6.replace(
@@ -1692,7 +1676,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(self.loadSettingsJSON())
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
-        xml = self.file_contents(join(self.data_path, "responses", "unsigned_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
             "http://stuff.com/endpoints/endpoints/acs.php", current_url
@@ -1721,7 +1705,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
-        xml = self.file_contents(join(self.data_path, "responses", "unsigned_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
             "http://stuff.com/endpoints/endpoints/acs.php", current_url
@@ -1793,7 +1777,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         request_data = {"http_host": "example.com", "script_name": "index.html"}
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
-        xml = self.file_contents(join(self.data_path, "responses", "unsigned_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml))
         plain_message = plain_message.replace(
             "http://stuff.com/endpoints/endpoints/acs.php", current_url
@@ -1867,11 +1851,9 @@ class Saml2_Response_Test(unittest.TestCase):
                 )
 
             message_2 = self.file_contents(
-                join(
-                    self.data_path,
-                    "responses",
-                    "valid_encrypted_assertion_encrypted_nameid.xml.base64",
-                )
+                self.data_path
+                / "responses"
+                / "valid_encrypted_assertion_encrypted_nameid.xml.base64"
             )
             response_6 = Saml2_Response(settings_2, message_2)
             self.assertFalse(response_6.is_valid(request_data))
@@ -1888,7 +1870,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         settings_info["idp"]["x509cert"] = "NotValidCert"
         settings = Saml2_Settings(settings_info)
-        xml = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, xml)
 
         with self.assertRaisesRegex(
@@ -1906,7 +1888,7 @@ class Saml2_Response_Test(unittest.TestCase):
             "x509cert"
         ] = "MIIENjCCAx6gAwIBAgIBATANBgkqhkiG9w0BAQUFADBvMQswCQYDVQQGEwJTRTEU MBIGA1UEChMLQWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVybmFs IFRUUCBOZXR3b3JrMSIwIAYDVQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290 MB4XDTAwMDUzMDEwNDgzOFoXDTIwMDUzMDEwNDgzOFowbzELMAkGA1UEBhMCU0Ux FDASBgNVBAoTC0FkZFRydXN0IEFCMSYwJAYDVQQLEx1BZGRUcnVzdCBFeHRlcm5h bCBUVFAgTmV0d29yazEiMCAGA1UEAxMZQWRkVHJ1c3QgRXh0ZXJuYWwgQ0EgUm9v dDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALf3GjPm8gAELTngTlvt H7xsD821+iO2zt6bETOXpClMfZOfvUq8k+0DGuOPz+VtUFrWlymUWoCwSXrbLpX9 uMq/NzgtHj6RQa1wVsfwTz/oMp50ysiQVOnGXw94nZpAPA6sYapeFI+eh6FqUNzX mk6vBbOmcZSccbNQYArHE504B4YCqOmoaSYYkKtMsE8jqzpPhNjfzp/haW+710LX a0Tkx63ubUFfclpxCDezeWWkWaCUN/cALw3CknLa0Dhy2xSoRcRdKn23tNbE7qzN E0S3ySvdQwAl+mG5aWpYIxG3pzOPVnVZ9c0p10a3CitlttNCbxWyuHv77+ldU9U0 WicCAwEAAaOB3DCB2TAdBgNVHQ4EFgQUrb2YejS0Jvf6xCZU7wO94CTLVBowCwYD VR0PBAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wgZkGA1UdIwSBkTCBjoAUrb2YejS0 Jvf6xCZU7wO94CTLVBqhc6RxMG8xCzAJBgNVBAYTAlNFMRQwEgYDVQQKEwtBZGRU cnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5ldHdvcmsx IjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3SCAQEwDQYJKoZIhvcN AQEFBQADggEBALCb4IUlwtYj4g+WBpKdQZic2YR5gdkeWxQHIzZlj7DYd7usQWxH YINRsPkyPef89iYTx4AWpb9a/IfPeHmJIZriTAcKhjW88t5RxNKWt9x+Tu5w/Rw5 6wwCURQtjr0W4MHfRnXnJK3s9EK0hZNwEGe6nQY1ShjTK3rMUUKhemPR5ruhxSvC Nr4TDea9Y355e6cJDUCrat2PisP29owaQgVR1EX1n6diIWgVIEM8med8vSTYqZEX c4g/VhsxOBi0cQ+azcgOno4uG+GMmIPLHzHxREzGBHNJdmAPx/i9F4BrLunMTA5a mnkPIAou1Z5jJh5VkpTYghdae9C8x49OhgQ="
         settings = Saml2_Settings(settings_info)
-        xml = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, xml)
         self.assertFalse(response.is_valid(self.get_request_data()))
 
@@ -1918,7 +1900,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(self.loadSettingsJSON())
 
         xml = self.file_contents(
-            join(self.data_path, "responses", "valid_unsigned_response.xml.base64")
+            self.data_path / "responses" / "valid_unsigned_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         response.is_valid(self.get_request_data())
@@ -1933,14 +1915,14 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(settings_info)
 
         # expired cert
-        xml = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, xml)
 
         self.assertTrue(response.is_valid(self.get_request_data()))
 
         settings_info_2 = self.loadSettingsJSON("settings2.json")
         settings_2 = Saml2_Settings(settings_info_2)
-        xml_2 = self.file_contents(join(self.data_path, "responses", "valid_response2.xml.base64"))
+        xml_2 = self.file_contents(self.data_path / "responses" / "valid_response2.xml.base64")
         response_2 = Saml2_Response(settings_2, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
@@ -1981,45 +1963,45 @@ class Saml2_Response_Test(unittest.TestCase):
 
         # expired cert
         xml = self.file_contents(
-            join(self.data_path, "responses", "double_signed_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "double_signed_encrypted_assertion.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.is_valid(self.get_request_data()))
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "signed_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "signed_encrypted_assertion.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "signed_message_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "signed_message_encrypted_assertion.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertTrue(response_3.is_valid(self.get_request_data()))
 
         settings_2 = Saml2_Settings(self.loadSettingsJSON("settings2.json"))
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_encrypted_assertion2.xml.base64")
+            self.data_path / "responses" / "double_signed_encrypted_assertion2.xml.base64"
         )
         response_4 = Saml2_Response(settings_2, xml_4)
         self.assertTrue(response_4.is_valid(self.get_request_data()))
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "signed_encrypted_assertion2.xml.base64")
+            self.data_path / "responses" / "signed_encrypted_assertion2.xml.base64"
         )
         response_5 = Saml2_Response(settings_2, xml_5)
         self.assertTrue(response_5.is_valid(self.get_request_data()))
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "signed_message_encrypted_assertion2.xml.base64")
+            self.data_path / "responses" / "signed_message_encrypted_assertion2.xml.base64"
         )
         response_6 = Saml2_Response(settings_2, xml_6)
         self.assertTrue(response_6.is_valid(self.get_request_data()))
 
         settings.set_strict(True)
         xml_7 = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.b64decode(xml_7))
@@ -2045,38 +2027,38 @@ class Saml2_Response_Test(unittest.TestCase):
 
         # expired cert
         xml = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.is_valid(self.get_request_data()))
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "signed_assertion_response.xml.base64")
+            self.data_path / "responses" / "signed_assertion_response.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_response.xml.base64")
+            self.data_path / "responses" / "double_signed_response.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertTrue(response_3.is_valid(self.get_request_data()))
 
         settings_2 = Saml2_Settings(self.loadSettingsJSON("settings2.json"))
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response2.xml.base64")
+            self.data_path / "responses" / "signed_message_response2.xml.base64"
         )
         response_4 = Saml2_Response(settings_2, xml_4)
         self.assertTrue(response_4.is_valid(self.get_request_data()))
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "signed_assertion_response2.xml.base64")
+            self.data_path / "responses" / "signed_assertion_response2.xml.base64"
         )
         response_5 = Saml2_Response(settings_2, xml_5)
         self.assertTrue(response_5.is_valid(self.get_request_data()))
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_response2.xml.base64")
+            self.data_path / "responses" / "double_signed_response2.xml.base64"
         )
         response_6 = Saml2_Response(settings_2, xml_6)
         self.assertTrue(response_6.is_valid(self.get_request_data()))
@@ -2114,38 +2096,38 @@ class Saml2_Response_Test(unittest.TestCase):
 
         # expired cert
         xml = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.is_valid(self.get_request_data()))
 
         xml_2 = self.file_contents(
-            join(self.data_path, "responses", "signed_assertion_response.xml.base64")
+            self.data_path / "responses" / "signed_assertion_response.xml.base64"
         )
         response_2 = Saml2_Response(settings, xml_2)
         self.assertTrue(response_2.is_valid(self.get_request_data()))
 
         xml_3 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_response.xml.base64")
+            self.data_path / "responses" / "double_signed_response.xml.base64"
         )
         response_3 = Saml2_Response(settings, xml_3)
         self.assertTrue(response_3.is_valid(self.get_request_data()))
 
         settings_2 = Saml2_Settings(self.loadSettingsJSON("settings2.json"))
         xml_4 = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response2.xml.base64")
+            self.data_path / "responses" / "signed_message_response2.xml.base64"
         )
         response_4 = Saml2_Response(settings_2, xml_4)
         self.assertTrue(response_4.is_valid(self.get_request_data()))
 
         xml_5 = self.file_contents(
-            join(self.data_path, "responses", "signed_assertion_response2.xml.base64")
+            self.data_path / "responses" / "signed_assertion_response2.xml.base64"
         )
         response_5 = Saml2_Response(settings_2, xml_5)
         self.assertTrue(response_5.is_valid(self.get_request_data()))
 
         xml_6 = self.file_contents(
-            join(self.data_path, "responses", "double_signed_response2.xml.base64")
+            self.data_path / "responses" / "double_signed_response2.xml.base64"
         )
         response_6 = Saml2_Response(settings_2, xml_6)
         self.assertTrue(response_6.is_valid(self.get_request_data()))
@@ -2177,7 +2159,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_info["idp"]["certFingerprint"] = "657302a5e11a4794a1e50a705988d66c9377575d"
         settings = Saml2_Settings(settings_info)
         xml = self.file_contents(
-            join(self.data_path, "responses", "response_without_reference_uri.xml.base64")
+            self.data_path / "responses" / "response_without_reference_uri.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.is_valid(self.get_request_data()))
@@ -2188,7 +2170,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_info["idp"]["certFingerprint"] = "657302a5e11a4794a1e50a705988d66c9377575d"
         settings = Saml2_Settings(settings_info)
         xml = self.file_contents(
-            join(self.data_path, "responses", "response_without_assertion_reference_uri.xml.base64")
+            self.data_path / "responses" / "response_without_assertion_reference_uri.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertTrue(response.is_valid(self.get_request_data()))
@@ -2210,7 +2192,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(settings_info)
 
         xml = self.file_contents(
-            join(self.data_path, "responses", "valid_response_without_inresponseto.xml.base64")
+            self.data_path / "responses" / "valid_response_without_inresponseto.xml.base64"
         )
         response = Saml2_Response(settings, xml)
 
@@ -2236,7 +2218,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings = Saml2_Settings(self.loadSettingsJSON())
         settings.set_strict(True)
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_conditions.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_conditions.xml.base64"
         )
         response = Saml2_Response(settings, xml)
 
@@ -2251,7 +2233,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "invalids", "status_code_responder.xml.base64")
+            self.data_path / "responses" / "invalids" / "status_code_responder.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         with self.assertRaisesRegex(
@@ -2265,7 +2247,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertEqual(response.get_id(), "pfxc3d2b542-0f7e-8767-8e87-5b0dc6913375")
@@ -2276,7 +2258,7 @@ class Saml2_Response_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         xml = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         response = Saml2_Response(settings, xml)
         self.assertEqual(response.get_assertion_id(), "_cccd6024116641fe48e0ae2c51220d02755f96c98d")
@@ -2289,7 +2271,7 @@ class Saml2_Response_Test(unittest.TestCase):
         settings_data = self.loadSettingsJSON()
         request_data = self.get_request_data()
         settings = Saml2_Settings(settings_data)
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         response = Saml2_Response(settings, message)
         self.assertIsNone(response.get_assertion_not_on_or_after())
 

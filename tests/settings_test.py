@@ -4,7 +4,7 @@
 # MIT License
 
 import json
-from os.path import dirname, join, exists, sep
+from pathlib import Path
 import unittest
 
 from saml2 import compat
@@ -14,12 +14,15 @@ from saml2.utils import Saml2_Utils
 
 
 class Saml2_Settings_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    base_path = root_path.parents[0]
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -90,7 +93,7 @@ class Saml2_Settings_Test(unittest.TestCase):
 
         settings_info = self.loadSettingsJSON()
         settings_info["security"]["authnRequestsSigned"] = True
-        settings_info["custom_base_path"] = dirname(__file__)
+        settings_info["custom_base_path"] = self.root_path
         try:
             settings_6 = Saml2_Settings(settings_info)
             self.assertNotEqual(len(settings_6.get_errors()), 0)
@@ -119,7 +122,7 @@ class Saml2_Settings_Test(unittest.TestCase):
         except Exception as e:
             self.assertIn("Unsupported settings object", str(e))
 
-        settings = Saml2_Settings(custom_base_path=self.settings_path)
+        settings = Saml2_Settings(custom_base_path=self.settings_path.as_posix())
         self.assertEqual(len(settings.get_errors()), 0)
 
     def testLoadSettingsFromFile(self):
@@ -127,17 +130,17 @@ class Saml2_Settings_Test(unittest.TestCase):
         Tests the Saml2_Settings Constructor.
         Case load setting from file
         """
-        custom_base_path = join(dirname(__file__), "..", "..", "..", "settings")
+        custom_base_path = self.settings_path.as_posix()
         settings = Saml2_Settings(custom_base_path=custom_base_path)
         self.assertEqual(len(settings.get_errors()), 0)
 
-        custom_base_path = dirname(__file__)
+        custom_base_path = self.root_path.as_posix()
         try:
             Saml2_Settings(custom_base_path=custom_base_path)
         except Exception as e:
             self.assertIn("Settings file not found", str(e))
 
-        custom_base_path = join(dirname(__file__), "..", "..", "..", "data", "customPath")
+        custom_base_path = (self.data_path / "customPath").as_posix()
         settings_3 = Saml2_Settings(custom_base_path=custom_base_path)
         self.assertEqual(len(settings_3.get_errors()), 0)
 
@@ -145,15 +148,15 @@ class Saml2_Settings_Test(unittest.TestCase):
         """
         Tests getCertPath method of the Saml2_Settings
         """
-        settings = Saml2_Settings(custom_base_path=self.settings_path)
-        self.assertEqual(self.settings_path + sep + "certs" + sep, settings.get_cert_path())
+        settings = Saml2_Settings(custom_base_path=self.settings_path.as_posix())
+        self.assertIn((self.settings_path / "certs").as_posix(), settings.get_cert_path())
 
     def testSetCertPath(self):
         """
         Tests setCertPath method of the Saml2_Settings
         """
-        settings = Saml2_Settings(custom_base_path=self.settings_path)
-        self.assertEqual(self.settings_path + sep + "certs" + sep, settings.get_cert_path())
+        settings = Saml2_Settings(custom_base_path=str(self.settings_path))
+        self.assertIn((self.settings_path / "certs").as_posix(), settings.get_cert_path())
 
         settings.set_cert_path("/tmp")
         self.assertEqual("/tmp", settings.get_cert_path())
@@ -165,34 +168,28 @@ class Saml2_Settings_Test(unittest.TestCase):
         settingsInfo = self.loadSettingsJSON()
         settings = Saml2_Settings(settingsInfo)
         path = settings.get_base_path()
-        self.assertEqual(
+        self.assertIn(
+            (self.base_path / "saml2/").as_posix(),
             settings.get_lib_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/"),
         )
-        self.assertEqual(
+        self.assertIn(
+            (self.base_path / "saml2/../tests/data/customPath/").as_posix(),
             path,
-            join(
-                dirname(dirname(dirname(dirname(dirname(__file__))))),
-                "saml2/../../../tests/data/customPath/",
-            ),
         )
 
         del settingsInfo["custom_base_path"]
         settings = Saml2_Settings(settingsInfo)
         path = settings.get_base_path()
-        self.assertEqual(
-            settings.get_lib_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/"),
-        )
-        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), "src/"))
+        self.assertIn((self.base_path / "saml2/").as_posix(), settings.get_lib_path())
+        self.assertIn((self.root_path.parents[1]).as_posix(), path)
 
-        settings = Saml2_Settings(custom_base_path=self.settings_path)
+        settings = Saml2_Settings(custom_base_path=(self.settings_path).as_posix())
         path = settings.get_base_path()
-        self.assertEqual(
+        self.assertIn(
+            (self.base_path / "saml2/").as_posix(),
             settings.get_lib_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/"),
         )
-        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), "settings/"))
+        self.assertIn((self.settings_path).as_posix(), path)
 
     def testGetSchemasPath(self):
         """
@@ -201,34 +198,22 @@ class Saml2_Settings_Test(unittest.TestCase):
         settingsInfo = self.loadSettingsJSON()
         settings = Saml2_Settings(settingsInfo)
         path = settings.get_base_path()
-        self.assertEqual(
-            settings.get_schemas_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/schemas/"),
-        )
-        self.assertEqual(
+        self.assertIn((self.base_path / "saml2/schemas/").as_posix(), settings.get_schemas_path())
+        self.assertIn(
+            (self.base_path / "saml2/../tests/data/customPath/").as_posix(),
             path,
-            join(
-                dirname(dirname(dirname(dirname(dirname(__file__))))),
-                "saml2/../../../tests/data/customPath/",
-            ),
         )
 
         del settingsInfo["custom_base_path"]
         settings = Saml2_Settings(settingsInfo)
         path = settings.get_base_path()
-        self.assertEqual(
-            settings.get_schemas_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/schemas/"),
-        )
-        self.assertEqual(path, join(dirname(dirname(dirname(dirname(dirname(__file__))))), "src/"))
+        self.assertIn((self.base_path / "saml2/schemas/").as_posix(), settings.get_schemas_path())
+        self.assertIn(self.root_path.parents[1].as_posix(), path)
 
-        settings = Saml2_Settings(custom_base_path=self.settings_path)
+        settings = Saml2_Settings(custom_base_path=self.settings_path.as_posix())
         path = settings.get_base_path()
-        self.assertEqual(
-            settings.get_schemas_path(),
-            join(dirname(dirname(dirname(dirname(dirname(__file__))))), "saml2/schemas/"),
-        )
-        self.assertEqual(path, join(dirname(dirname(dirname(dirname(__file__)))), "settings/"))
+        self.assertIn((self.base_path / "saml2/schemas/").as_posix(), settings.get_schemas_path())
+        self.assertIn(self.settings_path.as_posix(), path)
 
     def testGetIdPSSOurl(self):
         """
@@ -283,9 +268,9 @@ class Saml2_Settings_Test(unittest.TestCase):
 
         del settings_data["sp"]["x509cert"]
         del settings_data["custom_base_path"]
-        custom_base_path = dirname(__file__)
+        custom_base_path = self.root_path
 
-        settings_3 = Saml2_Settings(settings_data, custom_base_path=custom_base_path)
+        settings_3 = Saml2_Settings(settings_data, custom_base_path=custom_base_path.as_posix())
         self.assertIsNone(settings_3.get_sp_cert())
 
     def testGetSPCertNew(self):
@@ -319,9 +304,9 @@ class Saml2_Settings_Test(unittest.TestCase):
 
         del settings_data["sp"]["privateKey"]
         del settings_data["custom_base_path"]
-        custom_base_path = dirname(__file__)
+        custom_base_path = self.root_path
 
-        settings_3 = Saml2_Settings(settings_data, custom_base_path=custom_base_path)
+        settings_3 = Saml2_Settings(settings_data, custom_base_path=custom_base_path.as_posix())
         self.assertIsNone(settings_3.get_sp_key())
 
     def testGetIDPCert(self):
@@ -341,7 +326,7 @@ class Saml2_Settings_Test(unittest.TestCase):
 
         del settings_data["idp"]["x509cert"]
         del settings_data["custom_base_path"]
-        custom_base_path = dirname(__file__)
+        custom_base_path = self.root_path.as_posix()
 
         settings_3 = Saml2_Settings(settings_data, custom_base_path=custom_base_path)
         self.assertIsNone(settings_3.get_idp_cert())
@@ -607,10 +592,10 @@ class Saml2_Settings_Test(unittest.TestCase):
             Saml2_Settings(settings_info).get_sp_metadata()
         # Set the keys in the settings:
         settings_info["sp"]["x509cert"] = self.file_contents(
-            join(self.data_path, "customPath", "certs", "sp.crt")
+            self.data_path / "customPath" / "certs" / "sp.crt"
         )
         settings_info["sp"]["privateKey"] = self.file_contents(
-            join(self.data_path, "customPath", "certs", "sp.key")
+            self.data_path / "customPath" / "certs" / "sp.key"
         )
         self.generateAndCheckMetadata(settings_info)
 
@@ -702,21 +687,19 @@ class Saml2_Settings_Test(unittest.TestCase):
         metadata = settings.get_sp_metadata()
         self.assertEqual(len(settings.validate_metadata(metadata)), 0)
 
-        xml = self.file_contents(join(self.data_path, "metadata", "metadata_settings1.xml"))
+        xml = self.file_contents(self.data_path / "metadata" / "metadata_settings1.xml")
         self.assertEqual(len(settings.validate_metadata(xml)), 0)
 
         xml_2 = "<xml>invalid</xml>"
         self.assertIn("invalid_xml", settings.validate_metadata(xml_2))
 
-        xml_3 = self.file_contents(join(self.data_path, "metadata", "entities_metadata.xml"))
+        xml_3 = self.file_contents(self.data_path / "metadata" / "entities_metadata.xml")
         self.assertIn("noEntityDescriptor_xml", settings.validate_metadata(xml_3))
 
-        xml_4 = self.file_contents(join(self.data_path, "metadata", "idp_metadata.xml"))
+        xml_4 = self.file_contents(self.data_path / "metadata" / "idp_metadata.xml")
         self.assertIn("onlySPSSODescriptor_allowed_xml", settings.validate_metadata(xml_4))
 
-        xml_5 = self.file_contents(
-            join(self.data_path, "metadata", "no_expiration_mark_metadata.xml")
-        )
+        xml_5 = self.file_contents(self.data_path / "metadata" / "no_expiration_mark_metadata.xml")
         self.assertEqual(len(settings.validate_metadata(xml_5)), 0)
 
     def testValidateMetadataExpired(self):
@@ -725,7 +708,7 @@ class Saml2_Settings_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         metadata = self.file_contents(
-            join(self.data_path, "metadata", "expired_metadata_settings1.xml")
+            self.data_path / "metadata" / "expired_metadata_settings1.xml"
         )
         errors = settings.validate_metadata(metadata)
         self.assertNotEqual(len(metadata), 0)
@@ -756,7 +739,7 @@ class Saml2_Settings_Test(unittest.TestCase):
         """
         settings = Saml2_Settings(self.loadSettingsJSON())
         metadata = self.file_contents(
-            join(self.data_path, "metadata", "noentity_metadata_settings1.xml")
+            self.data_path / "metadata" / "noentity_metadata_settings1.xml"
         )
         errors = settings.validate_metadata(metadata)
         self.assertNotEqual(len(metadata), 0)

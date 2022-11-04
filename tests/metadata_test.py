@@ -4,7 +4,8 @@
 # MIT License
 
 import json
-from os.path import dirname, join, exists
+from os.path import join
+from pathlib import Path
 from time import strftime
 from datetime import datetime
 import unittest
@@ -18,9 +19,14 @@ from saml2.xml_utils import Saml2_XML
 
 
 class Saml2_Metadata_Test(unittest.TestCase):
-    def loadSettingsJSON(self, filename="settings1.json"):
-        filename = join(dirname(__file__), "..", "..", "..", "settings", filename)
-        if exists(filename):
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
+
+    def loadSettingsJSON(self, name="settings1.json"):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -236,8 +242,8 @@ class Saml2_Metadata_Test(unittest.TestCase):
         self.assertIsNotNone(metadata)
 
         cert_path = settings.get_cert_path()
-        key = self.file_contents(join(cert_path, "sp.key"))
-        cert = self.file_contents(join(cert_path, "sp.crt"))
+        key = self.file_contents(Path(cert_path) / "sp.key")
+        cert = self.file_contents(Path(cert_path) / "sp.crt")
 
         signed_metadata = compat.to_string(Saml2_Metadata.sign_metadata(metadata, key, cert))
         self.assertTrue(Saml2_Utils.validate_metadata_sign(signed_metadata, cert))
@@ -371,9 +377,8 @@ class Saml2_Metadata_Test(unittest.TestCase):
             exception = context.exception
             self.assertIn("Error parsing metadata", str(exception))
 
-        base_path = dirname(dirname(dirname(dirname(__file__))))
         unparsed_metadata = self.file_contents(
-            join(base_path, "data", "metadata", "unparsed_metadata.xml")
+            self.data_path / "metadata" / "unparsed_metadata.xml"
         )
 
         with self.assertRaises(Exception) as context:

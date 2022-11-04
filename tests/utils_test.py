@@ -6,7 +6,7 @@
 from base64 import b64decode
 import json
 from lxml import etree
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 from xml.dom.minidom import parseString
 
@@ -18,8 +18,11 @@ from saml2.xmlparser import fromstring
 
 
 class Saml2_Utils_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
+    certs_path = root_path / "certs"
 
     # assertRegexpMatches deprecated on python3
     def assertRaisesRegex(self, exception, regexp, msg=None):
@@ -29,14 +32,12 @@ class Saml2_Utils_Test(unittest.TestCase):
             return self.assertRaisesRegexp(exception, regexp)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
             return settings
-        else:
-            raise Exception("Settings json file does not exist")
 
     def file_contents(self, filename):
         f = open(filename, "r")
@@ -340,7 +341,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         """
         Gets the status of a message
         """
-        xml = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        xml = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         xml = b64decode(xml)
         dom = etree.fromstring(xml)
 
@@ -348,7 +349,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual(Saml2_Constants.STATUS_SUCCESS, status["code"])
 
         xml2 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "status_code_responder.xml.base64")
+            self.data_path / "responses" / "invalids" / "status_code_responder.xml.base64"
         )
         xml2 = b64decode(xml2)
         dom2 = etree.fromstring(xml2)
@@ -358,7 +359,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual("", status2["msg"])
 
         xml3 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "status_code_responer_and_msg.xml.base64")
+            self.data_path / "responses" / "invalids" / "status_code_responer_and_msg.xml.base64"
         )
         xml3 = b64decode(xml3)
         dom3 = etree.fromstring(xml3)
@@ -368,7 +369,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual("something_is_wrong", status3["msg"])
 
         xml_inv = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_status.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_status.xml.base64"
         )
         xml_inv = b64decode(xml_inv)
         dom_inv = etree.fromstring(xml_inv)
@@ -377,7 +378,7 @@ class Saml2_Utils_Test(unittest.TestCase):
             Saml2_Utils.get_status(dom_inv)
 
         xml_inv2 = self.file_contents(
-            join(self.data_path, "responses", "invalids", "no_status_code.xml.base64")
+            self.data_path / "responses" / "invalids" / "no_status_code.xml.base64"
         )
         xml_inv2 = b64decode(xml_inv2)
         dom_inv2 = etree.fromstring(xml_inv2)
@@ -633,7 +634,7 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_nameid_enc = b64decode(
             self.file_contents(
-                join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+                self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
             )
         )
         dom_nameid_enc = etree.fromstring(xml_nameid_enc)
@@ -647,11 +648,9 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_assertion_enc = b64decode(
             self.file_contents(
-                join(
-                    self.data_path,
-                    "responses",
-                    "valid_encrypted_assertion_encrypted_nameid.xml.base64",
-                )
+                self.data_path
+                / "responses"
+                / "valid_encrypted_assertion_encrypted_nameid.xml.base64"
             )
         )
         dom_assertion_enc = etree.fromstring(xml_assertion_enc)
@@ -674,7 +673,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual("{%s}NameID" % Saml2_Constants.NS_SAML, decrypted_nameid.tag)
         self.assertEqual("457bdb600de717891c77647b0806ce59c089d5b8", decrypted_nameid.text)
 
-        key_2_file_name = join(self.data_path, "misc", "sp2.key")
+        key_2_file_name = self.data_path / "misc" / "sp2.key"
         f = open(key_2_file_name, "r")
         key2 = f.read()
         f.close()
@@ -684,7 +683,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertIn("{%s}NameID" % (Saml2_Constants.NS_SAML), decrypted_nameid.tag)
         self.assertEqual("457bdb600de717891c77647b0806ce59c089d5b8", decrypted_nameid.text)
 
-        key_3_file_name = join(self.data_path, "misc", "sp3.key")
+        key_3_file_name = self.data_path / "misc" / "sp3.key"
         f = open(key_3_file_name, "r")
         key3 = f.read()
         f.close()
@@ -694,7 +693,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertIn("{%s}NameID" % (Saml2_Constants.NS_SAML), decrypted_nameid.tag)
         self.assertEqual("457bdb600de717891c77647b0806ce59c089d5b8", decrypted_nameid.text)
 
-        key_4_file_name = join(self.data_path, "misc", "sp4.key")
+        key_4_file_name = self.data_path / "misc" / "sp4.key"
         f = open(key_4_file_name, "r")
         key4 = f.read()
         f.close()
@@ -704,12 +703,10 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_nameid_enc_2 = b64decode(
             self.file_contents(
-                join(
-                    self.data_path,
-                    "responses",
-                    "invalids",
-                    "encrypted_nameID_without_EncMethod.xml.base64",
-                )
+                self.data_path
+                / "responses"
+                / "invalids"
+                / "encrypted_nameID_without_EncMethod.xml.base64"
             )
         )
         dom_nameid_enc_2 = parseString(xml_nameid_enc_2)
@@ -721,12 +718,10 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_nameid_enc_3 = b64decode(
             self.file_contents(
-                join(
-                    self.data_path,
-                    "responses",
-                    "invalids",
-                    "encrypted_nameID_without_keyinfo.xml.base64",
-                )
+                self.data_path
+                / "responses"
+                / "invalids"
+                / "encrypted_nameID_without_keyinfo.xml.base64"
             )
         )
         dom_nameid_enc_3 = parseString(xml_nameid_enc_3)
@@ -746,7 +741,7 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_nameid_enc = b64decode(
             self.file_contents(
-                join(self.data_path, "responses", "response_encrypted_nameid.xml.base64")
+                self.data_path / "responses" / "response_encrypted_nameid.xml.base64"
             )
         )
         dom = fromstring(xml_nameid_enc)
@@ -778,7 +773,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         cert = settings.get_sp_cert()
 
         xml_authn = b64decode(
-            self.file_contents(join(self.data_path, "requests", "authn_request.xml.base64"))
+            self.file_contents(self.data_path / "requests" / "authn_request.xml.base64")
         )
         xml_authn_signed = compat.to_string(Saml2_Utils.add_sign(xml_authn, key, cert))
         self.assertIn("<ds:SignatureValue>", xml_authn_signed)
@@ -818,7 +813,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertIn("ds:Signature", ds_signature_5.tagName)
 
         xml_logout_req = b64decode(
-            self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml.base64"))
+            self.file_contents(self.data_path / "logout_requests" / "logout_request.xml.base64")
         )
         xml_logout_req_signed = compat.to_string(Saml2_Utils.add_sign(xml_logout_req, key, cert))
         self.assertIn("<ds:SignatureValue>", xml_logout_req_signed)
@@ -827,9 +822,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         self.assertIn("ds:Signature", ds_signature_6.tagName)
 
         xml_logout_res = b64decode(
-            self.file_contents(
-                join(self.data_path, "logout_responses", "logout_response.xml.base64")
-            )
+            self.file_contents(self.data_path / "logout_responses" / "logout_response.xml.base64")
         )
         xml_logout_res_signed = compat.to_string(Saml2_Utils.add_sign(xml_logout_res, key, cert))
         self.assertIn("<ds:SignatureValue>", xml_logout_res_signed)
@@ -837,9 +830,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         ds_signature_7 = res_7.firstChild.firstChild.nextSibling.nextSibling
         self.assertIn("ds:Signature", ds_signature_7.tagName)
 
-        xml_metadata = self.file_contents(
-            join(self.data_path, "metadata", "metadata_settings1.xml")
-        )
+        xml_metadata = self.file_contents(self.data_path / "metadata" / "metadata_settings1.xml")
         xml_metadata_signed = compat.to_string(Saml2_Utils.add_sign(xml_metadata, key, cert))
         self.assertIn("<ds:SignatureValue>", xml_metadata_signed)
         res_8 = parseString(xml_metadata_signed)
@@ -856,7 +847,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         cert = settings.get_sp_cert()
 
         xml_authn = b64decode(
-            self.file_contents(join(self.data_path, "requests", "authn_request.xml.base64"))
+            self.file_contents(self.data_path / "requests" / "authn_request.xml.base64")
         )
         xml_authn_signed = compat.to_string(Saml2_Utils.add_sign(xml_authn, key, cert))
         self.assertIn("<ds:SignatureValue>", xml_authn_signed)
@@ -930,7 +921,7 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         # expired cert
         xml_metadata_signed = self.file_contents(
-            join(self.data_path, "metadata", "signed_metadata_settings1.xml")
+            self.data_path / "metadata" / "signed_metadata_settings1.xml"
         )
         self.assertTrue(Saml2_Utils.validate_metadata_sign(xml_metadata_signed, cert))
         # expired cert, verified it
@@ -939,7 +930,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         xml_metadata_signed_2 = self.file_contents(
-            join(self.data_path, "metadata", "signed_metadata_settings2.xml")
+            self.data_path / "metadata" / "signed_metadata_settings2.xml"
         )
         self.assertTrue(Saml2_Utils.validate_metadata_sign(xml_metadata_signed_2, cert_2))
         self.assertTrue(
@@ -947,9 +938,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         xml_response_msg_signed = b64decode(
-            self.file_contents(
-                join(self.data_path, "responses", "signed_message_response.xml.base64")
-            )
+            self.file_contents(self.data_path / "responses" / "signed_message_response.xml.base64")
         )
 
         # expired cert
@@ -960,8 +949,8 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         # modified cert
-        other_cert_path = join(dirname(__file__), "..", "..", "..", "certs")
-        f = open(other_cert_path + "/certificate1", "r")
+        other_cert_path = self.certs_path
+        f = open(other_cert_path / "certificate1", "r")
         cert_x = f.read()
         f.close()
         self.assertFalse(Saml2_Utils.validate_sign(xml_response_msg_signed, cert_x))
@@ -970,9 +959,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         xml_response_msg_signed_2 = b64decode(
-            self.file_contents(
-                join(self.data_path, "responses", "signed_message_response2.xml.base64")
-            )
+            self.file_contents(self.data_path / "responses" / "signed_message_response2.xml.base64")
         )
         self.assertTrue(Saml2_Utils.validate_sign(xml_response_msg_signed_2, cert_2))
         self.assertTrue(Saml2_Utils.validate_sign(xml_response_msg_signed_2, None, fingerprint_2))
@@ -985,7 +972,7 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_response_assert_signed = b64decode(
             self.file_contents(
-                join(self.data_path, "responses", "signed_assertion_response.xml.base64")
+                self.data_path / "responses" / "signed_assertion_response.xml.base64"
             )
         )
 
@@ -998,7 +985,7 @@ class Saml2_Utils_Test(unittest.TestCase):
 
         xml_response_assert_signed_2 = b64decode(
             self.file_contents(
-                join(self.data_path, "responses", "signed_assertion_response2.xml.base64")
+                self.data_path / "responses" / "signed_assertion_response2.xml.base64"
             )
         )
         self.assertTrue(Saml2_Utils.validate_sign(xml_response_assert_signed_2, cert_2))
@@ -1007,9 +994,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         xml_response_double_signed = b64decode(
-            self.file_contents(
-                join(self.data_path, "responses", "double_signed_response.xml.base64")
-            )
+            self.file_contents(self.data_path / "responses" / "double_signed_response.xml.base64")
         )
 
         # expired cert
@@ -1020,9 +1005,7 @@ class Saml2_Utils_Test(unittest.TestCase):
         )
 
         xml_response_double_signed_2 = b64decode(
-            self.file_contents(
-                join(self.data_path, "responses", "double_signed_response2.xml.base64")
-            )
+            self.file_contents(self.data_path / "responses" / "double_signed_response2.xml.base64")
         )
         self.assertTrue(Saml2_Utils.validate_sign(xml_response_double_signed_2, cert_2))
         self.assertTrue(
@@ -1063,22 +1046,20 @@ class Saml2_Utils_Test(unittest.TestCase):
         # Wrong scheme
         no_signed = b64decode(
             self.file_contents(
-                join(self.data_path, "responses", "invalids", "no_signature.xml.base64")
+                self.data_path / "responses" / "invalids" / "no_signature.xml.base64"
             )
         )
         self.assertFalse(Saml2_Utils.validate_sign(no_signed, cert))
 
         no_key = b64decode(
-            self.file_contents(join(self.data_path, "responses", "invalids", "no_key.xml.base64"))
+            self.file_contents(self.data_path / "responses" / "invalids" / "no_key.xml.base64")
         )
         self.assertFalse(Saml2_Utils.validate_sign(no_key, cert))
 
         # Signature Wrapping attack
         wrapping_attack1 = b64decode(
             self.file_contents(
-                join(
-                    self.data_path, "responses", "invalids", "signature_wrapping_attack.xml.base64"
-                )
+                self.data_path / "responses" / "invalids" / "signature_wrapping_attack.xml.base64"
             )
         )
         self.assertFalse(Saml2_Utils.validate_sign(wrapping_attack1, cert))

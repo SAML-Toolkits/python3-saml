@@ -5,7 +5,7 @@
 
 from base64 import b64decode, b64encode
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 
 from saml2 import compat
@@ -19,8 +19,10 @@ from urllib.parse import urlparse, parse_qs
 
 
 class Saml2_Auth_Test(unittest.TestCase):
-    data_path = join(dirname(dirname(dirname(dirname(__file__)))), "data")
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+
+    root_path = Path().absolute()
+    data_path = root_path / "data"
+    settings_path = root_path / "settings"
 
     # assertRaisesRegexp deprecated on python3
     def assertRaisesRegex(self, exception, regexp, msg=None):
@@ -30,8 +32,8 @@ class Saml2_Auth_Test(unittest.TestCase):
             return self.assertRaisesRegexp(exception, regexp)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
@@ -106,7 +108,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         self.assertIsNone(auth.get_session_index())
 
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth2 = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -124,7 +126,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         self.assertIsNone(auth.get_session_expiration())
 
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth2 = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -139,7 +141,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         Case Invalid Response
         """
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -167,7 +169,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         the error array is not empty, contains 'invalid_response
         """
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -185,9 +187,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         Case Invalid Response, Invalid requestID
         """
         request_data = self.get_request()
-        message = self.file_contents(
-            join(self.data_path, "responses", "unsigned_response.xml.base64")
-        )
+        message = self.file_contents(self.data_path / "responses" / "unsigned_response.xml.base64")
         plain_message = compat.to_string(b64decode(message))
         current_url = Saml2_Utils.get_self_url_no_query(request_data)
         plain_message = plain_message.replace(
@@ -222,7 +222,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         the error array is empty
         """
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -290,7 +290,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         request_data["get_data"]["SAMLResponse"] = message
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -314,7 +314,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "invalids", "status_code_responder.xml.base64")
+            self.data_path / "logout_responses" / "invalids" / "status_code_responder.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -337,7 +337,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -354,7 +354,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         auth.process_slo(True, request_id)
         self.assertEqual(auth.get_errors(), ["invalid_logout_response"])
 
-        request_id = "21584ccdfaca36a145ae990442dcd96bfe60151e"
+        request_id = "ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e"
         auth.process_slo(True, request_id)
         self.assertEqual(len(auth.get_errors()), 0)
 
@@ -365,7 +365,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -399,7 +399,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
 
         # FIXME
@@ -434,7 +434,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         request_data["get_data"]["SAMLRequest"] = message
         auth = Saml2_Auth(request_data, old_settings=settings_info)
@@ -467,7 +467,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "invalids", "not_after_failed.xml.base64")
+            self.data_path / "logout_requests" / "invalids" / "not_after_failed.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -492,7 +492,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -544,7 +544,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings_info = self.loadSettingsJSON()
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -576,7 +576,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings_info["security"]["logoutResponseSigned"] = True
         request_data = self.get_request()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         # In order to avoid the destination problem
         plain_message = compat.to_string(Saml2_Utils.decode_base64_and_inflate(message))
@@ -935,7 +935,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         Case nameID loaded after process SAML Response
         """
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
@@ -993,13 +993,13 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         request_data = self.get_request()
         del request_data["get_data"]
-        message = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
         auth.process_response()
         self.assertFalse(auth.is_authenticated())
 
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
         auth.process_response()
@@ -1012,14 +1012,14 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings = self.loadSettingsJSON()
         request_data = self.get_request()
         del request_data["get_data"]
-        message = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
         self.assertFalse(auth.is_authenticated())
         self.assertEqual(auth.get_nameid(), None)
 
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
@@ -1028,7 +1028,7 @@ class Saml2_Auth_Test(unittest.TestCase):
 
         settings_2 = self.loadSettingsJSON("settings2.json")
         message = self.file_contents(
-            join(self.data_path, "responses", "signed_message_encrypted_assertion2.xml.base64")
+            self.data_path / "responses" / "signed_message_encrypted_assertion2.xml.base64"
         )
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings_2)
@@ -1043,14 +1043,14 @@ class Saml2_Auth_Test(unittest.TestCase):
         settings = self.loadSettingsJSON()
         request_data = self.get_request()
         del request_data["get_data"]
-        message = self.file_contents(join(self.data_path, "responses", "response1.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "response1.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
         self.assertFalse(auth.is_authenticated())
         self.assertEqual(auth.get_nameid_format(), None)
 
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
@@ -1061,7 +1061,7 @@ class Saml2_Auth_Test(unittest.TestCase):
 
         settings_2 = self.loadSettingsJSON("settings2.json")
         message = self.file_contents(
-            join(self.data_path, "responses", "signed_message_encrypted_assertion2.xml.base64")
+            self.data_path / "responses" / "signed_message_encrypted_assertion2.xml.base64"
         )
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings_2)
@@ -1077,7 +1077,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(
-            join(self.data_path, "responses", "valid_response_with_namequalifier.xml.base64")
+            self.data_path / "responses" / "valid_response_with_namequalifier.xml.base64"
         )
         request_data = self.get_request()
         request_data["post_data"] = {"SAMLResponse": message}
@@ -1092,7 +1092,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         Tests the get_nameid_nq method of the Saml2_Auth
         """
         settings = self.loadSettingsJSON()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         request_data = self.get_request()
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
@@ -1107,7 +1107,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(
-            join(self.data_path, "responses", "valid_response_with_namequalifier.xml.base64")
+            self.data_path / "responses" / "valid_response_with_namequalifier.xml.base64"
         )
         request_data = self.get_request()
         request_data["post_data"] = {"SAMLResponse": message}
@@ -1122,7 +1122,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         Tests the get_nameid_spnq method of the Saml2_Auth
         """
         settings = self.loadSettingsJSON()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         request_data = self.get_request()
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
@@ -1137,7 +1137,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(
-            join(self.data_path, "logout_requests", "logout_request_deflated.xml.base64")
+            self.data_path / "logout_requests" / "logout_request_deflated.xml.base64"
         )
         relay_state = "http://relaystate.com"
         parameters = {"SAMLRequest": message, "RelayState": relay_state}
@@ -1161,7 +1161,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         settings = self.loadSettingsJSON()
         message = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response_deflated.xml.base64")
+            self.data_path / "logout_responses" / "logout_response_deflated.xml.base64"
         )
         relay_state = "http://relaystate.com"
         auth = Saml2_Auth(self.get_request(), old_settings=settings)
@@ -1451,29 +1451,29 @@ class Saml2_Auth_Test(unittest.TestCase):
     def testGetLastSAMLResponse(self):
         settings = self.loadSettingsJSON()
         message = self.file_contents(
-            join(self.data_path, "responses", "signed_message_response.xml.base64")
+            self.data_path / "responses" / "signed_message_response.xml.base64"
         )
         message_wrapper = {"post_data": {"SAMLResponse": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_response()
         expected_message = self.file_contents(
-            join(self.data_path, "responses", "pretty_signed_message_response.xml")
+            self.data_path / "responses" / "pretty_signed_message_response.xml"
         )
         self.assertEqual(auth.get_last_response_xml(True), expected_message)
 
         # with encrypted assertion
         message = self.file_contents(
-            join(self.data_path, "responses", "valid_encrypted_assertion.xml.base64")
+            self.data_path / "responses" / "valid_encrypted_assertion.xml.base64"
         )
         message_wrapper = {"post_data": {"SAMLResponse": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_response()
         decrypted_response = self.file_contents(
-            join(self.data_path, "responses", "decrypted_valid_encrypted_assertion.xml")
+            self.data_path / "responses" / "decrypted_valid_encrypted_assertion.xml"
         )
         self.assertEqual(auth.get_last_response_xml(False), decrypted_response)
         pretty_decrypted_response = self.file_contents(
-            join(self.data_path, "responses", "pretty_decrypted_valid_encrypted_assertion.xml")
+            self.data_path / "responses" / "pretty_decrypted_valid_encrypted_assertion.xml"
         )
         self.assertEqual(auth.get_last_response_xml(True), pretty_decrypted_response)
 
@@ -1498,7 +1498,7 @@ class Saml2_Auth_Test(unittest.TestCase):
     def testGetLastAuthnContexts(self):
         settings = self.loadSettingsJSON()
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
@@ -1520,7 +1520,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         )
         self.assertIn(expectedFragment, auth.get_last_request_xml())
 
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         message = Saml2_Utils.deflate_and_base64_encode(request)
         message_wrapper = {"get_data": {"SAMLRequest": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
@@ -1529,14 +1529,14 @@ class Saml2_Auth_Test(unittest.TestCase):
 
     def testGetLastLogoutResponse(self):
         settings = self.loadSettingsJSON()
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         message = Saml2_Utils.deflate_and_base64_encode(request)
         message_wrapper = {"get_data": {"SAMLRequest": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_slo()
         expectedFragment = (
             '  Destination="http://idp.example.com/SingleLogoutService.php"\n'
-            '  InResponseTo="21584ccdfaca36a145ae990442dcd96bfe60151e">\n'
+            '  InResponseTo="ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e">\n'
             "    <saml:Issuer>http://stuff.com/endpoints/metadata.php</saml:Issuer>\n"
             "    <samlp:Status>\n"
             '        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />\n'
@@ -1545,9 +1545,7 @@ class Saml2_Auth_Test(unittest.TestCase):
         )
         self.assertIn(expectedFragment, auth.get_last_response_xml())
 
-        response = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response.xml")
-        )
+        response = self.file_contents(self.data_path / "logout_responses" / "logout_response.xml")
         message = Saml2_Utils.deflate_and_base64_encode(response)
         message_wrapper = {"get_data": {"SAMLResponse": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
@@ -1561,15 +1559,14 @@ class Saml2_Auth_Test(unittest.TestCase):
         """
         settings = self.loadSettingsJSON()
         request_data = self.get_request()
-        message = self.file_contents(join(self.data_path, "responses", "valid_response.xml.base64"))
+        message = self.file_contents(self.data_path / "responses" / "valid_response.xml.base64")
         del request_data["get_data"]
         request_data["post_data"] = {"SAMLResponse": message}
         auth = Saml2_Auth(request_data, old_settings=settings)
 
         auth.process_response()
-        self.assertEqual(
-            auth.get_last_response_in_response_to(),
-            "5fe9d6e499b2f0913206aab3f7191729049bb807",
+        self.assertIn(
+            "5fe9d6e499b2f0913206aab3f7191729049bb807", auth.get_last_response_in_response_to()
         )
         self.assertEqual(auth.get_last_message_id(), "pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e")
         self.assertEqual(auth.get_last_assertion_id(), "pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb")
@@ -1595,9 +1592,9 @@ class Saml2_Auth_Test(unittest.TestCase):
         auth = Saml2_Auth(request_data, old_settings=settings)
         auth.process_response()
         self.assertEqual(len(auth.get_errors()), 0)
-        self.assertEqual(
-            auth.get_last_response_in_response_to(),
+        self.assertIn(
             "5fe9d6e499b2f0913206aab3f7191729049bb807",
+            auth.get_last_response_in_response_to(),
         )
         self.assertEqual(auth.get_last_message_id(), "pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e")
         self.assertEqual(auth.get_last_assertion_id(), "pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb")
@@ -1610,12 +1607,12 @@ class Saml2_Auth_Test(unittest.TestCase):
         Case Valid Logout request
         """
         settings = self.loadSettingsJSON()
-        request = self.file_contents(join(self.data_path, "logout_requests", "logout_request.xml"))
+        request = self.file_contents(self.data_path / "logout_requests" / "logout_request.xml")
         message = Saml2_Utils.deflate_and_base64_encode(request)
         message_wrapper = {"get_data": {"SAMLRequest": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_slo()
-        self.assertIn(auth.get_last_message_id(), "21584ccdfaca36a145ae990442dcd96bfe60151e")
+        self.assertIn("21584ccdfaca36a145ae990442dcd96bfe60151e", auth.get_last_message_id())
 
     def testGetIdFromLogoutResponse(self):
         """
@@ -1623,11 +1620,9 @@ class Saml2_Auth_Test(unittest.TestCase):
         Case Valid Logout response
         """
         settings = self.loadSettingsJSON()
-        response = self.file_contents(
-            join(self.data_path, "logout_responses", "logout_response.xml")
-        )
+        response = self.file_contents(self.data_path / "logout_responses" / "logout_response.xml")
         message = Saml2_Utils.deflate_and_base64_encode(response)
         message_wrapper = {"get_data": {"SAMLResponse": message}}
         auth = Saml2_Auth(message_wrapper, old_settings=settings)
         auth.process_slo()
-        self.assertIn(auth.get_last_message_id(), "_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859")
+        self.assertIn("_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859", auth.get_last_message_id())

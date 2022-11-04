@@ -1,7 +1,7 @@
 {
     "strict": false,
     "debug": false,
-    "custom_base_path": "../../../tests/data/customPath/",
+    "custom_base_path": "../tests/data/customPath/",
     "sp": {
         "entityId": "http://stuff.com/endpoints/metadata.php",
         "assertionConsumerService": {

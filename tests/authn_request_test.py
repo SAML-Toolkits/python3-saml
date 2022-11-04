@@ -4,7 +4,7 @@
 # MIT License
 
 import json
-from os.path import dirname, join, exists
+from pathlib import Path
 import unittest
 
 from saml2 import compat
@@ -18,7 +18,8 @@ from urllib.parse import urlparse, parse_qs
 
 
 class Saml2_Authn_Request_Test(unittest.TestCase):
-    settings_path = join(dirname(dirname(dirname(dirname(__file__)))), "settings")
+    root_path = Path().absolute()
+    settings_path = root_path / "settings"
 
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
@@ -28,8 +29,8 @@ class Saml2_Authn_Request_Test(unittest.TestCase):
             return self.assertRegexpMatches(text, regexp, msg)
 
     def loadSettingsJSON(self, name="settings1.json"):
-        filename = join(self.settings_path, name)
-        if exists(filename):
+        filename = self.settings_path / name
+        if filename.exists():
             stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()

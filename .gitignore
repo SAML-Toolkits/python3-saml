@@ -23,10 +23,3 @@ __pycache_
 /.idea
 .mypy_cache/
 .pytest_cache
-
-*.key
-*.crt
-*.pem
-
-settings.py
-advanced_settings.py

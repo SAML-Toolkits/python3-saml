@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2021 OneLogin, Inc.
-# MIT License
 
 import unittest
 from onelogin.saml2.errors import OneLogin_Saml2_Error

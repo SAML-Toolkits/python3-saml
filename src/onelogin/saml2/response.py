@@ -2,10 +2,8 @@
 
 """ OneLogin_Saml2_Response class
 
-Copyright (c) 2010-2021 OneLogin, Inc.
-MIT License
 
-SAML Response class of OneLogin's Python Toolkit.
+SAML Response class of SAML Python Toolkit.
 
 """
 

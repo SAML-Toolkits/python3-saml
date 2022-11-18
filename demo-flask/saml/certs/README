@@ -1,6 +1,6 @@
 Take care of this folder that could contain private key. Be sure that this folder never is published.
 
-Onelogin Python Toolkit expects that certs for the SP could be stored in this folder as:
+SAML Python Toolkit expects that certs for the SP could be stored in this folder as:
 
  * sp.key     Private Key
  * sp.crt     Public cert

@@ -404,7 +404,7 @@ class OneLogin_Saml2_Settings(object):
                     nameid_enc = bool(security.get('nameIdEncrypted'))
 
                     if (want_assert_sign or want_mes_signed) and \
-                            not(exists_x509 or exists_fingerprint or exists_multix509sign):
+                            not (exists_x509 or exists_fingerprint or exists_multix509sign):
                         errors.append('idp_cert_or_fingerprint_not_found_and_required')
                     if nameid_enc and not (exists_x509 or exists_multix509enc):
                         errors.append('idp_cert_not_found_and_required')

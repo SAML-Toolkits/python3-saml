@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2021 OneLogin, Inc.
-# MIT License
 
 from base64 import b64decode, b64encode
 import json

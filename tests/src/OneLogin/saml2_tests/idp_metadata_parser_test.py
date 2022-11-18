@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2021 OneLogin, Inc.
-# MIT License
 
 try:
     from urllib.error import URLError

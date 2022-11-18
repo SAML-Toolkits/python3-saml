@@ -1,16 +1,13 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2022 OneLogin, Inc.
-# MIT License
-
 from setuptools import setup
 
 
 setup(
     name='python3-saml',
     version='1.14.0',
-    description='Onelogin Python Toolkit. Add SAML support to your Python software using this library',
+    description='Saml Python Toolkit. Add SAML support to your Python software using this library',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -25,10 +22,8 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ],
-    author='OneLogin',
-    author_email='support@onelogin.com',
     license='MIT',
-    url='https://github.com/onelogin/python3-saml',
+    url='https://github.com/saml-toolkit/python3-saml',
     packages=['onelogin', 'onelogin/saml2'],
     include_package_data=True,
     package_data={

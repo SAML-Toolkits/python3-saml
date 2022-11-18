@@ -2,8 +2,6 @@
 
 """ py3 compatibility class
 
-Copyright (c) 2010-2021 OneLogin, Inc.
-MIT License
 
 """
 

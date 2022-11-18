@@ -67,6 +67,6 @@ WQO0LPxPqRiUqUzyhDhLo/xXNrHCu4VbMw==</ds:X509Certificate>
   </IDPSSODescriptor>
   <ContactPerson contactType="technical">
     <SurName>Support</SurName>
-    <EmailAddress>support@onelogin.com</EmailAddress>
+    <EmailAddress>support@example.com</EmailAddress>
   </ContactPerson>
 </EntityDescriptor>

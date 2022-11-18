@@ -2,10 +2,8 @@
 
 """ OneLogin_Saml2_Constants class
 
-Copyright (c) 2010-2021 OneLogin, Inc.
-MIT License
 
-Constants class of OneLogin's Python Toolkit.
+Constants class of SAML Python Toolkit.
 
 """
 
@@ -14,7 +12,7 @@ class OneLogin_Saml2_Constants(object):
     """
 
     This class defines all the constants that will be used
-    in the OneLogin's Python Toolkit.
+    in the SAML Python Toolkit.
 
     """
 

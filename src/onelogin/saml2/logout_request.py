@@ -2,10 +2,8 @@
 
 """ OneLogin_Saml2_Logout_Request class
 
-Copyright (c) 2010-2021 OneLogin, Inc.
-MIT License
 
-Logout Request class of OneLogin's Python Toolkit.
+Logout Request class of SAML Python Toolkit.
 
 """
 

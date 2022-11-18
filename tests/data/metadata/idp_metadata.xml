@@ -37,6 +37,6 @@ QOPR6cEwFZzP0tHTYbI839WgxX6hfhIUTUz6mLqq4+3P4BG3+1OXeVDg63y8Uh78
   </IDPSSODescriptor>
   <ContactPerson contactType="technical">
     <SurName>Support</SurName>
-    <EmailAddress>support@onelogin.com</EmailAddress>
+    <EmailAddress>support@example.com</EmailAddress>
   </ContactPerson>
 </EntityDescriptor>

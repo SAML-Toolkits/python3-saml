@@ -2,10 +2,8 @@
 
 """ OneLogin_Saml2_Utils class
 
-Copyright (c) 2010-2021 OneLogin, Inc.
-MIT License
 
-Auxiliary class of OneLogin's Python Toolkit.
+Auxiliary class of SAML Python Toolkit.
 
 """
 

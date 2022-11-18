@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2021 OneLogin, Inc.
-# MIT License
 
 from base64 import b64decode
 
@@ -112,7 +110,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         settings = OneLogin_Saml2_Settings(json_settings)
         xml = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
-        self.assertEqual('support@onelogin.com', response.get_nameid())
+        self.assertEqual('support@example.com', response.get_nameid())
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'response_encrypted_nameid.xml.base64'))
         response_2 = OneLogin_Saml2_Response(settings, xml_2)
@@ -391,7 +389,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'response1.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         expected_nameid_data = {
-            'Value': 'support@onelogin.com',
+            'Value': 'support@example.com',
             'Format': 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
         }
         nameid_data = response.get_nameid_data()
@@ -824,7 +822,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         attributes = response.get_attributes()
         nameid = response.get_nameid()
         self.assertEqual("smith", attributes.get('surname')[0])
-        self.assertEqual('support@onelogin.com', nameid)
+        self.assertEqual('support@example.com', nameid)
 
     def testGetSessionNotOnOrAfter(self):
         """

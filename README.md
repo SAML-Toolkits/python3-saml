@@ -88,6 +88,7 @@ Installation
 
  * python 2.7 // python 3.6
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
+ * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
  duration parser and formatter
 
@@ -114,6 +115,14 @@ $ pip install python3-saml
 ```
 
 If you want to know how a project can handle python packages review this [guide](https://packaging.python.org/en/latest/tutorial.html) and review this [sampleproject](https://github.com/pypa/sampleproject)
+
+#### NOTE ####
+To avoid ``libxml2`` library version incompatibilities between ``xmlsec`` and ``lxml`` it is recommended that ``lxml`` is not installed from binary.
+
+This can be ensured by executing:
+```
+$ pip install --force-reinstall --no-binary lxml lxml
+```
 
 Security Warning
 ----------------

@@ -3,6 +3,7 @@
 
 import json
 import unittest
+import xmlsec
 
 from base64 import b64decode
 from lxml import etree
@@ -31,6 +32,29 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
         content = f.read()
         f.close()
         return content
+
+    def testLibxml2(self):
+        """
+        Tests that libxml2 versions used by xmlsec and lxml are compatible
+
+        If this test fails, reinstall lxml without using binary to ensure it is
+        linked to same version of libxml2 as xmlsec:
+        pip install --force-reinstall --no-binary lxml lxml
+
+        See https://bugs.launchpad.net/lxml/+bug/1960668
+        """
+        env = etree.fromstring('<xml></xml>')
+        sig = xmlsec.template.create(
+            env,
+            xmlsec.Transform.EXCL_C14N,
+            xmlsec.Transform.RSA_SHA256,
+            ns="ds"
+        )
+
+        ds = etree.QName(sig).namespace
+        cm = sig.find(".//{%s}CanonicalizationMethod" % ds)
+
+        self.assertIsNotNone(cm)
 
     def testValidateXML(self):
         """

@@ -148,7 +148,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
                 idp_entity_id = entity_descriptor_node.get('entityID', None)
 
-                want_authn_requests_signed = entity_descriptor_node.get('WantAuthnRequestsSigned', None)
+                want_authn_requests_signed = idp_descriptor_node.get('WantAuthnRequestsSigned', None)
 
                 name_id_format_nodes = OneLogin_Saml2_XML.query(idp_descriptor_node, './md:NameIDFormat')
                 if len(name_id_format_nodes) > 0:

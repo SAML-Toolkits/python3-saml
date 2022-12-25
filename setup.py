@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='python3-saml',
-    version='1.14.0',
+    version='1.15.0',
     description='Saml Python Toolkit. Add SAML support to your Python software using this library',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -23,7 +23,7 @@ setup(
         'Programming Language :: Python :: 3.10',
     ],
     license='MIT',
-    url='https://github.com/saml-toolkit/python3-saml',
+    url='https://github.com/SAML-Toolkits/python3-saml',
     packages=['onelogin', 'onelogin/saml2'],
     include_package_data=True,
     package_data={
@@ -43,10 +43,10 @@ setup(
         'test': (
             'coverage>=4.5.2',
             'freezegun>=0.3.11, <=1.1.0',
-            'pylint==1.9.4',
+#            'pylint>=1.9.4',
             'flake8>=3.6.0',
             'pytest>=4.6',
         ),
     },
-    keywords='saml saml2 xmlsec django flask pyramid python3',
+    keywords='saml saml2 sso xmlsec federation identity',
 )

@@ -19,8 +19,8 @@ install:
   - 'travis_retry pip install --force-reinstall --no-binary lxml lxml'
   - 'travis_retry pip install -e ".[test]"'
 
-script: 
+script:
   - 'coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
-  - 'flake8 .'
+  - 'flake8 --toml-config pyproject.toml'

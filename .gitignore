@@ -23,6 +23,7 @@ __pycache_
 /.idea
 .mypy_cache/
 .pytest_cache
+poetry.lock
 
 *.key
 *.crt

@@ -24,4 +24,5 @@ script:
   - 'coverage run --source=src/onelogin/saml2 --rcfile=tests/coverage.rc setup.py test'
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
-  - 'flake8 --toml-config pyproject.toml'
+#  - 'flake8 --toml-config pyproject.toml'
+  - 'flake8 .'

@@ -314,7 +314,6 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         expected_settings = json.loads(expected_settings_json)
         self.assertEqual(expected_settings, data)
 
-
         # should find desired descriptor
         data2 = OneLogin_Saml2_IdPMetadataParser.parse(xml_idp_metadata, entity_id="https://bar.example.com/access/saml/idp.xml")
         self.assertEqual("https://bar.example.com/access/saml/idp.xml", data2["idp"]["entityId"])

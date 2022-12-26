@@ -26,7 +26,7 @@
     </md:IDPSSODescriptor>
   </md:EntityDescriptor>
   <md:EntityDescriptor entityID="https://bar.example.com/access/saml/idp.xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="md:EntityDescriptorType">
-    <md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
       <md:KeyDescriptor use="signing">
         <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
           <ds:X509Data>

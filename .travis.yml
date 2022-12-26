@@ -16,9 +16,8 @@ matrix:
 install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
-  - 'travis_retry pip install --upgrade setuptools'
-  - 'travis_retry pip install .'
   - 'travis_retry pip install --force-reinstall --no-binary lxml lxml'
+  - 'travis_retry pip install .'
   - 'travis_retry pip install -e ".[test]"'
 
 script:

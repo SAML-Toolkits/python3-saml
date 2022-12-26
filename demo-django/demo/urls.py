@@ -1,10 +1,10 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from .views import attrs, index, metadata
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^$', index, name='index'),
-    url(r'^attrs/$', attrs, name='attrs'),
-    url(r'^metadata/$', metadata, name='metadata'),
+    re_path(r'^$', index, name='index'),
+    re_path(r'^attrs/$', attrs, name='attrs'),
+    re_path(r'^metadata/$', metadata, name='metadata'),
 ]

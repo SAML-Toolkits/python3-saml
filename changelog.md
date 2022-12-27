@@ -1,4 +1,13 @@
 # python3-saml changelog
+### 1.15.0 (Feb 18, 2022)
+- [#317](https://github.com/SAML-Toolkits/python3-saml/pull/317) Handle unicode characters gracefully in python 2
+- [#338](https://github.com/SAML-Toolkits/python3-saml/pull/338) Fix WantAuthnRequestsSigned parser
+- [#339](https://github.com/SAML-Toolkits/python3-saml/pull/339) Add Poetry support
+- Remove version restriction on lxml dependency
+- Updated Django demo to 4.X (only py3 compatible)
+- Updated Travis file. Forced lxml to be installed using no-validate_binary
+- Removed references to OneLogin from documentation
+
 ### 1.14.0 (Feb 18, 2022)
 - [#297](https://github.com/onelogin/python3-saml/pull/297) Don't require yanked version of lxml.
 - [#298](https://github.com/onelogin/python3-saml/pull/298) Add support for python 3.10 and cleanup the GHA.

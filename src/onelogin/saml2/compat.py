@@ -37,6 +37,8 @@ if isinstance(b'', type('')):  # py 2.x
 
     def to_bytes(data):
         """ return bytes """
+        if isinstance(data, unicode):
+            return data.encode("utf8")
         return str(data)
 
 else:  # py 3.x

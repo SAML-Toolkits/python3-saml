@@ -8,7 +8,6 @@ maintainers = ["Sixto Martin <sixto.martin.garcia@gmail.com>"]
 readme = "README.md"
 homepage = "https://saml.info"
 repository = "https://github.com/SAML-Toolkits/python3-saml"
-documentation = "https://pysaml2.readthedocs.io"
 keywords = [
     "saml",
     "saml2",

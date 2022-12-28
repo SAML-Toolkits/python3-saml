@@ -25,4 +25,4 @@ script:
   - 'coverage report -m --rcfile=tests/coverage.rc'
 # - 'pylint src/onelogin/saml2 --rcfile=tests/pylint.rc'
 #  - 'flake8 --toml-config pyproject.toml'
-  - 'flake8 .'
+  - 'flake8 --ignore E226,E302,E41,E731,E501,C901,W504'

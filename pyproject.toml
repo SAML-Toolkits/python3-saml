@@ -77,11 +77,7 @@ test = ["flake8", "freezegun", "pytest", "coverage"]
 #sphinx = "*"
 
 [build-system]
-requires = [
-  "poetry>=1.1.15",
-  "setuptools >= 40.1.0",
-  "wheel"
-]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]

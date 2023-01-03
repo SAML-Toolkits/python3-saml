@@ -1,6 +1,6 @@
 # SAML Python Toolkit (compatible with Python3)
 
-[![Build Status](https://api.travis-ci.org/onelogin/python3-saml.png?branch=master)](http://travis-ci.org/onelogin/python3-saml)
+[![Python package](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml/badge.svg)](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml)
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
 ![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)
 

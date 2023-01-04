@@ -33,7 +33,7 @@ Update ``python3-saml`` to ``>= 1.2.1``, ``1.2.0`` had a bug on signature valida
 
 #### Security Guidelines ####
 
-If you believe you have discovered a security vulnerability in this gem, please report it by mail to the maintainer: sixto.martin.garcia+security@gmail.com
+If you believe you have discovered a security vulnerability in this toolkit, please report it by mail to the maintainer: sixto.martin.garcia+security@gmail.com
 
 Why add SAML support to my software?
 ------------------------------------

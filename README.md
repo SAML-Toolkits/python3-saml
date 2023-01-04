@@ -1,6 +1,7 @@
 # SAML Python Toolkit (compatible with Python3)
 
 [![Python package](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml/badge.svg)](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml)
+![PyPI Downloads](https://img.shields.io/pypi/dm/python3-saml.svg?label=PyPI%20Downloads)
 [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/python3-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/python3-saml?branch=master)
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
 ![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)

@@ -97,7 +97,6 @@ pythonpath = [
 [tool.coverage.run]
 branch = true
 source = ["src/onelogin/saml2"]
-ignore_errors = true
 
 [tool.coverage.report]
 exclude_lines = [
@@ -110,6 +109,7 @@ exclude_lines = [
   "if TYPE_CHECKING:",
   "if typing.TYPE_CHECKING:",
 ]
+ignore_errors = true
 
 [tool.coverage.html]
 directory = "cov_html"

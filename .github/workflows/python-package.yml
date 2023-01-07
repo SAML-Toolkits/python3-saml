@@ -78,4 +78,4 @@ jobs:
         pip install coveralls
         coverage run  setup.py test
         coverage report -m
-        coveralls --service=github
+        coveralls --verbose

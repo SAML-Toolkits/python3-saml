@@ -75,6 +75,7 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
+        pip install coveralls
         coverage run  setup.py test
         coverage report -m
         coveralls --service=github

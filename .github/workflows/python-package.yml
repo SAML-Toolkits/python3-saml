@@ -70,3 +70,9 @@ jobs:
       run: |
         make pycodestyle
         make flake8
+    - name: Run coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: |
+        coverage report -m --rcfile=tests/coverage.rc
+        coveralls --service=github

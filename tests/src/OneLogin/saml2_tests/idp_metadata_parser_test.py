@@ -293,7 +293,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
 
         expected_settings_json = """
         {
-            "security": {"authnRequestsSigned": "true"},
+            "security": {"authnRequestsSigned": true},
             "sp": {
                 "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
             },
@@ -320,7 +320,7 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
 
         expected_settings_json2 = """
         {
-            "security": {"authnRequestsSigned": "false"},
+            "security": {"authnRequestsSigned": false},
             "sp": {
                 "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
             },

@@ -201,7 +201,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
                 if want_authn_requests_signed is not None:
                     data['security'] = {}
-                    data['security']['authnRequestsSigned'] = want_authn_requests_signed
+                    data['security']['authnRequestsSigned'] = want_authn_requests_signed == "true"
 
                 if idp_name_id_format:
                     data['sp'] = {}

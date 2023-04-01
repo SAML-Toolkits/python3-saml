@@ -901,7 +901,7 @@ class OneLogin_Saml2_Utils(object):
 
         if len(signature_nodes) > 0:
             for signature_node in signature_nodes:
-                # Raises expection if invalid
+                # Raises exception if invalid
                 OneLogin_Saml2_Utils.validate_node_sign(signature_node, elem, cert, fingerprint, fingerprintalg, validatecert, debug, raise_exceptions=True)
             return True
         else:

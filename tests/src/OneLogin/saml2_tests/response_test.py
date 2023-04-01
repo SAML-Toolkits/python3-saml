@@ -1282,7 +1282,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
     def testDatetimeWithMiliseconds(self):
         """
         Tests the is_valid method of the OneLogin_Saml2_Response class
-        Somtimes IdPs uses datetimes with miliseconds, this
+        Sometimes IdPs uses datetimes with miliseconds, this
         test is to verify that the toolkit supports them
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())

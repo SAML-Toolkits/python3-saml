@@ -101,7 +101,7 @@
 ### 1.3.0 (Sep 15, 2017)
 * Improve decrypt method, Add an option to decrypt an element in place or copy it before decryption.
 * [#63](https://github.com/onelogin/python3-saml/pull/63) Be able to get at the auth object the last processed ID (response/assertion) and the last generated ID, as well as the NotOnOrAfter value of the valid SubjectConfirmationData in the processed SAMLResponse
-* On a LogoutRequest if the NameIdFormat is entity, NameQualifier and SPNameQualifier will be ommited. If the NameIdFormat is not entity and a NameQualifier is provided, then the SPNameQualifier will be also added.
+* On a LogoutRequest if the NameIdFormat is entity, NameQualifier and SPNameQualifier will be omitted. If the NameIdFormat is not entity and a NameQualifier is provided, then the SPNameQualifier will be also added.
 * Reset errorReason attribute of the auth object before each Process method
 * [#65](https://github.com/onelogin/python3-saml/pull/65) Fix issue on getting multiple certs when only sign or encryption certs
 

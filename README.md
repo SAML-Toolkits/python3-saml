@@ -154,7 +154,7 @@ A replay attack is basically try to reuse an intercepted valid SAML Message in o
 SAML Messages have a limited timelife (NotBefore, NotOnOrAfter) that
 make harder this kind of attacks, but they are still possible.
 
-In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs alredy valdidated and processed. Those values only need
+In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs already validated and processed. Those values only need
 to be stored the amount of time of the SAML Message life time, so
 we don't need to store all processed message/assertion Ids, but the most recent ones.
 
@@ -297,9 +297,9 @@ This is the ``settings.json`` file:
         },
         // If you need to specify requested attributes, set a
         // attributeConsumingService. nameFormat, attributeValue and
-        // friendlyName can be ommited
+        // friendlyName can be omitted
         "attributeConsumingService": {
-                // OPTIONAL: only specifiy if SP requires this.
+                // OPTIONAL: only specify if SP requires this.
                 // index is an integer which identifies the attributeConsumingService used
                 // to the SP. SAML toolkit supports configuring only one attributeConsumingService
                 // but in certain cases the SP requires a different value.  Defaults to '1'.
@@ -366,7 +366,7 @@ This is the ``settings.json`` file:
         /*
          *  Instead of using the whole X.509cert you can use a fingerprint in order to
          *  validate a SAMLResponse (but you still need the X.509cert to validate LogoutRequest and LogoutResponse using the HTTP-Redirect binding).
-         *  But take in mind that the algortithm for the fingerprint should be as strong as the algorithm in a normal certificate signature
+         *  But take in mind that the algorithm for the fingerprint should be as strong as the algorithm in a normal certificate signature
 	 *  (e.g. SHA256 or strong)
          *
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
@@ -501,7 +501,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         'allowRepeatAttributeName': false,
 
         // If the toolkit receive a message signed with a
-        // deprecated algoritm (defined at the constant class)
+        // deprecated algorithm (defined at the constant class)
         // will raise an error and reject the message
         "rejectDeprecatedAlgorithm": true
     },
@@ -520,7 +520,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
     },
 
     // Organization information template, the info in en_US lang is
-    // recomended, add more if required.
+    // recommended, add more if required.
     "organization": {
         "en-US": {
             "name": "sp_test",
@@ -690,7 +690,7 @@ We can set a ``return_to`` url parameter to the login function and that will be 
 target_url = 'https://example.com'
 auth.login(return_to=target_url)
 ```
-The login method can recieve 3 more optional parameters:
+The login method can receive 3 more optional parameters:
 
 * ``force_authn``       When ``true``, the ``AuthNReuqest`` will set the ``ForceAuthn='true'``
 * ``is_passive``        When true, the ``AuthNReuqest`` will set the ``Ispassive='true'``
@@ -785,7 +785,7 @@ If we execute print attributes we could get:
 }
 ```
 
-Each attribute name can be used as a key to obtain the value. Every attribute is a list of values. A single-valued attribute is a listy of a single element.
+Each attribute name can be used as a key to obtain the value. Every attribute is a list of values. A single-valued attribute is a list of a single element.
 
 The following code is equivalent:
 
@@ -813,7 +813,7 @@ if len(errors) == 0:
         # the value of the url is a trusted URL.
         return redirect(url)
     else:
-        print("Sucessfully Logged out")
+        print("Successfully Logged out")
 else:
     print("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason()))
 ```
@@ -955,7 +955,7 @@ elif 'sls' in request.args:                                             # Single
             # the value of the url is a trusted URL.
             return redirect(url)
         else:
-            msg = "Sucessfully logged out"
+            msg = "Successfully logged out"
 
 if len(errors) == 0:
   print(msg)
@@ -1071,7 +1071,7 @@ SAML 2 Logout Request class
 * ***get_nameid*** Gets the NameID of the Logout Request Message (returns a string).
 * ***get_issuer*** Gets the Issuer of the Logout Request Message.
 * ***get_session_indexes*** Gets the ``SessionIndexes`` from the Logout Request.
-* ***is_valid*** Checks if the Logout Request recieved is valid.
+* ***is_valid*** Checks if the Logout Request received is valid.
 * ***get_error*** After execute a validation process, if fails this method returns the cause.
 * ***get_xml*** Returns the XML that will be sent as part of the request or that was received at the SP
 
@@ -1154,7 +1154,7 @@ Auxiliary class that contains several methods
 * ***get_expire_time*** Compares 2 dates and returns the earliest.
 * ***delete_local_session*** Deletes the local session.
 * ***calculate_X.509_fingerprint*** Calculates the fingerprint of a X.509 cert.
-* ***format_finger_print*** Formates a fingerprint.
+* ***format_finger_print*** Formats a fingerprint.
 * ***generate_name_id*** Generates a nameID.
 * ***get_status*** Gets Status from a Response.
 * ***decrypt_element*** Decrypts an encrypted element.
@@ -1204,7 +1204,7 @@ let's see how fast is it to deploy them.
 The use of a [virtualenv](http://virtualenv.readthedocs.org/en/latest/) is
 highly recommended.
 
-Virtualenv helps isolating the python enviroment used to run the toolkit. You
+Virtualenv helps isolating the python environment used to run the toolkit. You
 can find more details and an installation guide in the
 [official documentation](http://virtualenv.readthedocs.org/en/latest/).
 
@@ -1508,7 +1508,7 @@ Once the SP is configured, the metadata of the SP is published at the ``/metadat
 
  4. We are logged in the app and the user attributes are showed. At this point, we can test the single log out functionality.
 
- The single log out funcionality could be tested by 2 ways.
+ The single log out functionality could be tested by 2 ways.
 
     5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies through the client to the SP with a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
 

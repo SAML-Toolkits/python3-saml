@@ -310,7 +310,7 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
     def testProcessSLOResponseNoSucess(self):
         """
         Tests the process_slo method of the OneLogin_Saml2_Auth class
-        Case Logout Response not sucess
+        Case Logout Response not success
         """
         request_data = self.get_request()
         message = self.file_contents(join(self.data_path, 'logout_responses', 'invalids', 'status_code_responder.xml.base64'))

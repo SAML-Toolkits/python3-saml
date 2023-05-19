@@ -160,7 +160,7 @@ we don't need to store all processed message/assertion Ids, but the most recent 
 
 The OneLogin_Saml2_Auth class contains the [get_last_request_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L357), [get_last_message_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L364) and [get_last_assertion_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L371) methods to retrieve the IDs
 
-Checking that the ID of the current Message/Assertion does not exists in the lis of the ones already processed will prevent replay attacks.
+Checking that the ID of the current Message/Assertion does not exists in the list of the ones already processed will prevent replay attacks.
 
 
 Getting Started

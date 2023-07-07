@@ -54,6 +54,13 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         except URLError:
             pass
 
+    def testGetMetadataWithHeaders(self):
+        data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://samltest.id/saml/providers',
+                                                             headers={'User-Agent': 'Mozilla/5.0'})
+        self.assertIsNotNone(data)
+        self.assertIn(b'entityID=', data)
+
+
     def testParseRemote(self):
         """
         Tests the parse_remote method of the OneLogin_Saml2_IdPMetadataParser
@@ -85,6 +92,15 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         """
         expected_settings = json.loads(expected_settings_json)
         self.assertEqual(expected_settings, data)
+
+    def testParseRemoteWithHeaders(self):
+        """
+        Tests the parse_remote method passing headers of the OneLogin_Saml2_IdPMetadataParser
+        """
+        data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://samltest.id/saml/providers')
+        self.assertEqual(data['idp']['entityId'], 'https://samltest.id/saml/idp')
+        self.assertIsNotNone(data['idp']['singleSignOnService']['url'])
+        self.assertIsNotNone(data['idp']['x509certMulti'])
 
     def testParse(self):
         """

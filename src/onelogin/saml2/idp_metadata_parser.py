@@ -27,7 +27,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     """
 
     @classmethod
-    def get_metadata(cls, url, validate_cert=True, timeout=None):
+    def get_metadata(cls, url, validate_cert=True, timeout=None, headers=None):
         """
         Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -38,19 +38,23 @@ class OneLogin_Saml2_IdPMetadataParser(object):
 
         :param timeout: Timeout in seconds to wait for metadata response
         :type timeout: int
+        :param headers: Extra headers to send in the request
+        :type headers: dict
 
         :returns: metadata XML
         :rtype: string
         """
         valid = False
 
+        request = urllib2.Request(url, headers=headers or {})
+
         if validate_cert:
-            response = urllib2.urlopen(url, timeout=timeout)
+            response = urllib2.urlopen(request, timeout=timeout)
         else:
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
-            response = urllib2.urlopen(url, context=ctx, timeout=timeout)
+            response = urllib2.urlopen(request, context=ctx, timeout=timeout)
         xml = response.read()
 
         if xml:
@@ -87,7 +91,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :returns: settings dict with extracted data
         :rtype: dict
         """
-        idp_metadata = cls.get_metadata(url, validate_cert, timeout)
+        idp_metadata = cls.get_metadata(url, validate_cert, timeout, headers=kwargs.pop('headers', None))
         return cls.parse(idp_metadata, entity_id=entity_id, **kwargs)
 
     @classmethod

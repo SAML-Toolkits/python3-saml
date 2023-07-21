@@ -677,7 +677,8 @@ req = prepare_request_for_toolkit(request)
 auth = OneLogin_Saml2_Auth(req)   # Constructor of the SP, loads settings.json
                                   # and advanced_settings.json
 
-auth.login()      # Method that builds and sends the AuthNRequest
+auth.login()      # This method will build and return a AuthNRequest URL that can be
+                  # either redirected to, or printed out onto the screen as a hyperlink
 ```
 
 The ``AuthNRequest`` will be sent signed or unsigned based on the security info of the ``advanced_settings.json`` file (i.e. ``authnRequestsSigned``).

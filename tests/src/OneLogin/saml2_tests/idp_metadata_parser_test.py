@@ -60,7 +60,6 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         self.assertIsNotNone(data)
         self.assertIn(b'entityID=', data)
 
-
     def testParseRemote(self):
         """
         Tests the parse_remote method of the OneLogin_Saml2_IdPMetadataParser

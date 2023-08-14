@@ -714,6 +714,23 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_5 = OneLogin_Saml2_Response(settings, xml_4)
         self.assertEqual(expected_attributes, response_5.get_attributes())
 
+    def testGetEncryptedAttributes(self):
+        """
+        Tests the get_attributes method of the OneLogin_Saml2_Response with an encrypted response
+        """
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings8.json'))
+        xml = self.file_contents(join(self.data_path, 'responses',
+                                        'signed_message_encrypted_assertion2.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertEqual({
+            'uid': ['smartin'],
+            'mail': ['smartin@yaco.es'],
+            'cn': ['Sixto3'],
+            'sn': ['Martin2'],
+            'phone': [],
+            'eduPersonAffiliation': ['user', 'admin'],
+        }, response.get_attributes())
+
     def testGetFriendlyAttributes(self):
         """
         Tests the get_friendlyname_attributes method of the OneLogin_Saml2_Response

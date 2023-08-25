@@ -1930,3 +1930,10 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response.is_valid(request_data)
         self.assertIsNone(response.get_error())
         self.assertEqual(response.get_assertion_not_on_or_after(), 2671081021)
+
+    def testGetConditionNotOnOrAfter(self):
+        settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
+
+        xml = self.file_contents(join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        response = OneLogin_Saml2_Response(settings, xml)
+        self.assertEqual(response.get_conditions_not_on_or_after(), 2671081021)

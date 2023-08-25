@@ -550,6 +550,13 @@ class OneLogin_Saml2_Response(object):
         """
         return self.valid_scd_not_on_or_after
 
+    def get_conditions_not_on_or_after(self):
+        not_on_or_after = None
+        condition_nodes = self._query_assertion('/saml:Conditions[@NotOnOrAfter]')
+        if condition_nodes:
+            not_on_or_after = OneLogin_Saml2_Utils.parse_SAML_to_time(condition_nodes[0].get('NotOnOrAfter'))
+        return not_on_or_after
+
     def get_session_index(self):
         """
         Gets the SessionIndex from the AuthnStatement

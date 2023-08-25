@@ -75,6 +75,7 @@ class OneLogin_Saml2_Auth(object):
         self._last_response = None
         self._last_response_in_response_to = None
         self._last_assertion_not_on_or_after = None
+        self._conditions_not_on_or_after = None
 
     def get_settings(self):
         """
@@ -110,6 +111,7 @@ class OneLogin_Saml2_Auth(object):
         self._authenticated = True
         self._last_response_in_response_to = response.get_in_response_to()
         self._last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
+        self._conditions_not_on_or_after = response.get_conditions_not_on_or_after()
 
     def process_response(self, request_id=None):
         """
@@ -307,6 +309,14 @@ class OneLogin_Saml2_Auth(object):
         (if any) of the last assertion processed
         """
         return self._last_assertion_not_on_or_after
+
+    def get_conditions_not_on_or_after(self):
+        """
+        Returns the NotOnOrAfter value of the valid Conditions node
+        :returns: The NotOnOrAfter of the valid Conditions Node
+        :rtype: unix/posix timestamp|None
+        """
+        return self._conditions_not_on_or_after
 
     def get_errors(self):
         """

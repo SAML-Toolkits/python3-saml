@@ -140,6 +140,27 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth2.process_response()
         self.assertEqual(2655106621, auth2.get_session_expiration())
 
+    def testGetConditionsNotOnOrAfter(self):
+        """
+        Tests the get_conditions_not_on_or_after method of the OneLogin_Saml2_Auth class
+        """
+        settings_info = self.loadSettingsJSON()
+        auth = OneLogin_Saml2_Auth(self.get_request(), old_settings=settings_info)
+        self.assertIsNone(auth.get_conditions_not_on_or_after())
+
+        request_data = self.get_request()
+        message = self.file_contents(
+            join(self.data_path, 'responses', 'valid_response.xml.base64'))
+        del request_data['get_data']
+        request_data['post_data'] = {
+            'SAMLResponse': message
+        }
+        auth2 = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
+        self.assertIsNone(auth2.get_conditions_not_on_or_after())
+
+        auth2.process_response()
+        self.assertEqual(2671081021, auth2.get_conditions_not_on_or_after())
+
     def testGetLastErrorReason(self):
         """
         Tests the get_last_error_reason method of the OneLogin_Saml2_Auth class

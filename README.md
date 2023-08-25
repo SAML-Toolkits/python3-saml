@@ -648,7 +648,7 @@ def prepare_from_django_request(request):
 def prepare_from_flask_request(request):
     url_data = urlparse(request.url)
     return {
-        'http_host': request.netloc,
+        'http_host': request.host,
         'script_name': request.path,
         'get_data': request.args.copy(),
         'post_data': request.form.copy()

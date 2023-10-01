@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.xmlparser &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.xmlparser</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.xmlparser</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Based on the lxml example from defusedxml</span>
+<span class="c1"># DTDForbidden, EntitiesForbidden, NotSupportedError are clones of the classes defined at defusedxml</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2013 by Christian Heimes &lt;christian@python.org&gt;</span>
+<span class="c1"># Licensed to PSF under a Contributor Agreement.</span>
+<span class="c1"># See https://www.python.org/psf/license for licensing details.</span>
+<span class="sd">&quot;&quot;&quot;lxml.etree protection&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span> <span class="k">as</span> <span class="n">_etree</span>
+
+<span class="n">LXML3</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">LXML_VERSION</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+
+<span class="n">__origin__</span> <span class="o">=</span> <span class="s2">&quot;lxml.etree&quot;</span>
+
+<span class="n">tostring</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">tostring</span>
+
+
+<div class="viewcode-block" id="DTDForbidden"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.DTDForbidden">[docs]</a><span class="k">class</span> <span class="nc">DTDForbidden</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Document type definition is forbidden</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sysid</span><span class="p">,</span> <span class="n">pubid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DTDForbidden</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysid</span> <span class="o">=</span> <span class="n">sysid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pubid</span> <span class="o">=</span> <span class="n">pubid</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tpl</span> <span class="o">=</span> <span class="s2">&quot;DTDForbidden(name=&#39;</span><span class="si">{}</span><span class="s2">&#39;, system_id=</span><span class="si">{!r}</span><span class="s2">, public_id=</span><span class="si">{!r}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">tpl</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sysid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pubid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EntitiesForbidden"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.EntitiesForbidden">[docs]</a><span class="k">class</span> <span class="nc">EntitiesForbidden</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Entity definition is forbidden</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">sysid</span><span class="p">,</span> <span class="n">pubid</span><span class="p">,</span> <span class="n">notation_name</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EntitiesForbidden</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">base</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysid</span> <span class="o">=</span> <span class="n">sysid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pubid</span> <span class="o">=</span> <span class="n">pubid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notation_name</span> <span class="o">=</span> <span class="n">notation_name</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tpl</span> <span class="o">=</span> <span class="s2">&quot;EntitiesForbidden(name=&#39;</span><span class="si">{}</span><span class="s2">&#39;, system_id=</span><span class="si">{!r}</span><span class="s2">, public_id=</span><span class="si">{!r}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">tpl</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sysid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pubid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotSupportedError"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.NotSupportedError">[docs]</a><span class="k">class</span> <span class="nc">NotSupportedError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The operation is not supported</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RestrictedElement"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement">[docs]</a><span class="k">class</span> <span class="nc">RestrictedElement</span><span class="p">(</span><span class="n">_etree</span><span class="o">.</span><span class="n">ElementBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A restricted Element class that filters out instances of some classes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">blacklist</span> <span class="o">=</span> <span class="p">(</span><span class="n">_etree</span><span class="o">.</span><span class="n">_Entity</span><span class="p">,</span> <span class="n">_etree</span><span class="o">.</span><span class="n">_ProcessingInstruction</span><span class="p">,</span> <span class="n">_etree</span><span class="o">.</span><span class="n">_Comment</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator</span><span class="p">):</span>
+        <span class="n">blacklist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">blacklist</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">yield</span> <span class="n">child</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RestrictedElement.iterchildren"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iterchildren">[docs]</a>    <span class="k">def</span> <span class="nf">iterchildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">reversed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iterchildren</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="nb">reversed</span><span class="o">=</span><span class="nb">reversed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestrictedElement.iter"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iter">[docs]</a>    <span class="k">def</span> <span class="nf">iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestrictedElement.iterdescendants"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iterdescendants">[docs]</a>    <span class="k">def</span> <span class="nf">iterdescendants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iterdescendants</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestrictedElement.itersiblings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.itersiblings">[docs]</a>    <span class="k">def</span> <span class="nf">itersiblings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">preceding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">itersiblings</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">preceding</span><span class="o">=</span><span class="n">preceding</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestrictedElement.getchildren"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.getchildren">[docs]</a>    <span class="k">def</span> <span class="nf">getchildren</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RestrictedElement.getiterator"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.getiterator">[docs]</a>    <span class="k">def</span> <span class="nf">getiterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RestrictedElement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">getiterator</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GlobalParserTLS"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS">[docs]</a><span class="k">class</span> <span class="nc">GlobalParserTLS</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Thread local context for custom parser instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser_config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;resolve_entities&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;remove_comments&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;no_network&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;remove_pis&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;huge_tree&#39;</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="p">}</span>
+
+    <span class="n">element_class</span> <span class="o">=</span> <span class="n">RestrictedElement</span>
+
+<div class="viewcode-block" id="GlobalParserTLS.createDefaultParser"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.createDefaultParser">[docs]</a>    <span class="k">def</span> <span class="nf">createDefaultParser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parser_config</span><span class="p">)</span>
+        <span class="n">element_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_class</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lookup</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">ElementDefaultClassLookup</span><span class="p">(</span><span class="n">element</span><span class="o">=</span><span class="n">element_class</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">set_element_class_lookup</span><span class="p">(</span><span class="n">lookup</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="GlobalParserTLS.setDefaultParser"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.setDefaultParser">[docs]</a>    <span class="k">def</span> <span class="nf">setDefaultParser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_parser</span> <span class="o">=</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="GlobalParserTLS.getDefaultParser"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.getDefaultParser">[docs]</a>    <span class="k">def</span> <span class="nf">getDefaultParser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_default_parser&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createDefaultParser</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setDefaultParser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parser</span></div></div>
+
+
+<span class="n">_parser_tls</span> <span class="o">=</span> <span class="n">GlobalParserTLS</span><span class="p">()</span>
+<span class="n">getDefaultParser</span> <span class="o">=</span> <span class="n">_parser_tls</span><span class="o">.</span><span class="n">getDefaultParser</span>
+
+
+<div class="viewcode-block" id="check_docinfo"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.check_docinfo">[docs]</a><span class="k">def</span> <span class="nf">check_docinfo</span><span class="p">(</span><span class="n">elementtree</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check docinfo of an element tree for DTD and entity declarations</span>
+<span class="sd">    The check for entity declarations needs lxml 3 or newer. lxml 2.x does</span>
+<span class="sd">    not support dtd.iterentities().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">docinfo</span> <span class="o">=</span> <span class="n">elementtree</span><span class="o">.</span><span class="n">docinfo</span>
+    <span class="k">if</span> <span class="n">docinfo</span><span class="o">.</span><span class="n">doctype</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">forbid_dtd</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DTDForbidden</span><span class="p">(</span><span class="n">docinfo</span><span class="o">.</span><span class="n">doctype</span><span class="p">,</span> <span class="n">docinfo</span><span class="o">.</span><span class="n">system_url</span><span class="p">,</span> <span class="n">docinfo</span><span class="o">.</span><span class="n">public_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">forbid_entities</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">LXML3</span><span class="p">:</span>
+            <span class="c1"># lxml &lt; 3 has no iterentities()</span>
+            <span class="k">raise</span> <span class="n">NotSupportedError</span><span class="p">(</span><span class="s2">&quot;Unable to check for entity declarations &quot;</span> <span class="s2">&quot;in lxml 2.x&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">forbid_entities</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">dtd</span> <span class="ow">in</span> <span class="n">docinfo</span><span class="o">.</span><span class="n">internalDTD</span><span class="p">,</span> <span class="n">docinfo</span><span class="o">.</span><span class="n">externalDTD</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dtd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">dtd</span><span class="o">.</span><span class="n">iterentities</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">EntitiesForbidden</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.parse">[docs]</a><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">getDefaultParser</span><span class="p">()</span>
+    <span class="n">elementtree</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">)</span>
+    <span class="n">check_docinfo</span><span class="p">(</span><span class="n">elementtree</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">elementtree</span></div>
+
+
+<div class="viewcode-block" id="fromstring"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.fromstring">[docs]</a><span class="k">def</span> <span class="nf">fromstring</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">getDefaultParser</span><span class="p">()</span>
+    <span class="n">rootelement</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">)</span>
+    <span class="n">elementtree</span> <span class="o">=</span> <span class="n">rootelement</span><span class="o">.</span><span class="n">getroottree</span><span class="p">()</span>
+    <span class="n">check_docinfo</span><span class="p">(</span><span class="n">elementtree</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rootelement</span></div>
+
+
+<span class="n">XML</span> <span class="o">=</span> <span class="n">fromstring</span>
+
+
+<div class="viewcode-block" id="iterparse"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xmlparser.iterparse">[docs]</a><span class="k">def</span> <span class="nf">iterparse</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="n">NotSupportedError</span><span class="p">(</span><span class="s2">&quot;iterparse not available&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

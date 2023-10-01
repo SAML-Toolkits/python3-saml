@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.xml_utils &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.xml_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.xml_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_XML class</span>
+
+
+<span class="sd">Auxiliary class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">dirname</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xmlparser</span> <span class="kn">import</span> <span class="n">tostring</span><span class="p">,</span> <span class="n">fromstring</span>
+
+
+<span class="k">for</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">etree</span><span class="o">.</span><span class="n">register_namespace</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_XML</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_element_class</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">))</span>
+    <span class="n">_parse_etree</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">fromstring</span><span class="p">)</span>
+    <span class="n">_schema_class</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSchema</span>
+    <span class="n">_text_class</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_types</span>
+    <span class="n">_bytes_class</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">bytes_type</span>
+    <span class="n">_unparse_etree</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">tostring</span><span class="p">)</span>
+
+    <span class="n">dump</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">dump</span><span class="p">)</span>
+    <span class="n">make_root</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">)</span>
+    <span class="n">make_child</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.to_string"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.to_string">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Serialize an element to an encoded string representation of its XML tree.</span>
+<span class="sd">        :param xml: The root node</span>
+<span class="sd">        :type xml: str|bytes|xml.dom.minidom.Document|etree.Element</span>
+<span class="sd">        :returns: string representation of xml</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_text_class</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">xml</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_element_class</span><span class="p">):</span>
+            <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">cleanup_namespaces</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_unparse_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unsupported type </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">xml</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.to_etree"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.to_etree">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses an XML document or fragment from a string.</span>
+<span class="sd">        :param xml: the string to parse</span>
+<span class="sd">        :type xml: str|bytes|xml.dom.minidom.Document|etree.Element</span>
+<span class="sd">        :returns: the root node</span>
+<span class="sd">        :rtype: OneLogin_Saml2_XML._element_class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_element_class</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">xml</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_bytes_class</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_parse_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">forbid_dtd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_text_class</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_parse_etree</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">forbid_dtd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">forbid_entities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported type </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">xml</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.validate_xml"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.validate_xml">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates a xml against a schema</span>
+<span class="sd">        :param xml: The xml that will be validated</span>
+<span class="sd">        :type xml: str|bytes|xml.dom.minidom.Document|etree.Element</span>
+<span class="sd">        :param schema: The schema</span>
+<span class="sd">        :type schema: string</span>
+<span class="sd">        :param debug: If debug is active, the parse-errors will be showed</span>
+<span class="sd">        :type debug: bool</span>
+<span class="sd">        :returns: Error code or the DomDocument of the xml</span>
+<span class="sd">        :rtype: xml.dom.minidom.Document</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;unloaded_xml&#39;</span>
+
+        <span class="n">schema_file</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">schema_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_schema</span><span class="p">:</span>
+            <span class="n">xmlschema</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_schema_class</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f_schema</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">xmlschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">xml</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Errors validating the metadata: &#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">xmlschema</span><span class="o">.</span><span class="n">error_log</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;invalid_xml&#39;</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.query"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.query">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tagid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts nodes that match the query from the Element</span>
+
+<span class="sd">        :param dom: The root of the lxml objet</span>
+<span class="sd">        :type: Element</span>
+
+<span class="sd">        :param query: Xpath Expresion</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param context: Context Node</span>
+<span class="sd">        :type: DOMElement</span>
+
+<span class="sd">        :param tagid: Tag ID</span>
+<span class="sd">        :type query: String</span>
+
+<span class="sd">        :returns: The queried nodes</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">dom</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">context</span>
+
+        <span class="k">if</span> <span class="n">tagid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">tagid</span><span class="o">=</span><span class="n">tagid</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.cleanup_namespaces"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.cleanup_namespaces">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cleanup_namespaces</span><span class="p">(</span><span class="n">tree_or_element</span><span class="p">,</span> <span class="n">top_nsmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_ns_prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keeps the xmlns:xs namespace intact when etree.cleanup_namespaces is invoked.</span>
+<span class="sd">        :param tree_or_element: An XML tree or element</span>
+<span class="sd">        :type tree_or_element: etree.Element</span>
+<span class="sd">        :param top_nsmap: A mapping from namespace prefixes to namespace URIs</span>
+<span class="sd">        :type top_nsmap: dict</span>
+<span class="sd">        :param keep_ns_prefixes: List of prefixes that should not be removed as part of the cleanup</span>
+<span class="sd">        :type keep_ns_prefixes: list</span>
+<span class="sd">        :returns: An XML tree or element</span>
+<span class="sd">        :rtype: etree.Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_prefixes_to_keep</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_PREFIX_XS</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_PREFIX_XSI</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_PREFIX_XSD</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">keep_ns_prefixes</span><span class="p">:</span>
+            <span class="n">all_prefixes_to_keep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_prefixes_to_keep</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">keep_ns_prefixes</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">cleanup_namespaces</span><span class="p">(</span><span class="n">tree_or_element</span><span class="p">,</span> <span class="n">keep_ns_prefixes</span><span class="o">=</span><span class="n">all_prefixes_to_keep</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.extract_tag_text"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.extract_tag_text">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract_tag_text</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">tagname</span><span class="p">):</span>
+        <span class="n">open_tag</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tagname</span><span class="p">)</span>
+        <span class="n">close_tag</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="s2">&quot;&lt;/</span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="n">tagname</span><span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">open_tag</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">start</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">end</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">close_tag</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">close_tag</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">end</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">xml</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_XML.element_text"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.element_text">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="c1"># Double check, the LXML Parser already removes comments</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">strip_tags</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.auth &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.auth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.auth</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Auth class</span>
+
+
+<span class="sd">Main class of SAML Python Toolkit.</span>
+
+<span class="sd">Initializes the SP SAML instance</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">xmlsec</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.authn_request</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Authn_Request</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.logout_request</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Logout_Request</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.logout_response</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Logout_Response</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.response</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Response</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.settings</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Settings</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">,</span> <span class="n">OneLogin_Saml2_ValidationError</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xmlparser</span> <span class="kn">import</span> <span class="n">tostring</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Auth</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class implements the SP SAML instance.</span>
+
+<span class="sd">    Defines the methods that you can invoke in your application in</span>
+<span class="sd">    order to add SAML support (initiates SSO, initiates SLO, processes a</span>
+<span class="sd">    SAML Response, a Logout Request or a Logout Response).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">authn_request_class</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Authn_Request</span>
+    <span class="n">logout_request_class</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Logout_Request</span>
+    <span class="n">logout_response_class</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Logout_Response</span>
+    <span class="n">response_class</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Response</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">,</span> <span class="n">old_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_base_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the SP SAML instance.</span>
+
+<span class="sd">        :param request_data: Request Data</span>
+<span class="sd">        :type request_data: dict</span>
+
+<span class="sd">        :param old_settings: Optional. SAML Toolkit Settings</span>
+<span class="sd">        :type old_settings: dict</span>
+
+<span class="sd">        :param custom_base_path: Optional. Path where are stored the settings file and the cert folder</span>
+<span class="sd">        :type custom_base_path: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span> <span class="o">=</span> <span class="n">request_data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_settings</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Settings</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="n">old_settings</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Settings</span><span class="p">(</span><span class="n">old_settings</span><span class="p">,</span> <span class="n">custom_base_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_friendlyname_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_format</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_nq</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_spnq</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_expiration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_authenticated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_message_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_issue_instant</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_authn_contexts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_response_in_response_to</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_not_on_or_after</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_settings">[docs]</a>    <span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the settings info</span>
+<span class="sd">        :return: Setting info</span>
+<span class="sd">        :rtype: OneLogin_Saml2_Setting object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.set_strict"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.set_strict">[docs]</a>    <span class="k">def</span> <span class="nf">set_strict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the strict mode active/disable</span>
+
+<span class="sd">        :param value:</span>
+<span class="sd">        :type value: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">set_strict</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.store_valid_response"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.store_valid_response">[docs]</a>    <span class="k">def</span> <span class="nf">store_valid_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_friendlyname_attributes</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_friendlyname_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_nameid</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_format</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_nameid_format</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_nq</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_nameid_nq</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_spnq</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_nameid_spnq</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_index</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_session_index</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_expiration</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_session_not_on_or_after</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_message_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_assertion_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_issue_instant</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_assertion_issue_instant</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_authn_contexts</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_authn_contexts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_authenticated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_response_in_response_to</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_in_response_to</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_not_on_or_after</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_assertion_not_on_or_after</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.process_response"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.process_response">[docs]</a>    <span class="k">def</span> <span class="nf">process_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the SAML Response sent by the IdP.</span>
+
+<span class="sd">        :param request_id: Is an optional argument. Is the ID of the AuthNRequest sent by this SP to the IdP.</span>
+<span class="sd">        :type request_id: string</span>
+
+<span class="sd">        :raises: OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND, when a POST with a SAMLResponse is not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;post_data&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span> <span class="ow">and</span> <span class="s1">&#39;SAMLResponse&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;post_data&#39;</span><span class="p">]:</span>
+            <span class="c1"># AuthnResponse -- HTTP_POST Binding</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;post_data&#39;</span><span class="p">][</span><span class="s1">&#39;SAMLResponse&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_xml_document</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_valid_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_response&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_error</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_binding&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;SAML Response not found, Only supported HTTP_POST Binding&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SAML_RESPONSE_NOT_FOUND</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.process_slo"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.process_slo">[docs]</a>    <span class="k">def</span> <span class="nf">process_slo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_local_session</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">request_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delete_session_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the SAML Logout Response / Logout Request sent by the IdP.</span>
+
+<span class="sd">        :param keep_local_session: When false will destroy the local session, otherwise will destroy it</span>
+<span class="sd">        :type keep_local_session: bool</span>
+
+<span class="sd">        :param request_id: The ID of the LogoutRequest sent by this SP to the IdP</span>
+<span class="sd">        :type request_id: string</span>
+
+<span class="sd">        :returns: Redirection url</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">get_data</span> <span class="o">=</span> <span class="s1">&#39;get_data&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">get_data</span> <span class="ow">and</span> <span class="s1">&#39;SAMLResponse&#39;</span> <span class="ow">in</span> <span class="n">get_data</span><span class="p">:</span>
+            <span class="n">logout_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logout_response_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">,</span> <span class="n">get_data</span><span class="p">[</span><span class="s1">&#39;SAMLResponse&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span> <span class="o">=</span> <span class="n">logout_response</span><span class="o">.</span><span class="n">get_xml</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_response_signature</span><span class="p">(</span><span class="n">get_data</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_logout_response_signature&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Signature validation failed. Logout Response rejected&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">logout_response</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_logout_response&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">logout_response</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span> <span class="o">!=</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">STATUS_SUCCESS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;logout_not_success&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_message_id</span> <span class="o">=</span> <span class="n">logout_response</span><span class="o">.</span><span class="n">id</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_local_session</span><span class="p">:</span>
+                    <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">delete_local_session</span><span class="p">(</span><span class="n">delete_session_cb</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">get_data</span> <span class="ow">and</span> <span class="s1">&#39;SAMLRequest&#39;</span> <span class="ow">in</span> <span class="n">get_data</span><span class="p">:</span>
+            <span class="n">logout_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logout_request_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">,</span> <span class="n">get_data</span><span class="p">[</span><span class="s1">&#39;SAMLRequest&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">get_xml</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_request_signature</span><span class="p">(</span><span class="n">get_data</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;invalid_logout_request_signature&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Signature validation failed. Logout Request rejected&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_logout_request&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_local_session</span><span class="p">:</span>
+                    <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">delete_local_session</span><span class="p">(</span><span class="n">delete_session_cb</span><span class="p">)</span>
+
+                <span class="n">in_response_to</span> <span class="o">=</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">id</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_message_id</span> <span class="o">=</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">response_builder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logout_response_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">)</span>
+                <span class="n">response_builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">in_response_to</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span> <span class="o">=</span> <span class="n">response_builder</span><span class="o">.</span><span class="n">get_xml</span><span class="p">()</span>
+                <span class="n">logout_response</span> <span class="o">=</span> <span class="n">response_builder</span><span class="o">.</span><span class="n">get_response</span><span class="p">()</span>
+
+                <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SAMLResponse&#39;</span><span class="p">:</span> <span class="n">logout_response</span><span class="p">}</span>
+                <span class="k">if</span> <span class="s1">&#39;RelayState&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">]:</span>
+                    <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">][</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span>
+
+                <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;logoutResponseSigned&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_response_signature</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;signatureAlgorithm&#39;</span><span class="p">])</span>
+
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slo_response_url</span><span class="p">(),</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_binding&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;SAML LogoutRequest/LogoutResponse not found. Only supported HTTP_REDIRECT Binding&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SAML_LOGOUTMESSAGE_NOT_FOUND</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.redirect_to"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.redirect_to">[docs]</a>    <span class="k">def</span> <span class="nf">redirect_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redirects the user to the URL passed by parameter or to the URL that we defined in our SSO Request.</span>
+
+<span class="sd">        :param url: The target URL to redirect the user</span>
+<span class="sd">        :type url: string</span>
+<span class="sd">        :param parameters: Extra parameters to be passed as part of the URL</span>
+<span class="sd">        :type parameters: dict</span>
+
+<span class="sd">        :returns: Redirection URL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;RelayState&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">]:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">][</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">request_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.is_authenticated"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.is_authenticated">[docs]</a>    <span class="k">def</span> <span class="nf">is_authenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the user is authenticated or not.</span>
+
+<span class="sd">        :returns: True if is authenticated, False if not</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_authenticated</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_attributes"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the set of SAML attributes.</span>
+
+<span class="sd">        :returns: SAML attributes</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_friendlyname_attributes"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_friendlyname_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_friendlyname_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the set of SAML attributes indexed by FiendlyName.</span>
+
+<span class="sd">        :returns: SAML attributes</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_friendlyname_attributes</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_nameid"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the nameID.</span>
+
+<span class="sd">        :returns: NameID</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_nameid_format"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the nameID Format.</span>
+
+<span class="sd">        :returns: NameID Format</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_format</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_nameid_nq"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_nq">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_nq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the nameID NameQualifier of the Assertion.</span>
+
+<span class="sd">        :returns: NameID NameQualifier</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_nq</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_nameid_spnq"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_spnq">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_spnq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the nameID SP NameQualifier of the Assertion.</span>
+
+<span class="sd">        :returns: NameID SP NameQualifier</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_spnq</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_session_index"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_session_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the SessionIndex from the AuthnStatement.</span>
+<span class="sd">        :returns: The SessionIndex of the assertion</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_index</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_session_expiration"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_session_expiration">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_expiration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the SessionNotOnOrAfter from the AuthnStatement.</span>
+<span class="sd">        :returns: The SessionNotOnOrAfter of the assertion</span>
+<span class="sd">        :rtype: unix/posix timestamp|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_expiration</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_assertion_not_on_or_after"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_not_on_or_after">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_assertion_not_on_or_after</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The NotOnOrAfter value of the valid SubjectConfirmationData node</span>
+<span class="sd">        (if any) of the last assertion processed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_not_on_or_after</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_errors"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_errors">[docs]</a>    <span class="k">def</span> <span class="nf">get_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list with code errors if something went wrong</span>
+
+<span class="sd">        :returns: List of errors</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_error_reason"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_error_reason">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_error_reason</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the reason for the last error</span>
+
+<span class="sd">        :returns: Reason of the last error</span>
+<span class="sd">        :rtype: None | string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_attribute"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">get_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the requested SAML attribute.</span>
+
+<span class="sd">        :param name: Name of the attribute</span>
+<span class="sd">        :type name: string</span>
+
+<span class="sd">        :returns: Attribute value(s) if exists or None</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_friendlyname_attribute"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_friendlyname_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">get_friendlyname_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendlyname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the requested SAML attribute searched by FriendlyName.</span>
+
+<span class="sd">        :param friendlyname: FriendlyName of the attribute</span>
+<span class="sd">        :type friendlyname: string</span>
+
+<span class="sd">        :returns: Attribute value(s) if exists or None</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">friendlyname</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_friendlyname_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">friendlyname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_request_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_request_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The ID of the last Request SAML message generated.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_id</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_message_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_message_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_message_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The ID of the last Response SAML message processed.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_message_id</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_assertion_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_assertion_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The ID of the last assertion processed.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_id</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_assertion_issue_instant"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_issue_instant">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_assertion_issue_instant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The IssueInstant of the last assertion processed.</span>
+<span class="sd">        :rtype: unix/posix timestamp|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_assertion_issue_instant</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_authn_contexts"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_authn_contexts">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_authn_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The list of authentication contexts sent in the last SAML Response.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_authn_contexts</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_response_in_response_to"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_response_in_response_to">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_response_in_response_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: InResponseTo attribute of the last Response SAML processed or None if it is not present.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_response_in_response_to</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.login"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_authn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_passive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">set_nameid_policy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">name_id_value_req</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates the SSO process.</span>
+
+<span class="sd">        :param return_to: Optional argument. The target URL the user should be redirected to after login.</span>
+<span class="sd">        :type return_to: string</span>
+
+<span class="sd">        :param force_authn: Optional argument. When true the AuthNRequest will set the ForceAuthn=&#39;true&#39;.</span>
+<span class="sd">        :type force_authn: bool</span>
+
+<span class="sd">        :param is_passive: Optional argument. When true the AuthNRequest will set the Ispassive=&#39;true&#39;.</span>
+<span class="sd">        :type is_passive: bool</span>
+
+<span class="sd">        :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.</span>
+<span class="sd">        :type set_nameid_policy: bool</span>
+
+<span class="sd">        :param name_id_value_req: Optional argument. Indicates to the IdP the subject that should be authenticated</span>
+<span class="sd">        :type name_id_value_req: string</span>
+
+<span class="sd">        :returns: Redirection URL</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">authn_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">authn_request_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">,</span> <span class="n">force_authn</span><span class="p">,</span> <span class="n">is_passive</span><span class="p">,</span> <span class="n">set_nameid_policy</span><span class="p">,</span> <span class="n">name_id_value_req</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="n">authn_request</span><span class="o">.</span><span class="n">get_xml</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_id</span> <span class="o">=</span> <span class="n">authn_request</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+
+        <span class="n">saml_request</span> <span class="o">=</span> <span class="n">authn_request</span><span class="o">.</span><span class="n">get_request</span><span class="p">()</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SAMLRequest&#39;</span><span class="p">:</span> <span class="n">saml_request</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">return_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">return_to</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_no_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">)</span>
+
+        <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;authnRequestsSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_request_signature</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;signatureAlgorithm&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sso_url</span><span class="p">(),</span> <span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.logout"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.logout">[docs]</a>    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name_id_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spnq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates the SLO process.</span>
+
+<span class="sd">        :param return_to: Optional argument. The target URL the user should be redirected to after logout.</span>
+<span class="sd">        :type return_to: string</span>
+
+<span class="sd">        :param name_id: The NameID that will be set in the LogoutRequest.</span>
+<span class="sd">        :type name_id: string</span>
+
+<span class="sd">        :param session_index: SessionIndex that identifies the session of the user.</span>
+<span class="sd">        :type session_index: string</span>
+
+<span class="sd">        :param nq: IDP Name Qualifier</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param name_id_format: The NameID Format that will be set in the LogoutRequest.</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param spnq: SP Name Qualifier</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :returns: Redirection URL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slo_url</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">slo_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;The IdP does not support Single Log Out&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SAML_SINGLE_LOGOUT_NOT_SUPPORTED</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid</span>
+
+        <span class="k">if</span> <span class="n">name_id_format</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_id_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nameid_format</span>
+
+        <span class="n">logout_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logout_request_class</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">,</span>
+            <span class="n">name_id</span><span class="o">=</span><span class="n">name_id</span><span class="p">,</span>
+            <span class="n">session_index</span><span class="o">=</span><span class="n">session_index</span><span class="p">,</span>
+            <span class="n">nq</span><span class="o">=</span><span class="n">nq</span><span class="p">,</span>
+            <span class="n">name_id_format</span><span class="o">=</span><span class="n">name_id_format</span><span class="p">,</span>
+            <span class="n">spnq</span><span class="o">=</span><span class="n">spnq</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">get_xml</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_request_id</span> <span class="o">=</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SAMLRequest&#39;</span><span class="p">:</span> <span class="n">logout_request</span><span class="o">.</span><span class="n">get_request</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="n">return_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">return_to</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;RelayState&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_no_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="p">)</span>
+
+        <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logoutRequestSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_request_signature</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;signatureAlgorithm&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect_to</span><span class="p">(</span><span class="n">slo_url</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_sso_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_sso_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_sso_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SSO URL.</span>
+
+<span class="sd">        :returns: An URL, the SSO endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_sso_url</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_slo_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_slo_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_slo_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SLO URL.</span>
+
+<span class="sd">        :returns: An URL, the SLO endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_slo_url</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_slo_response_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_slo_response_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_slo_response_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SLO return URL for IdP-initiated logout.</span>
+
+<span class="sd">        :returns: an URL, the SLO return endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_slo_response_url</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.add_request_signature"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.add_request_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_request_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the Signature of the SAML Request.</span>
+
+<span class="sd">        :param request_data: The Request parameters</span>
+<span class="sd">        :type request_data: dict</span>
+
+<span class="sd">        :param sign_algorithm: Signature algorithm method</span>
+<span class="sd">        :type sign_algorithm: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_signature</span><span class="p">(</span><span class="n">request_data</span><span class="p">,</span> <span class="s1">&#39;SAMLRequest&#39;</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.add_response_signature"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.add_response_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_response_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response_data</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the Signature of the SAML Response.</span>
+<span class="sd">        :param response_data: The Response parameters</span>
+<span class="sd">        :type response_data: dict</span>
+
+<span class="sd">        :param sign_algorithm: Signature algorithm method</span>
+<span class="sd">        :type sign_algorithm: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_signature</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="s1">&#39;SAMLResponse&#39;</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_build_sign_query_from_qs</span><span class="p">(</span><span class="n">query_string</span><span class="p">,</span> <span class="n">saml_type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build sign query from query string</span>
+
+<span class="sd">        :param query_string: The query string</span>
+<span class="sd">        :type query_string: str</span>
+
+<span class="sd">        :param saml_type: The target URL the user should be redirected to</span>
+<span class="sd">        :type saml_type: string SAMLRequest | SAMLResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=&#39;</span> <span class="o">%</span> <span class="n">saml_type</span><span class="p">,</span> <span class="s1">&#39;RelayState=&#39;</span><span class="p">,</span> <span class="s1">&#39;SigAlg=&#39;</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">query_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+        <span class="c1"># Join in the order of arguments rather than the original order of parts.</span>
+        <span class="k">return</span> <span class="s1">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">part</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span> <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_build_sign_query</span><span class="p">(</span><span class="n">saml_data</span><span class="p">,</span> <span class="n">relay_state</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">saml_type</span><span class="p">,</span> <span class="n">lowercase_urlencoding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build sign query</span>
+
+<span class="sd">        :param saml_data: The Request data</span>
+<span class="sd">        :type saml_data: str</span>
+
+<span class="sd">        :param relay_state: The Relay State</span>
+<span class="sd">        :type relay_state: str</span>
+
+<span class="sd">        :param algorithm: The Signature Algorithm</span>
+<span class="sd">        :type algorithm: str</span>
+
+<span class="sd">        :param saml_type: The target URL the user should be redirected to</span>
+<span class="sd">        :type saml_type: string  SAMLRequest | SAMLResponse</span>
+
+<span class="sd">        :param lowercase_urlencoding: lowercase or no</span>
+<span class="sd">        :type lowercase_urlencoding: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sign_data</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">saml_type</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">saml_data</span><span class="p">,</span> <span class="n">lowercase_urlencoding</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">relay_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sign_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;RelayState=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">relay_state</span><span class="p">,</span> <span class="n">lowercase_urlencoding</span><span class="p">))</span>
+        <span class="n">sign_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;SigAlg=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">lowercase_urlencoding</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s1">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sign_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">saml_type</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the Signature</span>
+<span class="sd">        :param data: The Request data</span>
+<span class="sd">        :type data: dict</span>
+
+<span class="sd">        :param saml_type: The target URL the user should be redirected to</span>
+<span class="sd">        :type saml_type: string  SAMLRequest | SAMLResponse</span>
+
+<span class="sd">        :param sign_algorithm: Signature algorithm method</span>
+<span class="sd">        :type sign_algorithm: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">saml_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;SAMLRequest&#39;</span><span class="p">,</span> <span class="s1">&#39;SAMLResponse&#39;</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span><span class="o">.</span><span class="n">get_sp_key</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s2">&quot;Trying to sign the </span><span class="si">%s</span><span class="s2"> but can&#39;t load the SP private key.&quot;</span> <span class="o">%</span> <span class="n">saml_type</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PRIVATE_KEY_NOT_FOUND</span>
+            <span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_sign_query</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">saml_type</span><span class="p">],</span>
+                                     <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RelayState&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                     <span class="n">sign_algorithm</span><span class="p">,</span>
+                                     <span class="n">saml_type</span><span class="p">)</span>
+
+        <span class="n">sign_algorithm_transform_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA512</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA512</span>
+        <span class="p">}</span>
+        <span class="n">sign_algorithm_transform</span> <span class="o">=</span> <span class="n">sign_algorithm_transform_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sign_algorithm</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">)</span>
+
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">sign_binary</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">sign_algorithm_transform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">())</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;SigAlg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sign_algorithm</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.validate_request_signature"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.validate_request_signature">[docs]</a>    <span class="k">def</span> <span class="nf">validate_request_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate Request Signature</span>
+
+<span class="sd">        :param request_data: The Request data</span>
+<span class="sd">        :type request_data: dict</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_signature</span><span class="p">(</span><span class="n">request_data</span><span class="p">,</span> <span class="s1">&#39;SAMLRequest&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.validate_response_signature"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.validate_response_signature">[docs]</a>    <span class="k">def</span> <span class="nf">validate_response_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate Response Signature</span>
+
+<span class="sd">        :param request_data: The Request data</span>
+<span class="sd">        :type request_data: dict</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_signature</span><span class="p">(</span><span class="n">request_data</span><span class="p">,</span> <span class="s1">&#39;SAMLResponse&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">saml_type</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate Signature</span>
+
+<span class="sd">        :param data: The Request data</span>
+<span class="sd">        :type data: dict</span>
+
+<span class="sd">        :param cert: The certificate to check signature</span>
+<span class="sd">        :type cert: str</span>
+
+<span class="sd">        :param saml_type: The target URL the user should be redirected to</span>
+<span class="sd">        :type saml_type: string  SAMLRequest | SAMLResponse</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Signature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_strict</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantMessagesSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The </span><span class="si">%s</span><span class="s1"> is not signed. Rejected.&#39;</span> <span class="o">%</span> <span class="n">saml_type</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_SIGNED_MESSAGE</span>
+                    <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+
+            <span class="n">exists_x509cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span><span class="o">.</span><span class="n">get_idp_cert</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">exists_multix509sign</span> <span class="o">=</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span> <span class="ow">and</span> \
+                <span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span> <span class="ow">and</span> \
+                <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exists_x509cert</span> <span class="ow">or</span> <span class="n">exists_multix509sign</span><span class="p">):</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;In order to validate the sign on the </span><span class="si">%s</span><span class="s1">, the x509cert of the IdP is required&#39;</span> <span class="o">%</span> <span class="n">saml_type</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                    <span class="n">error_msg</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">CERT_NOT_FOUND</span>
+                <span class="p">)</span>
+
+            <span class="n">sign_alg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SigAlg&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sign_alg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="n">sign_alg</span> <span class="o">=</span> <span class="n">sign_alg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+
+            <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+            <span class="n">reject_deprecated_alg</span> <span class="o">=</span> <span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rejectDeprecatedAlgorithm&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">reject_deprecated_alg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sign_alg</span> <span class="ow">in</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DEPRECATED_ALGORITHMS</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Deprecated signature algorithm found: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sign_alg</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DEPRECATED_SIGNATURE_METHOD</span>
+                    <span class="p">)</span>
+
+            <span class="n">query_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;query_string&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">query_string</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;validate_signature_from_qs&#39;</span><span class="p">):</span>
+                <span class="n">signed_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_sign_query_from_qs</span><span class="p">(</span><span class="n">query_string</span><span class="p">,</span> <span class="n">saml_type</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lowercase_urlencoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lowercase_urlencoding&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="n">signed_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_sign_query</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">saml_type</span><span class="p">],</span>
+                                                      <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RelayState&#39;</span><span class="p">),</span>
+                                                      <span class="n">sign_alg</span><span class="p">,</span>
+                                                      <span class="n">saml_type</span><span class="p">,</span>
+                                                      <span class="n">lowercase_urlencoding</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">exists_multix509sign</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">cert</span> <span class="ow">in</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_binary_sign</span><span class="p">(</span><span class="n">signed_query</span><span class="p">,</span>
+                                                                 <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">signature</span><span class="p">),</span>
+                                                                 <span class="n">cert</span><span class="p">,</span>
+                                                                 <span class="n">sign_alg</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Signature validation failed. </span><span class="si">%s</span><span class="s1"> rejected&#39;</span> <span class="o">%</span> <span class="n">saml_type</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span><span class="o">.</span><span class="n">get_idp_cert</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_binary_sign</span><span class="p">(</span><span class="n">signed_query</span><span class="p">,</span>
+                                                                 <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">signature</span><span class="p">),</span>
+                                                                 <span class="n">cert</span><span class="p">,</span>
+                                                                 <span class="n">sign_alg</span><span class="p">,</span>
+                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">()):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Signature validation failed. </span><span class="si">%s</span><span class="s1"> rejected&#39;</span> <span class="o">%</span> <span class="n">saml_type</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error_reason</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exceptions</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_response_xml"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_response_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_response_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretty_print_if_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the raw XML (decrypted) of the last SAML response,</span>
+<span class="sd">        or the last Logout Response generated or processed</span>
+<span class="sd">        :returns: SAML response XML</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">):</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">tostring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_response</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print_if_possible</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Auth.get_last_request_xml"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_request_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_request_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the raw XML sent in the last SAML request</span>
+<span class="sd">        :returns: SAML request XML</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="ow">or</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

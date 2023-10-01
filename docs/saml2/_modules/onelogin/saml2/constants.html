@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.constants &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.constants</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.constants</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Constants class</span>
+
+
+<span class="sd">Constants class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Constants"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Constants</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class defines all the constants that will be used</span>
+<span class="sd">    in the SAML Python Toolkit.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Value added to the current time in time condition validations</span>
+    <span class="n">ALLOWED_CLOCK_DRIFT</span> <span class="o">=</span> <span class="mi">300</span>
+
+    <span class="c1"># NameID Formats</span>
+    <span class="n">NAMEID_EMAIL_ADDRESS</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&#39;</span>
+    <span class="n">NAMEID_X509_SUBJECT_NAME</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName&#39;</span>
+    <span class="n">NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName&#39;</span>
+    <span class="n">NAMEID_UNSPECIFIED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&#39;</span>
+    <span class="n">NAMEID_KERBEROS</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos&#39;</span>
+    <span class="n">NAMEID_ENTITY</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:nameid-format:entity&#39;</span>
+    <span class="n">NAMEID_TRANSIENT</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&#39;</span>
+    <span class="n">NAMEID_PERSISTENT</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:nameid-format:persistent&#39;</span>
+    <span class="n">NAMEID_ENCRYPTED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted&#39;</span>
+
+    <span class="c1"># Attribute Name Formats</span>
+    <span class="n">ATTRNAME_FORMAT_UNSPECIFIED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified&#39;</span>
+    <span class="n">ATTRNAME_FORMAT_URI</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:attrname-format:uri&#39;</span>
+    <span class="n">ATTRNAME_FORMAT_BASIC</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&#39;</span>
+
+    <span class="c1"># Namespaces</span>
+    <span class="n">NS_SAML</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:assertion&#39;</span>
+    <span class="n">NS_SAMLP</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:protocol&#39;</span>
+    <span class="n">NS_SOAP</span> <span class="o">=</span> <span class="s1">&#39;http://schemas.xmlsoap.org/soap/envelope/&#39;</span>
+    <span class="n">NS_MD</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:metadata&#39;</span>
+    <span class="n">NS_XS</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/XMLSchema&#39;</span>
+    <span class="n">NS_XSI</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/XMLSchema-instance&#39;</span>
+    <span class="n">NS_XENC</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#&#39;</span>
+    <span class="n">NS_DS</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2000/09/xmldsig#&#39;</span>
+
+    <span class="c1"># Namespace Prefixes</span>
+    <span class="n">NS_PREFIX_SAML</span> <span class="o">=</span> <span class="s1">&#39;saml&#39;</span>
+    <span class="n">NS_PREFIX_SAMLP</span> <span class="o">=</span> <span class="s1">&#39;samlp&#39;</span>
+    <span class="n">NS_PREFIX_MD</span> <span class="o">=</span> <span class="s1">&#39;md&#39;</span>
+    <span class="n">NS_PREFIX_XS</span> <span class="o">=</span> <span class="s1">&#39;xs&#39;</span>
+    <span class="n">NS_PREFIX_XSI</span> <span class="o">=</span> <span class="s1">&#39;xsi&#39;</span>
+    <span class="n">NS_PREFIX_XSD</span> <span class="o">=</span> <span class="s1">&#39;xsd&#39;</span>
+    <span class="n">NS_PREFIX_XENC</span> <span class="o">=</span> <span class="s1">&#39;xenc&#39;</span>
+    <span class="n">NS_PREFIX_DS</span> <span class="o">=</span> <span class="s1">&#39;ds&#39;</span>
+
+    <span class="c1"># Prefix:Namespace Mappings</span>
+    <span class="n">NSMAP</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">NS_PREFIX_SAMLP</span><span class="p">:</span> <span class="n">NS_SAMLP</span><span class="p">,</span>
+        <span class="n">NS_PREFIX_SAML</span><span class="p">:</span> <span class="n">NS_SAML</span><span class="p">,</span>
+        <span class="n">NS_PREFIX_DS</span><span class="p">:</span> <span class="n">NS_DS</span><span class="p">,</span>
+        <span class="n">NS_PREFIX_XENC</span><span class="p">:</span> <span class="n">NS_XENC</span><span class="p">,</span>
+        <span class="n">NS_PREFIX_MD</span><span class="p">:</span> <span class="n">NS_MD</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Bindings</span>
+    <span class="n">BINDING_HTTP_POST</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#39;</span>
+    <span class="n">BINDING_HTTP_REDIRECT</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&#39;</span>
+    <span class="n">BINDING_HTTP_ARTIFACT</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact&#39;</span>
+    <span class="n">BINDING_SOAP</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:SOAP&#39;</span>
+    <span class="n">BINDING_DEFLATE</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:URL-Encoding:DEFLATE&#39;</span>
+
+    <span class="c1"># Auth Context Class</span>
+    <span class="n">AC_UNSPECIFIED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified&#39;</span>
+    <span class="n">AC_PASSWORD</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:Password&#39;</span>
+    <span class="n">AC_PASSWORD_PROTECTED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport&#39;</span>
+    <span class="n">AC_X509</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:X509&#39;</span>
+    <span class="n">AC_SMARTCARD</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard&#39;</span>
+    <span class="n">AC_KERBEROS</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos&#39;</span>
+
+    <span class="c1"># Subject Confirmation</span>
+    <span class="n">CM_BEARER</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:cm:bearer&#39;</span>
+    <span class="n">CM_HOLDER_KEY</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:cm:holder-of-key&#39;</span>
+    <span class="n">CM_SENDER_VOUCHES</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:cm:sender-vouches&#39;</span>
+
+    <span class="c1"># Status Codes</span>
+    <span class="n">STATUS_SUCCESS</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:Success&#39;</span>
+    <span class="n">STATUS_REQUESTER</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:Requester&#39;</span>
+    <span class="n">STATUS_RESPONDER</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:Responder&#39;</span>
+    <span class="n">STATUS_VERSION_MISMATCH</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:VersionMismatch&#39;</span>
+    <span class="n">STATUS_NO_PASSIVE</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:NoPassive&#39;</span>
+    <span class="n">STATUS_PARTIAL_LOGOUT</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:PartialLogout&#39;</span>
+    <span class="n">STATUS_PROXY_COUNT_EXCEEDED</span> <span class="o">=</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded&#39;</span>
+
+    <span class="c1"># Sign &amp; Crypto</span>
+    <span class="n">SHA1</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2000/09/xmldsig#sha1&#39;</span>
+    <span class="n">SHA256</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#sha256&#39;</span>
+    <span class="n">SHA384</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmldsig-more#sha384&#39;</span>
+    <span class="n">SHA512</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#sha512&#39;</span>
+
+    <span class="n">DSA_SHA1</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2000/09/xmldsig#dsa-sha1&#39;</span>
+    <span class="n">RSA_SHA1</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2000/09/xmldsig#rsa-sha1&#39;</span>
+    <span class="n">RSA_SHA256</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmldsig-more#rsa-sha256&#39;</span>
+    <span class="n">RSA_SHA384</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmldsig-more#rsa-sha384&#39;</span>
+    <span class="n">RSA_SHA512</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmldsig-more#rsa-sha512&#39;</span>
+
+    <span class="c1"># Enc</span>
+    <span class="n">TRIPLEDES_CBC</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#tripledes-cbc&#39;</span>
+    <span class="n">AES128_CBC</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#aes128-cbc&#39;</span>
+    <span class="n">AES192_CBC</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#aes192-cbc&#39;</span>
+    <span class="n">AES256_CBC</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#aes256-cbc&#39;</span>
+    <span class="n">RSA_1_5</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#rsa-1_5&#39;</span>
+    <span class="n">RSA_OAEP_MGF1P</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p&#39;</span>
+
+    <span class="c1"># Define here the deprecated algorithms</span>
+    <span class="n">DEPRECATED_ALGORITHMS</span> <span class="o">=</span> <span class="p">[</span><span class="n">DSA_SHA1</span><span class="p">,</span> <span class="n">RSA_SHA1</span><span class="p">,</span> <span class="n">SHA1</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

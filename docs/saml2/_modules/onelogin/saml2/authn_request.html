@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.authn_request &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.authn_request</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.authn_request</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Authn_Request class</span>
+
+
+<span class="sd">AuthNRequest class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_templates</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Templates</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Authn_Request"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Authn_Request">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Authn_Request</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class handles an AuthNRequest. It builds an</span>
+<span class="sd">    AuthNRequest object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">force_authn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_passive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">set_nameid_policy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">name_id_value_req</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs the AuthnRequest object.</span>
+
+<span class="sd">        :param settings: OSetting data</span>
+<span class="sd">        :type settings: OneLogin_Saml2_Settings</span>
+
+<span class="sd">        :param force_authn: Optional argument. When true the AuthNRequest will set the ForceAuthn=&#39;true&#39;.</span>
+<span class="sd">        :type force_authn: bool</span>
+
+<span class="sd">        :param is_passive: Optional argument. When true the AuthNRequest will set the Ispassive=&#39;true&#39;.</span>
+<span class="sd">        :type is_passive: bool</span>
+
+<span class="sd">        :param set_nameid_policy: Optional argument. When true the AuthNRequest will set a nameIdPolicy element.</span>
+<span class="sd">        :type set_nameid_policy: bool</span>
+
+<span class="sd">        :param name_id_value_req: Optional argument. Indicates to the IdP the subject that should be authenticated</span>
+<span class="sd">        :type name_id_value_req: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="n">settings</span>
+
+        <span class="n">sp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_data</span><span class="p">()</span>
+        <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+        <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_request_id</span><span class="p">()</span>
+        <span class="n">issue_instant</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_time_to_SAML</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+
+        <span class="n">provider_name_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">organization_data</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get_organization</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">organization_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">organization_data</span><span class="p">:</span>
+            <span class="n">langs</span> <span class="o">=</span> <span class="n">organization_data</span>
+            <span class="k">if</span> <span class="s1">&#39;en-US&#39;</span> <span class="ow">in</span> <span class="n">langs</span><span class="p">:</span>
+                <span class="n">lang</span> <span class="o">=</span> <span class="s1">&#39;en-US&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lang</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">langs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">display_name</span> <span class="o">=</span> <span class="s1">&#39;displayname&#39;</span> <span class="ow">in</span> <span class="n">organization_data</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span> <span class="ow">and</span> <span class="n">organization_data</span><span class="p">[</span><span class="n">lang</span><span class="p">][</span><span class="s1">&#39;displayname&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">display_name</span><span class="p">:</span>
+                <span class="n">provider_name_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s1">&#39;    ProviderName=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">organization_data</span><span class="p">[</span><span class="n">lang</span><span class="p">][</span><span class="s1">&#39;displayname&#39;</span><span class="p">]</span>
+
+        <span class="n">force_authn_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">force_authn</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">force_authn_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s1">&#39;    ForceAuthn=&quot;true&quot;&#39;</span>
+
+        <span class="n">is_passive_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">is_passive</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">is_passive_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s1">&#39;    IsPassive=&quot;true&quot;&#39;</span>
+
+        <span class="n">subject_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name_id_value_req</span><span class="p">:</span>
+            <span class="n">subject_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;saml:Subject&gt;</span>
+<span class="s2">        &lt;saml:NameID Format=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/saml:NameID&gt;</span>
+<span class="s2">        &lt;saml:SubjectConfirmation Method=&quot;urn:oasis:names:tc:SAML:2.0:cm:bearer&quot;&gt;&lt;/saml:SubjectConfirmation&gt;</span>
+<span class="s2">    &lt;/saml:Subject&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;NameIDFormat&#39;</span><span class="p">],</span> <span class="n">name_id_value_req</span><span class="p">)</span>
+
+        <span class="n">nameid_policy_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">set_nameid_policy</span><span class="p">:</span>
+            <span class="n">name_id_policy_format</span> <span class="o">=</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;NameIDFormat&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantNameIdEncrypted&#39;</span><span class="p">]:</span>
+                <span class="n">name_id_policy_format</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NAMEID_ENCRYPTED</span>
+
+            <span class="n">nameid_policy_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;samlp:NameIDPolicy</span>
+<span class="s2">        Format=&quot;</span><span class="si">%s</span><span class="s2">&quot;</span>
+<span class="s2">        AllowCreate=&quot;true&quot; /&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">name_id_policy_format</span>
+
+        <span class="n">requested_authn_context_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;requestedAuthnContext&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">authn_comparison</span> <span class="o">=</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;requestedAuthnContextComparison&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;requestedAuthnContext&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">requested_authn_context_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;    &lt;samlp:RequestedAuthnContext Comparison=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">        &lt;saml:AuthnContextClassRef&gt;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport&lt;/saml:AuthnContextClassRef&gt;</span>
+<span class="s2">    &lt;/samlp:RequestedAuthnContext&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">authn_comparison</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">requested_authn_context_str</span> <span class="o">=</span> <span class="s1">&#39;     &lt;samlp:RequestedAuthnContext Comparison=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="n">authn_comparison</span>
+                <span class="k">for</span> <span class="n">authn_context</span> <span class="ow">in</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;requestedAuthnContext&#39;</span><span class="p">]:</span>
+                    <span class="n">requested_authn_context_str</span> <span class="o">+=</span> <span class="s1">&#39;&lt;saml:AuthnContextClassRef&gt;</span><span class="si">%s</span><span class="s1">&lt;/saml:AuthnContextClassRef&gt;&#39;</span> <span class="o">%</span> <span class="n">authn_context</span>
+                <span class="n">requested_authn_context_str</span> <span class="o">+=</span> <span class="s1">&#39;    &lt;/samlp:RequestedAuthnContext&gt;&#39;</span>
+
+        <span class="n">attr_consuming_service_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;attributeConsumingService&#39;</span> <span class="ow">in</span> <span class="n">sp_data</span> <span class="ow">and</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]:</span>
+            <span class="n">attr_consuming_service_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    AttributeConsumingServiceIndex=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+        <span class="n">request</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Templates</span><span class="o">.</span><span class="n">AUTHN_REQUEST</span> <span class="o">%</span> \
+            <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span>
+                <span class="s1">&#39;provider_name&#39;</span><span class="p">:</span> <span class="n">provider_name_str</span><span class="p">,</span>
+                <span class="s1">&#39;force_authn_str&#39;</span><span class="p">:</span> <span class="n">force_authn_str</span><span class="p">,</span>
+                <span class="s1">&#39;is_passive_str&#39;</span><span class="p">:</span> <span class="n">is_passive_str</span><span class="p">,</span>
+                <span class="s1">&#39;issue_instant&#39;</span><span class="p">:</span> <span class="n">issue_instant</span><span class="p">,</span>
+                <span class="s1">&#39;destination&#39;</span><span class="p">:</span> <span class="n">destination</span><span class="p">,</span>
+                <span class="s1">&#39;assertion_url&#39;</span><span class="p">:</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;entity_id&#39;</span><span class="p">:</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;entityId&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;subject_str&#39;</span><span class="p">:</span> <span class="n">subject_str</span><span class="p">,</span>
+                <span class="s1">&#39;nameid_policy_str&#39;</span><span class="p">:</span> <span class="n">nameid_policy_str</span><span class="p">,</span>
+                <span class="s1">&#39;requested_authn_context_str&#39;</span><span class="p">:</span> <span class="n">requested_authn_context_str</span><span class="p">,</span>
+                <span class="s1">&#39;attr_consuming_service_str&#39;</span><span class="p">:</span> <span class="n">attr_consuming_service_str</span><span class="p">,</span>
+                <span class="s1">&#39;acs_binding&#39;</span><span class="p">:</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;binding&#39;</span><span class="p">,</span> <span class="s1">&#39;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#39;</span><span class="p">)</span>
+            <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_authn_request</span> <span class="o">=</span> <span class="n">request</span>
+
+    <span class="k">def</span> <span class="nf">_generate_request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate an unique request ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">generate_unique_id</span><span class="p">()</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Authn_Request.get_request"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Authn_Request.get_request">[docs]</a>    <span class="k">def</span> <span class="nf">get_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns unsigned AuthnRequest.</span>
+<span class="sd">        :param deflate: It makes the deflate process optional</span>
+<span class="sd">        :type: bool</span>
+<span class="sd">        :return: AuthnRequest maybe deflated and base64 encoded</span>
+<span class="sd">        :rtype: str object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">deflate</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">deflate_and_base64_encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_authn_request</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_authn_request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">request</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Authn_Request.get_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Authn_Request.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the AuthNRequest ID.</span>
+<span class="sd">        :return: AuthNRequest ID</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Authn_Request.get_xml"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Authn_Request.get_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the XML that will be sent as part of the request</span>
+<span class="sd">        :return: XML request body</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_authn_request</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

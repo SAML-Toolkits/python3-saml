@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.metadata &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.metadata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.metadata</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLoginSaml2Metadata class</span>
+
+
+<span class="sd">Metadata class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span><span class="p">,</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_templates</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Templates</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Metadata"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Metadata</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    A class that contains methods related to the metadata of the SP</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TIME_VALID</span> <span class="o">=</span> <span class="mi">172800</span>   <span class="c1"># 2 days</span>
+    <span class="n">TIME_CACHED</span> <span class="o">=</span> <span class="mi">604800</span>  <span class="c1"># 1 week</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Metadata.builder"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.builder">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">builder</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sp</span><span class="p">,</span> <span class="n">authnsign</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wsign</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">valid_until</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">organization</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the metadata of the SP</span>
+
+<span class="sd">        :param sp: The SP data</span>
+<span class="sd">        :type sp: string</span>
+
+<span class="sd">        :param authnsign: authnRequestsSigned attribute</span>
+<span class="sd">        :type authnsign: string</span>
+
+<span class="sd">        :param wsign: wantAssertionsSigned attribute</span>
+<span class="sd">        :type wsign: string</span>
+
+<span class="sd">        :param valid_until: Metadata&#39;s expiry date</span>
+<span class="sd">        :type valid_until: string|DateTime|Timestamp</span>
+
+<span class="sd">        :param cache_duration: Duration of the cache in seconds</span>
+<span class="sd">        :type cache_duration: int|string</span>
+
+<span class="sd">        :param contacts: Contacts info</span>
+<span class="sd">        :type contacts: dict</span>
+
+<span class="sd">        :param organization: Organization info</span>
+<span class="sd">        :type organization: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">valid_until</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid_until</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">())</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TIME_VALID</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valid_until</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valid_until</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+                <span class="n">valid_until_time</span> <span class="o">=</span> <span class="n">valid_until</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">valid_until_time</span> <span class="o">=</span> <span class="n">gmtime</span><span class="p">(</span><span class="n">valid_until</span><span class="p">)</span>
+            <span class="n">valid_until_str</span> <span class="o">=</span> <span class="n">strftime</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">,</span> <span class="n">valid_until_time</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">valid_until_str</span> <span class="o">=</span> <span class="n">valid_until</span>
+
+        <span class="k">if</span> <span class="n">cache_duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache_duration</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TIME_CACHED</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cache_duration</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">):</span>
+            <span class="n">cache_duration_str</span> <span class="o">=</span> <span class="s1">&#39;PT</span><span class="si">%s</span><span class="s1">S&#39;</span> <span class="o">%</span> <span class="n">cache_duration</span>  <span class="c1"># Period of Time x Seconds</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cache_duration_str</span> <span class="o">=</span> <span class="n">cache_duration</span>
+
+        <span class="k">if</span> <span class="n">contacts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">contacts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">organization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">organization</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">sls</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;singleLogoutService&#39;</span> <span class="ow">in</span> <span class="n">sp</span> <span class="ow">and</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]:</span>
+            <span class="n">sls</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Templates</span><span class="o">.</span><span class="n">MD_SLS</span> <span class="o">%</span> \
+                <span class="p">{</span>
+                    <span class="s1">&#39;binding&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">][</span><span class="s1">&#39;binding&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                <span class="p">}</span>
+
+        <span class="n">str_authnsign</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">authnsign</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
+        <span class="n">str_wsign</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">wsign</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
+
+        <span class="n">str_organization</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">organization</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">organization_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">organization_displaynames</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">organization_urls</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">organization</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">organization_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;        &lt;md:OrganizationName xml:lang=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/md:OrganizationName&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                <span class="n">organization_displaynames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;        &lt;md:OrganizationDisplayName xml:lang=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/md:OrganizationDisplayName&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;displayname&#39;</span><span class="p">]))</span>
+                <span class="n">organization_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;        &lt;md:OrganizationURL xml:lang=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/md:OrganizationURL&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]))</span>
+            <span class="n">org_data</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">organization_names</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">organization_displaynames</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">organization_urls</span><span class="p">)</span>
+            <span class="n">str_organization</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;    &lt;md:Organization&gt;</span><span class="se">\n</span><span class="si">%(org)s</span><span class="se">\n</span><span class="s2">    &lt;/md:Organization&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">{</span><span class="s1">&#39;org&#39;</span><span class="p">:</span> <span class="n">org_data</span><span class="p">}</span>
+
+        <span class="n">str_contacts</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">contacts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">contacts_info</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">contacts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">contact</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Templates</span><span class="o">.</span><span class="n">MD_CONTACT_PERSON</span> <span class="o">%</span> \
+                    <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ctype</span><span class="p">,</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;givenName&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;emailAddress&#39;</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="n">contacts_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contact</span><span class="p">)</span>
+            <span class="n">str_contacts</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">contacts_info</span><span class="p">)</span>
+
+        <span class="n">str_attribute_consuming_service</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;attributeConsumingService&#39;</span> <span class="ow">in</span> <span class="n">sp</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]):</span>
+            <span class="n">attr_cs_desc_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="s2">&quot;serviceDescription&quot;</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]:</span>
+                <span class="n">attr_cs_desc_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;            &lt;md:ServiceDescription xml:lang=&quot;en&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/md:ServiceDescription&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">][</span><span class="s1">&#39;serviceDescription&#39;</span><span class="p">]</span>
+
+            <span class="n">requested_attribute_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">req_attribs</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">][</span><span class="s1">&#39;requestedAttributes&#39;</span><span class="p">]:</span>
+                <span class="n">req_attr_nameformat_str</span> <span class="o">=</span> <span class="n">req_attr_friendlyname_str</span> <span class="o">=</span> <span class="n">req_attr_isrequired_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">req_attr_aux_str</span> <span class="o">=</span> <span class="s1">&#39; /&gt;&#39;</span>
+
+                <span class="k">if</span> <span class="s1">&#39;nameFormat&#39;</span> <span class="ow">in</span> <span class="n">req_attribs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;nameFormat&#39;</span><span class="p">]:</span>
+                    <span class="n">req_attr_nameformat_str</span> <span class="o">=</span> <span class="s2">&quot; NameFormat=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;nameFormat&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;friendlyName&#39;</span> <span class="ow">in</span> <span class="n">req_attribs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;friendlyName&#39;</span><span class="p">]:</span>
+                    <span class="n">req_attr_friendlyname_str</span> <span class="o">=</span> <span class="s2">&quot; FriendlyName=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;friendlyName&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;isRequired&#39;</span> <span class="ow">in</span> <span class="n">req_attribs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;isRequired&#39;</span><span class="p">]:</span>
+                    <span class="n">req_attr_isrequired_str</span> <span class="o">=</span> <span class="s2">&quot; isRequired=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;isRequired&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
+                <span class="k">if</span> <span class="s1">&#39;attributeValue&#39;</span> <span class="ow">in</span> <span class="n">req_attribs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">],</span> <span class="n">basestring</span><span class="p">):</span>
+                        <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">]]</span>
+
+                    <span class="n">req_attr_aux_str</span> <span class="o">=</span> <span class="s2">&quot;&gt;&quot;</span>
+                    <span class="k">for</span> <span class="n">attrValue</span> <span class="ow">in</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">]:</span>
+                        <span class="n">req_attr_aux_str</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;saml:AttributeValue xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;&gt;</span><span class="si">%(attributeValue)s</span><span class="s2">&lt;/saml:AttributeValue&gt;&quot;&quot;&quot;</span> <span class="o">%</span> \
+                            <span class="p">{</span>
+                                <span class="s1">&#39;attributeValue&#39;</span><span class="p">:</span> <span class="n">attrValue</span>
+                            <span class="p">}</span>
+                    <span class="n">req_attr_aux_str</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;/md:RequestedAttribute&gt;&quot;&quot;&quot;</span>
+
+                <span class="n">requested_attribute</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;            &lt;md:RequestedAttribute Name=&quot;</span><span class="si">%(req_attr_name)s</span><span class="s2">&quot;</span><span class="si">%(req_attr_nameformat_str)s%(req_attr_friendlyname_str)s%(req_attr_isrequired_str)s%(req_attr_aux_str)s</span><span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> \
+                    <span class="p">{</span>
+                        <span class="s1">&#39;req_attr_name&#39;</span><span class="p">:</span> <span class="n">req_attribs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;req_attr_nameformat_str&#39;</span><span class="p">:</span> <span class="n">req_attr_nameformat_str</span><span class="p">,</span>
+                        <span class="s1">&#39;req_attr_friendlyname_str&#39;</span><span class="p">:</span> <span class="n">req_attr_friendlyname_str</span><span class="p">,</span>
+                        <span class="s1">&#39;req_attr_isrequired_str&#39;</span><span class="p">:</span> <span class="n">req_attr_isrequired_str</span><span class="p">,</span>
+                        <span class="s1">&#39;req_attr_aux_str&#39;</span><span class="p">:</span> <span class="n">req_attr_aux_str</span>
+                    <span class="p">}</span>
+
+                <span class="n">requested_attribute_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">requested_attribute</span><span class="p">)</span>
+
+            <span class="n">str_attribute_consuming_service</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;        &lt;md:AttributeConsumingService index=&quot;</span><span class="si">%(attribute_consuming_service_index)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">            &lt;md:ServiceName xml:lang=&quot;en&quot;&gt;</span><span class="si">%(service_name)s</span><span class="s2">&lt;/md:ServiceName&gt;</span>
+<span class="si">%(attr_cs_desc)s%(requested_attribute_str)s</span>
+<span class="s2">        &lt;/md:AttributeConsumingService&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> \
+                <span class="p">{</span>
+                    <span class="s1">&#39;service_name&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">][</span><span class="s1">&#39;serviceName&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;attr_cs_desc&#39;</span><span class="p">:</span> <span class="n">attr_cs_desc_str</span><span class="p">,</span>
+                    <span class="s1">&#39;attribute_consuming_service_index&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;requested_attribute_str&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">requested_attribute_data</span><span class="p">)</span>
+                <span class="p">}</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Templates</span><span class="o">.</span><span class="n">MD_ENTITY_DESCRIPTOR</span> <span class="o">%</span> \
+            <span class="p">{</span>
+                <span class="s1">&#39;valid&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;validUntil=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">valid_until_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">valid_until_str</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cache&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;cacheDuration=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">cache_duration_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">cache_duration_str</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;entity_id&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;entityId&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;authnsign&#39;</span><span class="p">:</span> <span class="n">str_authnsign</span><span class="p">,</span>
+                <span class="s1">&#39;wsign&#39;</span><span class="p">:</span> <span class="n">str_wsign</span><span class="p">,</span>
+                <span class="s1">&#39;name_id_format&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;NameIDFormat&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;binding&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">][</span><span class="s1">&#39;binding&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;sls&#39;</span><span class="p">:</span> <span class="n">sls</span><span class="p">,</span>
+                <span class="s1">&#39;organization&#39;</span><span class="p">:</span> <span class="n">str_organization</span><span class="p">,</span>
+                <span class="s1">&#39;contacts&#39;</span><span class="p">:</span> <span class="n">str_contacts</span><span class="p">,</span>
+                <span class="s1">&#39;attribute_consuming_service&#39;</span><span class="p">:</span> <span class="n">str_attribute_consuming_service</span>
+            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">metadata</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Metadata.sign_metadata"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.sign_metadata">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sign_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span> <span class="n">digest_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA256</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Signs the metadata with the key/cert provided</span>
+
+<span class="sd">        :param metadata: SAML Metadata XML</span>
+<span class="sd">        :type metadata: string</span>
+
+<span class="sd">        :param key: x509 key</span>
+<span class="sd">        :type key: string</span>
+
+<span class="sd">        :param cert: x509 cert</span>
+<span class="sd">        :type cert: string</span>
+
+<span class="sd">        :returns: Signed Metadata</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        :param sign_algorithm: Signature algorithm method</span>
+<span class="sd">        :type sign_algorithm: string</span>
+
+<span class="sd">        :param digest_algorithm: Digest algorithm method</span>
+<span class="sd">        :type digest_algorithm: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">add_sign</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="p">,</span> <span class="n">digest_algorithm</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_add_x509_key_descriptors</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">signing</span><span class="p">):</span>
+        <span class="n">key_descriptor</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_child</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}KeyDescriptor&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_MD</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key_descriptor</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_descriptor</span><span class="p">)</span>
+        <span class="n">key_info</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_child</span><span class="p">(</span><span class="n">key_descriptor</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}KeyInfo&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_DS</span><span class="p">)</span>
+        <span class="n">key_data</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_child</span><span class="p">(</span><span class="n">key_info</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}X509Data&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_DS</span><span class="p">)</span>
+
+        <span class="n">x509_certificate</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_child</span><span class="p">(</span><span class="n">key_data</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}X509Certificate&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_DS</span><span class="p">)</span>
+        <span class="n">x509_certificate</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">key_descriptor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;use&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;encryption&#39;</span><span class="p">,</span> <span class="s1">&#39;signing&#39;</span><span class="p">)[</span><span class="n">signing</span><span class="p">])</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Metadata.add_x509_key_descriptors"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.add_x509_key_descriptors">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_x509_key_descriptors</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_encryption</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the x509 descriptors (sign/encryption) to the metadata</span>
+<span class="sd">        The same cert will be used for sign/encrypt</span>
+
+<span class="sd">        :param metadata: SAML Metadata XML</span>
+<span class="sd">        :type metadata: string</span>
+
+<span class="sd">        :param cert: x509 cert</span>
+<span class="sd">        :type cert: string</span>
+
+<span class="sd">        :param add_encryption: Determines if the KeyDescriptor[use=&quot;encryption&quot;] should be added.</span>
+<span class="sd">        :type add_encryption: boolean</span>
+
+<span class="sd">        :returns: Metadata with KeyDescriptors</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cert</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cert</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">metadata</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Error parsing metadata. &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+        <span class="k">assert</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}EntityDescriptor&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_MD</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sp_sso_descriptor</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">iterfind</span><span class="p">(</span><span class="s1">&#39;.//md:SPSSODescriptor&#39;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Malformed metadata.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">add_encryption</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_add_x509_key_descriptors</span><span class="p">(</span><span class="n">sp_sso_descriptor</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_add_x509_key_descriptors</span><span class="p">(</span><span class="n">sp_sso_descriptor</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">root</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

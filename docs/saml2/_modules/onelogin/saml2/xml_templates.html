@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.xml_templates &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.xml_templates</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.xml_templates</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Auth class</span>
+
+
+<span class="sd">Main class of SAML Python Toolkit.</span>
+
+<span class="sd">Initializes the SP SAML instance</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Templates"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Templates</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">ATTRIBUTE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;saml:Attribute Name=&quot;</span><span class="si">%s</span><span class="s2">&quot; NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&quot;&gt;</span>
+<span class="s2">            &lt;saml:AttributeValue xsi:type=&quot;xs:string&quot;&gt;</span><span class="si">%s</span><span class="s2">&lt;/saml:AttributeValue&gt;</span>
+<span class="s2">        &lt;/saml:Attribute&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">AUTHN_REQUEST</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">&lt;samlp:AuthnRequest</span>
+<span class="s2">  xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;</span>
+<span class="s2">  xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;</span>
+<span class="s2">  ID=&quot;</span><span class="si">%(id)s</span><span class="s2">&quot;</span>
+<span class="s2">  Version=&quot;2.0&quot;</span><span class="si">%(provider_name)s%(force_authn_str)s%(is_passive_str)s</span>
+<span class="s2">  IssueInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;</span>
+<span class="s2">  Destination=&quot;</span><span class="si">%(destination)s</span><span class="s2">&quot;</span>
+<span class="s2">  ProtocolBinding=&quot;</span><span class="si">%(acs_binding)s</span><span class="s2">&quot;</span>
+<span class="s2">  AssertionConsumerServiceURL=&quot;</span><span class="si">%(assertion_url)s</span><span class="s2">&quot;</span><span class="si">%(attr_consuming_service_str)s</span><span class="s2">&gt;</span>
+<span class="s2">    &lt;saml:Issuer&gt;</span><span class="si">%(entity_id)s</span><span class="s2">&lt;/saml:Issuer&gt;</span><span class="si">%(subject_str)s%(nameid_policy_str)s</span>
+<span class="si">%(requested_authn_context_str)s</span>
+<span class="s2">&lt;/samlp:AuthnRequest&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">LOGOUT_REQUEST</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">&lt;samlp:LogoutRequest</span>
+<span class="s2">  xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;</span>
+<span class="s2">  xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;</span>
+<span class="s2">  ID=&quot;</span><span class="si">%(id)s</span><span class="s2">&quot;</span>
+<span class="s2">  Version=&quot;2.0&quot;</span>
+<span class="s2">  IssueInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;</span>
+<span class="s2">  Destination=&quot;</span><span class="si">%(single_logout_url)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">    &lt;saml:Issuer&gt;</span><span class="si">%(entity_id)s</span><span class="s2">&lt;/saml:Issuer&gt;</span>
+<span class="s2">    </span><span class="si">%(name_id)s</span>
+<span class="s2">    </span><span class="si">%(session_index)s</span>
+<span class="s2">&lt;/samlp:LogoutRequest&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">LOGOUT_RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">&lt;samlp:LogoutResponse</span>
+<span class="s2">  xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;</span>
+<span class="s2">  xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;</span>
+<span class="s2">  ID=&quot;</span><span class="si">%(id)s</span><span class="s2">&quot;</span>
+<span class="s2">  Version=&quot;2.0&quot;</span>
+<span class="s2">  IssueInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;</span>
+<span class="s2">  Destination=&quot;</span><span class="si">%(destination)s</span><span class="s2">&quot;</span>
+<span class="s2">  InResponseTo=&quot;</span><span class="si">%(in_response_to)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">    &lt;saml:Issuer&gt;</span><span class="si">%(entity_id)s</span><span class="s2">&lt;/saml:Issuer&gt;</span>
+<span class="s2">    &lt;samlp:Status&gt;</span>
+<span class="s2">        &lt;samlp:StatusCode Value=&quot;</span><span class="si">%(status)s</span><span class="s2">&quot; /&gt;</span>
+<span class="s2">    &lt;/samlp:Status&gt;</span>
+<span class="s2">&lt;/samlp:LogoutResponse&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">MD_CONTACT_PERSON</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    &lt;md:ContactPerson contactType=&quot;</span><span class="si">%(type)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">        &lt;md:GivenName&gt;</span><span class="si">%(name)s</span><span class="s2">&lt;/md:GivenName&gt;</span>
+<span class="s2">        &lt;md:EmailAddress&gt;</span><span class="si">%(email)s</span><span class="s2">&lt;/md:EmailAddress&gt;</span>
+<span class="s2">    &lt;/md:ContactPerson&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">MD_SLS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">        &lt;md:SingleLogoutService Binding=&quot;</span><span class="si">%(binding)s</span><span class="s2">&quot;</span>
+<span class="s2">                                Location=&quot;</span><span class="si">%(location)s</span><span class="s2">&quot; /&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">MD_REQUESTED_ATTRIBUTE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">            &lt;md:RequestedAttribute Name=&quot;</span><span class="si">%(req_attr_name)s</span><span class="s2">&quot;</span><span class="si">%(req_attr_nameformat_str)s%(req_attr_isrequired_str)s%(req_attr_aux_str)s</span><span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">MD_ATTR_CONSUMER_SERVICE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">        &lt;md:AttributeConsumingService index=&quot;1&quot;&gt;</span>
+<span class="s2">            &lt;md:ServiceName xml:lang=&quot;en&quot;&gt;</span><span class="si">%(service_name)s</span><span class="s2">&lt;/md:ServiceName&gt;</span>
+<span class="si">%(attr_cs_desc)s%(requested_attribute_str)s</span>
+<span class="s2">        &lt;/md:AttributeConsumingService&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">MD_ENTITY_DESCRIPTOR</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="s2">&lt;md:EntityDescriptor xmlns:md=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;</span>
+<span class="s2">                     </span><span class="si">%(valid)s</span>
+<span class="s2">                     </span><span class="si">%(cache)s</span>
+<span class="s2">                     entityID=&quot;</span><span class="si">%(entity_id)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">    &lt;md:SPSSODescriptor AuthnRequestsSigned=&quot;</span><span class="si">%(authnsign)s</span><span class="s2">&quot; WantAssertionsSigned=&quot;</span><span class="si">%(wsign)s</span><span class="s2">&quot; protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;</span>
+<span class="si">%(sls)s</span><span class="s2">        &lt;md:NameIDFormat&gt;</span><span class="si">%(name_id_format)s</span><span class="s2">&lt;/md:NameIDFormat&gt;</span>
+<span class="s2">        &lt;md:AssertionConsumerService Binding=&quot;</span><span class="si">%(binding)s</span><span class="s2">&quot;</span>
+<span class="s2">                                     Location=&quot;</span><span class="si">%(location)s</span><span class="s2">&quot;</span>
+<span class="s2">                                     index=&quot;1&quot; /&gt;</span>
+<span class="si">%(attribute_consuming_service)s</span><span class="s2">    &lt;/md:SPSSODescriptor&gt;</span>
+<span class="si">%(organization)s</span>
+<span class="si">%(contacts)s</span>
+<span class="s2">&lt;/md:EntityDescriptor&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">MD_ORGANISATION</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    &lt;md:Organization&gt;</span>
+<span class="s2">        &lt;md:OrganizationName xml:lang=&quot;</span><span class="si">%(lang)s</span><span class="s2">&quot;&gt;</span><span class="si">%(name)s</span><span class="s2">&lt;/md:OrganizationName&gt;</span>
+<span class="s2">        &lt;md:OrganizationDisplayName xml:lang=&quot;</span><span class="si">%(lang)s</span><span class="s2">&quot;&gt;</span><span class="si">%(display_name)s</span><span class="s2">&lt;/md:OrganizationDisplayName&gt;</span>
+<span class="s2">        &lt;md:OrganizationURL xml:lang=&quot;</span><span class="si">%(lang)s</span><span class="s2">&quot;&gt;</span><span class="si">%(url)s</span><span class="s2">&lt;/md:OrganizationURL&gt;</span>
+<span class="s2">    &lt;/md:Organization&gt;&quot;&quot;&quot;</span>
+
+    <span class="n">RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">&lt;samlp:Response</span>
+<span class="s2">  xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;</span>
+<span class="s2">  xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;</span>
+<span class="s2">  ID=&quot;</span><span class="si">%(id)s</span><span class="s2">&quot;</span>
+<span class="s2">  InResponseTo=&quot;</span><span class="si">%(in_response_to)s</span><span class="s2">&quot;</span>
+<span class="s2">  Version=&quot;2.0&quot;</span>
+<span class="s2">  IssueInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;</span>
+<span class="s2">  Destination=&quot;</span><span class="si">%(destination)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">    &lt;saml:Issuer&gt;</span><span class="si">%(entity_id)s</span><span class="s2">&lt;/saml:Issuer&gt;</span>
+<span class="s2">    &lt;samlp:Status xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;</span>
+<span class="s2">        &lt;samlp:StatusCode</span>
+<span class="s2">          xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;</span>
+<span class="s2">          Value=&quot;</span><span class="si">%(status)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">        &lt;/samlp:StatusCode&gt;</span>
+<span class="s2">    &lt;/samlp:Status&gt;</span>
+<span class="s2">    &lt;saml:Assertion</span>
+<span class="s2">        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="s2">        xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
+<span class="s2">        Version=&quot;2.0&quot;</span>
+<span class="s2">        ID=&quot;</span><span class="si">%(assertion_id)s</span><span class="s2">&quot;</span>
+<span class="s2">        IssueInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">        &lt;saml:Issuer&gt;</span><span class="si">%(entity_id)s</span><span class="s2">&lt;/saml:Issuer&gt;</span>
+<span class="s2">        &lt;saml:Subject&gt;</span>
+<span class="s2">            &lt;saml:NameID</span>
+<span class="s2">              NameQualifier=&quot;</span><span class="si">%(entity_id)s</span><span class="s2">&quot;</span>
+<span class="s2">              SPNameQualifier=&quot;</span><span class="si">%(requester)s</span><span class="s2">&quot;</span>
+<span class="s2">              Format=&quot;</span><span class="si">%(name_id_policy)s</span><span class="s2">&quot;&gt;</span><span class="si">%(name_id)s</span><span class="s2">&lt;/saml:NameID&gt;</span>
+<span class="s2">            &lt;saml:SubjectConfirmation Method=&quot;</span><span class="si">%(cm)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">                &lt;saml:SubjectConfirmationData</span>
+<span class="s2">                  NotOnOrAfter=&quot;</span><span class="si">%(not_after)s</span><span class="s2">&quot;</span>
+<span class="s2">                  InResponseTo=&quot;</span><span class="si">%(in_response_to)s</span><span class="s2">&quot;</span>
+<span class="s2">                  Recipient=&quot;</span><span class="si">%(destination)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">                &lt;/saml:SubjectConfirmationData&gt;</span>
+<span class="s2">            &lt;/saml:SubjectConfirmation&gt;</span>
+<span class="s2">        &lt;/saml:Subject&gt;</span>
+<span class="s2">        &lt;saml:Conditions NotBefore=&quot;</span><span class="si">%(not_before)s</span><span class="s2">&quot; NotOnOrAfter=&quot;</span><span class="si">%(not_after)s</span><span class="s2">&quot;&gt;</span>
+<span class="s2">            &lt;saml:AudienceRestriction&gt;</span>
+<span class="s2">                &lt;saml:Audience&gt;</span><span class="si">%(requester)s</span><span class="s2">&lt;/saml:Audience&gt;</span>
+<span class="s2">            &lt;/saml:AudienceRestriction&gt;</span>
+<span class="s2">        &lt;/saml:Conditions&gt;</span>
+<span class="s2">        &lt;saml:AuthnStatement</span>
+<span class="s2">          AuthnInstant=&quot;</span><span class="si">%(issue_instant)s</span><span class="s2">&quot;</span>
+<span class="s2">          SessionIndex=&quot;</span><span class="si">%(session_index)s</span><span class="s2">&quot;</span>
+<span class="s2">          SessionNotOnOrAfter=&quot;</span><span class="si">%(not_after)s</span><span class="s2">&quot;&gt;</span>
+<span class="si">%(authn_context)s</span>
+<span class="s2">        &lt;/saml:AuthnStatement&gt;</span>
+<span class="s2">        &lt;saml:AttributeStatement&gt;</span>
+<span class="si">%(attributes)s</span>
+<span class="s2">        &lt;/saml:AttributeStatement&gt;</span>
+<span class="s2">    &lt;/saml:Assertion&gt;</span>
+<span class="s2">&lt;/samlp:Response&gt;&quot;&quot;&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

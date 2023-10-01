@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.errors &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.errors</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.errors</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Error class</span>
+
+
+<span class="sd">Error class of SAML Python Toolkit.</span>
+
+<span class="sd">Defines common Error codes and has a custom initializator.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Error"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Error</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class implements a custom Exception handler.</span>
+<span class="sd">    Defines custom error codes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Errors</span>
+    <span class="n">SETTINGS_FILE_NOT_FOUND</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SETTINGS_INVALID_SYNTAX</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SETTINGS_INVALID</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">METADATA_SP_INVALID</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="c1"># SP_CERTS_NOT_FOUND is deprecated, use CERT_NOT_FOUND instead</span>
+    <span class="n">SP_CERTS_NOT_FOUND</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">CERT_NOT_FOUND</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">REDIRECT_INVALID_URL</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">PUBLIC_CERT_FILE_NOT_FOUND</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">PRIVATE_KEY_FILE_NOT_FOUND</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">SAML_RESPONSE_NOT_FOUND</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">SAML_LOGOUTMESSAGE_NOT_FOUND</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">SAML_LOGOUTREQUEST_INVALID</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">SAML_LOGOUTRESPONSE_INVALID</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">SAML_SINGLE_LOGOUT_NOT_SUPPORTED</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">PRIVATE_KEY_NOT_FOUND</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">UNSUPPORTED_SETTINGS_OBJECT</span> <span class="o">=</span> <span class="mi">14</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Exception instance.</span>
+
+<span class="sd">        Arguments are:</span>
+<span class="sd">            * (str)   message.   Describes the error.</span>
+<span class="sd">            * (int)   code.      The code error (defined in the error class).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span> <span class="o">%</span> <span class="n">errors</span>
+
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span></div>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_ValidationError"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_ValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements another custom Exception handler, related</span>
+<span class="sd">    to exceptions that happens during validation process.</span>
+<span class="sd">    Defines custom error codes .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Validation Errors</span>
+    <span class="n">UNSUPPORTED_SAML_VERSION</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">MISSING_ID</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">WRONG_NUMBER_OF_ASSERTIONS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MISSING_STATUS</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">MISSING_STATUS_CODE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">STATUS_CODE_IS_NOT_SUCCESS</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">WRONG_SIGNED_ELEMENT</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">ID_NOT_FOUND_IN_SIGNED_ELEMENT</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">DUPLICATED_ID_IN_SIGNED_ELEMENTS</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">INVALID_SIGNED_ELEMENT</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">UNEXPECTED_SIGNED_ELEMENTS</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">INVALID_XML_FORMAT</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">WRONG_INRESPONSETO</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">NO_ENCRYPTED_ASSERTION</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">NO_ENCRYPTED_NAMEID</span> <span class="o">=</span> <span class="mi">17</span>
+    <span class="n">MISSING_CONDITIONS</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">ASSERTION_TOO_EARLY</span> <span class="o">=</span> <span class="mi">19</span>
+    <span class="n">ASSERTION_EXPIRED</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">WRONG_NUMBER_OF_AUTHSTATEMENTS</span> <span class="o">=</span> <span class="mi">21</span>
+    <span class="n">NO_ATTRIBUTESTATEMENT</span> <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">ENCRYPTED_ATTRIBUTES</span> <span class="o">=</span> <span class="mi">23</span>
+    <span class="n">WRONG_DESTINATION</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">EMPTY_DESTINATION</span> <span class="o">=</span> <span class="mi">25</span>
+    <span class="n">WRONG_AUDIENCE</span> <span class="o">=</span> <span class="mi">26</span>
+    <span class="n">ISSUER_MULTIPLE_IN_RESPONSE</span> <span class="o">=</span> <span class="mi">27</span>
+    <span class="n">ISSUER_NOT_FOUND_IN_ASSERTION</span> <span class="o">=</span> <span class="mi">28</span>
+    <span class="n">WRONG_ISSUER</span> <span class="o">=</span> <span class="mi">29</span>
+    <span class="n">SESSION_EXPIRED</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">WRONG_SUBJECTCONFIRMATION</span> <span class="o">=</span> <span class="mi">31</span>
+    <span class="n">NO_SIGNED_MESSAGE</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">NO_SIGNED_ASSERTION</span> <span class="o">=</span> <span class="mi">33</span>
+    <span class="n">NO_SIGNATURE_FOUND</span> <span class="o">=</span> <span class="mi">34</span>
+    <span class="n">KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</span> <span class="o">=</span> <span class="mi">35</span>
+    <span class="n">CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</span> <span class="o">=</span> <span class="mi">36</span>
+    <span class="n">UNSUPPORTED_RETRIEVAL_METHOD</span> <span class="o">=</span> <span class="mi">37</span>
+    <span class="n">NO_NAMEID</span> <span class="o">=</span> <span class="mi">38</span>
+    <span class="n">EMPTY_NAMEID</span> <span class="o">=</span> <span class="mi">39</span>
+    <span class="n">SP_NAME_QUALIFIER_NAME_MISMATCH</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">DUPLICATED_ATTRIBUTE_NAME_FOUND</span> <span class="o">=</span> <span class="mi">41</span>
+    <span class="n">INVALID_SIGNATURE</span> <span class="o">=</span> <span class="mi">42</span>
+    <span class="n">WRONG_NUMBER_OF_SIGNATURES</span> <span class="o">=</span> <span class="mi">43</span>
+    <span class="n">RESPONSE_EXPIRED</span> <span class="o">=</span> <span class="mi">44</span>
+    <span class="n">AUTHN_CONTEXT_MISMATCH</span> <span class="o">=</span> <span class="mi">45</span>
+    <span class="n">DEPRECATED_SIGNATURE_METHOD</span> <span class="o">=</span> <span class="mi">46</span>
+    <span class="n">DEPRECATED_DIGEST_METHOD</span> <span class="o">=</span> <span class="mi">47</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Exception instance.</span>
+<span class="sd">        Arguments are:</span>
+<span class="sd">            * (str)   message.   Describes the error.</span>
+<span class="sd">            * (int)   code.      The code error (defined in the error class).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span> <span class="o">%</span> <span class="n">errors</span>
+
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

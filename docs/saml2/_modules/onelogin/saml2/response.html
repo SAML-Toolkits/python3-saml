@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.response &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.response</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.response</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Response class</span>
+
+
+<span class="sd">SAML Response class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">,</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">,</span> <span class="n">return_false_on_exception</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Response</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class handles a SAML Response. It parses or validates</span>
+<span class="sd">    a Logout Response object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs the response object.</span>
+
+<span class="sd">        :param settings: The setting info</span>
+<span class="sd">        :type settings: OneLogin_Saml2_Setting object</span>
+
+<span class="sd">        :param response: The base64 encoded, XML string containing the samlp:Response</span>
+<span class="sd">        :type response: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_scd_not_on_or_after</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Quick check for the presence of EncryptedAssertion</span>
+        <span class="n">encrypted_assertion_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;/samlp:Response/saml:EncryptedAssertion&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encrypted_assertion_nodes</span><span class="p">:</span>
+            <span class="n">decrypted_document</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decrypt_assertion</span><span class="p">(</span><span class="n">decrypted_document</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.is_valid"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">,</span> <span class="n">request_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates the response object.</span>
+
+<span class="sd">        :param request_data: Request Data</span>
+<span class="sd">        :type request_data: dict</span>
+
+<span class="sd">        :param request_id: Optional argument. The ID of the AuthNRequest sent by this SP to the IdP</span>
+<span class="sd">        :type request_id: string</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+
+<span class="sd">        :returns: True if the SAML Response is valid, False if not</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Checks SAML version</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;2.0&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Unsupported SAML version&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">UNSUPPORTED_SAML_VERSION</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Checks that ID exists</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Missing ID attribute on SAML Response&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">MISSING_ID</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Checks that the response has the SUCCESS status</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_status</span><span class="p">()</span>
+
+            <span class="c1"># Checks that the response only has one assertion</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_num_assertions</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;SAML Response must contain 1 assertion&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_ASSERTIONS</span>
+                <span class="p">)</span>
+
+            <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+            <span class="n">idp_entity_id</span> <span class="o">=</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;entityId&#39;</span><span class="p">]</span>
+            <span class="n">sp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_data</span><span class="p">()</span>
+            <span class="n">sp_entity_id</span> <span class="o">=</span> <span class="n">sp_data</span><span class="p">[</span><span class="s1">&#39;entityId&#39;</span><span class="p">]</span>
+
+            <span class="n">signed_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_signed_elements</span><span class="p">()</span>
+
+            <span class="n">has_signed_response</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Response&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAMLP</span> <span class="ow">in</span> <span class="n">signed_elements</span>
+            <span class="n">has_signed_assertion</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Assertion&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAML</span> <span class="ow">in</span> <span class="n">signed_elements</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_strict</span><span class="p">():</span>
+                <span class="n">no_valid_xml_msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd&#39;</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">validate_xml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;saml-schema-protocol-2.0.xsd&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">())</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="n">no_valid_xml_msg</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_XML_FORMAT</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># If encrypted, check also the decrypted document</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">validate_xml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span><span class="p">,</span> <span class="s1">&#39;saml-schema-protocol-2.0.xsd&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="n">no_valid_xml_msg</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_XML_FORMAT</span>
+                        <span class="p">)</span>
+
+                <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+                <span class="n">current_url</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_no_query</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+
+                <span class="c1"># Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided</span>
+                <span class="n">in_response_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_response_to</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">in_response_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">request_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">in_response_to</span> <span class="o">!=</span> <span class="n">request_id</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The InResponseTo of the Response: </span><span class="si">%s</span><span class="s1">, does not match the ID of the AuthNRequest sent by the SP: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_response_to</span><span class="p">,</span> <span class="n">request_id</span><span class="p">),</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_INRESPONSETO</span>
+                        <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="ow">and</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantAssertionsEncrypted&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The assertion of the Response is not encrypted and the SP require it&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_ENCRYPTED_ASSERTION</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantNameIdEncrypted&#39;</span><span class="p">]:</span>
+                    <span class="n">encrypted_nameid_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Subject/saml:EncryptedID/xenc:EncryptedData&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encrypted_nameid_nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The NameID of the Response is not encrypted and the SP require it&#39;</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_ENCRYPTED_NAMEID</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># Checks that a Conditions element exists</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_one_condition</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The Assertion must include a Conditions element&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">MISSING_CONDITIONS</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Validates Assertion timestamps</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">validate_timestamps</span><span class="p">(</span><span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1"># Checks that an AuthnStatement element exists and is unique</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_one_authnstatement</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The Assertion must include an AuthnStatement element&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_AUTHSTATEMENTS</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Checks that the response has all of the AuthnContexts that we provided in the request.</span>
+                <span class="c1"># Only check if failOnAuthnContextMismatch is true and requestedAuthnContext is set to a list.</span>
+                <span class="n">requested_authn_contexts</span> <span class="o">=</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;requestedAuthnContext&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;failOnAuthnContextMismatch&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">requested_authn_contexts</span> <span class="ow">and</span> <span class="n">requested_authn_contexts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">authn_contexts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_authn_contexts</span><span class="p">()</span>
+                    <span class="n">unmatched_contexts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">authn_contexts</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">requested_authn_contexts</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">unmatched_contexts</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The AuthnContext &quot;</span><span class="si">%s</span><span class="s1">&quot; was not a requested context &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unmatched_contexts</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">requested_authn_contexts</span><span class="p">)),</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">AUTHN_CONTEXT_MISMATCH</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># Checks that there is at least one AttributeStatement if required</span>
+                <span class="n">attribute_statement_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AttributeStatement&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantAttributeStatement&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">attribute_statement_nodes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;There is no AttributeStatement on the Response&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_ATTRIBUTESTATEMENT</span>
+                    <span class="p">)</span>
+
+                <span class="n">encrypted_attributes_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AttributeStatement/saml:EncryptedAttribute&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">encrypted_attributes_nodes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;There is an EncryptedAttribute in the Response and this SP not support them&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ENCRYPTED_ATTRIBUTES</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Checks destination</span>
+                <span class="n">destination</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Destination&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">destination</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">normalize_url</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">destination</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">normalize_url</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">current_url</span><span class="p">)):</span>
+                        <span class="c1"># TODO: Review if following lines are required, since we can control the</span>
+                        <span class="c1"># request_data</span>
+                        <span class="c1">#  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)</span>
+                        <span class="c1">#  if not destination.startswith(current_url_routed):</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The response was received at </span><span class="si">%s</span><span class="s1"> instead of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">current_url</span><span class="p">,</span> <span class="n">destination</span><span class="p">),</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_DESTINATION</span>
+                        <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">destination</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The response has an empty Destination value&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">EMPTY_DESTINATION</span>
+                    <span class="p">)</span>
+                <span class="c1"># Checks audience</span>
+                <span class="n">valid_audiences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_audiences</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">valid_audiences</span> <span class="ow">and</span> <span class="n">sp_entity_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_audiences</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid audience for this Response&#39;</span> <span class="o">%</span> <span class="n">sp_entity_id</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_AUDIENCE</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Checks the issuers</span>
+                <span class="n">issuers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issuers</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">issuer</span> <span class="ow">in</span> <span class="n">issuers</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">issuer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">issuer</span> <span class="o">!=</span> <span class="n">idp_entity_id</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;Invalid issuer in the Assertion/Response (expected </span><span class="si">%(idpEntityId)s</span><span class="s1">, got </span><span class="si">%(issuer)s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+                            <span class="p">{</span>
+                                <span class="s1">&#39;idpEntityId&#39;</span><span class="p">:</span> <span class="n">idp_entity_id</span><span class="p">,</span>
+                                <span class="s1">&#39;issuer&#39;</span><span class="p">:</span> <span class="n">issuer</span>
+                            <span class="p">},</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_ISSUER</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># Checks the session Expiration</span>
+                <span class="n">session_expiration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_session_not_on_or_after</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">session_expiration</span> <span class="ow">and</span> <span class="n">session_expiration</span> <span class="o">&lt;=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">SESSION_EXPIRED</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Checks the SubjectConfirmation, at least one SubjectConfirmation must be valid</span>
+                <span class="n">any_subject_confirmation</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">subject_confirmation_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Subject/saml:SubjectConfirmation&#39;</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">scn</span> <span class="ow">in</span> <span class="n">subject_confirmation_nodes</span><span class="p">:</span>
+                    <span class="n">method</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Method&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">method</span> <span class="ow">and</span> <span class="n">method</span> <span class="o">!=</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">CM_BEARER</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">sc_data</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;saml:SubjectConfirmationData&#39;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">sc_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">irt</span> <span class="o">=</span> <span class="n">sc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;InResponseTo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">in_response_to</span> <span class="ow">and</span> <span class="n">irt</span> <span class="ow">and</span> <span class="n">irt</span> <span class="o">!=</span> <span class="n">in_response_to</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">recipient</span> <span class="o">=</span> <span class="n">sc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Recipient&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">recipient</span> <span class="ow">and</span> <span class="n">current_url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">recipient</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">nooa</span> <span class="o">=</span> <span class="n">sc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NotOnOrAfter&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">nooa</span><span class="p">:</span>
+                            <span class="n">parsed_nooa</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">nooa</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">parsed_nooa</span> <span class="o">&lt;=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+                                <span class="k">continue</span>
+                        <span class="n">nb</span> <span class="o">=</span> <span class="n">sc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NotBefore&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">nb</span><span class="p">:</span>
+                            <span class="n">parsed_nb</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">nb</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">parsed_nb</span> <span class="o">&gt;</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+                                <span class="k">continue</span>
+
+                        <span class="k">if</span> <span class="n">nooa</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">valid_scd_not_on_or_after</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">nooa</span><span class="p">)</span>
+
+                        <span class="n">any_subject_confirmation</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">any_subject_confirmation</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;A valid SubjectConfirmation was not found on this Response&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_SUBJECTCONFIRMATION</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantAssertionsSigned&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_signed_assertion</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The Assertion of the Response is not signed and the SP require it&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_SIGNED_ASSERTION</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantMessagesSigned&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_signed_response</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The Message of the Response is not signed and the SP require it&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_SIGNED_MESSAGE</span>
+                    <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">signed_elements</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">has_signed_response</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_signed_assertion</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;No Signature found. SAML Response rejected&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_SIGNATURE_FOUND</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_cert</span><span class="p">()</span>
+                <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">idp_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;certFingerprint&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fingerprint</span><span class="p">:</span>
+                    <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_finger_print</span><span class="p">(</span><span class="n">fingerprint</span><span class="p">)</span>
+                <span class="n">fingerprintalg</span> <span class="o">=</span> <span class="n">idp_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;certFingerprintAlgorithm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">multicerts</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span> <span class="ow">and</span> <span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">]:</span>
+                    <span class="n">multicerts</span> <span class="o">=</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">]</span>
+
+                <span class="c1"># If find a Signature on the Response, validates it checking the original response</span>
+                <span class="k">if</span> <span class="n">has_signed_response</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">,</span> <span class="n">xpath</span><span class="o">=</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE_XPATH</span><span class="p">,</span> <span class="n">multicerts</span><span class="o">=</span><span class="n">multicerts</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Signature validation failed. SAML Response rejected&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span>
+                    <span class="p">)</span>
+
+                <span class="n">document_check_assertion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span>
+                <span class="k">if</span> <span class="n">has_signed_assertion</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_sign</span><span class="p">(</span><span class="n">document_check_assertion</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">,</span> <span class="n">xpath</span><span class="o">=</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">ASSERTION_SIGNATURE_XPATH</span><span class="p">,</span> <span class="n">multicerts</span><span class="o">=</span><span class="n">multicerts</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Signature validation failed. SAML Response rejected&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span>
+                    <span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exceptions</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.check_status"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.check_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the status of the response is success or not</span>
+
+<span class="sd">        :raises: Exception. If the status is not success</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">and</span> <span class="n">code</span> <span class="o">!=</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">STATUS_SUCCESS</span><span class="p">:</span>
+            <span class="n">splited_code</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">printable_code</span> <span class="o">=</span> <span class="n">splited_code</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">status_exception_msg</span> <span class="o">=</span> <span class="s1">&#39;The status code of the Response was not Success, was </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">printable_code</span>
+            <span class="n">status_msg</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">status_msg</span><span class="p">:</span>
+                <span class="n">status_exception_msg</span> <span class="o">+=</span> <span class="s1">&#39; -&gt; &#39;</span> <span class="o">+</span> <span class="n">status_msg</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="n">status_exception_msg</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">STATUS_CODE_IS_NOT_SUCCESS</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.check_one_condition"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.check_one_condition">[docs]</a>    <span class="k">def</span> <span class="nf">check_one_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the samlp:Response/saml:Assertion/saml:Conditions element exists and is unique.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">condition_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Conditions&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">condition_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.check_one_authnstatement"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.check_one_authnstatement">[docs]</a>    <span class="k">def</span> <span class="nf">check_one_authnstatement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the samlp:Response/saml:Assertion/saml:AuthnStatement element exists and is unique.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">authnstatement_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AuthnStatement&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">authnstatement_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_audiences"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_audiences">[docs]</a>    <span class="k">def</span> <span class="nf">get_audiences</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the audiences</span>
+
+<span class="sd">        :returns: The valid audiences for the SAML Response</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">audience_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Conditions/saml:AudienceRestriction/saml:Audience&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">audience_nodes</span> <span class="k">if</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_authn_contexts"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_authn_contexts">[docs]</a>    <span class="k">def</span> <span class="nf">get_authn_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the authentication contexts</span>
+
+<span class="sd">        :returns: The authentication classes for the SAML Response</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">authn_context_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AuthnStatement/saml:AuthnContext/saml:AuthnContextClassRef&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">authn_context_nodes</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_in_response_to"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_in_response_to">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_response_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ID of the request which this response is in response to</span>
+<span class="sd">        :returns: ID of AuthNRequest this Response is in response to or None if it is not present</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;InResponseTo&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_issuers"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_issuers">[docs]</a>    <span class="k">def</span> <span class="nf">get_issuers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the issuers (from message and from assertion)</span>
+
+<span class="sd">        :returns: The issuers</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">issuers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="n">message_issuer_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/saml:Issuer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message_issuer_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message_issuer_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">issuer_value</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">message_issuer_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">issuer_value</span><span class="p">:</span>
+                    <span class="n">issuers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">issuer_value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Issuer of the Response is multiple.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ISSUER_MULTIPLE_IN_RESPONSE</span>
+                <span class="p">)</span>
+
+        <span class="n">assertion_issuer_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Issuer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">assertion_issuer_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">issuer_value</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">assertion_issuer_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">issuer_value</span><span class="p">:</span>
+                <span class="n">issuers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">issuer_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;Issuer of the Assertion not found or multiple.&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ISSUER_NOT_FOUND_IN_ASSERTION</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">issuers</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_nameid_data"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_nameid_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the NameID Data provided by the SAML Response from the IdP</span>
+
+<span class="sd">        :returns: Name ID Data (Value, Format, NameQualifier, SPNameQualifier)</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nameid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">nameid_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">encrypted_id_data_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Subject/saml:EncryptedID/xenc:EncryptedData&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encrypted_id_data_nodes</span><span class="p">:</span>
+            <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">encrypted_id_data_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_key</span><span class="p">()</span>
+            <span class="n">nameid</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">decrypt_element</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nameid_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Subject/saml:NameID&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nameid_nodes</span><span class="p">:</span>
+                <span class="n">nameid</span> <span class="o">=</span> <span class="n">nameid_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">is_strict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_strict</span><span class="p">()</span>
+        <span class="n">want_nameid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantNameId&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nameid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_strict</span> <span class="ow">and</span> <span class="n">want_nameid</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;NameID not found in the assertion of the Response&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_NAMEID</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_strict</span> <span class="ow">and</span> <span class="n">want_nameid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">nameid</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;An empty NameID value found&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">EMPTY_NAMEID</span>
+                <span class="p">)</span>
+
+            <span class="n">nameid_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">nameid</span><span class="p">)}</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Format&#39;</span><span class="p">,</span> <span class="s1">&#39;SPNameQualifier&#39;</span><span class="p">,</span> <span class="s1">&#39;NameQualifier&#39;</span><span class="p">]:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">nameid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">is_strict</span> <span class="ow">and</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;SPNameQualifier&#39;</span><span class="p">:</span>
+                        <span class="n">sp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_data</span><span class="p">()</span>
+                        <span class="n">sp_entity_id</span> <span class="o">=</span> <span class="n">sp_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entityId&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">sp_entity_id</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                                <span class="s1">&#39;The SPNameQualifier value mistmatch the SP entityID value.&#39;</span><span class="p">,</span>
+                                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">SP_NAME_QUALIFIER_NAME_MISMATCH</span>
+                            <span class="p">)</span>
+
+                    <span class="n">nameid_data</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">nameid_data</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_nameid"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_nameid">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the NameID provided by the SAML Response from the IdP</span>
+
+<span class="sd">        :returns: NameID (value)</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nameid_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">nameid_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nameid_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nameid_data</span> <span class="ow">and</span> <span class="s1">&#39;Value&#39;</span> <span class="ow">in</span> <span class="n">nameid_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">nameid_value</span> <span class="o">=</span> <span class="n">nameid_data</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">nameid_value</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_nameid_format"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_nameid_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the NameID Format provided by the SAML Response from the IdP</span>
+
+<span class="sd">        :returns: NameID Format</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nameid_format</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">nameid_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nameid_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nameid_data</span> <span class="ow">and</span> <span class="s1">&#39;Format&#39;</span> <span class="ow">in</span> <span class="n">nameid_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">nameid_format</span> <span class="o">=</span> <span class="n">nameid_data</span><span class="p">[</span><span class="s1">&#39;Format&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">nameid_format</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_nameid_nq"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_nameid_nq">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_nq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the NameID NameQualifier provided by the SAML Response from the IdP</span>
+
+<span class="sd">        :returns: NameID NameQualifier</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nameid_nq</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">nameid_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nameid_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nameid_data</span> <span class="ow">and</span> <span class="s1">&#39;NameQualifier&#39;</span> <span class="ow">in</span> <span class="n">nameid_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">nameid_nq</span> <span class="o">=</span> <span class="n">nameid_data</span><span class="p">[</span><span class="s1">&#39;NameQualifier&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">nameid_nq</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_nameid_spnq"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_nameid_spnq">[docs]</a>    <span class="k">def</span> <span class="nf">get_nameid_spnq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the NameID SP NameQualifier provided by the SAML response from the IdP.</span>
+
+<span class="sd">        :returns: NameID SP NameQualifier</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nameid_spnq</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">nameid_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nameid_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nameid_data</span> <span class="ow">and</span> <span class="s1">&#39;SPNameQualifier&#39;</span> <span class="ow">in</span> <span class="n">nameid_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">nameid_spnq</span> <span class="o">=</span> <span class="n">nameid_data</span><span class="p">[</span><span class="s1">&#39;SPNameQualifier&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">nameid_spnq</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_session_not_on_or_after"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_session_not_on_or_after">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_not_on_or_after</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SessionNotOnOrAfter from the AuthnStatement</span>
+<span class="sd">        Could be used to set the local session expiration</span>
+
+<span class="sd">        :returns: The SessionNotOnOrAfter value</span>
+<span class="sd">        :rtype: time|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">not_on_or_after</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">authn_statement_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AuthnStatement[@SessionNotOnOrAfter]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">authn_statement_nodes</span><span class="p">:</span>
+            <span class="n">not_on_or_after</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">authn_statement_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SessionNotOnOrAfter&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">not_on_or_after</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_assertion_not_on_or_after"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_assertion_not_on_or_after">[docs]</a>    <span class="k">def</span> <span class="nf">get_assertion_not_on_or_after</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the NotOnOrAfter value of the valid SubjectConfirmationData node if any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_scd_not_on_or_after</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_session_index"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_session_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SessionIndex from the AuthnStatement</span>
+<span class="sd">        Could be used to be stored in the local session in order</span>
+<span class="sd">        to be used in a future Logout Request that the SP could</span>
+<span class="sd">        send to the SP, to set what specific session must be deleted</span>
+
+<span class="sd">        :returns: The SessionIndex value</span>
+<span class="sd">        :rtype: string|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">authn_statement_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AuthnStatement[@SessionIndex]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">authn_statement_nodes</span><span class="p">:</span>
+            <span class="n">session_index</span> <span class="o">=</span> <span class="n">authn_statement_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SessionIndex&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">session_index</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_attributes"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the Attributes from the AttributeStatement element.</span>
+<span class="sd">        EncryptedAttributes are not supported</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attributes</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_friendlyname_attributes"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_friendlyname_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_friendlyname_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the Attributes from the AttributeStatement element indexed by FiendlyName.</span>
+<span class="sd">        EncryptedAttributes are not supported</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attributes</span><span class="p">(</span><span class="s1">&#39;FriendlyName&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+        <span class="n">allow_duplicates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;allowRepeatAttributeName&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">attribute_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:AttributeStatement/saml:Attribute&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attribute_node</span> <span class="ow">in</span> <span class="n">attribute_nodes</span><span class="p">:</span>
+            <span class="n">attr_key</span> <span class="o">=</span> <span class="n">attribute_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr_key</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_duplicates</span> <span class="ow">and</span> <span class="n">attr_key</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Found an Attribute element with duplicated &#39;</span> <span class="o">+</span> <span class="n">attr_name</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DUPLICATED_ATTRIBUTE_NAME_FOUND</span>
+                    <span class="p">)</span>
+
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attribute_node</span><span class="o">.</span><span class="n">iterchildren</span><span class="p">(</span><span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}AttributeValue&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">[</span><span class="s1">&#39;saml&#39;</span><span class="p">]):</span>
+                    <span class="n">attr_text</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">attr_text</span><span class="p">:</span>
+                        <span class="n">attr_text</span> <span class="o">=</span> <span class="n">attr_text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">attr_text</span><span class="p">:</span>
+                            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr_text</span><span class="p">)</span>
+
+                    <span class="c1"># Parse any nested NameID children</span>
+                    <span class="k">for</span> <span class="n">nameid</span> <span class="ow">in</span> <span class="n">attr</span><span class="o">.</span><span class="n">iterchildren</span><span class="p">(</span><span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}NameID&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">[</span><span class="s1">&#39;saml&#39;</span><span class="p">]):</span>
+                        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                            <span class="s1">&#39;NameID&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;Format&#39;</span><span class="p">:</span> <span class="n">nameid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Format&#39;</span><span class="p">),</span>
+                                <span class="s1">&#39;NameQualifier&#39;</span><span class="p">:</span> <span class="n">nameid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NameQualifier&#39;</span><span class="p">),</span>
+                                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">nameid</span><span class="o">.</span><span class="n">text</span>
+                            <span class="p">}</span>
+                        <span class="p">})</span>
+                <span class="k">if</span> <span class="n">attr_key</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                    <span class="n">attributes</span><span class="p">[</span><span class="n">attr_key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attributes</span><span class="p">[</span><span class="n">attr_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+        <span class="k">return</span> <span class="n">attributes</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.validate_num_assertions"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.validate_num_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">validate_num_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the document only contains a single Assertion (encrypted or not)</span>
+
+<span class="sd">        :returns: True if only 1 assertion encrypted or not</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encrypted_assertion_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;//saml:EncryptedAssertion&#39;</span><span class="p">)</span>
+        <span class="n">assertion_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;//saml:Assertion&#39;</span><span class="p">)</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">encrypted_assertion_nodes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">assertion_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span><span class="p">):</span>
+            <span class="n">assertion_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span><span class="p">,</span> <span class="s1">&#39;//saml:Assertion&#39;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">assertion_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">valid</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.process_signed_elements"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.process_signed_elements">[docs]</a>    <span class="k">def</span> <span class="nf">process_signed_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies the signature nodes:</span>
+<span class="sd">         - Checks that are Response or Assertion</span>
+<span class="sd">         - Check that IDs and reference URI are unique and consistent.</span>
+
+<span class="sd">        :returns: The signed elements tag names</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sign_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;//ds:Signature&#39;</span><span class="p">)</span>
+
+        <span class="n">signed_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">verified_seis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">verified_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">response_tag</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Response&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAMLP</span>
+        <span class="n">assertion_tag</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Assertion&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAML</span>
+
+        <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+        <span class="n">reject_deprecated_alg</span> <span class="o">=</span> <span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rejectDeprecatedAlgorithm&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">sign_node</span> <span class="ow">in</span> <span class="n">sign_nodes</span><span class="p">:</span>
+            <span class="n">signed_element</span> <span class="o">=</span> <span class="n">sign_node</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">tag</span>
+            <span class="k">if</span> <span class="n">signed_element</span> <span class="o">!=</span> <span class="n">response_tag</span> <span class="ow">and</span> <span class="n">signed_element</span> <span class="o">!=</span> <span class="n">assertion_tag</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Invalid Signature Element </span><span class="si">%s</span><span class="s1"> SAML Response rejected&#39;</span> <span class="o">%</span> <span class="n">signed_element</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_SIGNED_ELEMENT</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sign_node</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Signed Element must contain an ID. SAML Response rejected&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ID_NOT_FOUND_IN_SIGNED_ELEMENT</span>
+                <span class="p">)</span>
+
+            <span class="n">id_value</span> <span class="o">=</span> <span class="n">sign_node</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">id_value</span> <span class="ow">in</span> <span class="n">verified_ids</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Duplicated ID. SAML Response rejected&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DUPLICATED_ID_IN_SIGNED_ELEMENTS</span>
+                <span class="p">)</span>
+            <span class="n">verified_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_value</span><span class="p">)</span>
+
+            <span class="c1"># Check that reference URI matches the parent ID and no duplicate References or IDs</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sign_node</span><span class="p">,</span> <span class="s1">&#39;.//ds:Reference&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ref</span><span class="p">:</span>
+                <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ref</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URI&#39;</span><span class="p">):</span>
+                    <span class="n">sei</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URI&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+                    <span class="k">if</span> <span class="n">sei</span> <span class="o">!=</span> <span class="n">id_value</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;Found an invalid Signed Element. SAML Response rejected&#39;</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNED_ELEMENT</span>
+                        <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">sei</span> <span class="ow">in</span> <span class="n">verified_seis</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;Duplicated Reference URI. SAML Response rejected&#39;</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</span>
+                        <span class="p">)</span>
+                    <span class="n">verified_seis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sei</span><span class="p">)</span>
+
+            <span class="c1"># Check the signature and digest algorithm</span>
+            <span class="k">if</span> <span class="n">reject_deprecated_alg</span><span class="p">:</span>
+                <span class="n">sig_method_node</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sign_node</span><span class="p">,</span> <span class="s1">&#39;.//ds:SignatureMethod&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sig_method_node</span><span class="p">:</span>
+                    <span class="n">sig_method</span> <span class="o">=</span> <span class="n">sig_method_node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Algorithm&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">sig_method</span> <span class="ow">in</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DEPRECATED_ALGORITHMS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;Deprecated signature algorithm found: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sig_method</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DEPRECATED_SIGNATURE_METHOD</span>
+                        <span class="p">)</span>
+
+                <span class="n">dig_method_node</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sign_node</span><span class="p">,</span> <span class="s1">&#39;.//ds:DigestMethod&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dig_method_node</span><span class="p">:</span>
+                    <span class="n">dig_method</span> <span class="o">=</span> <span class="n">dig_method_node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Algorithm&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dig_method</span> <span class="ow">in</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DEPRECATED_ALGORITHMS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;Deprecated digest algorithm found: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dig_method</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">DEPRECATED_DIGEST_METHOD</span>
+                        <span class="p">)</span>
+
+            <span class="n">signed_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signed_element</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">signed_elements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_signed_elements</span><span class="p">(</span><span class="n">signed_elements</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Found an unexpected Signature Element. SAML Response rejected&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">UNEXPECTED_SIGNED_ELEMENTS</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">signed_elements</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.validate_signed_elements"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.validate_signed_elements">[docs]</a>    <span class="nd">@return_false_on_exception</span>
+    <span class="k">def</span> <span class="nf">validate_signed_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signed_elements</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the document has the expected signed nodes.</span>
+
+<span class="sd">        :param signed_elements: The signed elements to be checked</span>
+<span class="sd">        :type signed_elements: list</span>
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signed_elements</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">response_tag</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Response&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAMLP</span>
+        <span class="n">assertion_tag</span> <span class="o">=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}Assertion&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAML</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">response_tag</span> <span class="ow">in</span> <span class="n">signed_elements</span> <span class="ow">and</span> <span class="n">signed_elements</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">response_tag</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="p">(</span><span class="n">assertion_tag</span> <span class="ow">in</span> <span class="n">signed_elements</span> <span class="ow">and</span> <span class="n">signed_elements</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">assertion_tag</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="p">(</span><span class="n">response_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">signed_elements</span> <span class="ow">and</span> <span class="n">assertion_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">signed_elements</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check that the signed elements found here, are the ones that will be verified</span>
+        <span class="c1"># by OneLogin_Saml2_Utils.validate_sign</span>
+        <span class="k">if</span> <span class="n">response_tag</span> <span class="ow">in</span> <span class="n">signed_elements</span><span class="p">:</span>
+            <span class="n">expected_signature_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE_XPATH</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_signature_nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Unexpected number of Response signatures found. SAML Response rejected.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">assertion_tag</span> <span class="ow">in</span> <span class="n">signed_elements</span><span class="p">:</span>
+            <span class="n">expected_signature_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">ASSERTION_SIGNATURE_XPATH</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_signature_nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Unexpected number of Assertion signatures found. SAML Response rejected.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.validate_timestamps"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.validate_timestamps">[docs]</a>    <span class="nd">@return_false_on_exception</span>
+    <span class="k">def</span> <span class="nf">validate_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies that the document is valid according to Conditions Element</span>
+
+<span class="sd">        :returns: True if the condition is valid, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">conditions_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;/saml:Conditions&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">conditions_node</span> <span class="ow">in</span> <span class="n">conditions_nodes</span><span class="p">:</span>
+            <span class="n">nb_attr</span> <span class="o">=</span> <span class="n">conditions_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NotBefore&#39;</span><span class="p">)</span>
+            <span class="n">nooa_attr</span> <span class="o">=</span> <span class="n">conditions_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NotOnOrAfter&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nb_attr</span> <span class="ow">and</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">nb_attr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">ALLOWED_CLOCK_DRIFT</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not validate timestamp: not yet valid. Check system clock.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ASSERTION_TOO_EARLY</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">nooa_attr</span> <span class="ow">and</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">nooa_attr</span><span class="p">)</span> <span class="o">+</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">ALLOWED_CLOCK_DRIFT</span> <span class="o">&lt;=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not validate timestamp: expired. Check system clock.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">ASSERTION_EXPIRED</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_query_assertion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xpath_expr</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts nodes that match the query from the Assertion</span>
+
+<span class="sd">        :param xpath_expr: Xpath Expresion</span>
+<span class="sd">        :type xpath_expr: String</span>
+
+<span class="sd">        :returns: The queried nodes</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">assertion_expr</span> <span class="o">=</span> <span class="s1">&#39;/saml:Assertion&#39;</span>
+        <span class="n">signature_expr</span> <span class="o">=</span> <span class="s1">&#39;/ds:Signature/ds:SignedInfo/ds:Reference&#39;</span>
+        <span class="n">signed_assertion_query</span> <span class="o">=</span> <span class="s1">&#39;/samlp:Response&#39;</span> <span class="o">+</span> <span class="n">assertion_expr</span> <span class="o">+</span> <span class="n">signature_expr</span>
+        <span class="n">assertion_reference_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">signed_assertion_query</span><span class="p">)</span>
+        <span class="n">tagid</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">assertion_reference_nodes</span><span class="p">:</span>
+            <span class="c1"># Check if the message is signed</span>
+            <span class="n">signed_message_query</span> <span class="o">=</span> <span class="s1">&#39;/samlp:Response&#39;</span> <span class="o">+</span> <span class="n">signature_expr</span>
+            <span class="n">message_reference_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">signed_message_query</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">message_reference_nodes</span><span class="p">:</span>
+                <span class="n">message_id</span> <span class="o">=</span> <span class="n">message_reference_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URI&#39;</span><span class="p">)</span>
+                <span class="n">final_query</span> <span class="o">=</span> <span class="s2">&quot;/samlp:Response[@ID=$tagid]/&quot;</span>
+                <span class="n">tagid</span> <span class="o">=</span> <span class="n">message_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">final_query</span> <span class="o">=</span> <span class="s2">&quot;/samlp:Response&quot;</span>
+            <span class="n">final_query</span> <span class="o">+=</span> <span class="n">assertion_expr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">assertion_id</span> <span class="o">=</span> <span class="n">assertion_reference_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URI&#39;</span><span class="p">)</span>
+            <span class="n">final_query</span> <span class="o">=</span> <span class="s1">&#39;/samlp:Response&#39;</span> <span class="o">+</span> <span class="n">assertion_expr</span> <span class="o">+</span> <span class="s2">&quot;[@ID=$tagid]&quot;</span>
+            <span class="n">tagid</span> <span class="o">=</span> <span class="n">assertion_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">final_query</span> <span class="o">+=</span> <span class="n">xpath_expr</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">final_query</span><span class="p">,</span> <span class="n">tagid</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">tagid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts nodes that match the query from the Response</span>
+
+<span class="sd">        :param query: Xpath Expresion</span>
+<span class="sd">        :type query: String</span>
+
+<span class="sd">        :param tagid: Tag ID</span>
+<span class="sd">        :type query: String</span>
+
+<span class="sd">        :returns: The queried nodes</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+            <span class="n">document</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">document</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tagid</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_decrypt_assertion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypts the Assertion</span>
+
+<span class="sd">        :raises: Exception if no private key available</span>
+<span class="sd">        :param xml: Encrypted Assertion</span>
+<span class="sd">        :type xml: Element</span>
+<span class="sd">        :returns: Decrypted Assertion</span>
+<span class="sd">        :rtype: Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_key</span><span class="p">()</span>
+        <span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;No private key available to decrypt the assertion, check settings&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PRIVATE_KEY_NOT_FOUND</span>
+            <span class="p">)</span>
+
+        <span class="n">encrypted_assertion_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/saml:EncryptedAssertion&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encrypted_assertion_nodes</span><span class="p">:</span>
+            <span class="n">encrypted_data_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">encrypted_assertion_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;//saml:EncryptedAssertion/xenc:EncryptedData&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">encrypted_data_nodes</span><span class="p">:</span>
+                <span class="n">keyinfo</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">encrypted_assertion_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;//saml:EncryptedAssertion/xenc:EncryptedData/ds:KeyInfo&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">keyinfo</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;No KeyInfo present, invalid Assertion&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</span>
+                    <span class="p">)</span>
+                <span class="n">keyinfo</span> <span class="o">=</span> <span class="n">keyinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="n">keyinfo</span><span class="o">.</span><span class="n">getchildren</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">children</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;KeyInfo has no children nodes, invalid Assertion&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</span>
+                    <span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;RetrievalMethod&#39;</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;http://www.w3.org/2001/04/xmlenc#EncryptedKey&#39;</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                                <span class="s1">&#39;Unsupported Retrieval Method found&#39;</span><span class="p">,</span>
+                                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">UNSUPPORTED_RETRIEVAL_METHOD</span>
+                            <span class="p">)</span>
+                        <span class="n">uri</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;URI&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                            <span class="k">break</span>
+                        <span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">encrypted_key</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">encrypted_assertion_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;./xenc:EncryptedKey[@Id=$tagid]&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">encrypted_key</span><span class="p">:</span>
+                            <span class="n">keyinfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encrypted_key</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">encrypted_data_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">decrypted</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">decrypt_element</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">xml</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">encrypted_assertion_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">decrypted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xml</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_error"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After executing a validation process, if it fails this method returns the cause</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_xml_document"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_xml_document">[docs]</a>    <span class="k">def</span> <span class="nf">get_xml_document</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the SAML Response document (If contains an encrypted assertion, decrypts it)</span>
+
+<span class="sd">        :return: Decrypted XML response document</span>
+<span class="sd">        :rtype: DOMDocument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decrypted_document</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: the ID of the response</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_assertion_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_assertion_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_assertion_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: the ID of the assertion in the response</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_num_assertions</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;SAML Response must contain 1 assertion&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_ASSERTIONS</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Response.get_assertion_issue_instant"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Response.get_assertion_issue_instant">[docs]</a>    <span class="k">def</span> <span class="nf">get_assertion_issue_instant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: the IssueInstant of the assertion in the response</span>
+<span class="sd">        :rtype: unix/posix timestamp|None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_num_assertions</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;SAML Response must contain 1 assertion&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_ASSERTIONS</span>
+            <span class="p">)</span>
+        <span class="n">issue_instant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_assertion</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IssueInstant&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">issue_instant</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

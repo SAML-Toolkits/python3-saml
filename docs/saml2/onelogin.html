@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin package &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=404a92a0"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="onelogin.saml2 package" href="onelogin.saml2.html" />
+    <link rel="prev" title="Welcome to SAML Python2/3 Toolkit’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">onelogin package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html">onelogin.saml2 package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-onelogin">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">onelogin package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/onelogin.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="onelogin-package">
+<h1>onelogin package<a class="headerlink" href="#onelogin-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onelogin.saml2.html">onelogin.saml2 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.auth">onelogin.saml2.auth module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.add_request_signature"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.add_request_signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.add_response_signature"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.add_response_signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.authn_request_class"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.authn_request_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_attribute"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_attribute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_attributes"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_errors"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_friendlyname_attribute"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_friendlyname_attribute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_friendlyname_attributes"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_friendlyname_attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_assertion_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_issue_instant"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_assertion_issue_instant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_assertion_not_on_or_after"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_assertion_not_on_or_after()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_authn_contexts"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_authn_contexts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_error_reason"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_error_reason()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_message_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_message_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_request_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_request_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_request_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_request_xml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_response_in_response_to"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_response_in_response_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_last_response_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_last_response_xml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_nameid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_format"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_nameid_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_nq"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_nameid_nq()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_nameid_spnq"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_nameid_spnq()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_session_expiration"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_session_expiration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_session_index"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_session_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_slo_response_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_slo_response_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_slo_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_slo_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.get_sso_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.get_sso_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.is_authenticated"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.is_authenticated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.login"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.logout"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.logout_request_class"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.logout_request_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.logout_response_class"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.logout_response_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.process_response"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.process_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.process_slo"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.process_slo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.redirect_to"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.redirect_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.response_class"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.response_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.set_strict"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.set_strict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.store_valid_response"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.store_valid_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.validate_request_signature"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.validate_request_signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Auth.validate_response_signature"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Auth.validate_response_signature()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.authn_request">onelogin.saml2.authn_request module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.authn_request.OneLogin_Saml2_Authn_Request"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Authn_Request</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.authn_request.OneLogin_Saml2_Authn_Request.get_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Authn_Request.get_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.authn_request.OneLogin_Saml2_Authn_Request.get_request"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Authn_Request.get_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.authn_request.OneLogin_Saml2_Authn_Request.get_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Authn_Request.get_xml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.compat">onelogin.saml2.compat module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.compat.to_bytes"><code class="docutils literal notranslate"><span class="pre">to_bytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.compat.to_string"><code class="docutils literal notranslate"><span class="pre">to_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.compat.utf8"><code class="docutils literal notranslate"><span class="pre">utf8()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.constants">onelogin.saml2.constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_KERBEROS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_KERBEROS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_PASSWORD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_PASSWORD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_PASSWORD_PROTECTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_SMARTCARD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_SMARTCARD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_UNSPECIFIED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_UNSPECIFIED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AC_X509"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AC_X509</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AES128_CBC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AES128_CBC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AES192_CBC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AES192_CBC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.AES256_CBC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.AES256_CBC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.ATTRNAME_FORMAT_BASIC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.ATTRNAME_FORMAT_BASIC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.ATTRNAME_FORMAT_UNSPECIFIED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.ATTRNAME_FORMAT_UNSPECIFIED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.ATTRNAME_FORMAT_URI"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.ATTRNAME_FORMAT_URI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.BINDING_DEFLATE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.BINDING_DEFLATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.BINDING_HTTP_ARTIFACT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.BINDING_HTTP_ARTIFACT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.BINDING_HTTP_POST"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.BINDING_HTTP_POST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.BINDING_SOAP"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.BINDING_SOAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.CM_BEARER"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.CM_BEARER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.CM_HOLDER_KEY"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.CM_HOLDER_KEY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.CM_SENDER_VOUCHES"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.CM_SENDER_VOUCHES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.DSA_SHA1"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.DSA_SHA1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_ENCRYPTED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_ENCRYPTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_ENTITY"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_ENTITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_KERBEROS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_KERBEROS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_PERSISTENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_PERSISTENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_TRANSIENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_TRANSIENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_UNSPECIFIED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NAMEID_X509_SUBJECT_NAME"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NAMEID_X509_SUBJECT_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NSMAP"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NSMAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_DS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_DS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_MD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_MD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_DS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_DS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_MD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_MD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_SAML"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_SAML</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_SAMLP"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_SAMLP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_XENC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_XENC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_XS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_XS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_XSD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_XSD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_PREFIX_XSI"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_PREFIX_XSI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_SAML"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_SAML</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_SAMLP"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_SAMLP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_SOAP"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_SOAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_XENC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_XENC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_XS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_XS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.NS_XSI"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.NS_XSI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_1_5"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_1_5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_OAEP_MGF1P"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_OAEP_MGF1P</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_SHA1"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_SHA1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_SHA256"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_SHA256</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_SHA384"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_SHA384</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.RSA_SHA512"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.RSA_SHA512</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.SHA1"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.SHA1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.SHA256"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.SHA256</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.SHA384"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.SHA384</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.SHA512"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.SHA512</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_NO_PASSIVE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_NO_PASSIVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_PARTIAL_LOGOUT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_PARTIAL_LOGOUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_PROXY_COUNT_EXCEEDED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_PROXY_COUNT_EXCEEDED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_REQUESTER"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_REQUESTER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_RESPONDER"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_RESPONDER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_SUCCESS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.STATUS_VERSION_MISMATCH"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.STATUS_VERSION_MISMATCH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.constants.OneLogin_Saml2_Constants.TRIPLEDES_CBC"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Constants.TRIPLEDES_CBC</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.errors">onelogin.saml2.errors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.CERT_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.CERT_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.METADATA_SP_INVALID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.METADATA_SP_INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.REDIRECT_INVALID_URL"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.REDIRECT_INVALID_URL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SAML_LOGOUTMESSAGE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SAML_LOGOUTMESSAGE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SAML_LOGOUTREQUEST_INVALID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SAML_LOGOUTREQUEST_INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SAML_LOGOUTRESPONSE_INVALID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SAML_LOGOUTRESPONSE_INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SAML_SINGLE_LOGOUT_NOT_SUPPORTED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SAML_SINGLE_LOGOUT_NOT_SUPPORTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SETTINGS_FILE_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SETTINGS_FILE_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SETTINGS_INVALID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SETTINGS_INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SETTINGS_INVALID_SYNTAX"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SETTINGS_INVALID_SYNTAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.SP_CERTS_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.SP_CERTS_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_Error.UNSUPPORTED_SETTINGS_OBJECT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Error.UNSUPPORTED_SETTINGS_OBJECT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ASSERTION_EXPIRED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ASSERTION_EXPIRED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ASSERTION_TOO_EARLY"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ASSERTION_TOO_EARLY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.AUTHN_CONTEXT_MISMATCH"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.AUTHN_CONTEXT_MISMATCH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.DEPRECATED_DIGEST_METHOD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.DEPRECATED_DIGEST_METHOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.DUPLICATED_ID_IN_SIGNED_ELEMENTS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.DUPLICATED_ID_IN_SIGNED_ELEMENTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.EMPTY_DESTINATION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.EMPTY_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.EMPTY_NAMEID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.EMPTY_NAMEID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ENCRYPTED_ATTRIBUTES"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ENCRYPTED_ATTRIBUTES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ID_NOT_FOUND_IN_SIGNED_ELEMENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ID_NOT_FOUND_IN_SIGNED_ELEMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.INVALID_SIGNATURE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.INVALID_SIGNATURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.INVALID_SIGNED_ELEMENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.INVALID_SIGNED_ELEMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.INVALID_XML_FORMAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ISSUER_MULTIPLE_IN_RESPONSE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ISSUER_MULTIPLE_IN_RESPONSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_ASSERTION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.ISSUER_NOT_FOUND_IN_ASSERTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.MISSING_CONDITIONS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.MISSING_CONDITIONS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.MISSING_ID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.MISSING_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.MISSING_STATUS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.MISSING_STATUS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.MISSING_STATUS_CODE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.MISSING_STATUS_CODE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_ATTRIBUTESTATEMENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_ATTRIBUTESTATEMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_ENCRYPTED_ASSERTION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_ENCRYPTED_ASSERTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_ENCRYPTED_NAMEID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_ENCRYPTED_NAMEID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_NAMEID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_NAMEID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_SIGNATURE_FOUND"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_SIGNATURE_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_SIGNED_ASSERTION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_SIGNED_ASSERTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.RESPONSE_EXPIRED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.RESPONSE_EXPIRED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.SESSION_EXPIRED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.SESSION_EXPIRED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.STATUS_CODE_IS_NOT_SUCCESS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.STATUS_CODE_IS_NOT_SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.UNEXPECTED_SIGNED_ELEMENTS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.UNEXPECTED_SIGNED_ELEMENTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.UNSUPPORTED_RETRIEVAL_METHOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.UNSUPPORTED_SAML_VERSION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.UNSUPPORTED_SAML_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_AUDIENCE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_AUDIENCE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_DESTINATION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_ISSUER"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_ISSUER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_ASSERTIONS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_AUTHSTATEMENTS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_AUTHSTATEMENTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_SIGNED_ELEMENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_SIGNED_ELEMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.errors.OneLogin_Saml2_ValidationError.WRONG_SUBJECTCONFIRMATION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_ValidationError.WRONG_SUBJECTCONFIRMATION</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.idp_metadata_parser">onelogin.saml2.idp_metadata_parser module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_IdPMetadataParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.get_metadata"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_IdPMetadataParser.get_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.merge_settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_IdPMetadataParser.merge_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.parse"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_IdPMetadataParser.parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.parse_remote"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_IdPMetadataParser.parse_remote()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.dict_deep_merge"><code class="docutils literal notranslate"><span class="pre">dict_deep_merge()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.logout_request">onelogin.saml2.logout_request module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_error"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_issuer"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_issuer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_nameid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_nameid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_nameid_data"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_nameid_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_nameid_format"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_nameid_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_request"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_session_indexes"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_session_indexes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.get_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.get_xml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_request.OneLogin_Saml2_Logout_Request.is_valid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Request.is_valid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.logout_response">onelogin.saml2.logout_response module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.build"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.build()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_error"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_in_response_to"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_in_response_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_issuer"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_issuer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_response"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_status"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.get_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.get_xml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.logout_response.OneLogin_Saml2_Logout_Response.is_valid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Logout_Response.is_valid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.metadata">onelogin.saml2.metadata module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.TIME_CACHED"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata.TIME_CACHED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.TIME_VALID"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata.TIME_VALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.add_x509_key_descriptors"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata.add_x509_key_descriptors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.builder"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata.builder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.metadata.OneLogin_Saml2_Metadata.sign_metadata"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Metadata.sign_metadata()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.response">onelogin.saml2.response module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.check_one_authnstatement"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.check_one_authnstatement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.check_one_condition"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.check_one_condition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.check_status"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.check_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_assertion_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_assertion_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_assertion_issue_instant"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_assertion_issue_instant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_assertion_not_on_or_after"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_assertion_not_on_or_after()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_attributes"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_audiences"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_audiences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_authn_contexts"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_authn_contexts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_error"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_friendlyname_attributes"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_friendlyname_attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_in_response_to"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_in_response_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_issuers"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_issuers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_nameid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_nameid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_nameid_data"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_nameid_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_nameid_format"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_nameid_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_nameid_nq"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_nameid_nq()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_nameid_spnq"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_nameid_spnq()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_session_index"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_session_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_session_not_on_or_after"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_session_not_on_or_after()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.get_xml_document"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.get_xml_document()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.is_valid"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.is_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.process_signed_elements"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.process_signed_elements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.validate_num_assertions"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.validate_num_assertions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.validate_signed_elements"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.validate_signed_elements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.response.OneLogin_Saml2_Response.validate_timestamps"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Response.validate_timestamps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.settings">onelogin.saml2.settings module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_idp_settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.check_idp_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.check_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_sp_certs"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.check_sp_certs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_sp_settings"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.check_sp_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_idp_cert"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.format_idp_cert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_idp_cert_multi"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.format_idp_cert_multi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_cert"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.format_sp_cert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_cert_new"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.format_sp_cert_new()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_key"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.format_sp_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_base_path"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_base_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_cert_path"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_cert_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_contacts"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_errors"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_cert"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_idp_cert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_data"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_idp_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_slo_response_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_idp_slo_response_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_slo_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_idp_slo_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_sso_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_idp_sso_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_lib_path"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_lib_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_organization"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_organization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_schemas_path"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_schemas_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_security_data"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_security_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_cert"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_sp_cert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_cert_new"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_sp_cert_new()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_data"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_sp_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_key"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_sp_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_metadata"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.get_sp_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.is_debug_active"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.is_debug_active()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.is_strict"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.is_strict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.metadata_class"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.metadata_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.set_cert_path"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.set_cert_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.set_strict"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.set_strict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.validate_metadata"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Settings.validate_metadata()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.settings.validate_url"><code class="docutils literal notranslate"><span class="pre">validate_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.utils">onelogin.saml2.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.ASSERTION_SIGNATURE_XPATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.RESPONSE_SIGNATURE_XPATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.TIME_FORMAT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.TIME_FORMAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.TIME_FORMAT_2"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.TIME_FORMAT_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.TIME_FORMAT_WITH_FRAGMENT"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.TIME_FORMAT_WITH_FRAGMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.add_sign"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.add_sign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.b64decode"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.b64decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.b64encode"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.b64encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.calculate_x509_fingerprint"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.calculate_x509_fingerprint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.decode_base64_and_inflate"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.decode_base64_and_inflate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.decrypt_element"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.decrypt_element()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.deflate_and_base64_encode"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.deflate_and_base64_encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.delete_local_session"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.delete_local_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.escape_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.escape_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_cert"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.format_cert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_finger_print"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.format_finger_print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_private_key"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.format_private_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.generate_name_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.generate_name_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.generate_unique_id"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.generate_unique_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_expire_time"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_expire_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_host"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_self_host()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_routed_url_no_query"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_self_routed_url_no_query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_self_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url_host"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_self_url_host()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url_no_query"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_self_url_no_query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_status"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.get_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.is_https"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.is_https()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.normalize_url"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.normalize_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.now"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.now()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_SAML_to_time"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.parse_SAML_to_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_duration"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.parse_duration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_time_to_SAML"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.parse_time_to_SAML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.redirect"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.redirect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.sign_binary"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.sign_binary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_binary_sign"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.validate_binary_sign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_metadata_sign"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.validate_metadata_sign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_node_sign"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.validate_node_sign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_sign"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Utils.validate_sign()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.utils.return_false_on_exception"><code class="docutils literal notranslate"><span class="pre">return_false_on_exception()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.xml_templates">onelogin.saml2.xml_templates module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.ATTRIBUTE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.ATTRIBUTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.AUTHN_REQUEST"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.AUTHN_REQUEST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.LOGOUT_REQUEST"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.LOGOUT_REQUEST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.LOGOUT_RESPONSE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.LOGOUT_RESPONSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_ATTR_CONSUMER_SERVICE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_ATTR_CONSUMER_SERVICE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_CONTACT_PERSON"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_CONTACT_PERSON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_ENTITY_DESCRIPTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_ORGANISATION"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_ORGANISATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_REQUESTED_ATTRIBUTE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_REQUESTED_ATTRIBUTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.MD_SLS"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.MD_SLS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_templates.OneLogin_Saml2_Templates.RESPONSE"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_Templates.RESPONSE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.xml_utils">onelogin.saml2.xml_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.cleanup_namespaces"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.cleanup_namespaces()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.dump"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.element_text"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.element_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.extract_tag_text"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.extract_tag_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.make_child"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.make_child()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.make_root"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.make_root()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.query"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.to_etree"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.to_etree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.to_string"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.to_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xml_utils.OneLogin_Saml2_XML.validate_xml"><code class="docutils literal notranslate"><span class="pre">OneLogin_Saml2_XML.validate_xml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2.xmlparser">onelogin.saml2.xmlparser module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.DTDForbidden"><code class="docutils literal notranslate"><span class="pre">DTDForbidden</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.EntitiesForbidden"><code class="docutils literal notranslate"><span class="pre">EntitiesForbidden</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.createDefaultParser"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS.createDefaultParser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.element_class"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS.element_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.getDefaultParser"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS.getDefaultParser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.parser_config"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS.parser_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.GlobalParserTLS.setDefaultParser"><code class="docutils literal notranslate"><span class="pre">GlobalParserTLS.setDefaultParser()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.NotSupportedError"><code class="docutils literal notranslate"><span class="pre">NotSupportedError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement"><code class="docutils literal notranslate"><span class="pre">RestrictedElement</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.blacklist"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.blacklist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.getchildren"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.getchildren()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.getiterator"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.getiterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iter"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.iter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iterchildren"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.iterchildren()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.iterdescendants"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.iterdescendants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.RestrictedElement.itersiblings"><code class="docutils literal notranslate"><span class="pre">RestrictedElement.itersiblings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.XML"><code class="docutils literal notranslate"><span class="pre">XML()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.check_docinfo"><code class="docutils literal notranslate"><span class="pre">check_docinfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.fromstring"><code class="docutils literal notranslate"><span class="pre">fromstring()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.getDefaultParser"><code class="docutils literal notranslate"><span class="pre">getDefaultParser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.iterparse"><code class="docutils literal notranslate"><span class="pre">iterparse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="onelogin.saml2.html#onelogin.saml2.xmlparser.parse"><code class="docutils literal notranslate"><span class="pre">parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="onelogin.saml2.html#module-onelogin.saml2">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-onelogin">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-onelogin" title="Permalink to this heading"></a></h2>
+<p>Add SAML support to your Python softwares using this library.</p>
+<p>SAML Python toolkit let you build a SP (Service Provider)
+over your Python application and connect it to any IdP (Identity Provider).</p>
+<p>Supports:</p>
+<ul class="simple">
+<li><p>SSO and SLO (SP-Initiated and IdP-Initiated).</p></li>
+<li><p>Assertion and nameId encryption.</p></li>
+<li><p>Assertion signature.</p></li>
+<li><p>Message signature: AuthNRequest, LogoutRequest, LogoutResponses.</p></li>
+<li><p>Enable an Assertion Consumer Service endpoint.</p></li>
+<li><p>Enable a Single Logout Service endpoint.</p></li>
+<li><p>Publish the SP metadata (which can be signed).</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SAML Python2/3 Toolkit’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="onelogin.saml2.html" class="btn btn-neutral float-right" title="onelogin.saml2 package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.logout_response &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.logout_response</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.logout_response</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Logout_Response class</span>
+
+
+<span class="sd">Logout Response class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span><span class="p">,</span> <span class="n">OneLogin_Saml2_ValidationError</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_templates</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Templates</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Logout_Response</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    This class  handles a Logout Response. It Builds or parses a Logout Response object</span>
+<span class="sd">    and validates it.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a Logout Response object (Initialize params from settings</span>
+<span class="sd">        and if provided load the Logout Response.</span>
+
+<span class="sd">        Arguments are:</span>
+<span class="sd">            * (OneLogin_Saml2_Settings)   settings. Setting data</span>
+<span class="sd">            * (string)                    response. An UUEncoded SAML Logout</span>
+<span class="sd">                                                    response from the IdP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">decode_base64_and_inflate</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">ignore_zip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_issuer"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_issuer">[docs]</a>    <span class="k">def</span> <span class="nf">get_issuer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the Issuer of the Logout Response Message</span>
+<span class="sd">        :return: The Issuer</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">issuer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">issuer_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;/samlp:LogoutResponse/saml:Issuer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">issuer_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">issuer</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">issuer_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">issuer</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_status"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the Status</span>
+<span class="sd">        :return: The Status</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;/samlp:LogoutResponse/samlp:Status/samlp:StatusCode&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">status</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.is_valid"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">,</span> <span class="n">request_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines if the SAML LogoutResponse is valid</span>
+<span class="sd">        :param request_id: The ID of the LogoutRequest sent by this SP to the IdP</span>
+<span class="sd">        :type request_id: string</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+
+<span class="sd">        :return: Returns if the SAML LogoutResponse is or not valid</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+            <span class="n">idp_entity_id</span> <span class="o">=</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;entityId&#39;</span><span class="p">]</span>
+            <span class="n">get_data</span> <span class="o">=</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;get_data&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_strict</span><span class="p">():</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">validate_xml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;saml-schema-protocol-2.0.xsd&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">())</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_XML_FORMAT</span>
+                    <span class="p">)</span>
+
+                <span class="n">security</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_security_data</span><span class="p">()</span>
+
+                <span class="c1"># Check if the InResponseTo of the Logout Response matches the ID of the Logout Request (requestId) if provided</span>
+                <span class="n">in_response_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_response_to</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">request_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">in_response_to</span> <span class="ow">and</span> <span class="n">in_response_to</span> <span class="o">!=</span> <span class="n">request_id</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;The InResponseTo of the Logout Response: </span><span class="si">%s</span><span class="s1">, does not match the ID of the Logout request sent by the SP: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_response_to</span><span class="p">,</span> <span class="n">request_id</span><span class="p">),</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_INRESPONSETO</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Check issuer</span>
+                <span class="n">issuer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issuer</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">issuer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">issuer</span> <span class="o">!=</span> <span class="n">idp_entity_id</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Invalid issuer in the Logout Response (expected </span><span class="si">%(idpEntityId)s</span><span class="s1">, got </span><span class="si">%(issuer)s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+                        <span class="p">{</span>
+                            <span class="s1">&#39;idpEntityId&#39;</span><span class="p">:</span> <span class="n">idp_entity_id</span><span class="p">,</span>
+                            <span class="s1">&#39;issuer&#39;</span><span class="p">:</span> <span class="n">issuer</span>
+                        <span class="p">},</span>
+                        <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_ISSUER</span>
+                    <span class="p">)</span>
+
+                <span class="n">current_url</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_no_query</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+
+                <span class="c1"># Check destination</span>
+                <span class="n">destination</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Destination&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">destination</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">normalize_url</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">destination</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">normalize_url</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">current_url</span><span class="p">)):</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The LogoutResponse was received at </span><span class="si">%s</span><span class="s1"> instead of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">current_url</span><span class="p">,</span> <span class="n">destination</span><span class="p">),</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_DESTINATION</span>
+                        <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;wantMessagesSigned&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="s1">&#39;Signature&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">get_data</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                            <span class="s1">&#39;The Message of the Logout Response is not signed and the SP require it&#39;</span><span class="p">,</span>
+                            <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">NO_SIGNED_MESSAGE</span>
+                        <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># pylint: disable=R0801</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">is_debug_active</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exceptions</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a node from the Etree (Logout Response Message)</span>
+<span class="sd">        :param query: Xpath Expression</span>
+<span class="sd">        :type query: string</span>
+<span class="sd">        :return: The queried node</span>
+<span class="sd">        :rtype: Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.build"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_response_to</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">STATUS_SUCCESS</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a Logout Response object.</span>
+<span class="sd">        :param in_response_to: InResponseTo value for the Logout Response.</span>
+<span class="sd">        :type in_response_to: string</span>
+<span class="sd">        :param: status: The status of the response</span>
+<span class="sd">        :type: status: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_sp_data</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_request_id</span><span class="p">()</span>
+
+        <span class="n">issue_instant</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_time_to_SAML</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="n">logout_response</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Templates</span><span class="o">.</span><span class="n">LOGOUT_RESPONSE</span> <span class="o">%</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s2">&quot;issue_instant&quot;</span><span class="p">:</span> <span class="n">issue_instant</span><span class="p">,</span>
+            <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get_idp_slo_response_url</span><span class="p">(),</span>
+            <span class="s2">&quot;in_response_to&quot;</span><span class="p">:</span> <span class="n">in_response_to</span><span class="p">,</span>
+            <span class="s2">&quot;entity_id&quot;</span><span class="p">:</span> <span class="n">sp_data</span><span class="p">[</span><span class="s2">&quot;entityId&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span> <span class="o">=</span> <span class="n">logout_response</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_in_response_to"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_in_response_to">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_response_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ID of the LogoutRequest which this response is in response to</span>
+<span class="sd">        :returns: ID of LogoutRequest this LogoutResponse is in response to or None if it is not present</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;InResponseTo&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_response"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a Logout Response object.</span>
+<span class="sd">        :param deflate: It makes the deflate process optional</span>
+<span class="sd">        :type: bool</span>
+<span class="sd">        :return: Logout Response maybe deflated and base64 encoded</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">deflate</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">deflate_and_base64_encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_error"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After executing a validation process, if it fails this method returns the cause</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Logout_Response.get_xml"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.auth.OneLogin_Saml2_Logout_Response.get_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the XML that will be sent as part of the response</span>
+<span class="sd">        or that was received at the SP</span>
+<span class="sd">        :return: XML response body</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logout_response</span></div>
+
+    <span class="k">def</span> <span class="nf">_generate_request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate an unique logout response ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">generate_unique_id</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

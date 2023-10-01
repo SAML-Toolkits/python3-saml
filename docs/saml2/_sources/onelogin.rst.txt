@@ -1,0 +1,18 @@
+onelogin package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   onelogin.saml2
+
+Module contents
+---------------
+
+.. automodule:: onelogin
+   :members:
+   :undoc-members:
+   :show-inheritance:

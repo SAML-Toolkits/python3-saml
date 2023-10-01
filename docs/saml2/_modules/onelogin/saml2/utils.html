@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.utils &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Utils class</span>
+
+
+<span class="sd">Auxiliary class of SAML Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">calendar</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span><span class="p">,</span> <span class="n">sha256</span><span class="p">,</span> <span class="n">sha384</span><span class="p">,</span> <span class="n">sha512</span>
+<span class="kn">from</span> <span class="nn">isodate</span> <span class="kn">import</span> <span class="n">parse_duration</span> <span class="k">as</span> <span class="n">duration_parser</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">wrap</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">import</span> <span class="nn">zlib</span>
+<span class="kn">import</span> <span class="nn">xmlsec</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.errors</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">,</span> <span class="n">OneLogin_Saml2_ValidationError</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote_plus</span><span class="p">,</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span>  <span class="c1"># py3</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span>
+    <span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">quote_plus</span>  <span class="c1"># py2</span>
+
+
+<div class="viewcode-block" id="return_false_on_exception"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.return_false_on_exception">[docs]</a><span class="k">def</span> <span class="nf">return_false_on_exception</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator. When applied to a function, it will, by default, suppress any exceptions</span>
+<span class="sd">    raised by that function and return False. It may be overridden by passing a</span>
+<span class="sd">    &quot;raise_exceptions&quot; keyword argument when calling the wrapped function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">exceptfalse</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;raise_exceptions&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exceptfalse</span></div>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Utils</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Auxiliary class that contains several utility methods to parse time,</span>
+<span class="sd">    urls, add sign, encrypt, decrypt, sign validation, handle xml ...</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RESPONSE_SIGNATURE_XPATH</span> <span class="o">=</span> <span class="s1">&#39;/samlp:Response/ds:Signature&#39;</span>
+    <span class="n">ASSERTION_SIGNATURE_XPATH</span> <span class="o">=</span> <span class="s1">&#39;/samlp:Response/saml:Assertion/ds:Signature&#39;</span>
+
+    <span class="n">TIME_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%SZ&quot;</span>
+    <span class="n">TIME_FORMAT_2</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S.</span><span class="si">%f</span><span class="s2">Z&quot;</span>
+    <span class="n">TIME_FORMAT_WITH_FRAGMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:\d{2,2})(\.\d*)?Z?$&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.escape_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.escape_url">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">escape_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">lowercase_urlencoding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        escape the non-safe symbols in url</span>
+<span class="sd">        The encoding used by ADFS 3.0 is not compatible with</span>
+<span class="sd">        python&#39;s quote_plus (ADFS produces lower case hex numbers and quote_plus produces</span>
+<span class="sd">        upper case hex numbers)</span>
+<span class="sd">        :param url: the url to escape</span>
+<span class="sd">        :type url: str</span>
+
+<span class="sd">        :param lowercase_urlencoding: lowercase or no</span>
+<span class="sd">        :type lowercase_urlencoding: boolean</span>
+
+<span class="sd">        :return: the escaped url</span>
+<span class="sd">        :rtype str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="n">quote_plus</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;%[A-F0-9]</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">encoded</span><span class="p">)</span> <span class="k">if</span> <span class="n">lowercase_urlencoding</span> <span class="k">else</span> <span class="n">encoded</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.b64encode"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.b64encode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">b64encode</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;base64 encode&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.b64decode"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.b64decode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">b64decode</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;base64 decode&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.decode_base64_and_inflate"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.decode_base64_and_inflate">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">decode_base64_and_inflate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ignore_zip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        base64 decodes and then inflates according to RFC1951</span>
+<span class="sd">        :param value: a deflated and encoded string</span>
+<span class="sd">        :type value: string</span>
+<span class="sd">        :param ignore_zip: ignore zip errors</span>
+<span class="sd">        :returns: the string after decoding and inflating</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">zlib</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">zlib</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_zip</span><span class="p">:</span>
+                <span class="k">raise</span>
+        <span class="k">return</span> <span class="n">encoded</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.deflate_and_base64_encode"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.deflate_and_base64_encode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">deflate_and_base64_encode</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deflates and then base64 encodes a string</span>
+<span class="sd">        :param value: The string to deflate and encode</span>
+<span class="sd">        :type value: string</span>
+<span class="sd">        :returns: The deflated and encoded string</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">value</span><span class="p">))[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.format_cert"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_cert">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">format_cert</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">heads</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a x509 cert (adding header &amp; footer if required).</span>
+
+<span class="sd">        :param cert: A x509 unformatted cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param heads: True if we want to include head and footer</span>
+<span class="sd">        :type: boolean</span>
+
+<span class="sd">        :returns: Formatted cert</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x0D</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x509_cert</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----BEGIN CERTIFICATE-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----END CERTIFICATE-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">x509_cert</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">heads</span><span class="p">:</span>
+                <span class="n">x509_cert</span> <span class="o">=</span> <span class="s2">&quot;-----BEGIN CERTIFICATE-----</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">x509_cert</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-----END CERTIFICATE-----</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">x509_cert</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.format_private_key"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_private_key">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">format_private_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">heads</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a private key (adding header &amp; footer if required).</span>
+
+<span class="sd">        :param key A private key</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param heads: True if we want to include head and footer</span>
+<span class="sd">        :type: boolean</span>
+
+<span class="sd">        :returns: Formated private key</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">private_key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x0D</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">private_key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">private_key</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;-----BEGIN PRIVATE KEY-----&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----BEGIN PRIVATE KEY-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----END PRIVATE KEY-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">heads</span><span class="p">:</span>
+                    <span class="n">private_key</span> <span class="o">=</span> <span class="s2">&quot;-----BEGIN PRIVATE KEY-----</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-----END PRIVATE KEY-----</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----BEGIN RSA PRIVATE KEY-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-----END RSA PRIVATE KEY-----&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">heads</span><span class="p">:</span>
+                    <span class="n">private_key</span> <span class="o">=</span> <span class="s2">&quot;-----BEGIN RSA PRIVATE KEY-----</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-----END RSA PRIVATE KEY-----</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">private_key</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.redirect"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.redirect">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{},</span> <span class="n">request_data</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a redirection to the provided url (or return the target url).</span>
+
+<span class="sd">        :param url: The target url</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param parameters: Extra parameters to be passed as part of the url</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :returns: Url</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">),</span> <span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># Verify that the URL is to a http or https site.</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^https?://&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;Redirect to invalid URL: &#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">REDIRECT_INVALID_URL</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Add encoded parameters</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">param_prefix</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param_prefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">param</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">param</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">param</span> <span class="o">+=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;[]=&#39;</span> <span class="o">+</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&amp;&#39;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">param</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">escape_url</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">param</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="n">param_prefix</span> <span class="o">+</span> <span class="n">param</span>
+                <span class="n">param_prefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span>
+
+        <span class="k">return</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_self_url_host"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url_host">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_self_url_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the protocol + the current host + the port (if different than</span>
+<span class="sd">        common ports).</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: Url</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_host</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+        <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;https&#39;</span> <span class="k">if</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">is_https</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;http&#39;</span>
+
+        <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;server_port&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s1">&#39;The server_port key in request data is deprecated. &#39;</span>
+                <span class="s1">&#39;The http_host key should include a port, if required.&#39;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">port_suffix</span> <span class="o">=</span> <span class="s1">&#39;:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;server_port&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">current_host</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">port_suffix</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">protocol</span> <span class="o">==</span> <span class="s1">&#39;https&#39;</span> <span class="ow">and</span> <span class="n">port_suffix</span> <span class="o">==</span> <span class="s1">&#39;:443&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">protocol</span> <span class="o">==</span> <span class="s1">&#39;http&#39;</span> <span class="ow">and</span> <span class="n">port_suffix</span> <span class="o">==</span> <span class="s1">&#39;:80&#39;</span><span class="p">)):</span>
+                    <span class="n">current_host</span> <span class="o">+=</span> <span class="n">port_suffix</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">://</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">current_host</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_self_host"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_host">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_self_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current host (which may include a port number part).</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: The current host</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;http_host&#39;</span> <span class="ow">in</span> <span class="n">request_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;http_host&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;server_name&#39;</span> <span class="ow">in</span> <span class="n">request_data</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The server_name key in request data is undocumented &amp; deprecated.&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;server_name&#39;</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No hostname defined&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.is_https"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.is_https">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_https</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if https or http.</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: False if https is not active</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_https</span> <span class="o">=</span> <span class="s1">&#39;https&#39;</span> <span class="ow">in</span> <span class="n">request_data</span> <span class="ow">and</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;https&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;off&#39;</span>
+        <span class="c1"># TODO: this use of server_port should be removed too</span>
+        <span class="n">is_https</span> <span class="o">=</span> <span class="n">is_https</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;server_port&#39;</span> <span class="ow">in</span> <span class="n">request_data</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;server_port&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;443&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">is_https</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_self_url_no_query"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url_no_query">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_self_url_no_query</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the URL of the current host + current view.</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: The url of current host + current view</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_url_host</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+        <span class="n">script_name</span> <span class="o">=</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;script_name&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">script_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">script_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="n">script_name</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">script_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">script_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">self_url_no_query</span> <span class="o">=</span> <span class="n">self_url_host</span> <span class="o">+</span> <span class="n">script_name</span>
+        <span class="k">if</span> <span class="s1">&#39;path_info&#39;</span> <span class="ow">in</span> <span class="n">request_data</span><span class="p">:</span>
+            <span class="n">self_url_no_query</span> <span class="o">+=</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;path_info&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">self_url_no_query</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_self_routed_url_no_query"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_routed_url_no_query">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_self_routed_url_no_query</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the routed URL of the current host + current view.</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: The url of current host + current view</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_url_host</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;request_uri&#39;</span> <span class="ow">in</span> <span class="n">request_data</span> <span class="ow">and</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;request_uri&#39;</span><span class="p">]:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;request_uri&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;query_string&#39;</span> <span class="ow">in</span> <span class="n">request_data</span> <span class="ow">and</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;query_string&#39;</span><span class="p">]:</span>
+                <span class="n">route</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;query_string&#39;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">self_url_host</span> <span class="o">+</span> <span class="n">route</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_self_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_self_url">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_self_url</span><span class="p">(</span><span class="n">request_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the URL of the current host + current view + query.</span>
+
+<span class="sd">        :param request_data: The request as a dict</span>
+<span class="sd">        :type: dict</span>
+
+<span class="sd">        :return: The url of current host + current view + query</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_url_host</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_self_url_host</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+
+        <span class="n">request_uri</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;request_uri&#39;</span> <span class="ow">in</span> <span class="n">request_data</span><span class="p">:</span>
+            <span class="n">request_uri</span> <span class="o">=</span> <span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;request_uri&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request_uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^https?://[^/]*(/.*)&#39;</span><span class="p">,</span> <span class="n">request_uri</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">request_uri</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">self_url_host</span> <span class="o">+</span> <span class="n">request_uri</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.generate_unique_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.generate_unique_id">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">generate_unique_id</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates an unique string (used for example as ID for assertions).</span>
+
+<span class="sd">        :return: A unique string</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;ONELOGIN_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sha1</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.parse_time_to_SAML"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_time_to_SAML">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_time_to_SAML</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a UNIX timestamp to SAML2 timestamp on the form</span>
+<span class="sd">        yyyy-mm-ddThh:mm:ss(\.s+)?Z.</span>
+
+<span class="sd">        :param time: The time we should convert (DateTime).</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :return: SAML2 timestamp.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">TIME_FORMAT</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.parse_SAML_to_time"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_SAML_to_time">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_SAML_to_time</span><span class="p">(</span><span class="n">timestr</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z</span>
+<span class="sd">        to a UNIX timestamp. The sub-second part is ignored.</span>
+
+<span class="sd">        :param timestr: The time we should convert (SAML Timestamp).</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :return: Converted to a unix timestamp.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">TIME_FORMAT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">TIME_FORMAT_2</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">elem</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">TIME_FORMAT_WITH_FRAGMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">timestr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">elem</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;time data </span><span class="si">%s</span><span class="s2"> does not match format </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;yyyy-mm-ddThh:mm:ss(\.s+)?Z&#39;</span><span class="p">))</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">TIME_FORMAT</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">calendar</span><span class="o">.</span><span class="n">timegm</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">utctimetuple</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.now"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.now">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">now</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: unix timestamp of actual time.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">calendar</span><span class="o">.</span><span class="n">timegm</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">utctimetuple</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.parse_duration"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.parse_duration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_duration</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interprets a ISO8601 duration value relative to a given timestamp.</span>
+
+<span class="sd">        :param duration: The duration, as a string.</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param timestamp: The unix timestamp we should apply the duration to.</span>
+<span class="sd">                          Optional, default to the current time.</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :return: The new timestamp, after the duration is applied.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">timedelta</span> <span class="o">=</span> <span class="n">duration_parser</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span>
+        <span class="k">return</span> <span class="n">calendar</span><span class="o">.</span><span class="n">timegm</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">utctimetuple</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_expire_time"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_expire_time">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_expire_time</span><span class="p">(</span><span class="n">cache_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">valid_until</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares 2 dates and returns the earliest.</span>
+
+<span class="sd">        :param cache_duration: The duration, as a string.</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param valid_until: The valid until date, as a string or as a timestamp</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :return: The expiration time.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expire_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">cache_duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expire_time</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_duration</span><span class="p">(</span><span class="n">cache_duration</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">valid_until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valid_until</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">valid_until_time</span> <span class="o">=</span> <span class="n">valid_until</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">valid_until_time</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">valid_until</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">expire_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expire_time</span> <span class="o">&gt;</span> <span class="n">valid_until_time</span><span class="p">:</span>
+                <span class="n">expire_time</span> <span class="o">=</span> <span class="n">valid_until_time</span>
+
+        <span class="k">if</span> <span class="n">expire_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">expire_time</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.delete_local_session"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.delete_local_session">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">delete_local_session</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes the local session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.calculate_x509_fingerprint"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.calculate_x509_fingerprint">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_x509_fingerprint</span><span class="p">(</span><span class="n">x509_cert</span><span class="p">,</span> <span class="n">alg</span><span class="o">=</span><span class="s1">&#39;sha1&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the fingerprint of a formatted x509cert.</span>
+
+<span class="sd">        :param x509_cert: x509 cert formatted</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param alg: The algorithm to build the fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :returns: fingerprint</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x509_cert</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">str_type</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">x509_cert</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">inData</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="c1"># Remove &#39;\r&#39; from end of line if present.</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inData</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;-----BEGIN CERTIFICATE-----&#39;</span><span class="p">:</span>
+                    <span class="n">inData</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;-----BEGIN PUBLIC KEY-----&#39;</span> <span class="ow">or</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;-----BEGIN RSA PRIVATE KEY-----&#39;</span><span class="p">:</span>
+                    <span class="c1"># This isn&#39;t an X509 certificate.</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;-----END CERTIFICATE-----&#39;</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># Append the current line to the certificate data.</span>
+                <span class="n">data</span> <span class="o">+=</span> <span class="n">line</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">decoded_data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">alg</span> <span class="o">==</span> <span class="s1">&#39;sha512&#39;</span><span class="p">:</span>
+            <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">sha512</span><span class="p">(</span><span class="n">decoded_data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">alg</span> <span class="o">==</span> <span class="s1">&#39;sha384&#39;</span><span class="p">:</span>
+            <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">sha384</span><span class="p">(</span><span class="n">decoded_data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">alg</span> <span class="o">==</span> <span class="s1">&#39;sha256&#39;</span><span class="p">:</span>
+            <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="n">decoded_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">decoded_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fingerprint</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.format_finger_print"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.format_finger_print">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">format_finger_print</span><span class="p">(</span><span class="n">fingerprint</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats a fingerprint.</span>
+
+<span class="sd">        :param fingerprint: fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :returns: Formatted fingerprint</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">formatted_fingerprint</span> <span class="o">=</span> <span class="n">fingerprint</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">formatted_fingerprint</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.generate_name_id"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.generate_name_id">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">generate_name_id</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">sp_nq</span><span class="p">,</span> <span class="n">sp_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a nameID.</span>
+
+<span class="sd">        :param value: fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param sp_nq: SP Name Qualifier</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param sp_format: SP Format</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param cert: IdP Public Cert to encrypt the nameID</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :returns: DOMElement | XMLSec nameID</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        :param nq: IDP Name Qualifier</span>
+<span class="sd">        :type: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_root</span><span class="p">(</span><span class="s2">&quot;{</span><span class="si">%s</span><span class="s2">}container&quot;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAML</span><span class="p">)</span>
+        <span class="n">name_id</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">make_child</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}NameID&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_SAML</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp_nq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;SPNameQualifier&#39;</span><span class="p">,</span> <span class="n">sp_nq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp_format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Format&#39;</span><span class="p">,</span> <span class="n">sp_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;NameQualifier&#39;</span><span class="p">,</span> <span class="n">nq</span><span class="p">)</span>
+        <span class="n">name_id</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">cert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+
+            <span class="c1"># Load the public cert</span>
+            <span class="n">manager</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeysManager</span><span class="p">()</span>
+            <span class="n">manager</span><span class="o">.</span><span class="n">add_key</span><span class="p">(</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">CERT_PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+            <span class="c1"># Prepare for encryption</span>
+            <span class="n">enc_data</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">encrypted_data_create</span><span class="p">(</span>
+                <span class="n">root</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">AES128</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">EncryptionType</span><span class="o">.</span><span class="n">ELEMENT</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="s2">&quot;xenc&quot;</span><span class="p">)</span>
+
+            <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">encrypted_data_ensure_cipher_value</span><span class="p">(</span><span class="n">enc_data</span><span class="p">)</span>
+            <span class="n">key_info</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">encrypted_data_ensure_key_info</span><span class="p">(</span><span class="n">enc_data</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="s2">&quot;dsig&quot;</span><span class="p">)</span>
+            <span class="n">enc_key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">add_encrypted_key</span><span class="p">(</span><span class="n">key_info</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_OAEP</span><span class="p">)</span>
+            <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">encrypted_data_ensure_cipher_value</span><span class="p">(</span><span class="n">enc_key</span><span class="p">)</span>
+
+            <span class="c1"># Encrypt!</span>
+            <span class="n">enc_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">EncryptionContext</span><span class="p">(</span><span class="n">manager</span><span class="p">)</span>
+            <span class="n">enc_ctx</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyData</span><span class="o">.</span><span class="n">AES</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyDataType</span><span class="o">.</span><span class="n">SESSION</span><span class="p">)</span>
+            <span class="n">enc_data</span> <span class="o">=</span> <span class="n">enc_ctx</span><span class="o">.</span><span class="n">encrypt_xml</span><span class="p">(</span><span class="n">enc_data</span><span class="p">,</span> <span class="n">name_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;saml:EncryptedID&gt;&#39;</span> <span class="o">+</span> <span class="n">compat</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">enc_data</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;&lt;/saml:EncryptedID&gt;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">extract_tag_text</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;saml:NameID&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.get_status"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.get_status">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="n">dom</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets Status from a Response.</span>
+
+<span class="sd">        :param dom: The Response as XML</span>
+<span class="sd">        :type: Document</span>
+
+<span class="sd">        :returns: The Status, an array with the code and a message.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">status_entry</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/samlp:Status&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">status_entry</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;Missing Status on response&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">MISSING_STATUS</span>
+            <span class="p">)</span>
+
+        <span class="n">code_entry</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/samlp:Status/samlp:StatusCode&#39;</span><span class="p">,</span> <span class="n">status_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_entry</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;Missing Status Code on response&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">MISSING_STATUS_CODE</span>
+            <span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">code_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">code</span>
+
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">message_entry</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/samlp:Status/samlp:StatusMessage&#39;</span><span class="p">,</span> <span class="n">status_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message_entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">subcode_entry</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="s1">&#39;/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode&#39;</span><span class="p">,</span> <span class="n">status_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subcode_entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subcode_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">message_entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">message_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">status</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.decrypt_element"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.decrypt_element">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">decrypt_element</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypts an encrypted element.</span>
+
+<span class="sd">        :param encrypted_data: The encrypted data.</span>
+<span class="sd">        :type: lxml.etree.Element | DOMElement | basestring</span>
+
+<span class="sd">        :param key: The key.</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param inplace: update passed data with decrypted result</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :returns: The decrypted element.</span>
+<span class="sd">        :rtype: lxml.etree.Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">Element</span><span class="p">):</span>
+            <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">encrypted_data</span><span class="o">.</span><span class="n">toxml</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_element_class</span><span class="p">):</span>
+            <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">,</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_text_class</span><span class="p">):</span>
+            <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">_parse_etree</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">)</span>
+
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeysManager</span><span class="p">()</span>
+
+        <span class="n">manager</span><span class="o">.</span><span class="n">add_key</span><span class="p">(</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">enc_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">EncryptionContext</span><span class="p">(</span><span class="n">manager</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">enc_ctx</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.add_sign"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.add_sign">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_sign</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sign_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span> <span class="n">digest_algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA256</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds signature key and senders certificate to an element (Message or</span>
+<span class="sd">        Assertion).</span>
+
+<span class="sd">        :param xml: The element we should sign</span>
+<span class="sd">        :type: string | Document</span>
+
+<span class="sd">        :param key: The private key</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param cert: The public</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param sign_algorithm: Signature algorithm method</span>
+<span class="sd">        :type sign_algorithm: string</span>
+
+<span class="sd">        :param digest_algorithm: Digest algorithm method</span>
+<span class="sd">        :type digest_algorithm: string</span>
+
+<span class="sd">        :returns: Signed XML</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">xml</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">xml</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty string supplied as input&#39;</span><span class="p">)</span>
+
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+
+        <span class="n">sign_algorithm_transform_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA512</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA512</span>
+        <span class="p">}</span>
+        <span class="n">sign_algorithm_transform</span> <span class="o">=</span> <span class="n">sign_algorithm_transform_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sign_algorithm</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">)</span>
+
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">EXCL_C14N</span><span class="p">,</span> <span class="n">sign_algorithm_transform</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="s1">&#39;ds&#39;</span><span class="p">)</span>
+
+        <span class="n">issuer</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;//saml:Issuer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">issuer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">issuer</span> <span class="o">=</span> <span class="n">issuer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">issuer</span><span class="o">.</span><span class="n">addnext</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+            <span class="n">elem_to_sign</span> <span class="o">=</span> <span class="n">issuer</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">entity_descriptor</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;//md:EntityDescriptor&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity_descriptor</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+            <span class="n">elem_to_sign</span> <span class="o">=</span> <span class="n">elem</span>
+
+        <span class="n">elem_id</span> <span class="o">=</span> <span class="n">elem_to_sign</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">elem_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem_id</span><span class="p">:</span>
+                <span class="n">elem_id</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">elem_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">generated_id</span> <span class="o">=</span> <span class="n">generated_id</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">generate_unique_id</span><span class="p">()</span>
+            <span class="n">elem_id</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">generated_id</span>
+            <span class="n">elem_to_sign</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generated_id</span>
+
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">add_ids</span><span class="p">(</span><span class="n">elem_to_sign</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">])</span>
+
+        <span class="n">digest_algorithm_transform_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">SHA1</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA256</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">SHA256</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA384</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">SHA384</span><span class="p">,</span>
+            <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA512</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">SHA512</span>
+        <span class="p">}</span>
+        <span class="n">digest_algorithm_transform</span> <span class="o">=</span> <span class="n">digest_algorithm_transform_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">digest_algorithm</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">SHA256</span><span class="p">)</span>
+
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">add_reference</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">digest_algorithm_transform</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">elem_id</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">add_transform</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">ENVELOPED</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">add_transform</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">EXCL_C14N</span><span class="p">)</span>
+        <span class="n">key_info</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">ensure_key_info</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">add_x509_data</span><span class="p">(</span><span class="n">key_info</span><span class="p">)</span>
+
+        <span class="n">dsig_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">SignatureContext</span><span class="p">()</span>
+        <span class="n">sign_key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">sign_key</span><span class="o">.</span><span class="n">load_cert_from_memory</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">PEM</span><span class="p">)</span>
+
+        <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">sign_key</span>
+        <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.validate_sign"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_sign">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@return_false_on_exception</span>
+    <span class="k">def</span> <span class="nf">validate_sign</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="o">=</span><span class="s1">&#39;sha1&#39;</span><span class="p">,</span> <span class="n">validatecert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">xpath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">multicerts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates a signature (Message or Assertion).</span>
+
+<span class="sd">        :param xml: The element we should validate</span>
+<span class="sd">        :type: string | Document</span>
+
+<span class="sd">        :param cert: The public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprint: The fingerprint of the public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprintalg: The algorithm used to build the fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param validatecert: If true, will verify the signature and if the cert is valid.</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param xpath: The xpath of the signed element</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param multicerts: Multiple public certs</span>
+<span class="sd">        :type: list</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">xml</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">xml</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty string supplied as input&#39;</span><span class="p">)</span>
+
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">add_ids</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">xpath</span><span class="p">:</span>
+            <span class="n">signature_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">xpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">signature_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE_XPATH</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">signature_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">ASSERTION_SIGNATURE_XPATH</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">signature_node</span> <span class="o">=</span> <span class="n">signature_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">multicerts</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_node_sign</span><span class="p">(</span><span class="n">signature_node</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">,</span> <span class="n">validatecert</span><span class="p">,</span> <span class="n">debug</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If multiple certs are provided, I may ignore cert and</span>
+                <span class="c1"># fingerprint provided by the method and just check the</span>
+                <span class="c1"># certs multicerts</span>
+                <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">fingerprintalg</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">cert</span> <span class="ow">in</span> <span class="n">multicerts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_node_sign</span><span class="p">(</span><span class="n">signature_node</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">,</span> <span class="n">validatecert</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                    <span class="s1">&#39;Signature validation failed. SAML Response rejected.&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;Expected exactly one signature node; got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)),</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">WRONG_NUMBER_OF_SIGNATURES</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.validate_metadata_sign"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_metadata_sign">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@return_false_on_exception</span>
+    <span class="k">def</span> <span class="nf">validate_metadata_sign</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="o">=</span><span class="s1">&#39;sha1&#39;</span><span class="p">,</span> <span class="n">validatecert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates a signature of a EntityDescriptor.</span>
+
+<span class="sd">        :param xml: The element we should validate</span>
+<span class="sd">        :type: string | Document</span>
+
+<span class="sd">        :param cert: The public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprint: The fingerprint of the public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprintalg: The algorithm used to build the fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param validatecert: If true, will verify the signature and if the cert is valid.</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">xml</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">xml</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty string supplied as input&#39;</span><span class="p">)</span>
+
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">add_ids</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">])</span>
+
+        <span class="n">signature_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;/md:EntitiesDescriptor/ds:Signature&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">signature_nodes</span> <span class="o">+=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;/md:EntityDescriptor/ds:Signature&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">signature_nodes</span> <span class="o">+=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;/md:EntityDescriptor/md:SPSSODescriptor/ds:Signature&#39;</span><span class="p">)</span>
+                <span class="n">signature_nodes</span> <span class="o">+=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;/md:EntityDescriptor/md:IDPSSODescriptor/ds:Signature&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">signature_node</span> <span class="ow">in</span> <span class="n">signature_nodes</span><span class="p">:</span>
+                <span class="c1"># Raises exception if invalid</span>
+                <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">validate_node_sign</span><span class="p">(</span><span class="n">signature_node</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">,</span> <span class="n">validatecert</span><span class="p">,</span> <span class="n">debug</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not validate metadata signature: No signature nodes found.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.validate_node_sign"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_node_sign">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@return_false_on_exception</span>
+    <span class="k">def</span> <span class="nf">validate_node_sign</span><span class="p">(</span><span class="n">signature_node</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="o">=</span><span class="s1">&#39;sha1&#39;</span><span class="p">,</span> <span class="n">validatecert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates a signature node.</span>
+
+<span class="sd">        :param signature_node: The signature node</span>
+<span class="sd">        :type: Node</span>
+
+<span class="sd">        :param xml: The element we should validate</span>
+<span class="sd">        :type: Document</span>
+
+<span class="sd">        :param cert: The public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprint: The fingerprint of the public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param fingerprintalg: The algorithm used to build the fingerprint</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param validatecert: If true, will verify the signature and if the cert is valid.</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :param raise_exceptions: Whether to return false on failure or raise an exception</span>
+<span class="sd">        :type raise_exceptions: Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cert</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cert</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fingerprint</span><span class="p">:</span>
+            <span class="n">x509_certificate_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">signature_node</span><span class="p">,</span> <span class="s1">&#39;//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x509_certificate_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">x509_certificate_node</span> <span class="o">=</span> <span class="n">x509_certificate_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">x509_cert_value</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">x509_certificate_node</span><span class="p">)</span>
+                <span class="n">x509_cert_value_formatted</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="n">x509_cert_value</span><span class="p">)</span>
+                <span class="n">x509_fingerprint_value</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">calculate_x509_fingerprint</span><span class="p">(</span><span class="n">x509_cert_value_formatted</span><span class="p">,</span> <span class="n">fingerprintalg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fingerprint</span> <span class="o">==</span> <span class="n">x509_fingerprint_value</span><span class="p">:</span>
+                    <span class="n">cert</span> <span class="o">=</span> <span class="n">x509_cert_value_formatted</span>
+
+        <span class="k">if</span> <span class="n">cert</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cert</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;Could not validate node signature: No certificate provided.&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">CERT_NOT_FOUND</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check if Reference URI is empty</span>
+        <span class="c1"># reference_elem = OneLogin_Saml2_XML.query(signature_node, &#39;//ds:Reference&#39;)</span>
+        <span class="c1"># if len(reference_elem) &gt; 0:</span>
+        <span class="c1">#     if reference_elem[0].get(&#39;URI&#39;) == &#39;&#39;:</span>
+        <span class="c1">#         reference_elem[0].set(&#39;URI&#39;, &#39;#%s&#39; % signature_node.getparent().get(&#39;ID&#39;))</span>
+
+        <span class="k">if</span> <span class="n">validatecert</span><span class="p">:</span>
+            <span class="n">manager</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeysManager</span><span class="p">()</span>
+            <span class="n">manager</span><span class="o">.</span><span class="n">load_cert_from_memory</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">CERT_PEM</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyDataType</span><span class="o">.</span><span class="n">TRUSTED</span><span class="p">)</span>
+            <span class="n">dsig_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">SignatureContext</span><span class="p">(</span><span class="n">manager</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dsig_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">SignatureContext</span><span class="p">()</span>
+            <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">CERT_PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">set_enabled_key_data</span><span class="p">([</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyData</span><span class="o">.</span><span class="n">X509</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">signature_node</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_ValidationError</span><span class="p">(</span>
+                <span class="s1">&#39;Signature validation failed. SAML Response rejected. </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_ValidationError</span><span class="o">.</span><span class="n">INVALID_SIGNATURE</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.sign_binary"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.sign_binary">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sign_binary</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sign binary message</span>
+
+<span class="sd">        :param msg: The element we should validate</span>
+<span class="sd">        :type: bytes</span>
+
+<span class="sd">        :param key: The private key</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+
+<span class="sd">        :return signed message</span>
+<span class="sd">        :rtype str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+
+        <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">dsig_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">SignatureContext</span><span class="p">()</span>
+        <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">sign_binary</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">algorithm</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.validate_binary_sign"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.validate_binary_sign">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_binary_sign</span><span class="p">(</span><span class="n">signed_query</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">cert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates signed binary data (Used to validate GET Signature).</span>
+
+<span class="sd">        :param signed_query: The element we should validate</span>
+<span class="sd">        :type: string</span>
+
+
+<span class="sd">        :param signature: The signature that will be validate</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param cert: The public cert</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param algorithm: Signature algorithm</span>
+<span class="sd">        :type: string</span>
+
+<span class="sd">        :param debug: Activate the xmlsec debug</span>
+<span class="sd">        :type: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xmlsec</span><span class="o">.</span><span class="n">enable_debug_trace</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+            <span class="n">dsig_ctx</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">SignatureContext</span><span class="p">()</span>
+            <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_memory</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">KeyFormat</span><span class="o">.</span><span class="n">CERT_PEM</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="n">sign_algorithm_transform_map</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">DSA_SHA1</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA1</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA384</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA512</span><span class="p">:</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA512</span>
+            <span class="p">}</span>
+            <span class="n">sign_algorithm_transform</span> <span class="o">=</span> <span class="n">sign_algorithm_transform_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Transform</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">)</span>
+
+            <span class="n">dsig_ctx</span><span class="o">.</span><span class="n">verify_binary</span><span class="p">(</span><span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">signed_query</span><span class="p">),</span>
+                                   <span class="n">sign_algorithm_transform</span><span class="p">,</span>
+                                   <span class="n">compat</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">signature</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">xmlsec</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Utils.normalize_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.utils.OneLogin_Saml2_Utils.normalize_url">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns normalized URL for comparison.</span>
+<span class="sd">        This method converts the netloc to lowercase, as it should be case-insensitive (per RFC 4343, RFC 7617)</span>
+<span class="sd">        If standardization fails, the original URL is returned</span>
+<span class="sd">        Python documentation indicates that URL split also normalizes query strings if empty query fields are present</span>
+
+<span class="sd">        :param url: URL</span>
+<span class="sd">        :type url: String</span>
+
+<span class="sd">        :returns: A normalized URL, or the given URL string if parsing fails</span>
+<span class="sd">        :rtype: String</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">normalized_url</span> <span class="o">=</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">scheme</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">netloc</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">normalized_url</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">url</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

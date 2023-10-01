@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.idp_metadata_parser &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.idp_metadata_parser</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.idp_metadata_parser</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_IdPMetadataParser class</span>
+<span class="sd">Metadata class of SAML Python Toolkit.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib.request</span> <span class="k">as</span> <span class="nn">urllib2</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib2</span>
+
+<span class="kn">import</span> <span class="nn">ssl</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_IdPMetadataParser"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_IdPMetadataParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that contain methods related to obtaining and parsing metadata from IdP</span>
+
+<span class="sd">    This class does not validate in any way the URL that is introduced,</span>
+<span class="sd">    make sure to validate it properly before use it in a get_metadata method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_IdPMetadataParser.get_metadata"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.get_metadata">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">validate_cert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the metadata XML from the provided URL</span>
+<span class="sd">        :param url: Url where the XML of the Identity Provider Metadata is published.</span>
+<span class="sd">        :type url: string</span>
+
+<span class="sd">        :param validate_cert: If the url uses https schema, that flag enables or not the verification of the associated certificate.</span>
+<span class="sd">        :type validate_cert: bool</span>
+
+<span class="sd">        :param timeout: Timeout in seconds to wait for metadata response</span>
+<span class="sd">        :type timeout: int</span>
+<span class="sd">        :param headers: Extra headers to send in the request</span>
+<span class="sd">        :type headers: dict</span>
+
+<span class="sd">        :returns: metadata XML</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span> <span class="ow">or</span> <span class="p">{})</span>
+
+        <span class="k">if</span> <span class="n">validate_cert</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ctx</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">()</span>
+            <span class="n">ctx</span><span class="o">.</span><span class="n">check_hostname</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">ctx</span><span class="o">.</span><span class="n">verify_mode</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">CERT_NONE</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">xml</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dom</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+                <span class="n">idp_descriptor_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="s1">&#39;//md:IDPSSODescriptor&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">idp_descriptor_nodes</span><span class="p">:</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Not valid IdP XML found from URL: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_IdPMetadataParser.parse_remote"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.parse_remote">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parse_remote</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">validate_cert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">entity_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data</span>
+<span class="sd">        :param url: Url where the XML of the Identity Provider Metadata is published.</span>
+<span class="sd">        :type url: string</span>
+
+<span class="sd">        :param validate_cert: If the url uses https schema, that flag enables or not the verification of the associated certificate.</span>
+<span class="sd">        :type validate_cert: bool</span>
+
+<span class="sd">        :param entity_id: Specify the entity_id of the EntityDescriptor that you want to parse a XML</span>
+<span class="sd">                          that contains multiple EntityDescriptor.</span>
+<span class="sd">        :type entity_id: string</span>
+
+<span class="sd">        :param timeout: Timeout in seconds to wait for metadata response</span>
+<span class="sd">        :type timeout: int</span>
+
+<span class="sd">        :returns: settings dict with extracted data</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idp_metadata</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">validate_cert</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;headers&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">idp_metadata</span><span class="p">,</span> <span class="n">entity_id</span><span class="o">=</span><span class="n">entity_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_IdPMetadataParser.parse"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.parse">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">idp_metadata</span><span class="p">,</span>
+            <span class="n">required_sso_binding</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">BINDING_HTTP_REDIRECT</span><span class="p">,</span>
+            <span class="n">required_slo_binding</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">BINDING_HTTP_REDIRECT</span><span class="p">,</span>
+            <span class="n">entity_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the Identity Provider metadata and return a dict with extracted data.</span>
+
+<span class="sd">        If there are multiple &lt;IDPSSODescriptor&gt; tags, parse only the first.</span>
+
+<span class="sd">        Parses only those SSO endpoints with the same binding as given by</span>
+<span class="sd">        the `required_sso_binding` parameter.</span>
+
+<span class="sd">        Parses only those SLO endpoints with the same binding as given by</span>
+<span class="sd">        the `required_slo_binding` parameter.</span>
+
+<span class="sd">        If the metadata specifies multiple SSO endpoints with the required</span>
+<span class="sd">        binding, extract only the first (the same holds true for SLO</span>
+<span class="sd">        endpoints).</span>
+
+<span class="sd">        :param idp_metadata: XML of the Identity Provider Metadata.</span>
+<span class="sd">        :type idp_metadata: string</span>
+
+<span class="sd">        :param required_sso_binding: Parse only POST or REDIRECT SSO endpoints.</span>
+<span class="sd">        :type required_sso_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT</span>
+<span class="sd">            or OneLogin_Saml2_Constants.BINDING_HTTP_POST</span>
+
+<span class="sd">        :param required_slo_binding: Parse only POST or REDIRECT SLO endpoints.</span>
+<span class="sd">        :type required_slo_binding: one of OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT</span>
+<span class="sd">            or OneLogin_Saml2_Constants.BINDING_HTTP_POST</span>
+
+<span class="sd">        :param entity_id: Specify the entity_id of the EntityDescriptor that you want to parse a XML</span>
+<span class="sd">                          that contains multiple EntityDescriptor.</span>
+<span class="sd">        :type entity_id: string</span>
+
+<span class="sd">        :returns: settings dict with extracted data</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">dom</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">to_etree</span><span class="p">(</span><span class="n">idp_metadata</span><span class="p">)</span>
+        <span class="n">idp_entity_id</span> <span class="o">=</span> <span class="n">want_authn_requests_signed</span> <span class="o">=</span> <span class="n">idp_name_id_format</span> <span class="o">=</span> <span class="n">idp_sso_url</span> <span class="o">=</span> <span class="n">idp_slo_url</span> <span class="o">=</span> <span class="n">certs</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">entity_desc_path</span> <span class="o">=</span> <span class="s1">&#39;//md:EntityDescriptor&#39;</span>
+        <span class="k">if</span> <span class="n">entity_id</span><span class="p">:</span>
+            <span class="n">entity_desc_path</span> <span class="o">+=</span> <span class="s2">&quot;[@entityID=&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="n">entity_id</span>
+        <span class="n">entity_descriptor_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="n">entity_desc_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity_descriptor_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">entity_descriptor_node</span> <span class="o">=</span> <span class="n">entity_descriptor_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">idp_descriptor_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">entity_descriptor_node</span><span class="p">,</span> <span class="s1">&#39;./md:IDPSSODescriptor&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idp_descriptor_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">idp_descriptor_node</span> <span class="o">=</span> <span class="n">idp_descriptor_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">idp_entity_id</span> <span class="o">=</span> <span class="n">entity_descriptor_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entityID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">want_authn_requests_signed</span> <span class="o">=</span> <span class="n">idp_descriptor_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WantAuthnRequestsSigned&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">name_id_format_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">idp_descriptor_node</span><span class="p">,</span> <span class="s1">&#39;./md:NameIDFormat&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name_id_format_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">idp_name_id_format</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">name_id_format_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">sso_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                    <span class="n">idp_descriptor_node</span><span class="p">,</span>
+                    <span class="s2">&quot;./md:SingleSignOnService[@Binding=&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="n">required_sso_binding</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sso_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">idp_sso_url</span> <span class="o">=</span> <span class="n">sso_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">slo_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                    <span class="n">idp_descriptor_node</span><span class="p">,</span>
+                    <span class="s2">&quot;./md:SingleLogoutService[@Binding=&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="n">required_slo_binding</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slo_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">idp_slo_url</span> <span class="o">=</span> <span class="n">slo_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">signing_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">idp_descriptor_node</span><span class="p">,</span> <span class="s2">&quot;./md:KeyDescriptor[not(contains(@use, &#39;encryption&#39;))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate&quot;</span><span class="p">)</span>
+                <span class="n">encryption_nodes</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">idp_descriptor_node</span><span class="p">,</span> <span class="s2">&quot;./md:KeyDescriptor[not(contains(@use, &#39;signing&#39;))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signing_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">encryption_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">certs</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signing_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">cert_node</span> <span class="ow">in</span> <span class="n">signing_nodes</span><span class="p">:</span>
+                            <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">cert_node</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encryption_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">cert_node</span> <span class="ow">in</span> <span class="n">encryption_nodes</span><span class="p">:</span>
+                            <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">element_text</span><span class="p">(</span><span class="n">cert_node</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="k">if</span> <span class="n">idp_entity_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;entityId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idp_entity_id</span>
+
+                <span class="k">if</span> <span class="n">idp_sso_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idp_sso_url</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">][</span><span class="s1">&#39;binding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">required_sso_binding</span>
+
+                <span class="k">if</span> <span class="n">idp_slo_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idp_slo_url</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">][</span><span class="s1">&#39;binding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">required_slo_binding</span>
+
+                <span class="k">if</span> <span class="n">want_authn_requests_signed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;security&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;security&#39;</span><span class="p">][</span><span class="s1">&#39;authnRequestsSigned&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">want_authn_requests_signed</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
+
+                <span class="k">if</span> <span class="n">idp_name_id_format</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">][</span><span class="s1">&#39;NameIDFormat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idp_name_id_format</span>
+
+                <span class="k">if</span> <span class="n">certs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">certs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
+                        <span class="p">((</span><span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">certs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span>
+                         <span class="p">(</span><span class="s1">&#39;encryption&#39;</span> <span class="ow">in</span> <span class="n">certs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)))</span> <span class="ow">or</span> \
+                        <span class="p">((</span><span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">certs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span>
+                         <span class="p">(</span><span class="s1">&#39;encryption&#39;</span> <span class="ow">in</span> <span class="n">certs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
+                         <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+                        <span class="k">if</span> <span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;x509cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;signing&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;x509cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">certs</span><span class="p">[</span><span class="s1">&#39;encryption&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">certs</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_IdPMetadataParser.merge_settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.OneLogin_Saml2_IdPMetadataParser.merge_settings">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">merge_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">new_metadata_settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Will update the settings with the provided new settings data extracted from the IdP metadata</span>
+<span class="sd">        :param settings: Current settings dict data</span>
+<span class="sd">        :type settings: dict</span>
+<span class="sd">        :param new_metadata_settings: Settings to be merged (extracted from IdP metadata after parsing)</span>
+<span class="sd">        :type new_metadata_settings: dict</span>
+<span class="sd">        :returns: merged settings</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">new_metadata_settings</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Both arguments must be dictionaries.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Guarantee to not modify original data (`settings.copy()` would not</span>
+        <span class="c1"># be sufficient, as it&#39;s just a shallow copy).</span>
+        <span class="n">result_settings</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="c1"># previously I will take care of cert stuff</span>
+        <span class="k">if</span> <span class="s1">&#39;idp&#39;</span> <span class="ow">in</span> <span class="n">new_metadata_settings</span> <span class="ow">and</span> <span class="s1">&#39;idp&#39;</span> <span class="ow">in</span> <span class="n">result_settings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_metadata_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">del</span> <span class="n">result_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">new_metadata_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">del</span> <span class="n">result_settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">][</span><span class="s1">&#39;x509cert&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Merge `new_metadata_settings` into `result_settings`.</span>
+        <span class="n">dict_deep_merge</span><span class="p">(</span><span class="n">result_settings</span><span class="p">,</span> <span class="n">new_metadata_settings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result_settings</span></div></div>
+
+
+<div class="viewcode-block" id="dict_deep_merge"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.idp_metadata_parser.dict_deep_merge">[docs]</a><span class="k">def</span> <span class="nf">dict_deep_merge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deep-merge dictionary `b` into dictionary `a`.</span>
+
+<span class="sd">    Kudos to http://stackoverflow.com/a/7205107/145400</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">dict_deep_merge</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="c1"># Key conflict, but equal value.</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Key/value conflict. Prioritize b over a.</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">a</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

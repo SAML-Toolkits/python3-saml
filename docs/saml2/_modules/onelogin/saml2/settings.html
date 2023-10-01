@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>onelogin.saml2.settings &mdash; SAML Python2/3 Toolkit 1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=404a92a0"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SAML Python2/3 Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../onelogin.html">onelogin package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SAML Python2/3 Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">onelogin.saml2.settings</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for onelogin.saml2.settings</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; OneLogin_Saml2_Settings class</span>
+
+<span class="sd">Copyright (c) 2010-2021 OneLogin, Inc.</span>
+<span class="sd">MIT License</span>
+
+<span class="sd">Setting class of OneLogin&#39;s Python Toolkit.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">sep</span>
+
+<span class="kn">from</span> <span class="nn">onelogin.saml2</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.constants</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Constants</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.errors</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Error</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.metadata</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Metadata</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_Utils</span>
+<span class="kn">from</span> <span class="nn">onelogin.saml2.xml_utils</span> <span class="kn">import</span> <span class="n">OneLogin_Saml2_XML</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">ujson</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
+
+<span class="c1"># Regex from Django Software Foundation and individual contributors.</span>
+<span class="c1"># Released under a BSD 3-Clause License</span>
+<span class="n">url_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s1">&#39;^(?:[a-z0-9\.\-]*)://&#39;</span>  <span class="c1"># scheme is validated separately</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|&#39;</span>  <span class="c1"># domain...</span>
+    <span class="sa">r</span><span class="s1">&#39;localhost|&#39;</span>  <span class="c1"># localhost...</span>
+    <span class="sa">r</span><span class="s1">&#39;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|&#39;</span>  <span class="c1"># ...or ipv4</span>
+    <span class="sa">r</span><span class="s1">&#39;\[?[A-F0-9]*:[A-F0-9:]+\]?)&#39;</span>  <span class="c1"># ...or ipv6</span>
+    <span class="sa">r</span><span class="s1">&#39;(?::\d+)?&#39;</span>  <span class="c1"># optional port</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:/?|[/?]\S+)$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+<span class="n">url_regex_single_label_domain</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s1">&#39;^(?:[a-z0-9\.\-]*)://&#39;</span>  <span class="c1"># scheme is validated separately</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|&#39;</span>  <span class="c1"># domain...</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:[A-Z0-9_](?:[A-Z0-9-_]{0,61}[A-Z0-9_]))|&#39;</span>  <span class="c1"># single-label-domain</span>
+    <span class="sa">r</span><span class="s1">&#39;localhost|&#39;</span>  <span class="c1"># localhost...</span>
+    <span class="sa">r</span><span class="s1">&#39;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|&#39;</span>  <span class="c1"># ...or ipv4</span>
+    <span class="sa">r</span><span class="s1">&#39;\[?[A-F0-9]*:[A-F0-9:]+\]?)&#39;</span>  <span class="c1"># ...or ipv6</span>
+    <span class="sa">r</span><span class="s1">&#39;(?::\d+)?&#39;</span>  <span class="c1"># optional port</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:/?|[/?]\S+)$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+<span class="n">url_schemes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">,</span> <span class="s1">&#39;ftps&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="validate_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.validate_url">[docs]</a><span class="k">def</span> <span class="nf">validate_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">allow_single_label_domain</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Auxiliary method to validate an urllib</span>
+<span class="sd">    :param url: An url to be validated</span>
+<span class="sd">    :type url: string</span>
+<span class="sd">    :param allow_single_label_domain: In order to allow or not single label domain</span>
+<span class="sd">    :type url: bool</span>
+<span class="sd">    :returns: True if the url is valid</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">scheme</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;://&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">url_schemes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">allow_single_label_domain</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">url_regex_single_label_domain</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">url</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">url_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">url</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings">[docs]</a><span class="k">class</span> <span class="nc">OneLogin_Saml2_Settings</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Handles the settings of the Python toolkits.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">metadata_class</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Metadata</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_base_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sp_validation_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the settings:</span>
+<span class="sd">        - Sets the paths of the different folders</span>
+<span class="sd">        - Loads settings info from settings file or array/object provided</span>
+
+<span class="sd">        :param settings: SAML Toolkit Settings</span>
+<span class="sd">        :type settings: dict</span>
+
+<span class="sd">        :param custom_base_path: Path where are stored the settings file and the cert folder</span>
+<span class="sd">        :type custom_base_path: string</span>
+
+<span class="sd">        :param sp_validation_only: Avoid the IdP validation</span>
+<span class="sd">        :type sp_validation_only: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp_validation_only</span> <span class="o">=</span> <span class="n">sp_validation_only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strict</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_contacts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_organization</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_paths</span><span class="p">(</span><span class="n">base_path</span><span class="o">=</span><span class="n">custom_base_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_paths</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_settings_from_file</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                    <span class="s1">&#39;Invalid dict settings at the file: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SETTINGS_INVALID</span><span class="p">,</span>
+                    <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_settings_from_dict</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                    <span class="s1">&#39;Invalid dict settings: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SETTINGS_INVALID</span><span class="p">,</span>
+                    <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;Unsupported settings object&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">UNSUPPORTED_SETTINGS_OBJECT</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_idp_cert</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format_idp_cert_multi</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_sp_cert</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;x509certNew&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format_sp_cert_new</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_sp_key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_load_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the paths of the different folders</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">base_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">base_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">sep</span><span class="p">):</span>
+            <span class="n">base_path</span> <span class="o">+=</span> <span class="n">sep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base_path</span><span class="p">,</span>
+            <span class="s1">&#39;cert&#39;</span><span class="p">:</span> <span class="n">base_path</span> <span class="o">+</span> <span class="s1">&#39;certs&#39;</span> <span class="o">+</span> <span class="n">sep</span><span class="p">,</span>
+            <span class="s1">&#39;lib&#39;</span><span class="p">:</span> <span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="n">sep</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_update_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set custom paths if necessary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s1">&#39;custom_base_path&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;custom_base_path&#39;</span><span class="p">]</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">base_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_paths</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_base_path"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_base_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns base path</span>
+
+<span class="sd">        :return: The base toolkit folder path</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_cert_path"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_cert_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_cert_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns cert path</span>
+
+<span class="sd">        :return: The cert folder path</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.set_cert_path"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.set_cert_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_cert_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set a new cert path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_lib_path"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_lib_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_lib_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns lib path</span>
+
+<span class="sd">        :return: The library folder path</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;lib&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_schemas_path"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_schemas_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_schemas_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns schema path</span>
+
+<span class="sd">        :return: The schema folder path</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;lib&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;schemas/&#39;</span></div>
+
+    <span class="k">def</span> <span class="nf">_load_settings_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads settings info from a settings Dict</span>
+
+<span class="sd">        :param settings: SAML Toolkit Settings</span>
+<span class="sd">        :type settings: dict</span>
+
+<span class="sd">        :returns: True if the settings info is valid</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;idp&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strict</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;strict&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_security</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_contacts</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;contactPerson&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_organization</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;organization&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_default_values</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_load_settings_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads settings info from the settings json file</span>
+
+<span class="sd">        :returns: True if the settings info is valid</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_path</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;settings.json&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                <span class="s1">&#39;Settings file not found: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SETTINGS_FILE_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">filename</span>
+            <span class="p">)</span>
+
+        <span class="c1"># In the php toolkit instead of being a json file it is a php file and</span>
+        <span class="c1"># it is directly included</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_data</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="n">advanced_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_path</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;advanced_settings.json&#39;</span>
+        <span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">advanced_filename</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">advanced_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data</span><span class="p">:</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_data</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>  <span class="c1"># Merge settings</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_settings_from_dict</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_default_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add default values if the settings info is not complete</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;binding&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">BINDING_HTTP_POST</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;binding&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">BINDING_HTTP_REDIRECT</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># Related to nameID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;NameIDFormat&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NAMEID_UNSPECIFIED</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;nameIdEncrypted&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Metadata format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;metadataValidUntil&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># None means use default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;metadataCacheDuration&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># None means use default</span>
+
+        <span class="c1"># Sign provided</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;authnRequestsSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;logoutRequestSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;logoutResponseSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Sign expected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantMessagesSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantAssertionsSigned&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># NameID element expected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantNameId&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Encrypt expected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantAssertionsEncrypted&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantNameIdEncrypted&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Signature Algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;signatureAlgorithm&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">RSA_SHA256</span><span class="p">)</span>
+
+        <span class="c1"># Digest Algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;digestAlgorithm&#39;</span><span class="p">,</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">SHA256</span><span class="p">)</span>
+
+        <span class="c1"># Reject Deprecated Algorithms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;rejectDeprecatedAlgorithm&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># AttributeStatement required by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wantAttributeStatement&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Disallow duplicate attribute names by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;allowRepeatAttributeName&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;certFingerprint&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;certFingerprintAlgorithm&#39;</span><span class="p">,</span> <span class="s1">&#39;sha1&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;privateKey&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;requestedAuthnContext&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;requestedAuthnContextComparison&#39;</span><span class="p">,</span> <span class="s1">&#39;exact&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;failOnAuthnContextMismatch&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.check_settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_settings">[docs]</a>    <span class="k">def</span> <span class="nf">check_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the settings info.</span>
+
+<span class="sd">        :param settings: Dict with settings data</span>
+<span class="sd">        :type settings: dict</span>
+
+<span class="sd">        :returns: Errors found on the settings data</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_syntax&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp_validation_only</span><span class="p">:</span>
+                <span class="n">errors</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_idp_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+            <span class="n">sp_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_sp_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+            <span class="n">errors</span> <span class="o">+=</span> <span class="n">sp_errors</span>
+
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.check_idp_settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_idp_settings">[docs]</a>    <span class="k">def</span> <span class="nf">check_idp_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the IdP settings info.</span>
+<span class="sd">        :param settings: Dict with settings data</span>
+<span class="sd">        :type settings: dict</span>
+<span class="sd">        :returns: Errors found on the IdP settings data</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_syntax&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;idp&#39;</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_not_found&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">allow_single_domain_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_allow_single_label_domain</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+                <span class="n">idp</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;idp&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entityId&#39;</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_entityId_not_found&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_sso_not_found&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">idp</span><span class="p">[</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span> <span class="n">allow_single_domain_urls</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_sso_url_invalid&#39;</span><span class="p">)</span>
+
+                <span class="n">slo_url</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">slo_url</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">slo_url</span><span class="p">,</span> <span class="n">allow_single_domain_urls</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_slo_url_invalid&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;security&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="n">security</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;security&#39;</span><span class="p">]</span>
+
+                    <span class="n">exists_x509</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">))</span>
+                    <span class="n">exists_fingerprint</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;certFingerprint&#39;</span><span class="p">))</span>
+
+                    <span class="n">exists_multix509sign</span> <span class="o">=</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="n">idp</span> <span class="ow">and</span> \
+                        <span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="n">idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span> <span class="ow">and</span> \
+                        <span class="n">idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">]</span>
+                    <span class="n">exists_multix509enc</span> <span class="o">=</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="n">idp</span> <span class="ow">and</span> \
+                        <span class="s1">&#39;encryption&#39;</span> <span class="ow">in</span> <span class="n">idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]</span> <span class="ow">and</span> \
+                        <span class="n">idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;encryption&#39;</span><span class="p">]</span>
+
+                    <span class="n">want_assert_sign</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantAssertionsSigned&#39;</span><span class="p">))</span>
+                    <span class="n">want_mes_signed</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantMessagesSigned&#39;</span><span class="p">))</span>
+                    <span class="n">nameid_enc</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nameIdEncrypted&#39;</span><span class="p">))</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="n">want_assert_sign</span> <span class="ow">or</span> <span class="n">want_mes_signed</span><span class="p">)</span> <span class="ow">and</span> \
+                            <span class="ow">not</span> <span class="p">(</span><span class="n">exists_x509</span> <span class="ow">or</span> <span class="n">exists_fingerprint</span> <span class="ow">or</span> <span class="n">exists_multix509sign</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_cert_or_fingerprint_not_found_and_required&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nameid_enc</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exists_x509</span> <span class="ow">or</span> <span class="n">exists_multix509enc</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;idp_cert_not_found_and_required&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.check_sp_settings"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_sp_settings">[docs]</a>    <span class="k">def</span> <span class="nf">check_sp_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the SP settings info.</span>
+<span class="sd">        :param settings: Dict with settings data</span>
+<span class="sd">        :type settings: dict</span>
+<span class="sd">        :returns: Errors found on the SP settings data</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;invalid_syntax&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sp&#39;</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_not_found&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">allow_single_domain_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_allow_single_label_domain</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+                <span class="c1"># check_sp_certs uses self._sp so I add it</span>
+                <span class="n">old_sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span>
+
+                <span class="n">sp</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;sp&#39;</span><span class="p">]</span>
+                <span class="n">security</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entityId&#39;</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_entityId_not_found&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_acs_not_found&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">sp</span><span class="p">[</span><span class="s1">&#39;assertionConsumerService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span> <span class="n">allow_single_domain_urls</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_acs_url_invalid&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">):</span>
+                    <span class="n">attributeConsumingService</span> <span class="o">=</span> <span class="n">sp</span><span class="p">[</span><span class="s1">&#39;attributeConsumingService&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;serviceName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attributeConsumingService</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_serviceName_not_found&#39;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attributeConsumingService</span><span class="p">[</span><span class="s1">&#39;serviceName&#39;</span><span class="p">],</span> <span class="n">basestring</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_serviceName_type_invalid&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="s1">&#39;requestedAttributes&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attributeConsumingService</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_requestedAttributes_not_found&#39;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attributeConsumingService</span><span class="p">[</span><span class="s1">&#39;requestedAttributes&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_serviceName_type_invalid&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">req_attrib</span> <span class="ow">in</span> <span class="n">attributeConsumingService</span><span class="p">[</span><span class="s1">&#39;requestedAttributes&#39;</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req_attrib</span><span class="p">:</span>
+                                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_requestedAttributes_name_not_found&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">req_attrib</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">req_attrib</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_requestedAttributes_name_invalid&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="s1">&#39;attributeValue&#39;</span> <span class="ow">in</span> <span class="n">req_attrib</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">req_attrib</span><span class="p">[</span><span class="s1">&#39;attributeValue&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+                                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_requestedAttributes_attributeValue_type_invalid&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="s1">&#39;isRequired&#39;</span> <span class="ow">in</span> <span class="n">req_attrib</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">req_attrib</span><span class="p">[</span><span class="s1">&#39;isRequired&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>
+                                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_requestedAttributes_isRequired_type_invalid&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="s2">&quot;serviceDescription&quot;</span> <span class="ow">in</span> <span class="n">attributeConsumingService</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attributeConsumingService</span><span class="p">[</span><span class="s1">&#39;serviceDescription&#39;</span><span class="p">],</span> <span class="n">basestring</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_attributeConsumingService_serviceDescription_type_invalid&#39;</span><span class="p">)</span>
+
+                <span class="n">slo_url</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">slo_url</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">slo_url</span><span class="p">,</span> <span class="n">allow_single_domain_urls</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_sls_url_invalid&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;signMetadata&#39;</span> <span class="ow">in</span> <span class="n">security</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s1">&#39;keyFileName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]</span> <span class="ow">or</span> \
+                            <span class="s1">&#39;certFileName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_signMetadata_invalid&#39;</span><span class="p">)</span>
+
+                <span class="n">authn_sign</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;authnRequestsSigned&#39;</span><span class="p">))</span>
+                <span class="n">logout_req_sign</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logoutRequestSigned&#39;</span><span class="p">))</span>
+                <span class="n">logout_res_sign</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logoutResponseSigned&#39;</span><span class="p">))</span>
+                <span class="n">want_assert_enc</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantAssertionsEncrypted&#39;</span><span class="p">))</span>
+                <span class="n">want_nameid_enc</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">security</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wantNameIdEncrypted&#39;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_sp_certs</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">authn_sign</span> <span class="ow">or</span> <span class="n">logout_req_sign</span> <span class="ow">or</span> <span class="n">logout_res_sign</span> <span class="ow">or</span> \
+                       <span class="n">want_assert_enc</span> <span class="ow">or</span> <span class="n">want_nameid_enc</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sp_cert_not_found_and_required&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;contactPerson&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                <span class="n">types</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;contactPerson&#39;</span><span class="p">]</span>
+                <span class="n">valid_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;technical&#39;</span><span class="p">,</span> <span class="s1">&#39;support&#39;</span><span class="p">,</span> <span class="s1">&#39;administrative&#39;</span><span class="p">,</span> <span class="s1">&#39;billing&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">c_type</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">c_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_types</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;contact_type_invalid&#39;</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+                <span class="k">for</span> <span class="n">c_type</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;contactPerson&#39;</span><span class="p">]:</span>
+                    <span class="n">contact</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;contactPerson&#39;</span><span class="p">][</span><span class="n">c_type</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;givenName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contact</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact</span><span class="p">[</span><span class="s1">&#39;givenName&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> \
+                            <span class="p">(</span><span class="s1">&#39;emailAddress&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contact</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact</span><span class="p">[</span><span class="s1">&#39;emailAddress&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;contact_not_enought_data&#39;</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+            <span class="k">if</span> <span class="s1">&#39;organization&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">org</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;organization&#39;</span><span class="p">]:</span>
+                    <span class="n">organization</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;organization&#39;</span><span class="p">][</span><span class="n">org</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">organization</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">organization</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> \
+                        <span class="p">(</span><span class="s1">&#39;displayname&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">organization</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">organization</span><span class="p">[</span><span class="s1">&#39;displayname&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> \
+                            <span class="p">(</span><span class="s1">&#39;url&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">organization</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">organization</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;organization_not_enought_data&#39;</span><span class="p">)</span>
+                        <span class="k">break</span>
+        <span class="c1"># Restores the value that had the self._sp</span>
+        <span class="k">if</span> <span class="s1">&#39;old_sp&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span> <span class="o">=</span> <span class="n">old_sp</span>
+
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.check_sp_certs"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.check_sp_certs">[docs]</a>    <span class="k">def</span> <span class="nf">check_sp_certs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the x509 certs of the SP exists and are valid.</span>
+<span class="sd">        :returns: If the x509 certs of the SP exists and are valid</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sp_key</span><span class="p">()</span>
+        <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sp_cert</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_idp_sso_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_sso_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_idp_sso_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the IdP SSO URL.</span>
+
+<span class="sd">        :returns: An URL, the SSO endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleSignOnService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_idp_slo_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_slo_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_idp_slo_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the IdP SLO URL.</span>
+
+<span class="sd">        :returns: An URL, the SLO endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_idp_slo_response_url"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_slo_response_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_idp_slo_response_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the IdP SLO return URL for IdP-initiated logout.</span>
+
+<span class="sd">        :returns: an URL, the SLO return endpoint of the IdP</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idp_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_idp_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">idp_data</span><span class="p">[</span><span class="s1">&#39;singleLogoutService&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;responseUrl&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_idp_slo_url</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_sp_key"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_sp_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x509 private key of the SP.</span>
+<span class="sd">        :returns: SP private key</span>
+<span class="sd">        :rtype: string or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;privateKey&#39;</span><span class="p">)</span>
+        <span class="n">key_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;sp.key&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">key_file_name</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">key_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_sp_cert"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_cert">[docs]</a>    <span class="k">def</span> <span class="nf">get_sp_cert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x509 public cert of the SP.</span>
+<span class="sd">        :returns: SP public cert</span>
+<span class="sd">        :rtype: string or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">)</span>
+        <span class="n">cert_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;sp.crt&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cert</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">cert</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">cert</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_sp_cert_new"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_cert_new">[docs]</a>    <span class="k">def</span> <span class="nf">get_sp_cert_new</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x509 public of the SP planned</span>
+<span class="sd">        to be used soon instead the other public cert</span>
+<span class="sd">        :returns: SP public cert new</span>
+<span class="sd">        :rtype: string or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509certNew&#39;</span><span class="p">)</span>
+        <span class="n">cert_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;sp_new.crt&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cert</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">cert</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">cert</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_idp_cert"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_cert">[docs]</a>    <span class="k">def</span> <span class="nf">get_idp_cert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x509 public cert of the IdP.</span>
+<span class="sd">        :returns: IdP public cert</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x509cert&#39;</span><span class="p">)</span>
+        <span class="n">cert_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cert_path</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;idp.crt&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cert</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cert_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">cert</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cert</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_idp_data"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_idp_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_idp_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the IdP data.</span>
+
+<span class="sd">        :returns: IdP info</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_sp_data"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_sp_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SP data.</span>
+
+<span class="sd">        :returns: SP info</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_security_data"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_security_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_security_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets security data.</span>
+
+<span class="sd">        :returns: Security info</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_contacts"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_contacts">[docs]</a>    <span class="k">def</span> <span class="nf">get_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets contact data.</span>
+
+<span class="sd">        :returns: Contacts info</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contacts</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_organization"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_organization">[docs]</a>    <span class="k">def</span> <span class="nf">get_organization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets organization data.</span>
+
+<span class="sd">        :returns: Organization info</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_organization</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_sp_metadata"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_sp_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_sp_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the SP metadata. The XML representation.</span>
+<span class="sd">        :returns: SP metadata (xml)</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_class</span><span class="o">.</span><span class="n">builder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;authnRequestsSigned&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;wantAssertionsSigned&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;metadataValidUntil&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;metadataCacheDuration&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_contacts</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_organization</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">add_encryption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;wantNameIdEncrypted&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;wantAssertionsEncrypted&#39;</span><span class="p">]</span>
+
+        <span class="n">cert_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sp_cert_new</span><span class="p">()</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_class</span><span class="o">.</span><span class="n">add_x509_key_descriptors</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">cert_new</span><span class="p">,</span> <span class="n">add_encryption</span><span class="p">)</span>
+
+        <span class="n">cert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sp_cert</span><span class="p">()</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_class</span><span class="o">.</span><span class="n">add_x509_key_descriptors</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">cert</span><span class="p">,</span> <span class="n">add_encryption</span><span class="p">)</span>
+
+        <span class="c1"># Sign metadata</span>
+        <span class="k">if</span> <span class="s1">&#39;signMetadata&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Use the SP&#39;s normal key to sign the metadata:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cert</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                        <span class="s1">&#39;Cannot sign metadata: missing SP public key certificate.&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PUBLIC_CERT_FILE_NOT_FOUND</span>
+                    <span class="p">)</span>
+                <span class="n">cert_metadata</span> <span class="o">=</span> <span class="n">cert</span>
+                <span class="n">key_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sp_key</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key_metadata</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                        <span class="s1">&#39;Cannot sign metadata: missing SP private key.&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PRIVATE_KEY_FILE_NOT_FOUND</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Use a custom key to sign the metadata:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;keyFileName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]</span> <span class="ow">or</span>
+                        <span class="s1">&#39;certFileName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">]):</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                        <span class="s1">&#39;Invalid Setting: signMetadata value of the sp is not valid&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">SETTINGS_INVALID_SYNTAX</span>
+                    <span class="p">)</span>
+                <span class="n">key_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">][</span><span class="s1">&#39;keyFileName&#39;</span><span class="p">]</span>
+                <span class="n">cert_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signMetadata&#39;</span><span class="p">][</span><span class="s1">&#39;certFileName&#39;</span><span class="p">]</span>
+                <span class="n">key_metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">key_file_name</span>
+                <span class="n">cert_metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s1">&#39;cert&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cert_file_name</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">key_metadata_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_metadata_key</span><span class="p">:</span>
+                        <span class="n">key_metadata</span> <span class="o">=</span> <span class="n">f_metadata_key</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                        <span class="s1">&#39;Private key file not readable: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PRIVATE_KEY_FILE_NOT_FOUND</span><span class="p">,</span>
+                        <span class="n">key_metadata_file</span>
+                    <span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cert_metadata_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_metadata_cert</span><span class="p">:</span>
+                        <span class="n">cert_metadata</span> <span class="o">=</span> <span class="n">f_metadata_cert</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">OneLogin_Saml2_Error</span><span class="p">(</span>
+                        <span class="s1">&#39;Public cert file not readable: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">OneLogin_Saml2_Error</span><span class="o">.</span><span class="n">PUBLIC_CERT_FILE_NOT_FOUND</span><span class="p">,</span>
+                        <span class="n">cert_metadata_file</span>
+                    <span class="p">)</span>
+
+            <span class="n">signature_algorithm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;signatureAlgorithm&#39;</span><span class="p">]</span>
+            <span class="n">digest_algorithm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_security</span><span class="p">[</span><span class="s1">&#39;digestAlgorithm&#39;</span><span class="p">]</span>
+
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_class</span><span class="o">.</span><span class="n">sign_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key_metadata</span><span class="p">,</span> <span class="n">cert_metadata</span><span class="p">,</span> <span class="n">signature_algorithm</span><span class="p">,</span> <span class="n">digest_algorithm</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metadata</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.validate_metadata"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.validate_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">validate_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates an XML SP Metadata.</span>
+
+<span class="sd">        :param xml: Metadata&#39;s XML that will be validate</span>
+<span class="sd">        :type xml: string</span>
+
+<span class="sd">        :returns: The list of found errors</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty string supplied as input&#39;</span><span class="p">)</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_XML</span><span class="o">.</span><span class="n">validate_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="s1">&#39;saml-schema-metadata-2.0.xsd&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}EntityDescriptor&#39;</span> <span class="o">%</span> <span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NS_MD</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;noEntityDescriptor_xml&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;.//md:SPSSODescriptor&#39;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">OneLogin_Saml2_Constants</span><span class="o">.</span><span class="n">NSMAP</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;onlySPSSODescriptor_allowed_xml&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">valid_until</span><span class="p">,</span> <span class="n">cache_duration</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;validUntil&#39;</span><span class="p">),</span> <span class="n">root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cacheDuration&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">valid_until</span><span class="p">:</span>
+                        <span class="n">valid_until</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">parse_SAML_to_time</span><span class="p">(</span><span class="n">valid_until</span><span class="p">)</span>
+                    <span class="n">expire_time</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">get_expire_time</span><span class="p">(</span><span class="n">cache_duration</span><span class="p">,</span> <span class="n">valid_until</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">expire_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">expire_time</span><span class="p">):</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;expired_xml&#39;</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Validate Sign</span>
+
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.format_idp_cert"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_idp_cert">[docs]</a>    <span class="k">def</span> <span class="nf">format_idp_cert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats the IdP cert.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509cert&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.format_idp_cert_multi"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_idp_cert_multi">[docs]</a>    <span class="k">def</span> <span class="nf">format_idp_cert_multi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats the Multple IdP certs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;x509certMulti&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;signing&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">])):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;signing&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s1">&#39;encryption&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;encryption&#39;</span><span class="p">])):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;encryption&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_idp</span><span class="p">[</span><span class="s1">&#39;x509certMulti&#39;</span><span class="p">][</span><span class="s1">&#39;encryption&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.format_sp_cert"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_cert">[docs]</a>    <span class="k">def</span> <span class="nf">format_sp_cert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats the SP cert.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;x509cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;x509cert&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.format_sp_cert_new"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_cert_new">[docs]</a>    <span class="k">def</span> <span class="nf">format_sp_cert_new</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats the SP cert.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;x509certNew&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_cert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;x509certNew&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.format_sp_key"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.format_sp_key">[docs]</a>    <span class="k">def</span> <span class="nf">format_sp_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Formats the private key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;privateKey&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Utils</span><span class="o">.</span><span class="n">format_private_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">[</span><span class="s1">&#39;privateKey&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.get_errors"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.get_errors">[docs]</a>    <span class="k">def</span> <span class="nf">get_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an array with the errors, the array is empty when the settings is ok.</span>
+
+<span class="sd">        :returns: Errors</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.set_strict"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.set_strict">[docs]</a>    <span class="k">def</span> <span class="nf">set_strict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activates or deactivates the strict mode.</span>
+
+<span class="sd">        :param value: Strict parameter</span>
+<span class="sd">        :type value: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strict</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.is_strict"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.is_strict">[docs]</a>    <span class="k">def</span> <span class="nf">is_strict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns if the &#39;strict&#39; mode is active.</span>
+
+<span class="sd">        :returns: Strict parameter</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strict</span></div>
+
+<div class="viewcode-block" id="OneLogin_Saml2_Settings.is_debug_active"><a class="viewcode-back" href="../../../onelogin.saml2.html#onelogin.saml2.settings.OneLogin_Saml2_Settings.is_debug_active">[docs]</a>    <span class="k">def</span> <span class="nf">is_debug_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns if the debug is active.</span>
+
+<span class="sd">        :returns: Debug parameter</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_allow_single_label_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="n">security</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">return</span> <span class="s1">&#39;allowSingleLabelDomains&#39;</span> <span class="ow">in</span> <span class="n">security</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">security</span><span class="p">[</span><span class="s1">&#39;allowSingleLabelDomains&#39;</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Sixto Martin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

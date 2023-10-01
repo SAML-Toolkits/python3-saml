@@ -1,0 +1,133 @@
+onelogin.saml2 package
+======================
+
+Submodules
+----------
+
+onelogin.saml2.auth module
+--------------------------
+
+.. automodule:: onelogin.saml2.auth
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.authn\_request module
+------------------------------------
+
+.. automodule:: onelogin.saml2.authn_request
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.compat module
+----------------------------
+
+.. automodule:: onelogin.saml2.compat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.constants module
+-------------------------------
+
+.. automodule:: onelogin.saml2.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.errors module
+----------------------------
+
+.. automodule:: onelogin.saml2.errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.idp\_metadata\_parser module
+-------------------------------------------
+
+.. automodule:: onelogin.saml2.idp_metadata_parser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.logout\_request module
+-------------------------------------
+
+.. automodule:: onelogin.saml2.logout_request
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.logout\_response module
+--------------------------------------
+
+.. automodule:: onelogin.saml2.logout_response
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.metadata module
+------------------------------
+
+.. automodule:: onelogin.saml2.metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.response module
+------------------------------
+
+.. automodule:: onelogin.saml2.response
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.settings module
+------------------------------
+
+.. automodule:: onelogin.saml2.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.utils module
+---------------------------
+
+.. automodule:: onelogin.saml2.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.xml\_templates module
+------------------------------------
+
+.. automodule:: onelogin.saml2.xml_templates
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.xml\_utils module
+--------------------------------
+
+.. automodule:: onelogin.saml2.xml_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+onelogin.saml2.xmlparser module
+-------------------------------
+
+.. automodule:: onelogin.saml2.xmlparser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: onelogin.saml2
+   :members:
+   :undoc-members:
+   :show-inheritance:

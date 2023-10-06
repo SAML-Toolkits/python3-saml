@@ -94,7 +94,6 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'signed_message_response.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         pretty_xml = self.file_contents(join(self.data_path, 'responses', 'pretty_signed_message_response.xml'))
-        print(etree.tostring(response.get_xml_document(), encoding='unicode', pretty_print=True))
         self.assertEqual(etree.tostring(response.get_xml_document(), encoding='unicode', pretty_print=True), pretty_xml)
 
         xml_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion.xml.base64'))

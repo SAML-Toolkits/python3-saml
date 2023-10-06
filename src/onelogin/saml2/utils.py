@@ -11,7 +11,7 @@ import base64
 import warnings
 from copy import deepcopy
 import calendar
-from datetime import datetime
+from datetime import datetime, timezone
 from hashlib import sha1, sha256, sha384, sha512
 from isodate import parse_duration as duration_parser
 import re
@@ -391,7 +391,7 @@ class OneLogin_Saml2_Utils(object):
         :return: SAML2 timestamp.
         :rtype: string
         """
-        data = datetime.utcfromtimestamp(float(time))
+        data = datetime.fromtimestamp(float(time), timezone.utc)
         return data.strftime(OneLogin_Saml2_Utils.TIME_FORMAT)
 
     @staticmethod
@@ -425,7 +425,7 @@ class OneLogin_Saml2_Utils(object):
         :return: unix timestamp of actual time.
         :rtype: int
         """
-        return calendar.timegm(datetime.utcnow().utctimetuple())
+        return calendar.timegm(datetime.now(timezone.utc).utctimetuple())
 
     @staticmethod
     def parse_duration(duration, timestamp=None):
@@ -447,9 +447,9 @@ class OneLogin_Saml2_Utils(object):
 
         timedelta = duration_parser(duration)
         if timestamp is None:
-            data = datetime.utcnow() + timedelta
+            data = datetime.now(timezone.utc) + timedelta
         else:
-            data = datetime.utcfromtimestamp(timestamp) + timedelta
+            data = datetime.fromtimestamp(timestamp, timezone.utc) + timedelta
         return calendar.timegm(data.utctimetuple())
 
     @staticmethod

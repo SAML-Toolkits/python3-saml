@@ -1,4 +1,10 @@
 # python3-saml changelog
+### 1.16.0 (Oct 9, 2023)
+- [#364](https://github.com/SAML-Toolkits/python3-saml/commit/d1bfaeb17a786735827b8252b91deafde29dabd8) Improve get_metadata method from Parser, allowing to set headers
+- Fix WantAuthnRequestsSigned parser
+- Fix expired payloads used on tests
+- Updated content from docs folder
+
 ### 1.15.0 (Dec 27, 2022)
 - [#317](https://github.com/SAML-Toolkits/python3-saml/pull/317) Handle unicode characters gracefully in python 2
 - [#338](https://github.com/SAML-Toolkits/python3-saml/pull/338) Fix WantAuthnRequestsSigned parser

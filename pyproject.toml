@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python3-saml"
-version = "1.15.0"
+version = "1.16.0"
 description = "Saml Python Toolkit. Add SAML support to your Python software using this library"
 license = "Apache-2.0"
 authors = ["SAML-Toolkits <contact@iamdigitalservices.com>"]

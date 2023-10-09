@@ -13,6 +13,8 @@ This version supports Python3. Python 2 support was deprecated on Jan 1st, 2020:
 
 #### Warning ####
 
+Version 1.16.X is the latest version supporting Python2, consider its use deprecated. 1.17 won't be Python2 compatible.
+
 Version 1.13.0 sets sha256 and rsa-sha256 as default algorithms
 
 Version 1.8.0 sets strict mode active by default
@@ -88,7 +90,7 @@ Installation
 
 ### Dependencies ###
 
- * python 2.7 // python 3.6
+ * python 2.7 (deprecated) // python 3.6
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/

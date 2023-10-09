@@ -761,8 +761,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         Tests the get_attributes method of the OneLogin_Saml2_Response with an encrypted response
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON('settings8.json'))
-        xml = self.file_contents(join(self.data_path, 'responses',
-                                        'signed_message_encrypted_assertion2.xml.base64'))
+        xml = self.file_contents(join(self.data_path, 'responses', 'signed_message_encrypted_assertion2.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
         self.assertEqual({
             'uid': ['smartin'],

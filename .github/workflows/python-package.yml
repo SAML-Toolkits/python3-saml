@@ -13,10 +13,15 @@ on:
 
 jobs:
   test_py3:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-20.04
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
         python-version:
           - "3.5"
           - "3.6"

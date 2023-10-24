@@ -253,12 +253,12 @@ class OneLogin_Saml2_Response(object):
                         nooa = sc_data.get('NotOnOrAfter', None)
                         if nooa:
                             parsed_nooa = OneLogin_Saml2_Utils.parse_SAML_to_time(nooa)
-                            if parsed_nooa <= OneLogin_Saml2_Utils.now():
+                            if parsed_nooa + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT <= OneLogin_Saml2_Utils.now():
                                 continue
                         nb = sc_data.get('NotBefore', None)
                         if nb:
                             parsed_nb = OneLogin_Saml2_Utils.parse_SAML_to_time(nb)
-                            if parsed_nb > OneLogin_Saml2_Utils.now():
+                            if parsed_nb > OneLogin_Saml2_Utils.now() + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT:
                                 continue
 
                         if nooa:

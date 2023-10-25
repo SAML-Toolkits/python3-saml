@@ -226,7 +226,7 @@ class OneLogin_Saml2_Response(object):
 
                 # Checks the session Expiration
                 session_expiration = self.get_session_not_on_or_after()
-                if session_expiration and session_expiration <= OneLogin_Saml2_Utils.now():
+                if session_expiration and session_expiration + OneLogin_Saml2_Constants.ALLOWED_CLOCK_DRIFT <= OneLogin_Saml2_Utils.now():
                     raise OneLogin_Saml2_ValidationError(
                         'The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response',
                         OneLogin_Saml2_ValidationError.SESSION_EXPIRED

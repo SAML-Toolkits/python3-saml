@@ -35,7 +35,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.cfg') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install dependencies
@@ -58,7 +58,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.cfg') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install dependencies
@@ -81,7 +81,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.cfg') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install dependencies
@@ -101,6 +101,6 @@ jobs:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
         pip install coveralls
-        coverage run  setup.py test
+        coverage run pytest
         coverage report -m
         coveralls

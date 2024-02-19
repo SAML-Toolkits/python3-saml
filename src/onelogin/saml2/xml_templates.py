@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Auth class
 
 
@@ -10,7 +8,7 @@ Initializes the SP SAML instance
 """
 
 
-class OneLogin_Saml2_Templates(object):
+class OneLogin_Saml2_Templates:
 
     ATTRIBUTE = """
         <saml:Attribute Name="%s" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">

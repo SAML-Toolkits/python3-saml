@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from base64 import b64decode
 import json
 from lxml import etree
@@ -22,14 +19,14 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
     # assertRegexpMatches deprecated on python3
     def assertRaisesRegex(self, exception, regexp, msg=None):
         if hasattr(unittest.TestCase, 'assertRaisesRegex'):
-            return super(OneLogin_Saml2_Utils_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
+            return super().assertRaisesRegex(exception, regexp, msg=msg)
         else:
-            return self.assertRaisesRegexp(exception, regexp)
+            return self.assertRaisesRegex(exception, regexp)
 
     def loadSettingsJSON(self, name='settings1.json'):
         filename = join(self.settings_path, name)
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename)
             settings = json.load(stream)
             stream.close()
             return settings
@@ -37,7 +34,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
             raise Exception('Settings json file does not exist')
 
     def file_contents(self, filename):
-        f = open(filename, 'r')
+        f = open(filename)
         content = f.read()
         f.close()
         return content
@@ -153,7 +150,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         target_url7 = OneLogin_Saml2_Utils.redirect(url, parameters2, request_data)
         parameters2_decoded = {"alphavalue": "alphavalue=a", "numvaluelist": "numvaluelist[]=1&numvaluelist[]=2", "testing": "testing"}
         parameters2_str = "&".join(parameters2_decoded[x] for x in parameters2)
-        self.assertEqual('http://%s/example?%s' % (hostname, parameters2_str), target_url7)
+        self.assertEqual('http://{}/example?{}'.format(hostname, parameters2_str), target_url7)
 
         parameters3 = {
             'alphavalue': 'a',
@@ -161,9 +158,9 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
             'numvaluelist': [''],
         }
         parameters3_decoded = {"alphavalue": "alphavalue=a", "numvaluelist": "numvaluelist[]="}
-        parameters3_str = "&".join((parameters3_decoded[x] for x in parameters3.keys() if x in parameters3_decoded))
+        parameters3_str = "&".join(parameters3_decoded[x] for x in parameters3.keys() if x in parameters3_decoded)
         target_url8 = OneLogin_Saml2_Utils.redirect(url, parameters3, request_data)
-        self.assertEqual('http://%s/example?%s' % (hostname, parameters3_str), target_url8)
+        self.assertEqual('http://{}/example?{}'.format(hostname, parameters3_str), target_url8)
 
     def testGetselfhost(self):
         """
@@ -645,7 +642,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
 
         key_2_file_name = join(self.data_path, 'misc', 'sp2.key')
-        f = open(key_2_file_name, 'r')
+        f = open(key_2_file_name)
         key2 = f.read()
         f.close()
 
@@ -655,7 +652,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
 
         key_3_file_name = join(self.data_path, 'misc', 'sp3.key')
-        f = open(key_3_file_name, 'r')
+        f = open(key_3_file_name)
         key3 = f.read()
         f.close()
 
@@ -665,7 +662,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertEqual('457bdb600de717891c77647b0806ce59c089d5b8', decrypted_nameid.text)
 
         key_4_file_name = join(self.data_path, 'misc', 'sp4.key')
-        f = open(key_4_file_name, 'r')
+        f = open(key_4_file_name)
         key4 = f.read()
         f.close()
 
@@ -841,7 +838,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         # modified cert
         other_cert_path = join(dirname(__file__), '..', '..', '..', 'certs')
-        f = open(other_cert_path + '/certificate1', 'r')
+        f = open(other_cert_path + '/certificate1')
         cert_x = f.read()
         f.close()
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(xml_response_msg_signed, cert_x))
@@ -880,7 +877,7 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
 
         dom.firstChild.firstChild.firstChild.nodeValue = 'https://idp.example.com/simplesaml/saml2/idp/metadata.php'
 
-        dom.firstChild.getAttributeNode('ID').nodeValue = u'_34fg27g212d63k1f923845324475802ac0fc24530b'
+        dom.firstChild.getAttributeNode('ID').nodeValue = '_34fg27g212d63k1f923845324475802ac0fc24530b'
         # Reference validation failed
         self.assertFalse(OneLogin_Saml2_Utils.validate_sign(dom.toxml(), cert_2))
 

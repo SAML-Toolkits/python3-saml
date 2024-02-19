@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 import unittest
 import xmlsec
@@ -20,7 +17,7 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
         else:
             filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename)
             settings = json.load(stream)
             stream.close()
             return settings
@@ -28,7 +25,7 @@ class TestOneLoginSaml2Xml(unittest.TestCase):
             raise Exception('Settings json file does not exist')
 
     def file_contents(self, filename):
-        f = open(filename, 'r')
+        f = open(filename)
         content = f.read()
         f.close()
         return content

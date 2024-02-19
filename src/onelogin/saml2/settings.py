@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Settings class
 
 Copyright (c) 2010-2021 OneLogin, Inc.
@@ -74,7 +72,7 @@ def validate_url(url, allow_single_label_domain=False):
     return True
 
 
-class OneLogin_Saml2_Settings(object):
+class OneLogin_Saml2_Settings:
     """
 
     Handles the settings of the Python toolkits.
@@ -257,12 +255,12 @@ class OneLogin_Saml2_Settings(object):
 
         # In the php toolkit instead of being a json file it is a php file and
         # it is directly included
-        with open(filename, 'r') as json_data:
+        with open(filename) as json_data:
             settings = json.loads(json_data.read())
 
         advanced_filename = self.get_base_path() + 'advanced_settings.json'
         if exists(advanced_filename):
-            with open(advanced_filename, 'r') as json_data:
+            with open(advanced_filename) as json_data:
                 settings.update(json.loads(json_data.read()))  # Merge settings
 
         return self._load_settings_from_dict(settings)
@@ -715,9 +713,9 @@ class OneLogin_Saml2_Settings(object):
                 cert_metadata_file = self._paths['cert'] + cert_file_name
 
                 try:
-                    with open(key_metadata_file, 'r') as f_metadata_key:
+                    with open(key_metadata_file) as f_metadata_key:
                         key_metadata = f_metadata_key.read()
-                except IOError:
+                except OSError:
                     raise OneLogin_Saml2_Error(
                         'Private key file not readable: %s',
                         OneLogin_Saml2_Error.PRIVATE_KEY_FILE_NOT_FOUND,
@@ -725,9 +723,9 @@ class OneLogin_Saml2_Settings(object):
                     )
 
                 try:
-                    with open(cert_metadata_file, 'r') as f_metadata_cert:
+                    with open(cert_metadata_file) as f_metadata_cert:
                         cert_metadata = f_metadata_cert.read()
-                except IOError:
+                except OSError:
                     raise OneLogin_Saml2_Error(
                         'Public cert file not readable: %s',
                         OneLogin_Saml2_Error.PUBLIC_CERT_FILE_NOT_FOUND,

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 from os.path import dirname, join, exists
 import unittest
@@ -25,14 +22,14 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
     # assertRegexpMatches deprecated on python3
     def assertRegex(self, text, regexp, msg=None):
         if hasattr(unittest.TestCase, 'assertRegex'):
-            return super(OneLogin_Saml2_Authn_Request_Test, self).assertRegex(text, regexp, msg)
+            return super().assertRegex(text, regexp, msg)
         else:
-            return self.assertRegexpMatches(text, regexp, msg)
+            return self.assertRegex(text, regexp, msg)
 
     def loadSettingsJSON(self, name='settings1.json'):
         filename = join(self.settings_path, name)
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename)
             settings = json.load(stream)
             stream.close()
             return settings
@@ -51,9 +48,9 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         saml_settings = self.loadSettingsJSON()
         settings = OneLogin_Saml2_Settings(saml_settings)
         settings._organization = {
-            u'en-US': {
-                u'url': u'http://sp.example.com',
-                u'name': u'sp_test'
+            'en-US': {
+                'url': 'http://sp.example.com',
+                'name': 'sp_test'
             }
         }
 
@@ -79,10 +76,10 @@ class OneLogin_Saml2_Authn_Request_Test(unittest.TestCase):
         """
         saml_settings = self.loadSettingsJSON()
         saml_settings['organization'] = {
-            u'en-US': {
-                u'url': u'http://sp.example.com',
-                u'name': u'sp_test',
-                u'displayname': u'SP test',
+            'en-US': {
+                'url': 'http://sp.example.com',
+                'name': 'sp_test',
+                'displayname': 'SP test',
             }
         }
         settings = OneLogin_Saml2_Settings(saml_settings)

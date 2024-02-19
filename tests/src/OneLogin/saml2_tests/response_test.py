@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from base64 import b64decode
 
 from lxml import etree
@@ -26,20 +23,20 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
     # assertRaisesRegexp deprecated on python3
     def assertRaisesRegex(self, exception, regexp, msg=None):
         if hasattr(unittest.TestCase, 'assertRaisesRegex'):
-            return super(OneLogin_Saml2_Response_Test, self).assertRaisesRegex(exception, regexp, msg=msg)
+            return super().assertRaisesRegex(exception, regexp, msg=msg)
         else:
-            return self.assertRaisesRegexp(exception, regexp)
+            return self.assertRaisesRegex(exception, regexp)
 
     def loadSettingsJSON(self, name='settings1.json'):
         filename = join(self.settings_path, name)
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename)
             settings = json.load(stream)
             stream.close()
             return settings
 
     def file_contents(self, filename):
-        f = open(filename, 'r')
+        f = open(filename)
         content = f.read()
         f.close()
         return content
@@ -1214,7 +1211,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         # check that we catch when the contexts don't match
         response = OneLogin_Saml2_Response(settings, message)
         self.assertFalse(response.is_valid(request_data))
-        self.assertIn('The AuthnContext "%s" was not a requested context "%s"' % (password_context, two_factor_context), response.get_error())
+        self.assertIn('The AuthnContext "{}" was not a requested context "{}"'.format(password_context, two_factor_context), response.get_error())
 
         # now drop in the expected AuthnContextClassRef and see that it passes
         original_message = compat.to_string(OneLogin_Saml2_Utils.b64decode(message))

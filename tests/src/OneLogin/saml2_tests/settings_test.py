@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 from os.path import dirname, join, exists, sep
 import unittest
@@ -18,7 +15,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
     def loadSettingsJSON(self, name='settings1.json'):
         filename = join(self.settings_path, name)
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename)
             settings = json.load(stream)
             stream.close()
             return settings
@@ -26,7 +23,7 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
             raise Exception('Settings json file does not exist')
 
     def file_contents(self, filename):
-        f = open(filename, 'r')
+        f = open(filename)
         content = f.read()
         f.close()
         return content

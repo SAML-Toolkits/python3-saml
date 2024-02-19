@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_XML class
 
 
@@ -18,7 +16,7 @@ for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
     etree.register_namespace(prefix, url)
 
 
-class OneLogin_Saml2_XML(object):
+class OneLogin_Saml2_XML:
     _element_class = type(etree.Element('root'))
     _parse_etree = staticmethod(fromstring)
     _schema_class = etree.XMLSchema
@@ -90,7 +88,7 @@ class OneLogin_Saml2_XML(object):
             return 'unloaded_xml'
 
         schema_file = join(dirname(__file__), 'schemas', schema)
-        with open(schema_file, 'r') as f_schema:
+        with open(schema_file) as f_schema:
             xmlschema = OneLogin_Saml2_XML._schema_class(etree.parse(f_schema))
 
         if not xmlschema.validate(xml):

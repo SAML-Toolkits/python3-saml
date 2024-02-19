@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Constants class
 
 
@@ -8,7 +6,7 @@ Constants class of SAML Python Toolkit.
 """
 
 
-class OneLogin_Saml2_Constants(object):
+class OneLogin_Saml2_Constants:
     """
 
     This class defines all the constants that will be used

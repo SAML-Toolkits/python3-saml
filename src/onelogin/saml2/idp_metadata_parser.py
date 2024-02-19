@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_IdPMetadataParser class
 Metadata class of SAML Python Toolkit.
 """
@@ -18,7 +16,7 @@ from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
-class OneLogin_Saml2_IdPMetadataParser(object):
+class OneLogin_Saml2_IdPMetadataParser:
     """
     A class that contain methods related to obtaining and parsing metadata from IdP
 

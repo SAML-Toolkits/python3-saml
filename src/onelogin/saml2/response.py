@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Response class
 
 
@@ -13,7 +11,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, One
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
-class OneLogin_Saml2_Response(object):
+class OneLogin_Saml2_Response:
     """
 
     This class handles a SAML Response. It parses or validates
@@ -124,7 +122,7 @@ class OneLogin_Saml2_Response(object):
                 if in_response_to is not None and request_id is not None:
                     if in_response_to != request_id:
                         raise OneLogin_Saml2_ValidationError(
-                            'The InResponseTo of the Response: %s, does not match the ID of the AuthNRequest sent by the SP: %s' % (in_response_to, request_id),
+                            'The InResponseTo of the Response: {}, does not match the ID of the AuthNRequest sent by the SP: {}'.format(in_response_to, request_id),
                             OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
                         )
 
@@ -167,7 +165,7 @@ class OneLogin_Saml2_Response(object):
                     unmatched_contexts = set(authn_contexts).difference(requested_authn_contexts)
                     if unmatched_contexts:
                         raise OneLogin_Saml2_ValidationError(
-                            'The AuthnContext "%s" was not a requested context "%s"' % (', '.join(unmatched_contexts), ', '.join(requested_authn_contexts)),
+                            'The AuthnContext "{}" was not a requested context "{}"'.format(', '.join(unmatched_contexts), ', '.join(requested_authn_contexts)),
                             OneLogin_Saml2_ValidationError.AUTHN_CONTEXT_MISMATCH
                         )
 
@@ -195,7 +193,7 @@ class OneLogin_Saml2_Response(object):
                         #  current_url_routed = OneLogin_Saml2_Utils.get_self_routed_url_no_query(request_data)
                         #  if not destination.startswith(current_url_routed):
                         raise OneLogin_Saml2_ValidationError(
-                            'The response was received at %s instead of %s' % (current_url, destination),
+                            'The response was received at {} instead of {}'.format(current_url, destination),
                             OneLogin_Saml2_ValidationError.WRONG_DESTINATION
                         )
                 elif destination == '':

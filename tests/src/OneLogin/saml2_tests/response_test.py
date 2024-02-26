@@ -930,9 +930,10 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_4 = OneLogin_Saml2_Response(settings, xml_4)
         self.assertFalse(response_4.validate_timestamps())
 
-        xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'not_before_failed.xml.base64'))
-        response_5 = OneLogin_Saml2_Response(settings, xml_5)
-        self.assertFalse(response_5.validate_timestamps())
+        with freeze_time("2024-01-01T12:00:00Z"):
+            xml_5 = self.file_contents(join(self.data_path, 'responses', 'invalids', 'not_before_failed.xml.base64'))
+            response_5 = OneLogin_Saml2_Response(settings, xml_5)
+            self.assertFalse(response_5.validate_timestamps())
 
     def testValidateVersion(self):
         """

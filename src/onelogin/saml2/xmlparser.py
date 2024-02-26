@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Based on the lxml example from defusedxml
 # DTDForbidden, EntitiesForbidden, NotSupportedError are clones of the classes defined at defusedxml
 #
@@ -8,7 +6,6 @@
 # See https://www.python.org/psf/license for licensing details.
 """lxml.etree protection"""
 
-from __future__ import print_function, absolute_import
 
 import threading
 
@@ -26,7 +23,7 @@ class DTDForbidden(ValueError):
     """
 
     def __init__(self, name, sysid, pubid):
-        super(DTDForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.sysid = sysid
         self.pubid = pubid
@@ -41,7 +38,7 @@ class EntitiesForbidden(ValueError):
     """
 
     def __init__(self, name, value, base, sysid, pubid, notation_name):
-        super(EntitiesForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.value = value
         self.base = base
@@ -74,31 +71,31 @@ class RestrictedElement(_etree.ElementBase):
             yield child
 
     def __iter__(self):
-        iterator = super(RestrictedElement, self).__iter__()
+        iterator = super().__iter__()
         return self._filter(iterator)
 
     def iterchildren(self, tag=None, reversed=False):
-        iterator = super(RestrictedElement, self).iterchildren(tag=tag, reversed=reversed)
+        iterator = super().iterchildren(tag=tag, reversed=reversed)
         return self._filter(iterator)
 
     def iter(self, tag=None, *tags):
-        iterator = super(RestrictedElement, self).iter(tag=tag, *tags)
+        iterator = super().iter(tag=tag, *tags)
         return self._filter(iterator)
 
     def iterdescendants(self, tag=None, *tags):
-        iterator = super(RestrictedElement, self).iterdescendants(tag=tag, *tags)
+        iterator = super().iterdescendants(tag=tag, *tags)
         return self._filter(iterator)
 
     def itersiblings(self, tag=None, preceding=False):
-        iterator = super(RestrictedElement, self).itersiblings(tag=tag, preceding=preceding)
+        iterator = super().itersiblings(tag=tag, preceding=preceding)
         return self._filter(iterator)
 
     def getchildren(self):
-        iterator = super(RestrictedElement, self).__iter__()
+        iterator = super().__iter__()
         return list(self._filter(iterator))
 
     def getiterator(self, tag=None):
-        iterator = super(RestrictedElement, self).getiterator(tag)
+        iterator = super().getiterator(tag)
         return self._filter(iterator)
 
 

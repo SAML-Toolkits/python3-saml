@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import unittest
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 

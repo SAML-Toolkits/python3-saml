@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLoginSaml2Metadata class
 
 
@@ -22,7 +20,7 @@ except NameError:
     basestring = str
 
 
-class OneLogin_Saml2_Metadata(object):
+class OneLogin_Saml2_Metadata:
     """
 
     A class that contains methods related to the metadata of the SP
@@ -98,11 +96,11 @@ class OneLogin_Saml2_Metadata(object):
             organization_displaynames = []
             organization_urls = []
             for (lang, info) in organization.items():
-                organization_names.append("""        <md:OrganizationName xml:lang="%s">%s</md:OrganizationName>""" % (lang, info['name']))
-                organization_displaynames.append("""        <md:OrganizationDisplayName xml:lang="%s">%s</md:OrganizationDisplayName>""" % (lang, info['displayname']))
-                organization_urls.append("""        <md:OrganizationURL xml:lang="%s">%s</md:OrganizationURL>""" % (lang, info['url']))
+                organization_names.append("""        <md:OrganizationName xml:lang="{}">{}</md:OrganizationName>""".format(lang, info['name']))
+                organization_displaynames.append("""        <md:OrganizationDisplayName xml:lang="{}">{}</md:OrganizationDisplayName>""".format(lang, info['displayname']))
+                organization_urls.append("""        <md:OrganizationURL xml:lang="{}">{}</md:OrganizationURL>""".format(lang, info['url']))
             org_data = '\n'.join(organization_names) + '\n' + '\n'.join(organization_displaynames) + '\n' + '\n'.join(organization_urls)
-            str_organization = """    <md:Organization>\n%(org)s\n    </md:Organization>""" % {'org': org_data}
+            str_organization = """    <md:Organization>\n{org}\n    </md:Organization>""".format(org=org_data)
 
         str_contacts = ''
         if len(contacts) > 0:

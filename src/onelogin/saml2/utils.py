@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Utils class
 
 
@@ -53,7 +51,7 @@ def return_false_on_exception(func):
     return exceptfalse
 
 
-class OneLogin_Saml2_Utils(object):
+class OneLogin_Saml2_Utils:
     """
 
     Auxiliary class that contains several utility methods to parse time,
@@ -206,7 +204,7 @@ class OneLogin_Saml2_Utils(object):
         assert isinstance(parameters, dict)
 
         if url.startswith('/'):
-            url = '%s%s' % (OneLogin_Saml2_Utils.get_self_url_host(request_data), url)
+            url = '{}{}'.format(OneLogin_Saml2_Utils.get_self_url_host(request_data), url)
 
         # Verify that the URL is to a http or https site.
         if re.search('^https?://', url, flags=re.IGNORECASE) is None:
@@ -266,7 +264,7 @@ class OneLogin_Saml2_Utils(object):
                 if not ((protocol == 'https' and port_suffix == ':443') or (protocol == 'http' and port_suffix == ':80')):
                     current_host += port_suffix
 
-        return '%s://%s' % (protocol, current_host)
+        return '{}://{}'.format(protocol, current_host)
 
     @staticmethod
     def get_self_host(request_data):
@@ -414,7 +412,7 @@ class OneLogin_Saml2_Utils(object):
             except ValueError:
                 elem = OneLogin_Saml2_Utils.TIME_FORMAT_WITH_FRAGMENT.match(timestr)
                 if not elem:
-                    raise Exception("time data %s does not match format %s" % (timestr, r'yyyy-mm-ddThh:mm:ss(\.s+)?Z'))
+                    raise Exception("time data {} does not match format {}".format(timestr, r'yyyy-mm-ddThh:mm:ss(\.s+)?Z'))
                 data = datetime.strptime(elem.groups()[0] + "Z", OneLogin_Saml2_Utils.TIME_FORMAT)
 
         return calendar.timegm(data.utctimetuple())

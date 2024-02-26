@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Auth class
 
 
@@ -22,7 +20,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, One
 from onelogin.saml2.xmlparser import tostring
 
 
-class OneLogin_Saml2_Auth(object):
+class OneLogin_Saml2_Auth:
     """
 
     This class implements the SP SAML instance.
@@ -578,7 +576,7 @@ class OneLogin_Saml2_Auth(object):
         :param lowercase_urlencoding: lowercase or no
         :type lowercase_urlencoding: boolean
         """
-        sign_data = ['%s=%s' % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data, lowercase_urlencoding))]
+        sign_data = ['{}={}'.format(saml_type, OneLogin_Saml2_Utils.escape_url(saml_data, lowercase_urlencoding))]
         if relay_state is not None:
             sign_data.append('RelayState=%s' % OneLogin_Saml2_Utils.escape_url(relay_state, lowercase_urlencoding))
         sign_data.append('SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(algorithm, lowercase_urlencoding))

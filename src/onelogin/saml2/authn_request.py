@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Authn_Request class
 
 
@@ -12,7 +10,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 
 
-class OneLogin_Saml2_Authn_Request(object):
+class OneLogin_Saml2_Authn_Request:
     """
 
     This class handles an AuthNRequest. It builds an
@@ -75,9 +73,9 @@ class OneLogin_Saml2_Authn_Request(object):
         if name_id_value_req:
             subject_str = """
     <saml:Subject>
-        <saml:NameID Format="%s">%s</saml:NameID>
+        <saml:NameID Format="{}">{}</saml:NameID>
         <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"></saml:SubjectConfirmation>
-    </saml:Subject>""" % (sp_data['NameIDFormat'], name_id_value_req)
+    </saml:Subject>""".format(sp_data['NameIDFormat'], name_id_value_req)
 
         nameid_policy_str = ''
         if set_nameid_policy:

@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 """ py3 compatibility class
 
 
 """
 
-from __future__ import absolute_import, print_function, with_statement
 
 try:
     basestring
@@ -18,7 +15,7 @@ except NameError:
     unicode = str
 
 
-if isinstance(b'', type('')):  # py 2.x
+if isinstance(b'', str):  # py 2.x
     text_types = (basestring,)  # noqa
     bytes_type = bytes
     str_type = basestring  # noqa

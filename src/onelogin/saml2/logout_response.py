@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Logout_Response class
 
 
@@ -14,7 +12,7 @@ from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
-class OneLogin_Saml2_Logout_Response(object):
+class OneLogin_Saml2_Logout_Response:
     """
 
     This class  handles a Logout Response. It Builds or parses a Logout Response object
@@ -97,7 +95,7 @@ class OneLogin_Saml2_Logout_Response(object):
                 in_response_to = self.get_in_response_to()
                 if request_id is not None and in_response_to and in_response_to != request_id:
                     raise OneLogin_Saml2_ValidationError(
-                        'The InResponseTo of the Logout Response: %s, does not match the ID of the Logout request sent by the SP: %s' % (in_response_to, request_id),
+                        'The InResponseTo of the Logout Response: {}, does not match the ID of the Logout request sent by the SP: {}'.format(in_response_to, request_id),
                         OneLogin_Saml2_ValidationError.WRONG_INRESPONSETO
                     )
 
@@ -120,7 +118,7 @@ class OneLogin_Saml2_Logout_Response(object):
                 if destination:
                     if not OneLogin_Saml2_Utils.normalize_url(url=destination).startswith(OneLogin_Saml2_Utils.normalize_url(url=current_url)):
                         raise OneLogin_Saml2_ValidationError(
-                            'The LogoutResponse was received at %s instead of %s' % (current_url, destination),
+                            'The LogoutResponse was received at {} instead of {}'.format(current_url, destination),
                             OneLogin_Saml2_ValidationError.WRONG_DESTINATION
                         )
 

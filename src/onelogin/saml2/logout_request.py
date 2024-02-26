@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneLogin_Saml2_Logout_Request class
 
 
@@ -14,7 +12,7 @@ from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
 
 
-class OneLogin_Saml2_Logout_Request(object):
+class OneLogin_Saml2_Logout_Request:
     """
 
     This class handles a Logout Request.

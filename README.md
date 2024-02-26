@@ -235,11 +235,11 @@ pip install -e ".[test]"
 
 and execute:
 ```
-python setup.py test
+pytest
 ```
 The previous line will run the tests for the whole toolkit. You can also run the tests for a specific module. To do so for the auth module you would have to execute this:
 ```
-python setup.py test --test-suite tests.src.OneLogin.saml2_tests.auth_test.OneLogin_Saml2_Auth_Test
+pytest --test-suite tests.src.OneLogin.saml2_tests.auth_test.OneLogin_Saml2_Auth_Test
 ```
 
 With the ``--test-suite`` parameter you can specify the module to test. You'll find all the module available and their class names at ``tests/src/OneLogin/saml2_tests/``.

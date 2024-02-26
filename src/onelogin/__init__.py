@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 
 Add SAML support to your Python softwares using this library.

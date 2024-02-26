@@ -772,7 +772,7 @@ Notice that we saved the user data in the session before the redirection to have
 In order to retrieve attributes we use:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 ```
 
 With this method we get a dict with all the user data provided by the IdP in the assertion of the SAML response.
@@ -793,7 +793,7 @@ Each attribute name can be used as a key to obtain the value. Every attribute is
 The following code is equivalent:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 print(attributes['cn'])
 
 print(auth.get_attribute('cn'))

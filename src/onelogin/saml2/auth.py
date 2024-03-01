@@ -111,12 +111,15 @@ class OneLogin_Saml2_Auth(object):
         self._last_response_in_response_to = response.get_in_response_to()
         self._last_assertion_not_on_or_after = response.get_assertion_not_on_or_after()
 
-    def process_response(self, request_id=None):
+    def process_response(self, request_id=None, raise_exceptions=False):
         """
         Process the SAML Response sent by the IdP.
 
         :param request_id: Is an optional argument. Is the ID of the AuthNRequest sent by this SP to the IdP.
         :type request_id: string
+
+        :param raise_exceptions: Whether to return raise an exception during is_valid check
+        :type raise_exceptions: Boolean
 
         :raises: OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND, when a POST with a SAMLResponse is not found
         """
@@ -128,7 +131,7 @@ class OneLogin_Saml2_Auth(object):
             response = self.response_class(self._settings, self._request_data['post_data']['SAMLResponse'])
             self._last_response = response.get_xml_document()
 
-            if response.is_valid(self._request_data, request_id):
+            if response.is_valid(self._request_data, request_id, raise_exceptions=raise_exceptions):
                 self.store_valid_response(response)
             else:
                 self._errors.append('invalid_response')
@@ -141,7 +144,7 @@ class OneLogin_Saml2_Auth(object):
                 OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND
             )
 
-    def process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None):
+    def process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None, raise_exceptions=False):
         """
         Process the SAML Logout Response / Logout Request sent by the IdP.
 
@@ -150,6 +153,9 @@ class OneLogin_Saml2_Auth(object):
 
         :param request_id: The ID of the LogoutRequest sent by this SP to the IdP
         :type request_id: string
+
+        :param raise_exceptions: Whether to return raise an exception during is_valid check
+        :type raise_exceptions: Boolean
 
         :returns: Redirection url
         """
@@ -163,7 +169,7 @@ class OneLogin_Saml2_Auth(object):
             if not self.validate_response_signature(get_data):
                 self._errors.append('invalid_logout_response_signature')
                 self._errors.append('Signature validation failed. Logout Response rejected')
-            elif not logout_response.is_valid(self._request_data, request_id):
+            elif not logout_response.is_valid(self._request_data, request_id, raise_exceptions=raise_exceptions):
                 self._errors.append('invalid_logout_response')
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
                 self._errors.append('logout_not_success')
@@ -178,7 +184,7 @@ class OneLogin_Saml2_Auth(object):
             if not self.validate_request_signature(get_data):
                 self._errors.append("invalid_logout_request_signature")
                 self._errors.append('Signature validation failed. Logout Request rejected')
-            elif not logout_request.is_valid(self._request_data):
+            elif not logout_request.is_valid(self._request_data, raise_exceptions=raise_exceptions):
                 self._errors.append('invalid_logout_request')
             else:
                 if not keep_local_session:

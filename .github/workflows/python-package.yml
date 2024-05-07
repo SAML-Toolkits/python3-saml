@@ -70,8 +70,8 @@ jobs:
         make install-test
     - name: Run linters
       run: |
-        make pycodestyle
         make flake8
+        make black
     - name: Run coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

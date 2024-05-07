@@ -1,13 +1,19 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "python3-saml"
 version = "1.16.0"
 description = "Saml Python Toolkit. Add SAML support to your Python software using this library"
-license = "Apache-2.0"
-authors = ["SAML-Toolkits <contact@iamdigitalservices.com>"]
-maintainers = ["Sixto Martin <sixto.martin.garcia@gmail.com>"]
+license = {file = "LICENSE"}
+authors = [
+    {name = "SAML-Toolkits", email = "contact@iamdigitalservices.com"}
+]
+maintainers = [
+    {name = "Sixto Martin", email = "sixto.martin.garcia@gmail.com"}
+]
 readme = "README.md"
-homepage = "https://saml.info"
-repository = "https://github.com/SAML-Toolkits/python3-saml"
 keywords = [
     "saml",
     "saml2",
@@ -17,71 +23,44 @@ keywords = [
     "identity",
 ]
 classifiers = [
-    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-packages = [
-    { include = "onelogin", from = "src" },
-    { include = "onelogin/saml2", from = "src" },
+dependencies = [
+    "lxml>=4.6.5,!=4.7.0",
+    "xmlsec>=1.3.9",
+    "isodate>=0.6.1",
 ]
+requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
-include = [
-    { path = "src/onelogin/saml2/schemas"},
-    { path = "tests", format = "sdist" }
-]
-
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://saml.info"
+Source = "https://github.com/SAML-Toolkits/python3-saml"
 "Bug Tracker" = "https://github.com/SAML-Toolkits/python3-saml/issues"
+Changelog = "https://github.com/SAML-Toolkits/python3-saml/blob/master/changelog.md"
 
-[tool.poetry.dependencies]
-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-lxml = ">=4.6.5, !=4.7.0"
-xmlsec = ">=1.3.9"
-isodate = ">=0.6.1"
-
-#[tool.poetry.group.dev]
-#optional = true
-
-#[tool.poetry.group.dev.dependencies]
-#black = "*"
-#isort = {version = "^5.10.1", extras = ["pyproject"]}
-flake8 = { version = ">=3.6.0, <=5.0.0", optional = true}
-#Flake8-pyproject = "^1.1.0.post0"
-#flake8-bugbear = "^22.8.23"
-#flake8-logging-format = "^0.7.5"
-#ipdb = "^0.13.9"
-
-#[tool.poetry.group.test.dependencies]
-pytest = { version = ">=4.6.11", optional = true}
-coverage = { version = ">=4.5.2", optional = true}
-#pylint = ">=1.9.4"
-
-[tool.poetry.extras]
-test = ["flake8", "pytest", "coverage"]
-
-#[tool.poetry.group.test]
-#optional = true
-
-#[tool.poetry.group.coverage]
-#optional = true
-
-#[tool.poetry.group.coverage.dependencies]
-#coverage = ">=4.5.2"
-#pytest-cov = "*"
-
-#[tool.poetry.group.docs]
-#optional = true
-
-#[tool.poetry.group.docs.dependencies]
-#sphinx = "*"
-
-[build-system]
-requires = [
-  "poetry>=1.1.15",
-  "setuptools >= 40.1.0",
-  "wheel"
+[project.optional-dependencies]
+test = [
+    "coverage>=4.5.2",
+    "flake8>=3.6.0, <=5.0.0",
+    "pytest>=4.6",
 ]
-build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+"onelogin.saml2.schemas" = ["*.xsd"]
 
 [tool.pytest.ini_options]
 minversion = "4.6.11"
@@ -93,75 +72,11 @@ pythonpath = [
     "tests",
 ]
 
-[tool.coverage.run]
-branch = true
-source = ["src/onelogin/saml2"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "pragma: no cover",
-  "def __repr__",
-  "def __str__",
-  "raise AssertionError",
-  "raise NotImplementedError",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-  "if typing.TYPE_CHECKING:",
-]
-ignore_errors = true
-
-[tool.coverage.html]
-directory = "cov_html"
-
-[tool.flake8]
-max-line-length = 210
-max-complexity = 22
-count = true
-show-source = true
-statistics = true
-disable-noqa = false
-# 'ignore' defaults to: E121,E123,E126,E226,E24,E704,W503,W504
-extend-ignore = [
-    'B904',
-    'B006',
-    'B950',
-    'B017',
-    'C901',
-    'E501',
-    'E731',
-]
-per-file-ignores = [
-    '__init__.py:F401',
-]
-# 'select' defaults to: E,F,W,C90
-extend-select = [
-    # * Default warnings reported by flake8-bugbear (B) -
-    #   https://github.com/PyCQA/flake8-bugbear#list-of-warnings
-    'B',
-    # * The B950 flake8-bugbear opinionated warnings -
-    #   https://github.com/PyCQA/flake8-bugbear#opinionated-warnings
-    'B9',
-]
-extend-exclude = [
-    '.github', '.gitlab',
-    '.Python', '.*.pyc', '.*.pyo', '.*.pyd', '.*.py.class', '*.egg-info',
-    'venv*', '.venv*', '.*_cache',
-    'lib', 'lib64', '.*.so',
-    'build', 'dist', 'sdist', 'wheels',
-]
-
 [tool.black]
 line-length = 200
-extend-exclude = '''
-# A regex preceded with ^/ will apply only to files and directories
-# in the root of the project.
-(
-    \.pytest_cache
-)
-'''
 
 [tool.isort]
-profile = 'black'
+profile = "black"
 # The 'black' profile means:
 #   multi_line_output = 3
 #   include_trailing_comma = true
@@ -179,7 +94,4 @@ honor_noqa = true
 atomic = true
 ignore_comments = true
 skip_gitignore = true
-src_paths = [
-    'src',
-    'tests',
-]
+src_paths = ['src']

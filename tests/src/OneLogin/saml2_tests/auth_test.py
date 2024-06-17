@@ -9,6 +9,7 @@ import unittest
 from onelogin.saml2 import compat
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error
 from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
@@ -403,7 +404,15 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=self.loadSettingsJSON())
 
         auth.set_strict(True)
-        auth.process_slo(False)
+
+        callback_called = False
+        def delete_session_cb(logout_request, logout_response):
+            nonlocal callback_called
+            callback_called = True
+            self.assertIsNone(logout_request)
+            self.assertIsInstance(logout_response, OneLogin_Saml2_Logout_Response)
+        auth.process_slo(False, delete_session_cb=delete_session_cb)
+        self.assertTrue(callback_called)
 
         self.assertEqual(len(auth.get_errors()), 0)
 
@@ -484,7 +493,16 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         auth = OneLogin_Saml2_Auth(request_data, old_settings=settings_info)
 
         auth.set_strict(True)
-        target_url = auth.process_slo(True)
+
+        callback_called = False
+        def delete_session_cb(logout_request, logout_response):
+            nonlocal callback_called
+            callback_called = True
+            self.assertIsNone(logout_response)
+            self.assertIsInstance(logout_request, OneLogin_Saml2_Logout_Request)
+        target_url = auth.process_slo(False, delete_session_cb=delete_session_cb)
+        self.assertTrue(callback_called)
+
         parsed_query = parse_qs(urlparse(target_url)[4])
         slo_url = settings_info['idp']['singleLogoutService']['url']
         self.assertIn(slo_url, target_url)
@@ -497,7 +515,6 @@ class OneLogin_Saml2_Auth_Test(unittest.TestCase):
         # $_SESSION['samltest'] = true;
 
         auth.set_strict(True)
-        target_url_2 = auth.process_slo(True)
         target_url_2 = auth.process_slo(True)
         parsed_query_2 = parse_qs(urlparse(target_url_2)[4])
         slo_url = settings_info['idp']['singleLogoutService']['url']

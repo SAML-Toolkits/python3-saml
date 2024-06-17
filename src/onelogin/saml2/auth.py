@@ -170,7 +170,7 @@ class OneLogin_Saml2_Auth(object):
             else:
                 self._last_message_id = logout_response.id
                 if not keep_local_session:
-                    OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
+                    OneLogin_Saml2_Utils.delete_local_session(delete_session_cb, logout_response=logout_response)
 
         elif get_data and 'SAMLRequest' in get_data:
             logout_request = self.logout_request_class(self._settings, get_data['SAMLRequest'])
@@ -182,7 +182,7 @@ class OneLogin_Saml2_Auth(object):
                 self._errors.append('invalid_logout_request')
             else:
                 if not keep_local_session:
-                    OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
+                    OneLogin_Saml2_Utils.delete_local_session(delete_session_cb, logout_request=logout_request)
 
                 in_response_to = logout_request.id
                 self._last_message_id = logout_request.id

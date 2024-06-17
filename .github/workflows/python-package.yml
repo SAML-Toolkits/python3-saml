@@ -46,29 +46,6 @@ jobs:
         make install-test
     - name: Test
       run: make pytest
-  test_py2:
-    runs-on: ubuntu-20.04
-    container:
-      image: python:2.7.18-buster
-    strategy:
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Install dependencies
-      run: |
-        pip install -U setuptools
-        apt-get update -qq
-        apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
-        make install-req
-        make install-test
-    - name: Test
-      run: make pytest
   lint:
     runs-on: ubuntu-20.04
     environment: CI

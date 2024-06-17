@@ -90,7 +90,7 @@ Installation
 
 ### Dependencies ###
 
- * python 2.7 (deprecated) // python 3.6
+ * python 3.5
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/

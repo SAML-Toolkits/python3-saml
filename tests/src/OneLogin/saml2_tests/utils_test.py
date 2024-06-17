@@ -6,6 +6,7 @@ import json
 from lxml import etree
 from os.path import dirname, join, exists
 import unittest
+import sys
 from xml.dom.minidom import parseString
 
 from onelogin.saml2 import compat
@@ -175,10 +176,14 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
             exception = context.exception
             self.assertIn("No hostname defined", str(exception))
 
-        request_data = {
-            'server_name': 'example.com'
-        }
-        self.assertEqual('example.com', OneLogin_Saml2_Utils.get_self_host(request_data))
+        if sys.version_info > (3, 2, 0):
+            request_data = {
+                'server_name': 'example.com'
+            }
+            with self.assertWarns(Warning) as context:
+                self_host = OneLogin_Saml2_Utils.get_self_host(request_data)
+
+            self.assertEqual('example.com', self_host)
 
         request_data = {
             'http_host': 'example.com'
@@ -223,37 +228,48 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         }
         self.assertEqual('http://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['server_port'] = '80'
-        self.assertEqual('http://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+        if sys.version_info > (3, 2, 0):
+            with self.assertWarns(Warning) as context:
+                request_data['server_port'] = '80'
+                self.assertEqual('http://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['server_port'] = '81'
-        self.assertEqual('http://example.com:81', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['server_port'] = '81'
+                self.assertEqual('http://example.com:81', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['server_port'] = '443'
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['server_port'] = '443'
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
         del request_data['server_port']
         request_data['https'] = 'on'
         self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['server_port'] = '444'
-        self.assertEqual('https://example.com:444', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+        if sys.version_info > (3, 2, 0):
+            with self.assertWarns(Warning) as context:
+                request_data['server_port'] = '444'
+                self.assertEqual('https://example.com:444', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['server_port'] = '443'
-        request_data['request_uri'] = ''
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['server_port'] = '443'
+                request_data['request_uri'] = ''
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['request_uri'] = '/'
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['request_uri'] = '/'
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['request_uri'] = 'onelogin/'
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['request_uri'] = 'onelogin/'
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['request_uri'] = '/onelogin'
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['request_uri'] = '/onelogin'
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
-        request_data['request_uri'] = 'https://example.com/onelogin/sso'
-        self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
+            with self.assertWarns(Warning) as context:
+                request_data['request_uri'] = 'https://example.com/onelogin/sso'
+                self.assertEqual('https://example.com', OneLogin_Saml2_Utils.get_self_url_host(request_data))
 
         request_data2 = {
             'request_uri': 'example.com/onelogin/sso'
@@ -728,47 +744,47 @@ class OneLogin_Saml2_Utils_Test(unittest.TestCase):
         self.assertIn('<ds:SignatureValue>', xml_authn_signed)
 
         res = parseString(xml_authn_signed)
-        ds_signature = res.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature = res.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature.tagName)
 
         xml_authn_dom = parseString(xml_authn)
         xml_authn_signed_2 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.toxml(), key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_2)
         res_2 = parseString(xml_authn_signed_2)
-        ds_signature_2 = res_2.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_2 = res_2.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_2.tagName)
 
         xml_authn_signed_3 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_dom.firstChild.toxml(), key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_3)
         res_3 = parseString(xml_authn_signed_3)
-        ds_signature_3 = res_3.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_3 = res_3.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_3.tagName)
 
         xml_authn_etree = etree.fromstring(xml_authn)
         xml_authn_signed_4 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_4)
         res_4 = parseString(xml_authn_signed_4)
-        ds_signature_4 = res_4.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_4 = res_4.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_4.tagName)
 
         xml_authn_signed_5 = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_authn_etree, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_authn_signed_5)
         res_5 = parseString(xml_authn_signed_5)
-        ds_signature_5 = res_5.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_5 = res_5.firstChild.firstChild.nextSibling.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_5.tagName)
 
         xml_logout_req = b64decode(self.file_contents(join(self.data_path, 'logout_requests', 'logout_request.xml.base64')))
         xml_logout_req_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_logout_req, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_req_signed)
         res_6 = parseString(xml_logout_req_signed)
-        ds_signature_6 = res_6.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_6 = res_6.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_6.tagName)
 
         xml_logout_res = b64decode(self.file_contents(join(self.data_path, 'logout_responses', 'logout_response.xml.base64')))
         xml_logout_res_signed = compat.to_string(OneLogin_Saml2_Utils.add_sign(xml_logout_res, key, cert))
         self.assertIn('<ds:SignatureValue>', xml_logout_res_signed)
         res_7 = parseString(xml_logout_res_signed)
-        ds_signature_7 = res_7.firstChild.firstChild.nextSibling.nextSibling
+        ds_signature_7 = res_7.firstChild.firstChild.nextSibling.nextSibling.nextSibling
         self.assertIn('ds:Signature', ds_signature_7.tagName)
 
         xml_metadata = self.file_contents(join(self.data_path, 'metadata', 'metadata_settings1.xml'))

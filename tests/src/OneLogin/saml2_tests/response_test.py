@@ -6,8 +6,8 @@ from base64 import b64decode
 from lxml import etree
 from datetime import datetime
 from datetime import timedelta
-from freezegun import freeze_time
 import json
+import sys
 from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
@@ -1565,22 +1565,31 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         request_data = {
             'script_name': '',
             'request_uri': '?acs',
+            'http_host': 'pytoolkit.com',
+            'server_port': 8000
         }
-        for separate_port in (False, True):
-            if separate_port:
-                request_data.update({
-                    'http_host': 'pytoolkit.com',
-                    'server_port': 8000,
-                })
-            else:
-                request_data.update({
-                    'http_host': 'pytoolkit.com:8000',
-                })
+        
+        message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
+        response_6 = OneLogin_Saml2_Response(settings_2, message_2)
+        
+        if sys.version_info > (3, 2, 0):
+            with self.assertWarns(Warning) as context:
+                self.assertFalse(response_6.is_valid(request_data))
+                self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
 
-            message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
-            response_6 = OneLogin_Saml2_Response(settings_2, message_2)
-            self.assertFalse(response_6.is_valid(request_data))
-            self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
+
+        
+            
+        request_data = {
+            'script_name': '',
+            'request_uri': '?acs',
+            'http_host': 'pytoolkit.com:8000',
+        }
+
+        message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
+        response_6 = OneLogin_Saml2_Response(settings_2, message_2)
+        self.assertFalse(response_6.is_valid(request_data))
+        self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
 
     def testIsInValidCert(self):
         """
@@ -1863,15 +1872,11 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         xml = self.file_contents(join(self.data_path, 'responses', 'valid_response_without_inresponseto.xml.base64'))
         response = OneLogin_Saml2_Response(settings, xml)
 
-        not_on_or_after = datetime.strptime('2014-02-19T09:37:01Z', '%Y-%m-%dT%H:%M:%SZ')
-        not_on_or_after -= timedelta(seconds=150)
-
-        with freeze_time(not_on_or_after):
-            self.assertTrue(response.is_valid({
-                'https': 'on',
-                'http_host': 'pitbulk.no-ip.org',
-                'script_name': 'newonelogin/demo1/index.php?acs'
-            }))
+        self.assertTrue(response.is_valid({
+            'https': 'on',
+            'http_host': 'pitbulk.no-ip.org',
+            'script_name': 'newonelogin/demo1/index.php?acs'
+        }))
 
     def testIsValidRaisesExceptionWhenRaisesArgumentIsTrue(self):
         """

@@ -4,8 +4,6 @@
 from base64 import b64decode
 
 from lxml import etree
-from datetime import datetime
-from datetime import timedelta
 import json
 import sys
 from os.path import dirname, join, exists
@@ -1568,18 +1566,15 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
             'http_host': 'pytoolkit.com',
             'server_port': 8000
         }
-        
+
         message_2 = self.file_contents(join(self.data_path, 'responses', 'valid_encrypted_assertion_encrypted_nameid.xml.base64'))
         response_6 = OneLogin_Saml2_Response(settings_2, message_2)
-        
+
         if sys.version_info > (3, 2, 0):
-            with self.assertWarns(Warning) as context:
+            with self.assertWarns(Warning):
                 self.assertFalse(response_6.is_valid(request_data))
                 self.assertEqual('The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response', response_6.get_error())
 
-
-        
-            
         request_data = {
             'script_name': '',
             'request_uri': '?acs',

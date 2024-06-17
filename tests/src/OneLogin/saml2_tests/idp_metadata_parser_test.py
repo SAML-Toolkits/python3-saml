@@ -46,16 +46,16 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         Tests the get_metadata method of the OneLogin_Saml2_IdPMetadataParser
         """
         with self.assertRaises(Exception):
-            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('http://google.es')
+            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('http://google.es', validate_cert=False)
 
         try:
-            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://idp.testshib.org/idp/shibboleth')
+            data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml', validate_cert=False)
             self.assertTrue(data is not None and data is not {})
         except URLError:
             pass
 
     def testGetMetadataWithHeaders(self):
-        data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://samltest.id/saml/providers',
+        data = OneLogin_Saml2_IdPMetadataParser.get_metadata('https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml', validate_cert=False,
                                                              headers={'User-Agent': 'Mozilla/5.0'})
         self.assertIsNotNone(data)
         self.assertIn(b'entityID=', data)
@@ -65,10 +65,10 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         Tests the parse_remote method of the OneLogin_Saml2_IdPMetadataParser
         """
         with self.assertRaises(Exception):
-            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('http://google.es')
+            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('http://google.es', validate_cert=False)
 
         try:
-            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://idp.testshib.org/idp/shibboleth')
+            data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml', validate_cert=False)
         except URLError:
             xml = self.file_contents(join(self.data_path, 'metadata', 'testshib-providers.xml'))
             data = OneLogin_Saml2_IdPMetadataParser.parse(xml)
@@ -96,10 +96,10 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         """
         Tests the parse_remote method passing headers of the OneLogin_Saml2_IdPMetadataParser
         """
-        data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://samltest.id/saml/providers')
-        self.assertEqual(data['idp']['entityId'], 'https://samltest.id/saml/idp')
+        data = OneLogin_Saml2_IdPMetadataParser.parse_remote('https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml', validate_cert=False)
+        self.assertEqual(data['idp']['entityId'], 'https://idp.testshib.org/idp/shibboleth')
         self.assertIsNotNone(data['idp']['singleSignOnService']['url'])
-        self.assertIsNotNone(data['idp']['x509certMulti'])
+        self.assertIsNotNone(data['idp']['x509cert'])
 
     def testParse(self):
         """

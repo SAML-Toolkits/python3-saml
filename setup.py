@@ -13,7 +13,6 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -22,7 +21,7 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     license='MIT',
     url='https://github.com/SAML-Toolkits/python3-saml',
     packages=['onelogin', 'onelogin/saml2'],
@@ -43,7 +42,6 @@ setup(
     extras_require={
         'test': (
             'coverage>=4.5.2',
-            'freezegun>=0.3.11, <=1.1.0',
             # 'pylint>=1.9.4',
             'flake8>=3.6.0, <=5.0.0',
             'pytest>=4.6',

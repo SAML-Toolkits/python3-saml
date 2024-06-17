@@ -217,7 +217,6 @@ This folder contains a Pyramid project that will be used as demo to show how to 
 
 This folder contains a Tornado project that will be used as demo to show how to add SAML support to the Tornado Framework. ``views.py`` (with its ``settings.py``) is the main Flask file that has all the code, this file uses the templates stored at the ``templates`` folder. In the ``saml`` folder we found the ``certs`` folder to store the X.509 public and private key, and the SAML toolkit settings (``settings.json`` and ``advanced_settings.json``).
 
-It requires python3.5 (it's using tornado 6.0.3)
 
 #### setup.py ####
 
@@ -772,7 +771,7 @@ Notice that we saved the user data in the session before the redirection to have
 In order to retrieve attributes we use:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 ```
 
 With this method we get a dict with all the user data provided by the IdP in the assertion of the SAML response.
@@ -793,7 +792,7 @@ Each attribute name can be used as a key to obtain the value. Every attribute is
 The following code is equivalent:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 print(attributes['cn'])
 
 print(auth.get_attribute('cn'))

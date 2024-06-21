@@ -15,6 +15,9 @@ install-req:
 install-test:
 	$(PIP) install -e ".[test]"
 
+install-lint:
+	$(PIP) install -e ".[lint]"
+
 pytest:
 	$(COVERAGE) run --source $(MAIN_SOURCE) --rcfile=$(COVERAGE_CONFIG) -m pytest
 	$(COVERAGE) report -m --rcfile=$(COVERAGE_CONFIG)

@@ -66,7 +66,7 @@ jobs:
         sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
         pip install --force-reinstall --no-binary lxml lxml
         make install-req
-        make install-test
+        make install-lint
     - name: Run linters
       run: |
         make flake8

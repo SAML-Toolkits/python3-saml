@@ -194,6 +194,24 @@ class OneLogin_Saml2_Settings(object):
         """
         self._paths['cert'] = path
 
+    def set_sp_cert_filename(self, filename):
+        """
+        Set the filename of the SP certificate
+        """
+        self._sp['cert_filename'] = filename
+
+    def set_sp_key_filename(self, filename):
+        """
+        Set the filename of the SP key
+        """
+        self._sp['key_filename'] = filename
+
+    def set_idp_cert_filename(self, filename):
+        """
+        Set the filename of the idp certificate
+        """
+        self._idp['cert_filename'] = filename
+
     def get_lib_path(self):
         """
         Returns lib path
@@ -214,7 +232,7 @@ class OneLogin_Saml2_Settings(object):
 
     def _load_settings_from_dict(self, settings):
         """
-        Loads settings info from a settings Dict
+        Loads settings info from a settings Dict, adds default values and validates the settings
 
         :param settings: SAML Toolkit Settings
         :type settings: dict
@@ -222,18 +240,19 @@ class OneLogin_Saml2_Settings(object):
         :returns: True if the settings info is valid
         :rtype: boolean
         """
-        errors = self.check_settings(settings)
-        if len(errors) == 0:
-            self._errors = []
-            self._sp = settings['sp']
-            self._idp = settings.get('idp', {})
-            self._strict = settings.get('strict', True)
-            self._debug = settings.get('debug', False)
-            self._security = settings.get('security', {})
-            self._contacts = settings.get('contactPerson', {})
-            self._organization = settings.get('organization', {})
+        self._sp = settings.get('sp', {})
+        self._idp = settings.get('idp', {})
+        self._strict = settings.get('strict', True)
+        self._debug = settings.get('debug', False)
+        self._security = settings.get('security', {})
+        self._contacts = settings.get('contactPerson', {})
+        self._organization = settings.get('organization', {})
+        self._add_default_values()
 
-            self._add_default_values()
+        self._errors = []
+        errors = self.check_settings(settings)
+
+        if len(errors) == 0:
             return True
 
         self._errors = errors
@@ -328,6 +347,11 @@ class OneLogin_Saml2_Settings(object):
         self._sp.setdefault('x509cert', '')
         self._sp.setdefault('privateKey', '')
 
+        # Set the default filenames for the certificates and keys
+        self._idp.setdefault('cert_filename', 'idp.crt')
+        self._sp.setdefault('cert_filename', 'sp.crt')
+        self._sp.setdefault('key_filename', 'sp.key')
+
         self._security.setdefault('requestedAuthnContext', True)
         self._security.setdefault('requestedAuthnContextComparison', 'exact')
         self._security.setdefault('failOnAuthnContextMismatch', False)
@@ -389,7 +413,7 @@ class OneLogin_Saml2_Settings(object):
                 if 'security' in settings:
                     security = settings['security']
 
-                    exists_x509 = bool(idp.get('x509cert'))
+                    exists_x509 = bool(self.get_idp_cert())
                     exists_fingerprint = bool(idp.get('certFingerprint'))
 
                     exists_multix509sign = 'x509certMulti' in idp and \
@@ -566,7 +590,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: string or None
         """
         key = self._sp.get('privateKey')
-        key_file_name = self._paths['cert'] + 'sp.key'
+        key_file_name = self._paths['cert'] + self._sp['key_filename']
 
         if not key and exists(key_file_name):
             with open(key_file_name) as f:
@@ -581,7 +605,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: string or None
         """
         cert = self._sp.get('x509cert')
-        cert_file_name = self._paths['cert'] + 'sp.crt'
+        cert_file_name = self._paths['cert'] + self._sp['cert_filename']
 
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
@@ -612,7 +636,7 @@ class OneLogin_Saml2_Settings(object):
         :rtype: string
         """
         cert = self._idp.get('x509cert')
-        cert_file_name = self.get_cert_path() + 'idp.crt'
+        cert_file_name = self.get_cert_path() + self._idp['cert_filename']
         if not cert and exists(cert_file_name):
             with open(cert_file_name) as f:
                 cert = f.read()

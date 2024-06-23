@@ -123,23 +123,20 @@ class OneLogin_Saml2_Auth(object):
         self._errors = []
         self._error_reason = None
 
-        if 'post_data' in self._request_data and 'SAMLResponse' in self._request_data['post_data']:
+        if "post_data" in self._request_data and "SAMLResponse" in self._request_data["post_data"]:
             # AuthnResponse -- HTTP_POST Binding
-            response = self.response_class(self._settings, self._request_data['post_data']['SAMLResponse'])
+            response = self.response_class(self._settings, self._request_data["post_data"]["SAMLResponse"])
             self._last_response = response.get_xml_document()
 
             if response.is_valid(self._request_data, request_id):
                 self.store_valid_response(response)
             else:
-                self._errors.append('invalid_response')
+                self._errors.append("invalid_response")
                 self._error_reason = response.get_error()
 
         else:
-            self._errors.append('invalid_binding')
-            raise OneLogin_Saml2_Error(
-                'SAML Response not found, Only supported HTTP_POST Binding',
-                OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND
-            )
+            self._errors.append("invalid_binding")
+            raise OneLogin_Saml2_Error("SAML Response not found, Only supported HTTP_POST Binding", OneLogin_Saml2_Error.SAML_RESPONSE_NOT_FOUND)
 
     def process_slo(self, keep_local_session=False, request_id=None, delete_session_cb=None):
         """
@@ -156,30 +153,30 @@ class OneLogin_Saml2_Auth(object):
         self._errors = []
         self._error_reason = None
 
-        get_data = 'get_data' in self._request_data and self._request_data['get_data']
-        if get_data and 'SAMLResponse' in get_data:
-            logout_response = self.logout_response_class(self._settings, get_data['SAMLResponse'])
+        get_data = "get_data" in self._request_data and self._request_data["get_data"]
+        if get_data and "SAMLResponse" in get_data:
+            logout_response = self.logout_response_class(self._settings, get_data["SAMLResponse"])
             self._last_response = logout_response.get_xml()
             if not self.validate_response_signature(get_data):
-                self._errors.append('invalid_logout_response_signature')
-                self._errors.append('Signature validation failed. Logout Response rejected')
+                self._errors.append("invalid_logout_response_signature")
+                self._errors.append("Signature validation failed. Logout Response rejected")
             elif not logout_response.is_valid(self._request_data, request_id):
-                self._errors.append('invalid_logout_response')
+                self._errors.append("invalid_logout_response")
             elif logout_response.get_status() != OneLogin_Saml2_Constants.STATUS_SUCCESS:
-                self._errors.append('logout_not_success')
+                self._errors.append("logout_not_success")
             else:
                 self._last_message_id = logout_response.id
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
 
-        elif get_data and 'SAMLRequest' in get_data:
-            logout_request = self.logout_request_class(self._settings, get_data['SAMLRequest'])
+        elif get_data and "SAMLRequest" in get_data:
+            logout_request = self.logout_request_class(self._settings, get_data["SAMLRequest"])
             self._last_request = logout_request.get_xml()
             if not self.validate_request_signature(get_data):
                 self._errors.append("invalid_logout_request_signature")
-                self._errors.append('Signature validation failed. Logout Request rejected')
+                self._errors.append("Signature validation failed. Logout Request rejected")
             elif not logout_request.is_valid(self._request_data):
-                self._errors.append('invalid_logout_request')
+                self._errors.append("invalid_logout_request")
             else:
                 if not keep_local_session:
                     OneLogin_Saml2_Utils.delete_local_session(delete_session_cb)
@@ -191,21 +188,18 @@ class OneLogin_Saml2_Auth(object):
                 self._last_response = response_builder.get_xml()
                 logout_response = response_builder.get_response()
 
-                parameters = {'SAMLResponse': logout_response}
-                if 'RelayState' in self._request_data['get_data']:
-                    parameters['RelayState'] = self._request_data['get_data']['RelayState']
+                parameters = {"SAMLResponse": logout_response}
+                if "RelayState" in self._request_data["get_data"]:
+                    parameters["RelayState"] = self._request_data["get_data"]["RelayState"]
 
                 security = self._settings.get_security_data()
-                if security['logoutResponseSigned']:
-                    self.add_response_signature(parameters, security['signatureAlgorithm'])
+                if security["logoutResponseSigned"]:
+                    self.add_response_signature(parameters, security["signatureAlgorithm"])
 
                 return self.redirect_to(self.get_slo_response_url(), parameters)
         else:
-            self._errors.append('invalid_binding')
-            raise OneLogin_Saml2_Error(
-                'SAML LogoutRequest/LogoutResponse not found. Only supported HTTP_REDIRECT Binding',
-                OneLogin_Saml2_Error.SAML_LOGOUTMESSAGE_NOT_FOUND
-            )
+            self._errors.append("invalid_binding")
+            raise OneLogin_Saml2_Error("SAML LogoutRequest/LogoutResponse not found. Only supported HTTP_REDIRECT Binding", OneLogin_Saml2_Error.SAML_LOGOUTMESSAGE_NOT_FOUND)
 
     def redirect_to(self, url=None, parameters={}):
         """
@@ -218,8 +212,8 @@ class OneLogin_Saml2_Auth(object):
 
         :returns: Redirection URL
         """
-        if url is None and 'RelayState' in self._request_data['get_data']:
-            url = self._request_data['get_data']['RelayState']
+        if url is None and "RelayState" in self._request_data["get_data"]:
+            url = self._request_data["get_data"]["RelayState"]
         return OneLogin_Saml2_Utils.redirect(url, parameters, request_data=self._request_data)
 
     def is_authenticated(self):
@@ -421,16 +415,16 @@ class OneLogin_Saml2_Auth(object):
         self._last_request_id = authn_request.get_id()
 
         saml_request = authn_request.get_request()
-        parameters = {'SAMLRequest': saml_request}
+        parameters = {"SAMLRequest": saml_request}
 
         if return_to is not None:
-            parameters['RelayState'] = return_to
+            parameters["RelayState"] = return_to
         else:
-            parameters['RelayState'] = OneLogin_Saml2_Utils.get_self_url_no_query(self._request_data)
+            parameters["RelayState"] = OneLogin_Saml2_Utils.get_self_url_no_query(self._request_data)
 
         security = self._settings.get_security_data()
-        if security.get('authnRequestsSigned', False):
-            self.add_request_signature(parameters, security['signatureAlgorithm'])
+        if security.get("authnRequestsSigned", False):
+            self.add_request_signature(parameters, security["signatureAlgorithm"])
         return self.redirect_to(self.get_sso_url(), parameters)
 
     def logout(self, return_to=None, name_id=None, session_index=None, nq=None, name_id_format=None, spnq=None):
@@ -459,10 +453,7 @@ class OneLogin_Saml2_Auth(object):
         """
         slo_url = self.get_slo_url()
         if slo_url is None:
-            raise OneLogin_Saml2_Error(
-                'The IdP does not support Single Log Out',
-                OneLogin_Saml2_Error.SAML_SINGLE_LOGOUT_NOT_SUPPORTED
-            )
+            raise OneLogin_Saml2_Error("The IdP does not support Single Log Out", OneLogin_Saml2_Error.SAML_SINGLE_LOGOUT_NOT_SUPPORTED)
 
         if name_id is None and self._nameid is not None:
             name_id = self._nameid
@@ -470,26 +461,19 @@ class OneLogin_Saml2_Auth(object):
         if name_id_format is None and self._nameid_format is not None:
             name_id_format = self._nameid_format
 
-        logout_request = self.logout_request_class(
-            self._settings,
-            name_id=name_id,
-            session_index=session_index,
-            nq=nq,
-            name_id_format=name_id_format,
-            spnq=spnq
-        )
+        logout_request = self.logout_request_class(self._settings, name_id=name_id, session_index=session_index, nq=nq, name_id_format=name_id_format, spnq=spnq)
         self._last_request = logout_request.get_xml()
         self._last_request_id = logout_request.id
 
-        parameters = {'SAMLRequest': logout_request.get_request()}
+        parameters = {"SAMLRequest": logout_request.get_request()}
         if return_to is not None:
-            parameters['RelayState'] = return_to
+            parameters["RelayState"] = return_to
         else:
-            parameters['RelayState'] = OneLogin_Saml2_Utils.get_self_url_no_query(self._request_data)
+            parameters["RelayState"] = OneLogin_Saml2_Utils.get_self_url_no_query(self._request_data)
 
         security = self._settings.get_security_data()
-        if security.get('logoutRequestSigned', False):
-            self.add_request_signature(parameters, security['signatureAlgorithm'])
+        if security.get("logoutRequestSigned", False):
+            self.add_request_signature(parameters, security["signatureAlgorithm"])
         return self.redirect_to(slo_url, parameters)
 
     def get_sso_url(self):
@@ -529,7 +513,7 @@ class OneLogin_Saml2_Auth(object):
         :param sign_algorithm: Signature algorithm method
         :type sign_algorithm: string
         """
-        return self._build_signature(request_data, 'SAMLRequest', sign_algorithm)
+        return self._build_signature(request_data, "SAMLRequest", sign_algorithm)
 
     def add_response_signature(self, response_data, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256):
         """
@@ -540,7 +524,7 @@ class OneLogin_Saml2_Auth(object):
         :param sign_algorithm: Signature algorithm method
         :type sign_algorithm: string
         """
-        return self._build_signature(response_data, 'SAMLResponse', sign_algorithm)
+        return self._build_signature(response_data, "SAMLResponse", sign_algorithm)
 
     @staticmethod
     def _build_sign_query_from_qs(query_string, saml_type):
@@ -553,10 +537,10 @@ class OneLogin_Saml2_Auth(object):
         :param saml_type: The target URL the user should be redirected to
         :type saml_type: string SAMLRequest | SAMLResponse
         """
-        args = ('%s=' % saml_type, 'RelayState=', 'SigAlg=')
-        parts = query_string.split('&')
+        args = ("%s=" % saml_type, "RelayState=", "SigAlg=")
+        parts = query_string.split("&")
         # Join in the order of arguments rather than the original order of parts.
-        return '&'.join(part for arg in args for part in parts if part.startswith(arg))
+        return "&".join(part for arg in args for part in parts if part.startswith(arg))
 
     @staticmethod
     def _build_sign_query(saml_data, relay_state, algorithm, saml_type, lowercase_urlencoding=False):
@@ -578,11 +562,11 @@ class OneLogin_Saml2_Auth(object):
         :param lowercase_urlencoding: lowercase or no
         :type lowercase_urlencoding: boolean
         """
-        sign_data = ['%s=%s' % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data, lowercase_urlencoding))]
+        sign_data = ["%s=%s" % (saml_type, OneLogin_Saml2_Utils.escape_url(saml_data, lowercase_urlencoding))]
         if relay_state is not None:
-            sign_data.append('RelayState=%s' % OneLogin_Saml2_Utils.escape_url(relay_state, lowercase_urlencoding))
-        sign_data.append('SigAlg=%s' % OneLogin_Saml2_Utils.escape_url(algorithm, lowercase_urlencoding))
-        return '&'.join(sign_data)
+            sign_data.append("RelayState=%s" % OneLogin_Saml2_Utils.escape_url(relay_state, lowercase_urlencoding))
+        sign_data.append("SigAlg=%s" % OneLogin_Saml2_Utils.escape_url(algorithm, lowercase_urlencoding))
+        return "&".join(sign_data)
 
     def _build_signature(self, data, saml_type, sign_algorithm=OneLogin_Saml2_Constants.RSA_SHA256):
         """
@@ -596,32 +580,26 @@ class OneLogin_Saml2_Auth(object):
         :param sign_algorithm: Signature algorithm method
         :type sign_algorithm: string
         """
-        assert saml_type in ('SAMLRequest', 'SAMLResponse')
+        assert saml_type in ("SAMLRequest", "SAMLResponse")
         key = self.get_settings().get_sp_key()
 
         if not key:
-            raise OneLogin_Saml2_Error(
-                "Trying to sign the %s but can't load the SP private key." % saml_type,
-                OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND
-            )
+            raise OneLogin_Saml2_Error("Trying to sign the %s but can't load the SP private key." % saml_type, OneLogin_Saml2_Error.PRIVATE_KEY_NOT_FOUND)
 
-        msg = self._build_sign_query(data[saml_type],
-                                     data.get('RelayState', None),
-                                     sign_algorithm,
-                                     saml_type)
+        msg = self._build_sign_query(data[saml_type], data.get("RelayState", None), sign_algorithm, saml_type)
 
         sign_algorithm_transform_map = {
             OneLogin_Saml2_Constants.DSA_SHA1: xmlsec.Transform.DSA_SHA1,
             OneLogin_Saml2_Constants.RSA_SHA1: xmlsec.Transform.RSA_SHA1,
             OneLogin_Saml2_Constants.RSA_SHA256: xmlsec.Transform.RSA_SHA256,
             OneLogin_Saml2_Constants.RSA_SHA384: xmlsec.Transform.RSA_SHA384,
-            OneLogin_Saml2_Constants.RSA_SHA512: xmlsec.Transform.RSA_SHA512
+            OneLogin_Saml2_Constants.RSA_SHA512: xmlsec.Transform.RSA_SHA512,
         }
         sign_algorithm_transform = sign_algorithm_transform_map.get(sign_algorithm, xmlsec.Transform.RSA_SHA256)
 
         signature = OneLogin_Saml2_Utils.sign_binary(msg, key, sign_algorithm_transform, self._settings.is_debug_active())
-        data['Signature'] = OneLogin_Saml2_Utils.b64encode(signature)
-        data['SigAlg'] = sign_algorithm
+        data["Signature"] = OneLogin_Saml2_Utils.b64encode(signature)
+        data["SigAlg"] = sign_algorithm
 
     def validate_request_signature(self, request_data):
         """
@@ -632,7 +610,7 @@ class OneLogin_Saml2_Auth(object):
 
         """
 
-        return self._validate_signature(request_data, 'SAMLRequest')
+        return self._validate_signature(request_data, "SAMLRequest")
 
     def validate_response_signature(self, request_data):
         """
@@ -643,7 +621,7 @@ class OneLogin_Saml2_Auth(object):
 
         """
 
-        return self._validate_signature(request_data, 'SAMLResponse')
+        return self._validate_signature(request_data, "SAMLResponse")
 
     def _validate_signature(self, data, saml_type, raise_exceptions=False):
         """
@@ -662,77 +640,49 @@ class OneLogin_Saml2_Auth(object):
         :type raise_exceptions: Boolean
         """
         try:
-            signature = data.get('Signature', None)
+            signature = data.get("Signature", None)
             if signature is None:
-                if self._settings.is_strict() and self._settings.get_security_data().get('wantMessagesSigned', False):
-                    raise OneLogin_Saml2_ValidationError(
-                        'The %s is not signed. Rejected.' % saml_type,
-                        OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE
-                    )
+                if self._settings.is_strict() and self._settings.get_security_data().get("wantMessagesSigned", False):
+                    raise OneLogin_Saml2_ValidationError("The %s is not signed. Rejected." % saml_type, OneLogin_Saml2_ValidationError.NO_SIGNED_MESSAGE)
                 return True
 
             idp_data = self.get_settings().get_idp_data()
 
             exists_x509cert = self.get_settings().get_idp_cert() is not None
-            exists_multix509sign = 'x509certMulti' in idp_data and \
-                'signing' in idp_data['x509certMulti'] and \
-                idp_data['x509certMulti']['signing']
+            exists_multix509sign = "x509certMulti" in idp_data and "signing" in idp_data["x509certMulti"] and idp_data["x509certMulti"]["signing"]
 
             if not (exists_x509cert or exists_multix509sign):
-                error_msg = 'In order to validate the sign on the %s, the x509cert of the IdP is required' % saml_type
+                error_msg = "In order to validate the sign on the %s, the x509cert of the IdP is required" % saml_type
                 self._errors.append(error_msg)
-                raise OneLogin_Saml2_Error(
-                    error_msg,
-                    OneLogin_Saml2_Error.CERT_NOT_FOUND
-                )
+                raise OneLogin_Saml2_Error(error_msg, OneLogin_Saml2_Error.CERT_NOT_FOUND)
 
-            sign_alg = data.get('SigAlg', OneLogin_Saml2_Constants.RSA_SHA1)
+            sign_alg = data.get("SigAlg", OneLogin_Saml2_Constants.RSA_SHA1)
             if isinstance(sign_alg, bytes):
-                sign_alg = sign_alg.decode('utf8')
+                sign_alg = sign_alg.decode("utf8")
 
             security = self._settings.get_security_data()
-            reject_deprecated_alg = security.get('rejectDeprecatedAlgorithm', False)
+            reject_deprecated_alg = security.get("rejectDeprecatedAlgorithm", False)
             if reject_deprecated_alg:
                 if sign_alg in OneLogin_Saml2_Constants.DEPRECATED_ALGORITHMS:
-                    raise OneLogin_Saml2_ValidationError(
-                        'Deprecated signature algorithm found: %s' % sign_alg,
-                        OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD
-                    )
+                    raise OneLogin_Saml2_ValidationError("Deprecated signature algorithm found: %s" % sign_alg, OneLogin_Saml2_ValidationError.DEPRECATED_SIGNATURE_METHOD)
 
-            query_string = self._request_data.get('query_string')
-            if query_string and self._request_data.get('validate_signature_from_qs'):
+            query_string = self._request_data.get("query_string")
+            if query_string and self._request_data.get("validate_signature_from_qs"):
                 signed_query = self._build_sign_query_from_qs(query_string, saml_type)
             else:
-                lowercase_urlencoding = self._request_data.get('lowercase_urlencoding', False)
-                signed_query = self._build_sign_query(data[saml_type],
-                                                      data.get('RelayState'),
-                                                      sign_alg,
-                                                      saml_type,
-                                                      lowercase_urlencoding)
+                lowercase_urlencoding = self._request_data.get("lowercase_urlencoding", False)
+                signed_query = self._build_sign_query(data[saml_type], data.get("RelayState"), sign_alg, saml_type, lowercase_urlencoding)
 
             if exists_multix509sign:
-                for cert in idp_data['x509certMulti']['signing']:
-                    if OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
-                                                                 OneLogin_Saml2_Utils.b64decode(signature),
-                                                                 cert,
-                                                                 sign_alg):
+                for cert in idp_data["x509certMulti"]["signing"]:
+                    if OneLogin_Saml2_Utils.validate_binary_sign(signed_query, OneLogin_Saml2_Utils.b64decode(signature), cert, sign_alg):
                         return True
-                raise OneLogin_Saml2_ValidationError(
-                    'Signature validation failed. %s rejected' % saml_type,
-                    OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
-                )
+                raise OneLogin_Saml2_ValidationError("Signature validation failed. %s rejected" % saml_type, OneLogin_Saml2_ValidationError.INVALID_SIGNATURE)
             else:
                 cert = self.get_settings().get_idp_cert()
 
-                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query,
-                                                                 OneLogin_Saml2_Utils.b64decode(signature),
-                                                                 cert,
-                                                                 sign_alg,
-                                                                 self._settings.is_debug_active()):
-                    raise OneLogin_Saml2_ValidationError(
-                        'Signature validation failed. %s rejected' % saml_type,
-                        OneLogin_Saml2_ValidationError.INVALID_SIGNATURE
-                    )
+                if not OneLogin_Saml2_Utils.validate_binary_sign(signed_query, OneLogin_Saml2_Utils.b64decode(signature), cert, sign_alg, self._settings.is_debug_active()):
+                    raise OneLogin_Saml2_ValidationError("Signature validation failed. %s rejected" % saml_type, OneLogin_Saml2_ValidationError.INVALID_SIGNATURE)
             return True
         except Exception as e:
             self._error_reason = str(e)
@@ -752,7 +702,7 @@ class OneLogin_Saml2_Auth(object):
             if isinstance(self._last_response, compat.str_type):
                 response = self._last_response
             else:
-                response = tostring(self._last_response, encoding='unicode', pretty_print=pretty_print_if_possible)
+                response = tostring(self._last_response, encoding="unicode", pretty_print=pretty_print_if_possible)
         return response
 
     def get_last_request_xml(self):

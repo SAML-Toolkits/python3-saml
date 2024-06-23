@@ -4,7 +4,7 @@
 ![PyPI Downloads](https://img.shields.io/pypi/dm/python3-saml.svg?label=PyPI%20Downloads)
 [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/python3-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/python3-saml?branch=master)
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
-![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)
+![Python versions](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FSAML-Toolkits%2Fpython3-saml%2Fmaster%2Fpyproject.toml)
 
 Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided by the SAML tool community.
@@ -12,8 +12,6 @@ Forget those complicated libraries and use the open source library provided by t
 This version supports Python3. Python 2 support was deprecated on Jan 1st, 2020: [python-saml](https://github.com/onelogin/python-saml)
 
 #### Warning ####
-
-Version 1.16.X is the latest version supporting Python2, consider its use deprecated. 1.17 won't be Python2 compatible.
 
 Version 1.13.0 sets sha256 and rsa-sha256 as default algorithms
 
@@ -90,13 +88,13 @@ Installation
 
 ### Dependencies ###
 
- * python 3.5
+ * python => 3.7
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
  duration parser and formatter
 
-Review the ``setup.py`` file to know the version of the library that ``python3-saml`` is using
+Review the ``pyproject.toml`` file to know the version of the library that ``python3-saml`` is using
 
 ### Code ###
 
@@ -107,7 +105,7 @@ The toolkit is hosted on GitHub. You can download it from:
  * Latest release: https://github.com/saml-toolkits/python3-saml/releases/latest
  * Master repo: https://github.com/saml-toolkits/python3-saml/tree/master
 
-Copy the core of the library ``(src/onelogin/saml2 folder)`` and merge the ``setup.py`` inside the Python application. (Each application has its structure so take your time to locate the Python SAML toolkit in the best place).
+Find the core of the library at ``src/onelogin/saml2`` folder.
 
 #### Option 2. Download from pypi ####
 
@@ -156,13 +154,13 @@ A replay attack is basically try to reuse an intercepted valid SAML Message in o
 SAML Messages have a limited timelife (NotBefore, NotOnOrAfter) that
 make harder this kind of attacks, but they are still possible.
 
-In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs already validated and processed. Those values only need
+In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs alredy valdidated and processed. Those values only need
 to be stored the amount of time of the SAML Message life time, so
 we don't need to store all processed message/assertion Ids, but the most recent ones.
 
 The OneLogin_Saml2_Auth class contains the [get_last_request_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L357), [get_last_message_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L364) and [get_last_assertion_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L371) methods to retrieve the IDs
 
-Checking that the ID of the current Message/Assertion does not exists in the list of the ones already processed will prevent replay attacks.
+Checking that the ID of the current Message/Assertion does not exists in the lis of the ones already processed will prevent replay attacks.
 
 
 Getting Started
@@ -217,11 +215,8 @@ This folder contains a Pyramid project that will be used as demo to show how to 
 
 This folder contains a Tornado project that will be used as demo to show how to add SAML support to the Tornado Framework. ``views.py`` (with its ``settings.py``) is the main Flask file that has all the code, this file uses the templates stored at the ``templates`` folder. In the ``saml`` folder we found the ``certs`` folder to store the X.509 public and private key, and the SAML toolkit settings (``settings.json`` and ``advanced_settings.json``).
 
+It requires python3.8 (it's using tornado 6.4.1)
 
-#### setup.py ####
-
-Setup script is the centre of all activity in building, distributing, and installing modules.
-Read more at https://pythonhosted.org/an_example_pypi_project/setuptools.html
 
 #### tests ####
 
@@ -229,19 +224,23 @@ Contains the unit test of the toolkit.
 
 In order to execute the test you only need to load the virtualenv with the toolkit installed on it properly:
 ```
-pip install -e ".[test]"
+make install-test
 ```
 
 and execute:
 ```
-python setup.py test
+make pytest
 ```
 The previous line will run the tests for the whole toolkit. You can also run the tests for a specific module. To do so for the auth module you would have to execute this:
 ```
-python setup.py test --test-suite tests.src.OneLogin.saml2_tests.auth_test.OneLogin_Saml2_Auth_Test
+pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test
 ```
 
-With the ``--test-suite`` parameter you can specify the module to test. You'll find all the module available and their class names at ``tests/src/OneLogin/saml2_tests/``.
+Or for an specific method:
+```
+pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test::testBuildRequestSignature
+```
+
 
 ### How It Works ###
 
@@ -298,9 +297,9 @@ This is the ``settings.json`` file:
         },
         // If you need to specify requested attributes, set a
         // attributeConsumingService. nameFormat, attributeValue and
-        // friendlyName can be omitted
+        // friendlyName can be ommited
         "attributeConsumingService": {
-                // OPTIONAL: only specify if SP requires this.
+                // OPTIONAL: only specifiy if SP requires this.
                 // index is an integer which identifies the attributeConsumingService used
                 // to the SP. SAML toolkit supports configuring only one attributeConsumingService
                 // but in certain cases the SP requires a different value.  Defaults to '1'.
@@ -367,7 +366,7 @@ This is the ``settings.json`` file:
         /*
          *  Instead of using the whole X.509cert you can use a fingerprint in order to
          *  validate a SAMLResponse (but you still need the X.509cert to validate LogoutRequest and LogoutResponse using the HTTP-Redirect binding).
-         *  But take in mind that the algorithm for the fingerprint should be as strong as the algorithm in a normal certificate signature
+         *  But take in mind that the algortithm for the fingerprint should be as strong as the algorithm in a normal certificate signature
 	 *  (e.g. SHA256 or strong)
          *
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
@@ -502,7 +501,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
         'allowRepeatAttributeName': false,
 
         // If the toolkit receive a message signed with a
-        // deprecated algorithm (defined at the constant class)
+        // deprecated algoritm (defined at the constant class)
         // will raise an error and reject the message
         "rejectDeprecatedAlgorithm": true
     },
@@ -521,7 +520,7 @@ In addition to the required settings data (idp, sp), extra settings can be defin
     },
 
     // Organization information template, the info in en_US lang is
-    // recommended, add more if required.
+    // recomended, add more if required.
     "organization": {
         "en-US": {
             "name": "sp_test",
@@ -649,7 +648,7 @@ def prepare_from_django_request(request):
 def prepare_from_flask_request(request):
     url_data = urlparse(request.url)
     return {
-        'http_host': request.host,
+        'http_host': request.netloc,
         'script_name': request.path,
         'get_data': request.args.copy(),
         'post_data': request.form.copy()
@@ -678,8 +677,7 @@ req = prepare_request_for_toolkit(request)
 auth = OneLogin_Saml2_Auth(req)   # Constructor of the SP, loads settings.json
                                   # and advanced_settings.json
 
-auth.login()      # This method will build and return a AuthNRequest URL that can be
-                  # either redirected to, or printed out onto the screen as a hyperlink
+auth.login()      # Method that builds and sends the AuthNRequest
 ```
 
 The ``AuthNRequest`` will be sent signed or unsigned based on the security info of the ``advanced_settings.json`` file (i.e. ``authnRequestsSigned``).
@@ -692,7 +690,7 @@ We can set a ``return_to`` url parameter to the login function and that will be 
 target_url = 'https://example.com'
 auth.login(return_to=target_url)
 ```
-The login method can receive 3 more optional parameters:
+The login method can recieve 3 more optional parameters:
 
 * ``force_authn``       When ``true``, the ``AuthNReuqest`` will set the ``ForceAuthn='true'``
 * ``is_passive``        When true, the ``AuthNReuqest`` will set the ``Ispassive='true'``
@@ -771,7 +769,7 @@ Notice that we saved the user data in the session before the redirection to have
 In order to retrieve attributes we use:
 
 ```python
-attributes = auth.get_attributes()
+attributes = auth.get_attributes();
 ```
 
 With this method we get a dict with all the user data provided by the IdP in the assertion of the SAML response.
@@ -787,12 +785,12 @@ If we execute print attributes we could get:
 }
 ```
 
-Each attribute name can be used as a key to obtain the value. Every attribute is a list of values. A single-valued attribute is a list of a single element.
+Each attribute name can be used as a key to obtain the value. Every attribute is a list of values. A single-valued attribute is a listy of a single element.
 
 The following code is equivalent:
 
 ```python
-attributes = auth.get_attributes()
+attributes = auth.get_attributes();
 print(attributes['cn'])
 
 print(auth.get_attribute('cn'))
@@ -815,7 +813,7 @@ if len(errors) == 0:
         # the value of the url is a trusted URL.
         return redirect(url)
     else:
-        print("Successfully Logged out")
+        print("Sucessfully Logged out")
 else:
     print("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason()))
 ```
@@ -957,7 +955,7 @@ elif 'sls' in request.args:                                             # Single
             # the value of the url is a trusted URL.
             return redirect(url)
         else:
-            msg = "Successfully logged out"
+            msg = "Sucessfully logged out"
 
 if len(errors) == 0:
   print(msg)
@@ -1073,7 +1071,7 @@ SAML 2 Logout Request class
 * ***get_nameid*** Gets the NameID of the Logout Request Message (returns a string).
 * ***get_issuer*** Gets the Issuer of the Logout Request Message.
 * ***get_session_indexes*** Gets the ``SessionIndexes`` from the Logout Request.
-* ***is_valid*** Checks if the Logout Request received is valid.
+* ***is_valid*** Checks if the Logout Request recieved is valid.
 * ***get_error*** After execute a validation process, if fails this method returns the cause.
 * ***get_xml*** Returns the XML that will be sent as part of the request or that was received at the SP
 
@@ -1156,7 +1154,7 @@ Auxiliary class that contains several methods
 * ***get_expire_time*** Compares 2 dates and returns the earliest.
 * ***delete_local_session*** Deletes the local session.
 * ***calculate_X.509_fingerprint*** Calculates the fingerprint of a X.509 cert.
-* ***format_finger_print*** Formats a fingerprint.
+* ***format_finger_print*** Formates a fingerprint.
 * ***generate_name_id*** Generates a nameID.
 * ***get_status*** Gets Status from a Response.
 * ***decrypt_element*** Decrypts an encrypted element.
@@ -1206,22 +1204,14 @@ let's see how fast is it to deploy them.
 The use of a [virtualenv](http://virtualenv.readthedocs.org/en/latest/) is
 highly recommended.
 
-Virtualenv helps isolating the python environment used to run the toolkit. You
+Virtualenv helps isolating the python enviroment used to run the toolkit. You
 can find more details and an installation guide in the
 [official documentation](http://virtualenv.readthedocs.org/en/latest/).
 
 Once you have your virtualenv ready and loaded, then you can install the
-toolkit on it in development mode executing this:
+toolkit executing this:
 ```
- python setup.py develop
-```
-
-Using this method of deployment the toolkit files will be linked instead of
-copied, so if you make changes on them you won't need to reinstall the toolkit.
-
-If you want install it in a normal mode, execute:
-```
- python setup.py install
+ make install-req
 ```
 
 ### Demo Flask ###
@@ -1510,7 +1500,7 @@ Once the SP is configured, the metadata of the SP is published at the ``/metadat
 
  4. We are logged in the app and the user attributes are showed. At this point, we can test the single log out functionality.
 
- The single log out functionality could be tested by 2 ways.
+ The single log out funcionality could be tested by 2 ways.
 
     5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a Logout Request is sent to the IdP, the session at the IdP is closed and replies through the client to the SP with a Logout Response (sent to the Single Logout Service endpoint). The SLS endpoint /?sls of the SP process the Logout Response and if is valid, close the user session of the local app. Notice that the SLO Workflow starts and ends at the SP.
 

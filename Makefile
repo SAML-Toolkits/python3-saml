@@ -20,7 +20,7 @@ install-lint:
 	$(PIP) install -e ".[lint]"
 
 pytest:
-	$(pytest)
+	$(PYTEST)
 
 coverage:
 	$(COVERAGE) run -m $(PYTEST)

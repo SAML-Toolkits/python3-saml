@@ -4,6 +4,7 @@ FLAKE8=flake8
 PYTEST=pytest
 COVERAGE=coverage
 COVERAGE_CONFIG=tests/coverage.rc
+COVERALLS=coveralls
 MAIN_SOURCE=src/onelogin/saml2
 DEMOS=demo-django demo-flask demo-tornado demo_pyramid
 TESTS=tests/src/OneLogin/saml2_tests
@@ -19,8 +20,14 @@ install-lint:
 	$(PIP) install -e ".[lint]"
 
 pytest:
-	$(COVERAGE) run --source $(MAIN_SOURCE) --rcfile=$(COVERAGE_CONFIG) -m pytest
-	$(COVERAGE) report -m --rcfile=$(COVERAGE_CONFIG)
+	$(pytest)
+
+coverage:
+	$(COVERAGE) run -m $(PYTEST)
+	$(COVERAGE) report -m
+
+coveralls:
+	$(COVERALLS)
 
 black:
 	$(BLACK) $(SOURCES)

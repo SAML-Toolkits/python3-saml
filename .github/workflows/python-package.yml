@@ -47,6 +47,30 @@ jobs:
       run: make pytest
   lint:
     runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools
+        sudo apt-get update -qq
+        sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
+        make install-req
+        make install-lint
+    - name: Run linters
+      run: |
+        make flake8
+        make black
+  coveralls:
+    runs-on: ubuntu-22.04
     environment: CI
     steps:
     - uses: actions/checkout@v4
@@ -64,18 +88,12 @@ jobs:
         pip install -U setuptools
         sudo apt-get update -qq
         sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
-        pip install --force-reinstall --no-binary lxml lxml
         make install-req
-        make install-lint
-    - name: Run linters
-      run: |
-        make flake8
-        make black
+        make install-test
     - name: Run coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
         pip install coveralls
-        coverage run  setup.py test
-        coverage report -m
-        coveralls
+        make coverage
+        make coveralls      

@@ -46,7 +46,7 @@ Changelog = "https://github.com/SAML-Toolkits/python3-saml/blob/master/changelog
 
 [project.optional-dependencies]
 test = [
-    "coverage>=4.5.2",
+    "coverage[toml]>=4.5.2",
     "pytest>=4.6",
 ]
 lint = [
@@ -93,3 +93,30 @@ atomic = true
 ignore_comments = true
 skip_gitignore = true
 src_paths = ['src']
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.paths]
+source = [
+    "src/onelogin/saml2"
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug",
+    "if debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
+show_missing = true
+ignore_errors = true
+
+
+[tool.coverage.html]
+directory = "coverage_html_report"

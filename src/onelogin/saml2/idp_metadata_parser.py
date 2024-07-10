@@ -6,11 +6,7 @@ Metadata class of SAML Python Toolkit.
 
 
 from copy import deepcopy
-
-try:
-    import urllib.request as urllib2
-except ImportError:
-    import urllib2
+from urllib.request import Request, urlopen
 
 import ssl
 
@@ -27,7 +23,15 @@ class OneLogin_Saml2_IdPMetadataParser(object):
     """
 
     @classmethod
-    def get_metadata(cls, url, validate_cert=True, timeout=None, headers=None):
+    def get_metadata(
+        cls,
+        url,
+        validate_cert=True,
+        cafile=None,
+        capath=None,
+        timeout=None,
+        headers=None,
+    ):
         """
         Gets the metadata XML from the provided URL
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -46,15 +50,20 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         """
         valid = False
 
-        request = urllib2.Request(url, headers=headers or {})
-
-        if validate_cert:
-            response = urllib2.urlopen(request, timeout=timeout)
-        else:
+        # Respect the no-TLS-certificate validation option
+        ctx = None
+        if not validate_cert:
+            if cafile or capath:
+                raise ValueError(
+                    "Specifying 'cafile' or 'capath' while disabling certificate "
+                    "validation is contradictory."
+                )
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
-            response = urllib2.urlopen(request, context=ctx, timeout=timeout)
+
+        request = Request(url, headers=headers or {})
+        response = urlopen(request, timeout=timeout, cafile=cafile, capath=capath, context=ctx)
         xml = response.read()
 
         if xml:

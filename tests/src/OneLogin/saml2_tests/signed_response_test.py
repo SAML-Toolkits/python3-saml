@@ -11,20 +11,20 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
-    data_path = join(dirname(__file__), '..', '..', '..', 'data')
+    data_path = join(dirname(__file__), "..", "..", "..", "data")
 
     def loadSettingsJSON(self):
-        filename = join(dirname(__file__), '..', '..', '..', 'settings', 'settings1.json')
+        filename = join(dirname(__file__), "..", "..", "..", "settings", "settings1.json")
         if exists(filename):
-            stream = open(filename, 'r')
+            stream = open(filename, "r")
             settings = json.load(stream)
             stream.close()
             return settings
         else:
-            raise Exception('Settings json file does not exist')
+            raise Exception("Settings json file does not exist")
 
     def file_contents(self, filename):
-        f = open(filename, 'r')
+        f = open(filename, "r")
         content = f.read()
         f.close()
         return content
@@ -35,10 +35,10 @@ class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
         Case valid signed response, unsigned assertion
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        message = self.file_contents(join(self.data_path, 'responses', 'open_saml_response.xml'))
+        message = self.file_contents(join(self.data_path, "responses", "open_saml_response.xml"))
         response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
 
-        self.assertEqual('someone@example.org', response.get_nameid())
+        self.assertEqual("someone@example.org", response.get_nameid())
 
     def testResponseAndAssertionSigned(self):
         """
@@ -46,7 +46,7 @@ class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):
         Case valid signed response, signed assertion
         """
         settings = OneLogin_Saml2_Settings(self.loadSettingsJSON())
-        message = self.file_contents(join(self.data_path, 'responses', 'simple_saml_php.xml'))
+        message = self.file_contents(join(self.data_path, "responses", "simple_saml_php.xml"))
         response = OneLogin_Saml2_Response(settings, OneLogin_Saml2_Utils.b64encode(message))
 
-        self.assertEqual('someone@example.com', response.get_nameid())
+        self.assertEqual("someone@example.com", response.get_nameid())

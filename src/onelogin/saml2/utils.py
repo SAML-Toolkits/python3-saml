@@ -482,13 +482,17 @@ class OneLogin_Saml2_Utils(object):
         return None
 
     @staticmethod
-    def delete_local_session(callback=None):
+    def delete_local_session(callback=None, logout_request=None, logout_response=None):
         """
         Deletes the local session.
         """
 
         if callback is not None:
-            callback()
+            if callback.__code__.co_argcount == 0:
+                # Legacy callback with no parameters
+                callback()
+            else:
+                callback(logout_request=logout_request, logout_response=logout_response)
 
     @staticmethod
     def calculate_x509_fingerprint(x509_cert, alg="sha1"):

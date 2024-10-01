@@ -13,13 +13,11 @@ on:
 
 jobs:
   test_py3:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - "3.5"
-          - "3.6"
           - "3.7"
           - "3.8"
           - "3.9"
@@ -27,80 +25,75 @@ jobs:
           - "3.11"
           - "3.12"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
         pip install -U setuptools
         sudo apt-get update -qq
-        sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
-        make install-req
-        make install-test
-    - name: Test
-      run: make pytest
-  test_py2:
-    runs-on: ubuntu-20.04
-    container:
-      image: python:2.7.18-buster
-    strategy:
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Install dependencies
-      run: |
-        pip install -U setuptools
-        apt-get update -qq
-        apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
+        sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
         make install-req
         make install-test
     - name: Test
       run: make pytest
   lint:
-    runs-on: ubuntu-20.04
-    environment: CI
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
         pip install -U setuptools
         sudo apt-get update -qq
-        sudo apt-get install -qq swig python-dev libxml2-dev libxmlsec1-dev
-        pip install --force-reinstall --no-binary lxml lxml
+        sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
         make install-req
-        make install-test
+        make install-lint
     - name: Run linters
       run: |
-        make pycodestyle
         make flake8
+        make black
+  coveralls:
+    runs-on: ubuntu-22.04
+    environment: CI
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools
+        sudo apt-get update -qq
+        sudo apt-get install -qq swig libxml2-dev libxmlsec1-dev
+        make install-req
+        make install-test
     - name: Run coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
         pip install coveralls
-        coverage run  setup.py test
-        coverage report -m
-        coveralls
+        make coverage
+        make coveralls      

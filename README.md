@@ -4,7 +4,7 @@
 ![PyPI Downloads](https://img.shields.io/pypi/dm/python3-saml.svg?label=PyPI%20Downloads)
 [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/python3-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/python3-saml?branch=master)
 [![PyPi Version](https://img.shields.io/pypi/v/python3-saml.svg)](https://pypi.python.org/pypi/python3-saml)
-![Python versions](https://img.shields.io/pypi/pyversions/python3-saml.svg)
+![Python versions](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FSAML-Toolkits%2Fpython3-saml%2Fmaster%2Fpyproject.toml)
 
 Add SAML support to your Python software using this library.
 Forget those complicated libraries and use the open source library provided by the SAML tool community.
@@ -13,7 +13,7 @@ This version supports Python3. Python 2 support was deprecated on Jan 1st, 2020:
 
 #### Warning ####
 
-Version 1.16.X is the latest version supporting Python2, consider its use deprecated. 1.17 won't be Python2 compatible.
+Version 1.16.X is the latest version supporting Python2, consider its use deprecated. 1.17 won't be Python2 and old Python3 compatible.
 
 Version 1.13.0 sets sha256 and rsa-sha256 as default algorithms
 
@@ -90,13 +90,13 @@ Installation
 
 ### Dependencies ###
 
- * python 2.7 (deprecated) // python 3.6
+ * python => 3.7
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
  duration parser and formatter
 
-Review the ``setup.py`` file to know the version of the library that ``python3-saml`` is using
+Review the ``pyproject.toml`` file to know the version of the library that ``python3-saml`` is using
 
 ### Code ###
 
@@ -107,7 +107,7 @@ The toolkit is hosted on GitHub. You can download it from:
  * Latest release: https://github.com/saml-toolkits/python3-saml/releases/latest
  * Master repo: https://github.com/saml-toolkits/python3-saml/tree/master
 
-Copy the core of the library ``(src/onelogin/saml2 folder)`` and merge the ``setup.py`` inside the Python application. (Each application has its structure so take your time to locate the Python SAML toolkit in the best place).
+Find the core of the library at ``src/onelogin/saml2`` folder.
 
 #### Option 2. Download from pypi ####
 
@@ -217,12 +217,8 @@ This folder contains a Pyramid project that will be used as demo to show how to 
 
 This folder contains a Tornado project that will be used as demo to show how to add SAML support to the Tornado Framework. ``views.py`` (with its ``settings.py``) is the main Flask file that has all the code, this file uses the templates stored at the ``templates`` folder. In the ``saml`` folder we found the ``certs`` folder to store the X.509 public and private key, and the SAML toolkit settings (``settings.json`` and ``advanced_settings.json``).
 
-It requires python3.5 (it's using tornado 6.0.3)
+It requires python3.8 (it's using tornado 6.4.1)
 
-#### setup.py ####
-
-Setup script is the centre of all activity in building, distributing, and installing modules.
-Read more at https://pythonhosted.org/an_example_pypi_project/setuptools.html
 
 #### tests ####
 
@@ -230,19 +226,23 @@ Contains the unit test of the toolkit.
 
 In order to execute the test you only need to load the virtualenv with the toolkit installed on it properly:
 ```
-pip install -e ".[test]"
+make install-test
 ```
 
 and execute:
 ```
-python setup.py test
+make pytest
 ```
 The previous line will run the tests for the whole toolkit. You can also run the tests for a specific module. To do so for the auth module you would have to execute this:
 ```
-python setup.py test --test-suite tests.src.OneLogin.saml2_tests.auth_test.OneLogin_Saml2_Auth_Test
+pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test
 ```
 
-With the ``--test-suite`` parameter you can specify the module to test. You'll find all the module available and their class names at ``tests/src/OneLogin/saml2_tests/``.
+Or for an specific method:
+```
+pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test::testBuildRequestSignature
+```
+
 
 ### How It Works ###
 
@@ -650,7 +650,7 @@ def prepare_from_django_request(request):
 def prepare_from_flask_request(request):
     url_data = urlparse(request.url)
     return {
-        'http_host': request.host,
+        'http_host': request.netloc,
         'script_name': request.path,
         'get_data': request.args.copy(),
         'post_data': request.form.copy()
@@ -772,7 +772,7 @@ Notice that we saved the user data in the session before the redirection to have
 In order to retrieve attributes we use:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 ```
 
 With this method we get a dict with all the user data provided by the IdP in the assertion of the SAML response.
@@ -793,7 +793,7 @@ Each attribute name can be used as a key to obtain the value. Every attribute is
 The following code is equivalent:
 
 ```python
-attributes = auth.get_attributes();
+attributes = auth.get_attributes()
 print(attributes['cn'])
 
 print(auth.get_attribute('cn'))
@@ -1212,17 +1212,9 @@ can find more details and an installation guide in the
 [official documentation](http://virtualenv.readthedocs.org/en/latest/).
 
 Once you have your virtualenv ready and loaded, then you can install the
-toolkit on it in development mode executing this:
+toolkit executing this:
 ```
- python setup.py develop
-```
-
-Using this method of deployment the toolkit files will be linked instead of
-copied, so if you make changes on them you won't need to reinstall the toolkit.
-
-If you want install it in a normal mode, execute:
-```
- python setup.py install
+ make install-req
 ```
 
 ### Demo Flask ###

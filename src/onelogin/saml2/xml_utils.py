@@ -19,7 +19,7 @@ for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():
 
 
 class OneLogin_Saml2_XML(object):
-    _element_class = type(etree.Element('root'))
+    _element_class = type(etree.Element("root"))
     _parse_etree = staticmethod(fromstring)
     _schema_class = etree.XMLSchema
     _text_class = compat.text_types
@@ -65,7 +65,7 @@ class OneLogin_Saml2_XML(object):
         if isinstance(xml, OneLogin_Saml2_XML._text_class):
             return OneLogin_Saml2_XML._parse_etree(compat.to_bytes(xml), forbid_dtd=True, forbid_entities=True)
 
-        raise ValueError('unsupported type %r' % type(xml))
+        raise ValueError("unsupported type %r" % type(xml))
 
     @staticmethod
     def validate_xml(xml, schema, debug=False):
@@ -87,18 +87,18 @@ class OneLogin_Saml2_XML(object):
         except Exception as e:
             if debug:
                 print(e)
-            return 'unloaded_xml'
+            return "unloaded_xml"
 
-        schema_file = join(dirname(__file__), 'schemas', schema)
-        with open(schema_file, 'r') as f_schema:
+        schema_file = join(dirname(__file__), "schemas", schema)
+        with open(schema_file, "r") as f_schema:
             xmlschema = OneLogin_Saml2_XML._schema_class(etree.parse(f_schema))
 
         if not xmlschema.validate(xml):
             if debug:
-                print('Errors validating the metadata: ')
+                print("Errors validating the metadata: ")
                 for error in xmlschema.error_log:
                     print(error.message)
-            return 'invalid_xml'
+            return "invalid_xml"
         return xml
 
     @staticmethod
@@ -144,11 +144,7 @@ class OneLogin_Saml2_XML(object):
         :returns: An XML tree or element
         :rtype: etree.Element
         """
-        all_prefixes_to_keep = [
-            OneLogin_Saml2_Constants.NS_PREFIX_XS,
-            OneLogin_Saml2_Constants.NS_PREFIX_XSI,
-            OneLogin_Saml2_Constants.NS_PREFIX_XSD
-        ]
+        all_prefixes_to_keep = [OneLogin_Saml2_Constants.NS_PREFIX_XS, OneLogin_Saml2_Constants.NS_PREFIX_XSI, OneLogin_Saml2_Constants.NS_PREFIX_XSD]
 
         if keep_ns_prefixes:
             all_prefixes_to_keep = list(set(all_prefixes_to_keep.extend(keep_ns_prefixes)))

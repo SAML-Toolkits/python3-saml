@@ -22,8 +22,7 @@ tostring = _etree.tostring
 
 
 class DTDForbidden(ValueError):
-    """Document type definition is forbidden
-    """
+    """Document type definition is forbidden"""
 
     def __init__(self, name, sysid, pubid):
         super(DTDForbidden, self).__init__()
@@ -37,8 +36,7 @@ class DTDForbidden(ValueError):
 
 
 class EntitiesForbidden(ValueError):
-    """Entity definition is forbidden
-    """
+    """Entity definition is forbidden"""
 
     def __init__(self, name, value, base, sysid, pubid, notation_name):
         super(EntitiesForbidden, self).__init__()
@@ -55,13 +53,11 @@ class EntitiesForbidden(ValueError):
 
 
 class NotSupportedError(ValueError):
-    """The operation is not supported
-    """
+    """The operation is not supported"""
 
 
 class RestrictedElement(_etree.ElementBase):
-    """A restricted Element class that filters out instances of some classes
-    """
+    """A restricted Element class that filters out instances of some classes"""
 
     __slots__ = ()
     blacklist = (_etree._Entity, _etree._ProcessingInstruction, _etree._Comment)
@@ -103,16 +99,9 @@ class RestrictedElement(_etree.ElementBase):
 
 
 class GlobalParserTLS(threading.local):
-    """Thread local context for custom parser instances
-    """
+    """Thread local context for custom parser instances"""
 
-    parser_config = {
-        "resolve_entities": False,
-        'remove_comments': True,
-        'no_network': True,
-        'remove_pis': True,
-        'huge_tree': False
-    }
+    parser_config = {"resolve_entities": False, "remove_comments": True, "no_network": True, "remove_pis": True, "huge_tree": False}
 
     element_class = RestrictedElement
 

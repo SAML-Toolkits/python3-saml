@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError
+from urllib.error import URLError
 
 from copy import deepcopy
 import json

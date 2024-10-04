@@ -1,4 +1,4 @@
-# SAML Python Toolkit (compatible with Python3)
+# SAML Python3 Toolkit
 
 [![Python package](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml/badge.svg)](https://github.com/SAML-Toolkits/python3-saml/actions/workflows/python-package.yml)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/python3-saml.svg?label=PyPI%20Downloads)
@@ -36,6 +36,11 @@ Update ``python3-saml`` to ``>= 1.2.1``, ``1.2.0`` had a bug on signature valida
 #### Security Guidelines ####
 
 If you believe you have discovered a security vulnerability in this toolkit, please report it by mail to the maintainer: sixto.martin.garcia+security@gmail.com
+
+### Sponsors
+Thanks to the following sponsors for their support:
+
+[<img alt="84codes" src="https://avatars.githubusercontent.com/u/739212?s=200&v=4" width="50px">](https://www.maykinmedia.nl)
 
 Why add SAML support to my software?
 ------------------------------------

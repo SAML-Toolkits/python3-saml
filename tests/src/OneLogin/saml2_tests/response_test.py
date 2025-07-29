@@ -1143,7 +1143,7 @@ class OneLogin_Saml2_Response_Test(unittest.TestCase):
         response_2 = OneLogin_Saml2_Response(settings, message)
 
         self.assertFalse(response_2.is_valid(request_data))
-        self.assertIn("is not a valid audience for this Response", response_2.get_error())
+        self.assertIn('Response audience "http://invalid.audience.com" does not contain SP entityId "http://stuff.com/endpoints/metadata.php"', response_2.get_error())
 
     def testIsInValidAuthenticationContext(self):
         """

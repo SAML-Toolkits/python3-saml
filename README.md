@@ -130,7 +130,7 @@ To avoid ``libxml2`` library version incompatibilities between ``xmlsec`` and ``
 
 This can be ensured by executing:
 ```
-$ pip install --force-reinstall --no-binary lxml lxml
+$ pip install --force-reinstall --no-cache --no-binary lxml xmlsec
 ```
 
 Security Warning

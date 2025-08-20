@@ -21,7 +21,7 @@ def prepare_flask_request(request):
     return {
         "https": "on" if request.scheme == "https" else "off",
         "http_host": request.host,
-        "script_name": request.path,
+        "script_name": request.root_path + request.path,
         "get_data": request.args.copy(),
         # Uncomment if using ADFS as IdP, https://github.com/onelogin/python-saml/pull/144
         # 'lowercase_urlencoding': True,

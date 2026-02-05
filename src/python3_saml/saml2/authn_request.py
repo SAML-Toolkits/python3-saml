@@ -7,9 +7,9 @@ AuthNRequest class of SAML Python Toolkit.
 
 """
 
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from onelogin.saml2.xml_templates import OneLogin_Saml2_Templates
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.xml_templates import OneLogin_Saml2_Templates
 
 
 class OneLogin_Saml2_Authn_Request(object):

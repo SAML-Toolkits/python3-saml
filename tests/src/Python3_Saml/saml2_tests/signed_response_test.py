@@ -5,9 +5,9 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
-from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.response import OneLogin_Saml2_Response
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_SignedResponse_Test(unittest.TestCase):

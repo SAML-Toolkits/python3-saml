@@ -11,15 +11,15 @@ Initializes the SP SAML instance
 
 import xmlsec
 
-from onelogin.saml2 import compat
-from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
-from onelogin.saml2.logout_response import OneLogin_Saml2_Logout_Response
-from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
-from onelogin.saml2.xmlparser import tostring
+from python3_saml.saml2 import compat
+from python3_saml.saml2.authn_request import OneLogin_Saml2_Authn_Request
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.logout_request import OneLogin_Saml2_Logout_Request
+from python3_saml.saml2.logout_response import OneLogin_Saml2_Logout_Response
+from python3_saml.saml2.response import OneLogin_Saml2_Response
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
+from python3_saml.saml2.xmlparser import tostring
 
 
 class OneLogin_Saml2_Auth(object):

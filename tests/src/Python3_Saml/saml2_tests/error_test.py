@@ -2,7 +2,7 @@
 
 
 import unittest
-from onelogin.saml2.errors import OneLogin_Saml2_Error
+from python3_saml.saml2.errors import OneLogin_Saml2_Error
 
 
 class OneLogin_Saml2_Error_Test(unittest.TestCase):

@@ -9,9 +9,9 @@ Auxiliary class of SAML Python Toolkit.
 
 from os.path import join, dirname
 from lxml import etree
-from onelogin.saml2 import compat
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.xmlparser import tostring, fromstring
+from python3_saml.saml2 import compat
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.xmlparser import tostring, fromstring
 
 
 for prefix, url in OneLogin_Saml2_Constants.NSMAP.items():

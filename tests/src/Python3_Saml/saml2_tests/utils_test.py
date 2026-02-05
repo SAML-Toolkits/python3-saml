@@ -9,11 +9,11 @@ import unittest
 import sys
 from xml.dom.minidom import parseString
 
-from onelogin.saml2 import compat
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from onelogin.saml2.xmlparser import fromstring
+from python3_saml.saml2 import compat
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.xmlparser import fromstring
 
 
 class OneLogin_Saml2_Utils_Test(unittest.TestCase):

@@ -10,11 +10,11 @@ from os.path import dirname, join, exists
 import unittest
 from xml.dom.minidom import parseString
 
-from onelogin.saml2 import compat
-from onelogin.saml2.errors import OneLogin_Saml2_ValidationError
-from onelogin.saml2.response import OneLogin_Saml2_Response
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2 import compat
+from python3_saml.saml2.errors import OneLogin_Saml2_ValidationError
+from python3_saml.saml2.response import OneLogin_Saml2_Response
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
 
 
 class OneLogin_Saml2_Response_Test(unittest.TestCase):

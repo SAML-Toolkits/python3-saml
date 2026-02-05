@@ -2,8 +2,8 @@ import os
 
 from flask import Flask, request, render_template, redirect, session, make_response
 
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.auth import OneLogin_Saml2_Auth
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
 
 
 app = Flask(__name__)

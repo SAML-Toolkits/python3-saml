@@ -10,8 +10,8 @@ from urllib.request import Request, urlopen
 
 import ssl
 
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_IdPMetadataParser(object):
@@ -54,10 +54,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         ctx = None
         if not validate_cert:
             if cafile or capath:
-                raise ValueError(
-                    "Specifying 'cafile' or 'capath' while disabling certificate "
-                    "validation is contradictory."
-                )
+                raise ValueError("Specifying 'cafile' or 'capath' while disabling certificate " "validation is contradictory.")
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE

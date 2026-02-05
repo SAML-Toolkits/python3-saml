@@ -5,12 +5,12 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
-from onelogin.saml2 import compat
-from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from python3_saml.saml2 import compat
+from python3_saml.saml2.authn_request import OneLogin_Saml2_Authn_Request
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 try:

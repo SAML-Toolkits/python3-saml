@@ -1,4 +1,7 @@
 # python3-saml changelog
+### 2.0.0 (Oct 29, 2025)
+- Move namespace from onelogin to python3_saml to avoid conflicts with onelogin
+
 ### 1.16.0 (Oct 9, 2023)
 - [#364](https://github.com/SAML-Toolkits/python3-saml/commit/d1bfaeb17a786735827b8252b91deafde29dabd8) Improve get_metadata method from Parser, allowing to set headers
 - Fix WantAuthnRequestsSigned parser

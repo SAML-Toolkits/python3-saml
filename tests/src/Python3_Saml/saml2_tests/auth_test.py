@@ -6,12 +6,12 @@ import json
 from os.path import dirname, join, exists
 import unittest
 
-from onelogin.saml2 import compat
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error
-from onelogin.saml2.logout_request import OneLogin_Saml2_Logout_Request
+from python3_saml.saml2 import compat
+from python3_saml.saml2.auth import OneLogin_Saml2_Auth
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error
+from python3_saml.saml2.logout_request import OneLogin_Saml2_Logout_Request
 
 try:
     from urllib.parse import urlparse, parse_qs

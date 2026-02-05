@@ -8,7 +8,7 @@ import xmlsec
 from base64 import b64decode
 from lxml import etree
 from os.path import dirname, join, exists
-from onelogin.saml2.utils import OneLogin_Saml2_XML
+from python3_saml.saml2.utils import OneLogin_Saml2_XML
 
 
 class TestOneLoginSaml2Xml(unittest.TestCase):

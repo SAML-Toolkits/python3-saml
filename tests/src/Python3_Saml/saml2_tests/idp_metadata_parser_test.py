@@ -9,8 +9,8 @@ from os.path import dirname, join, exists
 from lxml.etree import XMLSyntaxError
 import unittest
 
-from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
 
 
 class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):

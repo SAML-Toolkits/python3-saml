@@ -5,9 +5,9 @@ PYTEST=pytest
 COVERAGE=coverage
 COVERAGE_CONFIG=tests/coverage.rc
 COVERALLS=coveralls
-MAIN_SOURCE=src/onelogin/saml2
+MAIN_SOURCE=src/python3_saml/saml2
 DEMOS=demo-django demo-flask demo-tornado demo_pyramid
-TESTS=tests/src/OneLogin/saml2_tests
+TESTS=tests/src/Python3_Saml/saml2_tests
 SOURCES=$(MAIN_SOURCE) $(DEMOS) $(TESTS)
 
 install-req:

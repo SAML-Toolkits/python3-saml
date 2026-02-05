@@ -23,7 +23,6 @@ keywords = [
     "identity",
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -32,11 +31,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "lxml>=4.6.5,!=4.7.0",
-    "xmlsec>=1.3.9",
+    "lxml>=6.0.0",
+    "xmlsec>=1.3.14",
     "isodate>=0.6.1",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 
 [project.urls]
 Homepage = "https://saml.info"
@@ -58,7 +57,7 @@ lint = [
 package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
-"onelogin.saml2.schemas" = ["*.xsd"]
+"python3_saml.saml2.schemas" = ["*.xsd"]
 
 [tool.pytest.ini_options]
 minversion = "4.6.11"
@@ -99,7 +98,7 @@ branch = true
 
 [tool.coverage.paths]
 source = [
-    "src/onelogin/saml2"
+    "src/python3_saml/saml2"
 ]
 
 [tool.coverage.report]

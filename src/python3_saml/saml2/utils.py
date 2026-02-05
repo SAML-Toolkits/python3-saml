@@ -21,10 +21,10 @@ from xml.dom.minidom import Element
 import zlib
 import xmlsec
 
-from onelogin.saml2 import compat
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.errors import OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
-from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from python3_saml.saml2 import compat
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.errors import OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError
+from python3_saml.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 try:

@@ -8,9 +8,9 @@ SAML Response class of SAML Python Toolkit.
 """
 
 from copy import deepcopy
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
-from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
+from python3_saml.saml2.xml_utils import OneLogin_Saml2_XML
 
 
 class OneLogin_Saml2_Response(object):

@@ -12,12 +12,12 @@ from time import time
 import re
 from os.path import dirname, exists, join, sep
 
-from onelogin.saml2 import compat
-from onelogin.saml2.constants import OneLogin_Saml2_Constants
-from onelogin.saml2.errors import OneLogin_Saml2_Error
-from onelogin.saml2.metadata import OneLogin_Saml2_Metadata
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from python3_saml.saml2 import compat
+from python3_saml.saml2.constants import OneLogin_Saml2_Constants
+from python3_saml.saml2.errors import OneLogin_Saml2_Error
+from python3_saml.saml2.metadata import OneLogin_Saml2_Metadata
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.xml_utils import OneLogin_Saml2_XML
 
 try:
     import ujson as json

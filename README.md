@@ -95,7 +95,7 @@ Installation
 
 ### Dependencies ###
 
- * python => 3.7
+  * python => 3.8
  * [xmlsec](https://pypi.python.org/pypi/xmlsec) Python bindings for the XML Security Library.
  * [lxml](https://pypi.python.org/pypi/lxml) Python bindings for the libxml2 and libxslt libraries.
  * [isodate](https://pypi.python.org/pypi/isodate) An ISO 8601 date/time/
@@ -112,7 +112,7 @@ The toolkit is hosted on GitHub. You can download it from:
  * Latest release: https://github.com/saml-toolkits/python3-saml/releases/latest
  * Master repo: https://github.com/saml-toolkits/python3-saml/tree/master
 
-Find the core of the library at ``src/onelogin/saml2`` folder.
+Find the core of the library at ``src/python3_saml/saml2`` folder.
 
 #### Option 2. Download from pypi ####
 
@@ -165,7 +165,7 @@ In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs
 to be stored the amount of time of the SAML Message life time, so
 we don't need to store all processed message/assertion Ids, but the most recent ones.
 
-The OneLogin_Saml2_Auth class contains the [get_last_request_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L357), [get_last_message_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L364) and [get_last_assertion_id](https://github.com/onelogin/python3-saml/blob/ab62b0d6f3e5ac2ae8e95ce3ed2f85389252a32d/src/onelogin/saml2/auth.py#L371) methods to retrieve the IDs
+The OneLogin_Saml2_Auth class contains the `get_last_request_id`, `get_last_message_id` and `get_last_assertion_id` methods to retrieve the IDs
 
 Checking that the ID of the current Message/Assertion does not exists in the list of the ones already processed will prevent replay attacks.
 
@@ -181,7 +181,7 @@ Let's start describing them:
 
 #### src ####
 
-This folder contains the heart of the toolkit, **onelogin/saml2** folder contains the new version of
+This folder contains the heart of the toolkit, **python3_saml/saml2** folder contains the new version of
 the classes and methods that are described in a later section.
 
 #### demo-django ####
@@ -240,12 +240,12 @@ make pytest
 ```
 The previous line will run the tests for the whole toolkit. You can also run the tests for a specific module. To do so for the auth module you would have to execute this:
 ```
-pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test
+pytest tests/src/Python3Saml/saml2_tests/auth_test.py::Python3Saml_Saml2_Auth_Test
 ```
 
 Or for an specific method:
 ```
-pytest tests/src/OneLogin/saml2_tests/auth_test.py::OneLogin_Saml2_Auth_Test::testBuildRequestSignature
+pytest tests/src/Python3Saml/saml2_tests/auth_test.py::Python3Saml_Saml2_Auth_Test::testBuildRequestSignature
 ```
 
 
@@ -325,7 +325,7 @@ This is the ``settings.json`` file:
         },
         // Specifies the constraints on the name identifier to be used to
         // represent the requested subject.
-        // Take a look on src/onelogin/saml2/constants.py to see the NameIdFormat that are supported.
+        // Take a look on src/python3_saml/saml2/constants.py to see the NameIdFormat that are supported.
         "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
         // Usually X.509 cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
@@ -609,9 +609,9 @@ In order to use the toolkit library you need to import the file that contains th
 on the top of your python file.
 
 ``` python
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from python3_saml.saml2.auth import OneLogin_Saml2_Auth
+from python3_saml.saml2.settings import OneLogin_Saml2_Settings
+from python3_saml.saml2.utils import OneLogin_Saml2_Utils
 ```
 
 #### The Request ####
@@ -678,7 +678,7 @@ An explanation of some advanced request parameters:
 In order to send an ``AuthNRequest`` to the IdP:
 
 ```python
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
+from python3_saml.saml2.auth import OneLogin_Saml2_Auth
 
 req = prepare_request_for_toolkit(request)
 auth = OneLogin_Saml2_Auth(req)   # Constructor of the SP, loads settings.json

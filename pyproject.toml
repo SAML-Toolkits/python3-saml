@@ -23,7 +23,6 @@ keywords = [
     "identity",
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -32,11 +31,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "lxml>=4.6.5,!=4.7.0",
-    "xmlsec>=1.3.9",
+    "lxml>=6.0.0",
+    "xmlsec>=1.3.14",
     "isodate>=0.6.1",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 
 [project.urls]
 Homepage = "https://saml.info"

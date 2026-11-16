@@ -97,18 +97,18 @@ class OneLogin_Saml2_Settings_Test(unittest.TestCase):
 
         # test if the cert-file is loaded correct with the default filename
         settings_info = self.loadSettingsJSON()
-        settings_info['security']['nameIdEncrypted'] = True
-        del settings_info['idp']['x509cert']
+        settings_info["security"]["nameIdEncrypted"] = True
+        del settings_info["idp"]["x509cert"]
         settings_7 = OneLogin_Saml2_Settings(settings_info)
         self.assertEqual(len(settings_7.get_errors()), 0)
 
         # test if the cert-file is loaded correct with a custom filename
-        settings_info['idp']['cert_filename'] = "Test_Root_CA.crt"
+        settings_info["idp"]["cert_filename"] = "Test_Root_CA.crt"
         settings_8 = OneLogin_Saml2_Settings(settings_info)
         self.assertEqual(len(settings_8.get_errors()), 0)
 
         # test for the correct error, if there is no cert at all
-        settings_info['idp']['cert_filename'] = "not_existing_file.crt"
+        settings_info["idp"]["cert_filename"] = "not_existing_file.crt"
         try:
             settings_9 = OneLogin_Saml2_Settings(settings_info)
             self.assertNotEqual(len(settings_9.get_errors()), 0)

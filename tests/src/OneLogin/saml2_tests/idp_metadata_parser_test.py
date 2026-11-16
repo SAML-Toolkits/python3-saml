@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-
-
-from urllib.error import URLError
+from email.message import Message
+from io import BytesIO
+from urllib.error import URLError, HTTPError
 
 from copy import deepcopy
 import json
 from os.path import dirname, join, exists
 from lxml.etree import XMLSyntaxError
+from unittest.mock import patch
 import unittest
 
 from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
@@ -32,6 +33,12 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         else:
             raise Exception("Settings json file does not exist")
 
+    @staticmethod
+    def makeRedirectError():
+        headers = Message()
+        headers["Location"] = "https://www.example.net"
+        return HTTPError(url="https://www.example.com", code=302, msg="found", hdrs=headers, fp=BytesIO(b""))
+
     def file_contents(self, filename):
         f = open(filename, "r")
         content = f.read()
@@ -51,12 +58,29 @@ class OneLogin_Saml2_IdPMetadataParser_Test(unittest.TestCase):
         except URLError:
             pass
 
+        # verify that not following redirects works with direct url
+        try:
+            data = OneLogin_Saml2_IdPMetadataParser.get_metadata("https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml", validate_cert=False, follow_redirects=False)
+            self.assertTrue(data is not None and data is not {})
+        except URLError:
+            pass
+
     def testGetMetadataWithHeaders(self):
         data = OneLogin_Saml2_IdPMetadataParser.get_metadata(
             "https://raw.githubusercontent.com/SAML-Toolkits/python3-saml/master/tests/data/metadata/testshib-providers.xml", validate_cert=False, headers={"User-Agent": "Mozilla/5.0"}
         )
         self.assertIsNotNone(data)
         self.assertIn(b"entityID=", data)
+
+    @patch("onelogin.saml2.idp_metadata_parser.build_opener")
+    def testGetMetadataRedirect(self, mocked_build_opener):
+        redirect_error = self.makeRedirectError()
+        mock_opener = mocked_build_opener.return_value
+        mock_opener.open.side_effect = redirect_error
+        with self.assertRaises(HTTPError) as exc:
+            OneLogin_Saml2_IdPMetadataParser.get_metadata("https://www.example.com", validate_cert=False, follow_redirects=False)
+        error = exc.exception
+        self.assertTrue(error.code == 302)
 
     def testParseRemote(self):
         """

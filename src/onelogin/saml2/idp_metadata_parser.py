@@ -6,7 +6,7 @@ Metadata class of SAML Python Toolkit.
 
 
 from copy import deepcopy
-from urllib.request import Request, urlopen
+from urllib.request import Request, build_opener, urlopen, HTTPRedirectHandler, HTTPSHandler
 
 import ssl
 
@@ -31,6 +31,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         capath=None,
         timeout=None,
         headers=None,
+        *,
+        follow_redirects=True,
     ):
         """
         Gets the metadata XML from the provided URL
@@ -44,6 +46,8 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :type timeout: int
         :param headers: Extra headers to send in the request
         :type headers: dict
+        :param follow_redirects: Whether to follow redirects when fetching metadata, default True
+        :type follow_redirects: bool
 
         :returns: metadata XML
         :rtype: string
@@ -54,16 +58,24 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         ctx = None
         if not validate_cert:
             if cafile or capath:
-                raise ValueError(
-                    "Specifying 'cafile' or 'capath' while disabling certificate "
-                    "validation is contradictory."
-                )
+                raise ValueError("Specifying 'cafile' or 'capath' while disabling certificate " "validation is contradictory.")
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
 
         request = Request(url, headers=headers or {})
-        response = urlopen(request, timeout=timeout, cafile=cafile, capath=capath, context=ctx)
+        if follow_redirects:
+            response = urlopen(request, timeout=timeout, cafile=cafile, capath=capath, context=ctx)
+        else:
+
+            class NoRedirect(HTTPRedirectHandler):
+                def redirect_request(self, req, fp, code, msg, headers, newurl):
+                    pass
+
+            if ctx is None:
+                ctx = ssl.create_default_context(cafile=cafile, capath=capath)
+            no_redirect_opener = build_opener(NoRedirect, HTTPSHandler(context=ctx))
+            response = no_redirect_opener.open(request, timeout=timeout)
         xml = response.read()
 
         if xml:
@@ -81,7 +93,7 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         return xml
 
     @classmethod
-    def parse_remote(cls, url, validate_cert=True, entity_id=None, timeout=None, **kwargs):
+    def parse_remote(cls, url, validate_cert=True, entity_id=None, timeout=None, follow_redirects=True, **kwargs):
         """
         Gets the metadata XML from the provided URL and parse it, returning a dict with extracted data
         :param url: Url where the XML of the Identity Provider Metadata is published.
@@ -97,10 +109,13 @@ class OneLogin_Saml2_IdPMetadataParser(object):
         :param timeout: Timeout in seconds to wait for metadata response
         :type timeout: int
 
+        :param follow_redirects: Follow redirects when fetching metadata, default True
+        :type follow_redirects: bool
+
         :returns: settings dict with extracted data
         :rtype: dict
         """
-        idp_metadata = cls.get_metadata(url, validate_cert, timeout, headers=kwargs.pop("headers", None))
+        idp_metadata = cls.get_metadata(url, validate_cert, timeout, headers=kwargs.pop("headers", None), follow_redirects=follow_redirects)
         return cls.parse(idp_metadata, entity_id=entity_id, **kwargs)
 
     @classmethod
